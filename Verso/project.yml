@@ -46,3 +46,27 @@ targets:
         com.apple.developer.ubiquity-container-identifiers:
           - iCloud.$(CFBundleIdentifier)
         com.apple.developer.ubiquity-kvstore-identifier: $(TeamIdentifierPrefix)$(CFBundleIdentifier)
+        com.apple.security.application-groups:
+          - group.com.fabiosasseron.verso
+
+  ShareExtension:
+    type: app-extension
+    platform: iOS
+    productName: ShareExtension
+    bundleId: com.fabiosasseron.verso.ShareExtension
+    sources:
+      - ShareExtension/Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fabiosasseron.verso.ShareExtension
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        SWIFT_VERSION: 5.0
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_FILE: ShareExtension/Resources/Info.plist
+        DEVELOPMENT_TEAM: "$(DEVELOPMENT_TEAM)"
+    entitlements:
+      path: ShareExtension/Resources/ShareExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.fabiosasseron.verso
