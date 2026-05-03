@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframes — Verso</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #E5E5EA;
+      color: #1C1C1E;
+      padding: 48px 32px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .doc-meta {
+      font-size: 13px;
+      color: #636366;
+      margin-bottom: 48px;
+    }
+
+    /* Section headings */
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1C1C1E;
+      border-bottom: 2px solid #1C1C1E;
+      padding-bottom: 8px;
+      margin-bottom: 32px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 13px;
+    }
+
+    .frames-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      align-items: flex-start;
+    }
+
+    /* Phone frame */
+    .frame-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .frame-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #3A3A3C;
+      text-align: center;
+    }
+
+    .phone {
+      width: 390px;
+      height: 844px;
+      border: 2.5px solid #1C1C1E;
+      border-radius: 50px;
+      background: #fff;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+    }
+
+    /* Status bar */
+    .status-bar {
+      height: 50px;
+      padding: 14px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .status-bar .time {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .status-bar .icons {
+      font-size: 12px;
+      color: #1C1C1E;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Nav bar */
+    .nav-bar {
+      height: 44px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      border-bottom: 0.5px solid #C6C6C8;
+    }
+
+    .nav-bar .title,
+    .nav-bar-title {
+      font-size: 17px;
+      font-weight: 600;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-bar .large-title {
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    /* Large title nav (iOS style with large title) */
+    .nav-large {
+      padding: 8px 20px 12px;
+      border-bottom: 0.5px solid #C6C6C8;
+      flex-shrink: 0;
+    }
+
+    /* Screen body */
+    .screen-body {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      height: 83px;
+      border-top: 0.5px solid #C6C6C8;
+      display: flex;
+      align-items: flex-start;
+      padding-top: 10px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.92);
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .tab-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .tab-label {
+      font-size: 10px;
+      color: #8E8E93;
+    }
+
+    .tab-item.active .tab-icon,
+    .tab-item.active .tab-label {
+      color: #007AFF;
+    }
+
+    /* Article card */
+    .article-card {
+      padding: 14px 20px;
+      border-bottom: 0.5px solid #E5E5EA;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #007AFF;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .unread-dot.read {
+      background: transparent;
+    }
+
+    .article-info { flex: 1; }
+
+    .article-title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #1C1C1E;
+      margin-bottom: 4px;
+    }
+
+    .article-title.read {
+      font-weight: 400;
+      color: #3A3A3C;
+    }
+
+    .article-meta {
+      font-size: 12px;
+      color: #8E8E93;
+    }
+
+    /* Article card — swiped state */
+    .article-card-swiped {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .swipe-action {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 90px;
+      background: #FF3B30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .article-card-swiped .article-card-inner {
+      transform: translateX(-90px);
+    }
+
+    /* Empty state */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1C1C1E;
+    }
+
+    .empty-subtitle {
+      font-size: 14px;
+      color: #8E8E93;
+      line-height: 1.5;
+    }
+
+    /* Reading view */
+    .reading-content {
+      flex: 1;
+      padding: 24px 40px;
+      overflow: hidden;
+    }
+
+    .article-big-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .article-source-line {
+      font-size: 13px;
+      color: #8E8E93;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .text-line {
+      height: 12px;
+      background: #D1D1D6;
+      border-radius: 6px;
+      margin-bottom: 9px;
+    }
+
+    .text-line.short { width: 60%; }
+    .text-line.medium { width: 80%; }
+    .text-line.full { width: 100%; }
+    .text-line.xshort { width: 40%; }
+
+    .text-gap { height: 16px; }
+
+    /* Reading bottom bar */
+    .reading-controls {
+      height: 64px;
+      border-top: 0.5px solid #C6C6C8;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 12px;
+      background: rgba(255,255,255,0.95);
+      flex-shrink: 0;
+    }
+
+    .ctrl-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 10px;
+    }
+
+    .ctrl-icon { font-size: 18px; }
+    .ctrl-label { font-size: 9px; color: #8E8E93; }
+
+    /* Reading top bar */
+    .reading-top-bar {
+      height: 44px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.5px solid #C6C6C8;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.95);
+    }
+
+    .back-btn { font-size: 15px; color: #007AFF; display: flex; align-items: center; gap: 2px; }
+    .reading-bar-title { font-size: 13px; color: #636366; font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Immersive overlay annotation */
+    .immersive-note {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* Onboarding screens */
+    .onboarding-body {
+      flex: 1;
+      padding: 32px 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ob-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 18px;
+      background: #1C1C1E;
+      margin: 20px 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    .ob-headline {
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .ob-subtext {
+      font-size: 15px;
+      color: #636366;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 40px;
+    }
+
+    .ob-spacer { flex: 1; }
+
+    .btn-primary {
+      width: 100%;
+      height: 50px;
+      background: #1C1C1E;
+      color: white;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .btn-secondary {
+      font-size: 15px;
+      color: #007AFF;
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    /* Theme picker */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .theme-card {
+      border-radius: 12px;
+      border: 2px solid transparent;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .theme-card.selected {
+      border-color: #007AFF;
+    }
+
+    .theme-card .tc-name {
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .theme-card .tc-title {
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .theme-card .tc-body {
+      height: 7px;
+      border-radius: 4px;
+      opacity: 0.4;
+      margin-bottom: 3px;
+    }
+
+    /* Paper */
+    .theme-paper { background: #F5F0E8; }
+    .theme-paper .tc-name { color: #6E675F; }
+    .theme-paper .tc-title { color: #2C2924; }
+    .theme-paper .tc-body { background: #2C2924; }
+
+    /* Sepia */
+    .theme-sepia { background: #F2E8D5; }
+    .theme-sepia .tc-name { color: #755E40; }
+    .theme-sepia .tc-title { color: #2E2013; }
+    .theme-sepia .tc-body { background: #2E2013; }
+
+    /* Night */
+    .theme-night { background: #1C1A16; }
+    .theme-night .tc-name { color: #8F897F; }
+    .theme-night .tc-title { color: #E8E0D0; }
+    .theme-night .tc-body { background: #E8E0D0; }
+
+    /* Ink */
+    .theme-ink { background: #111418; }
+    .theme-ink .tc-name { color: #7E8492; }
+    .theme-ink .tc-title { color: #E4E6EB; }
+    .theme-ink .tc-body { background: #E4E6EB; }
+
+    /* Folder setup */
+    .folder-box {
+      width: 100%;
+      background: #F2F2F7;
+      border: 1.5px dashed #C6C6C8;
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .folder-icon { font-size: 40px; }
+
+    .folder-hint {
+      font-size: 12px;
+      color: #8E8E93;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* Obsidian tip */
+    .obs-box {
+      width: 100%;
+      background: #F2F2F7;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .obs-gem { font-size: 28px; }
+
+    .obs-text { font-size: 13px; color: #3A3A3C; line-height: 1.5; }
+
+    /* Share sheet illustration */
+    .share-illustration {
+      width: 100%;
+      background: #F2F2F7;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .share-top {
+      background: white;
+      padding: 16px 16px 10px;
+      border-bottom: 0.5px solid #E5E5EA;
+    }
+
+    .share-bar {
+      display: flex;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .share-app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .share-app-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #D1D1D6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .share-app-icon.highlight {
+      background: #1C1C1E;
+      box-shadow: 0 0 0 3px #007AFF;
+    }
+
+    .share-app-label { font-size: 10px; color: #636366; }
+
+    /* Settings */
+    .settings-section {
+      padding: 0 20px;
+      margin-bottom: 8px;
+    }
+
+    .settings-section-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: #636366;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 16px 0 8px;
+    }
+
+    .settings-group {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .settings-row {
+      padding: 12px 16px;
+      border-bottom: 0.5px solid #E5E5EA;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .settings-row:last-child { border-bottom: none; }
+
+    .settings-row-label { font-size: 15px; color: #1C1C1E; }
+    .settings-row-value { font-size: 15px; color: #8E8E93; display: flex; align-items: center; gap: 4px; }
+    .settings-row-badge {
+      font-size: 12px;
+      background: #007AFF;
+      color: white;
+      border-radius: 10px;
+      padding: 1px 8px;
+    }
+
+    .theme-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .theme-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.15);
+    }
+
+    .font-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .font-chip {
+      border: 1px solid #C6C6C8;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+
+    .font-chip.active {
+      border-color: #007AFF;
+      color: #007AFF;
+    }
+
+    .size-stepper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .size-stepper span { font-size: 11px; color: #8E8E93; }
+
+    .preset-chips {
+      display: flex;
+      gap: 5px;
+    }
+
+    .preset-chip {
+      border: 1px solid #C6C6C8;
+      border-radius: 8px;
+      padding: 3px 7px;
+      font-size: 11px;
+      color: #636366;
+    }
+
+    .preset-chip.active {
+      background: #1C1C1E;
+      color: white;
+      border-color: #1C1C1E;
+    }
+
+    /* Annotations */
+    .annotations {
+      max-width: 280px;
+    }
+
+    .annotation {
+      background: #FFF9C4;
+      border-left: 3px solid #F5C400;
+      border-radius: 0 6px 6px 0;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #3A3A3C;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .annotation strong {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    /* Frame + annotation side by side */
+    .frame-with-notes {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .pr-indicator {
+      height: 3px;
+      background: #007AFF;
+      width: 40px;
+      border-radius: 2px;
+      margin: 8px auto 0;
+    }
+
+    /* Filter chips */
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 0.5px solid #E5E5EA;
+      flex-shrink: 0;
+    }
+
+    .filter-chip {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid #C6C6C8;
+      color: #3A3A3C;
+      white-space: nowrap;
+    }
+
+    .filter-chip.active {
+      background: #1C1C1E;
+      color: white;
+      border-color: #1C1C1E;
+    }
+
+    /* Reading (in-progress) dot — half-filled circle */
+    .reading-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #007AFF 50%, transparent 50%);
+      border: 1.5px solid #007AFF;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Wireframes — Verso</h1>
+  <p class="doc-meta">Version 1.3 &nbsp;·&nbsp; 2026-04-19 &nbsp;·&nbsp; Low-fidelity &nbsp;·&nbsp; All screens at 390×844pt (iPhone 14)</p>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: READING LIST                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">01 — Reading List</div>
+    <div class="frames-row">
+
+      <!-- 1A: Populated — All filter -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">1A — Reading List (All, populated)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="nav-large">
+              <div style="display:flex;justify-content:flex-end;margin-bottom:4px;gap:4px;">
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">🔍</div>
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">⚙️</div>
+              </div>
+              <span class="large-title">Reading List</span>
+            </div>
+            <div class="filter-chips">
+              <div class="filter-chip active">All</div>
+              <div class="filter-chip">Unread</div>
+              <div class="filter-chip">Reading</div>
+              <div class="filter-chip">Read</div>
+            </div>
+            <div class="screen-body">
+              <div class="pr-indicator"></div>
+              <!-- Swiped card -->
+              <div class="article-card-swiped" style="position:relative;overflow:hidden;border-bottom:0.5px solid #E5E5EA;">
+                <div class="swipe-action">Delete</div>
+                <div class="article-card-inner" style="transform:translateX(-90px);padding:14px 20px;display:flex;gap:12px;background:white;">
+                  <div class="unread-dot"></div>
+                  <div class="article-info">
+                    <div class="article-title">The Knowledge Graph Approach to Personal Research</div>
+                    <div class="article-meta">lesswrong.com · Apr 19</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Unread -->
+              <div class="article-card">
+                <div class="unread-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">Why Markdown Is the Future of Writing</div>
+                  <div class="article-meta">medium.com · Apr 18</div>
+                </div>
+              </div>
+              <!-- Reading (in progress) -->
+              <div class="article-card">
+                <div class="reading-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">How I Redesigned My Reading Workflow</div>
+                  <div class="article-meta">zettelkasten.de · Apr 16</div>
+                </div>
+              </div>
+              <!-- Reading (in progress) -->
+              <div class="article-card">
+                <div class="reading-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">SwiftUI for Beginners: Building Your First App</div>
+                  <div class="article-meta">hackingwithswift.com · Apr 14</div>
+                </div>
+              </div>
+              <!-- Read -->
+              <div class="article-card">
+                <div class="unread-dot read"></div>
+                <div class="article-info">
+                  <div class="article-title read">The Obsidian Ecosystem in 2026</div>
+                  <div class="article-meta">obsidian.md · Apr 12</div>
+                </div>
+              </div>
+              <!-- Read -->
+              <div class="article-card">
+                <div class="unread-dot read"></div>
+                <div class="article-info">
+                  <div class="article-title read">On Designing for Stillness</div>
+                  <div class="article-meta">frankchimero.com · Apr 10</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Nav bar icons</strong>🔍 triggers inline search (replaces the Reading List state — no push). ⚙️ opens Settings as a full-screen modal. No tab bar — Verso uses a single NavigationStack.</div>
+          <div class="annotation"><strong>Filter chips</strong>All / Unread / Reading / Read — sit below the large title. "All" selected by default, dark pill indicates active state.</div>
+          <div class="annotation"><strong>Unread</strong>Solid blue dot. Bold title. Article has not been opened yet.</div>
+          <div class="annotation"><strong>Reading</strong>Half-filled dot — blue left half, transparent right half with a blue border. Indicates the user opened but hasn't finished. Title stays bold.</div>
+          <div class="annotation"><strong>Read</strong>No dot. Title drops to regular weight, slightly dimmer. Coexists with other states in the All view.</div>
+          <div class="annotation"><strong>Pull-to-refresh</strong>Small blue bar at top — syncs with iCloud Drive. No spinner.</div>
+          <div class="annotation"><strong>Swipe to delete</strong>Top card shown mid-swipe revealing the red Delete action. Only destructive action in MVP.</div>
+        </div>
+      </div>
+
+      <!-- 1B: Populated — Unread filter -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">1B — Reading List (Unread filter)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="nav-large">
+              <div style="display:flex;justify-content:flex-end;margin-bottom:4px;gap:4px;">
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">🔍</div>
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">⚙️</div>
+              </div>
+              <span class="large-title">Reading List</span>
+            </div>
+            <div class="filter-chips">
+              <div class="filter-chip">All</div>
+              <div class="filter-chip active">Unread</div>
+              <div class="filter-chip">Reading</div>
+              <div class="filter-chip">Read</div>
+            </div>
+            <div class="screen-body">
+              <div class="article-card">
+                <div class="unread-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">The Knowledge Graph Approach to Personal Research</div>
+                  <div class="article-meta">lesswrong.com · Apr 19</div>
+                </div>
+              </div>
+              <div class="article-card">
+                <div class="unread-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">Why Markdown Is the Future of Writing</div>
+                  <div class="article-meta">medium.com · Apr 18</div>
+                </div>
+              </div>
+              <div class="article-card">
+                <div class="unread-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">Building a Second Brain</div>
+                  <div class="article-meta">fortelabs.com · Apr 13</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Filtered view</strong>Only unread articles — Reading and Read items are hidden. Shorter, less noisy list.</div>
+          <div class="annotation"><strong>Uniform state</strong>Every card here is unread by definition, so all dots are solid blue. No mixed states to scan.</div>
+        </div>
+      </div>
+
+      <!-- 1C: Empty — All filter -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">1C — Empty State (All)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="nav-large">
+              <div style="display:flex;justify-content:flex-end;margin-bottom:4px;gap:4px;">
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">🔍</div>
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">⚙️</div>
+              </div>
+              <span class="large-title">Reading List</span>
+            </div>
+            <div class="filter-chips">
+              <div class="filter-chip active">All</div>
+              <div class="filter-chip">Unread</div>
+              <div class="filter-chip">Reading</div>
+              <div class="filter-chip">Read</div>
+            </div>
+            <div class="screen-body">
+              <div class="empty-state">
+                <div class="empty-icon">📂</div>
+                <div class="empty-title">Nothing here yet</div>
+                <div class="empty-subtitle">Share any article from Safari or another app, and it'll appear here as a Markdown file in your iCloud Drive.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Copy: "Nothing here yet"</strong>Generic — shown when the user has zero articles total. Prompts the core save action and explains where files live.</div>
+          <div class="annotation"><strong>Chips present in empty state</strong>Filter chips are still rendered — they're part of the persistent nav pattern, not a list-only element.</div>
+        </div>
+      </div>
+
+      <!-- 1D: Empty — Unread filter -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">1D — Empty State (Unread)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="nav-large">
+              <div style="display:flex;justify-content:flex-end;margin-bottom:4px;gap:4px;">
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">🔍</div>
+                <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">⚙️</div>
+              </div>
+              <span class="large-title">Reading List</span>
+            </div>
+            <div class="filter-chips">
+              <div class="filter-chip">All</div>
+              <div class="filter-chip active">Unread</div>
+              <div class="filter-chip">Reading</div>
+              <div class="filter-chip">Read</div>
+            </div>
+            <div class="screen-body">
+              <div class="empty-state">
+                <div class="empty-icon">✅</div>
+                <div class="empty-title">You're all caught up!</div>
+                <div class="empty-subtitle">No unread articles. Start reading something new, or check the Reading or Read tabs.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Copy: "You're all caught up!"</strong>Positive framing — having nothing unread is a good thing. Avoids guilt-tripping the user into saving more.</div>
+          <div class="annotation"><strong>Subtitle redirects</strong>Nudges toward other tabs rather than prompting to save — respects that the user may simply be up to date.</div>
+        </div>
+      </div>
+
+      <!-- 1E: Empty — Reading filter -->
+      <div class="frame-wrapper">
+        <div class="frame-label">1E — Empty State (Reading)</div>
+        <div class="phone">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="icons">▶ ☁ 📶 🔋</div>
+          </div>
+          <div class="nav-large">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:4px;gap:4px;">
+              <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">🔍</div>
+              <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">⚙️</div>
+            </div>
+            <span class="large-title">Reading List</span>
+          </div>
+          <div class="filter-chips">
+            <div class="filter-chip">All</div>
+            <div class="filter-chip">Unread</div>
+            <div class="filter-chip active">Reading</div>
+            <div class="filter-chip">Read</div>
+          </div>
+          <div class="screen-body">
+            <div class="empty-state">
+              <div class="empty-icon">📖</div>
+              <div class="empty-title">Nothing in progress</div>
+              <div class="empty-subtitle">Open an article to start reading. It'll move here automatically as you go.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1F: Empty — Read filter -->
+      <div class="frame-wrapper">
+        <div class="frame-label">1F — Empty State (Read)</div>
+        <div class="phone">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="icons">▶ ☁ 📶 🔋</div>
+          </div>
+          <div class="nav-large">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:4px;gap:4px;">
+              <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">🔍</div>
+              <div style="font-size:18px;color:#1C1C1E;padding:2px 6px;">⚙️</div>
+            </div>
+            <span class="large-title">Reading List</span>
+          </div>
+          <div class="filter-chips">
+            <div class="filter-chip">All</div>
+            <div class="filter-chip">Unread</div>
+            <div class="filter-chip">Reading</div>
+            <div class="filter-chip active">Read</div>
+          </div>
+          <div class="screen-body">
+            <div class="empty-state">
+              <div class="empty-icon">📚</div>
+              <div class="empty-title">Nothing read yet</div>
+              <div class="empty-subtitle">Finished articles will appear here. Mark an article as read from the reading view.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1G: Search Active — results -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">1G — Search Active (results)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Nav with search title and X -->
+            <div class="nav-large">
+              <span class="large-title">Search</span>
+            </div>
+            <!-- Inline search bar -->
+            <div style="padding:10px 16px;background:white;border-bottom:0.5px solid #E5E5EA;display:flex;align-items:center;gap:8px;">
+              <div style="flex:1;height:36px;background:#F2F2F7;border-radius:10px;display:flex;align-items:center;padding:0 12px;">
+                <div style="font-size:15px;color:#1C1C1E;">markdown</div>
+              </div>
+              <div style="font-size:18px;color:#636366;">✕</div>
+            </div>
+            <!-- Filter chips: Status row -->
+            <div class="filter-chips" style="border-bottom:none;padding-bottom:4px;">
+              <div class="filter-chip active">All</div>
+              <div class="filter-chip">Unread</div>
+              <div class="filter-chip">Reading</div>
+              <div class="filter-chip">Read</div>
+            </div>
+            <!-- Filter chips: Date row -->
+            <div class="filter-chips" style="border-bottom:0.5px solid #E5E5EA;padding-top:4px;">
+              <div class="filter-chip active">Today</div>
+              <div class="filter-chip">This Week</div>
+              <div class="filter-chip">This Month</div>
+              <div class="filter-chip">Older</div>
+            </div>
+            <div class="screen-body">
+              <!-- Matching article: unread -->
+              <div class="article-card">
+                <div class="unread-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">Why Markdown Is the Future of Writing</div>
+                  <div class="article-meta">medium.com · Apr 18</div>
+                </div>
+              </div>
+              <!-- Matching article: reading -->
+              <div class="article-card">
+                <div class="reading-dot"></div>
+                <div class="article-info">
+                  <div class="article-title">How I Redesigned My Reading Workflow</div>
+                  <div class="article-meta">zettelkasten.de · Apr 16</div>
+                </div>
+              </div>
+              <!-- Matching article: read -->
+              <div class="article-card">
+                <div class="unread-dot read"></div>
+                <div class="article-info">
+                  <div class="article-title read">The Obsidian Ecosystem in 2026</div>
+                  <div class="article-meta">obsidian.md · Apr 12</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Trigger</strong>Tap search icon in nav bar → search view replaces Reading List. NOT a separate tab.</div>
+          <div class="annotation"><strong>Title: "Search"</strong>Replaces "Reading List" large title. Cancel button appears to the right of the search bar — not in the nav bar.</div>
+          <div class="annotation"><strong>Inline search bar</strong>Real-time filtering on keystroke. No submit button. Placeholder: "Search titles..."</div>
+          <div class="annotation"><strong>Filter rows</strong>Two rows: Status (All/Unread/Reading/Read) + Date (Today/This Week/This Month/Older). Same chip style.</div>
+          <div class="annotation"><strong>Date range chips</strong>Discrete chips (Today / This Week / This Month / Older) are the MVP implementation. A full calendar date picker is post-MVP.</div>
+          <div class="annotation"><strong>Tag filter: NOT included</strong>Tag filtering is post-MVP per PRD §4.2.5.</div>
+          <div class="annotation"><strong>X dismiss</strong>Tap ✕ to clear query, return to Reading List view.</div>
+          <div class="annotation"><strong>No tab bar</strong>Search is inline state, not separate destination. Tab bar hidden.</div>
+        </div>
+      </div>
+
+      <!-- 1H: Search Active — empty state -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">1H — Search Active (empty)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Nav with search title and X -->
+            <div class="nav-large">
+              <span class="large-title">Search</span>
+            </div>
+            <!-- Inline search bar with query -->
+            <div style="padding:10px 16px;background:white;border-bottom:0.5px solid #E5E5EA;display:flex;align-items:center;gap:8px;">
+              <div style="flex:1;height:36px;background:#F2F2F7;border-radius:10px;display:flex;align-items:center;padding:0 12px;">
+                <div style="font-size:15px;color:#1C1C1E;">markdown</div>
+              </div>
+              <div style="font-size:18px;color:#636366;">✕</div>
+            </div>
+            <!-- Filter chips: Status row -->
+            <div class="filter-chips" style="border-bottom:none;padding-bottom:4px;">
+              <div class="filter-chip active">All</div>
+              <div class="filter-chip">Unread</div>
+              <div class="filter-chip">Reading</div>
+              <div class="filter-chip">Read</div>
+            </div>
+            <!-- Filter chips: Date row -->
+            <div class="filter-chips" style="border-bottom:0.5px solid #E5E5EA;padding-top:4px;">
+              <div class="filter-chip">Today</div>
+              <div class="filter-chip">This Week</div>
+              <div class="filter-chip">This Month</div>
+              <div class="filter-chip active">Older</div>
+            </div>
+            <div class="screen-body">
+              <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-title">No results for 'markdown'</div>
+                <div class="empty-subtitle">Try a different search term or adjust your filters.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Query displayed</strong>Search term appears in the input field ("markdown") so user knows what they searched.</div>
+          <div class="annotation"><strong>Empty copy: "No results for 'query'"</strong>Specific message showing the search term. Includes hint to adjust filters.</div>
+          <div class="annotation"><strong>Filters preserved</strong>Status and Date chips still visible. User can adjust without re-typing.</div>
+          <div class="annotation"><strong>No suggestions</strong>Auto-suggestions are NOT in MVP scope per PRD.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: READING VIEW                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">02 — Reading View</div>
+    <div class="frames-row">
+
+      <!-- 2A: Chrome Visible -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">2A — Chrome Visible</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Top bar: Surface #EDE8DF -->
+            <div class="reading-top-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div class="back-btn" style="color:#766655;">‹ Home</div>
+              <div class="reading-bar-title" style="color:#2C2924;">Why Markdown Is the Future...</div>
+              <div style="font-size:12px;color:#6E675F;">5 min left <span style="font-size:10px;color:#8E8E93;">[post-MVP]</span></div>
+            </div>
+            <div class="reading-content" style="padding:24px 40px;">
+              <!-- Article header -->
+              <div class="article-big-title" style="color:#2C2924;">Why Markdown Is the Future of Writing</div>
+              <div class="article-source-line" style="color:#6E675F;">
+                <span>medium.com</span>
+                <span>·</span>
+                <span>Apr 18, 2026</span>
+              </div>
+              <!-- Body text placeholders -->
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line medium" style="background:#2C2924;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line short" style="background:#2C2924;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line medium" style="background:#2C2924;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line xshort" style="background:#2C2924;"></div>
+            </div>
+            <!-- Bottom bar: Surface #EDE8DF -->
+            <div class="reading-controls" style="background:#EDE8DF;border-top:0.5px solid #DDD8CE;justify-content:space-around;padding:0 8px;">
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A−</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A+</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">↕</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">⇔</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="width:22px;height:22px;border-radius:50%;background:#F5F0E8;border:2px solid #766655;display:flex;align-items:center;justify-content:center;"></div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#766655;">✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Navigation</strong>Reading View is a NavigationStack <em>push</em> from Home — NO tab bar.</div>
+          <div class="annotation"><strong>Top bar</strong>Back chevron → Home, article title (truncated, center), reading time (right, labeled "post-MVP"). Surface #EDE8DF.</div>
+          <div class="annotation"><strong>Bottom bar icons</strong>Icon-only. Each icon has a 44×44pt touch target (padded with 10px). Colors: Text Primary #2C2924, Accent #766655 for active states.</div>
+          <div class="annotation"><strong>Typography</strong>Font: New York (default). Body: 18pt. Line height: 1.75× (Relaxed). Margins: 40px each side (Wide preset).</div>
+          <div class="annotation"><strong>Paper theme colors</strong>Background #F5F0E8. Text Primary #2C2924. Text Secondary #6E675F. Surface #EDE8DF (bars). Accent #766655.</div>
+          <div class="annotation"><strong>Article header</strong>H1: 28pt Bold (article title inside scroll). Source & date: Text Secondary #6E675F.</div>
+        </div>
+      </div>
+
+      <!-- 2B: Immersive / Chrome Hidden -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">2B — Immersive (Chrome Hidden)</div>
+          <div class="phone" style="background:#F5F0E8;position:relative;">
+            <div class="status-bar" style="opacity:0.4;">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="reading-content" style="padding:20px 40px;flex:1;">
+              <div class="article-big-title" style="color:#2C2924;">Why Markdown Is the Future of Writing</div>
+              <div class="article-source-line" style="color:#6E675F;">
+                <span>medium.com</span>
+                <span>·</span>
+                <span>Apr 18, 2026</span>
+              </div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line medium" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line short" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line medium" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line xshort" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-gap"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.9;"></div>
+              <div class="text-line medium" style="background:#2C2924;opacity:0.9;"></div>
+            </div>
+            <div class="immersive-note">Tap anywhere to reveal</div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Immersive mode</strong>Chrome hides automatically after 2 seconds of inactivity. Scroll does NOT trigger show/hide — only tap does.</div>
+          <div class="annotation"><strong>Reveal trigger</strong>User taps anywhere → chrome fades back in. Returns to hidden after 3 seconds.</div>
+          <div class="annotation"><strong>Status bar</strong>Hidden in immersive mode via prefersStatusBarHidden. Returns when chrome is revealed.</div>
+          <div class="annotation"><strong>First-use hint</strong>"Tap anywhere to reveal" pill shown on first article open only. Dismissed on first tap and never shown again (flag persisted via UserDefaults: <code>hasShownImmersiveHint</code>). Not shown when VoiceOver is active — chrome stays permanently visible in that case.</div>
+        </div>
+      </div>
+
+      <!-- 2C: Reader Settings Sheet -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">2C — Reader Settings (.medium sheet)</div>
+          <div class="phone" style="background:#F5F0E8;position:relative;">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Top bar behind sheet -->
+            <div class="reading-top-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;opacity:0.95;">
+              <div class="back-btn" style="color:#766655;">‹ Home</div>
+              <div class="reading-bar-title" style="color:#2C2924;">Why Markdown Is the Future...</div>
+              <div style="font-size:12px;color:#6E675F;">5 min left</div>
+            </div>
+            <!-- Article content behind sheet -->
+            <div class="reading-content" style="padding:24px 40px;opacity:0.5;">
+              <div class="article-big-title" style="color:#2C2924;">Why Markdown Is the Future of Writing</div>
+              <div class="article-source-line" style="color:#6E675F;">
+                <span>medium.com</span>
+                <span>·</span>
+                <span>Apr 18, 2026</span>
+              </div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.3;"></div>
+              <div class="text-line full" style="background:#2C2924;opacity:0.3;"></div>
+              <div class="text-line medium" style="background:#2C2924;opacity:0.3;"></div>
+            </div>
+            <!-- Bottom sheet: .medium detent -->
+            <div style="position:absolute;bottom:0;left:0;right:0;background:#EDE8DF;border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -4px 20px rgba(0,0,0,0.15);padding:20px 20px 40px;">
+              <div style="width:36px;height:4px;background:#DDD8CE;border-radius:2px;margin:0 auto 16px;"></div>
+              <div style="font-size:15px;font-weight:600;color:#2C2924;margin-bottom:16px;">Reader Settings</div>
+              <!-- Font size row -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:13px;color:#6E675F;">Font size</div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:36px;height:36px;border-radius:18px;background:#F5F0E8;border:1px solid #DDD8CE;display:flex;align-items:center;justify-content:center;font-size:16px;color:#2C2924;">A−</div>
+                  <div style="font-size:14px;color:#2C2924;">M</div>
+                  <div style="width:36px;height:36px;border-radius:18px;background:#F5F0E8;border:1px solid #DDD8CE;display:flex;align-items:center;justify-content:center;font-size:20px;color:#2C2924;">A+</div>
+                </div>
+              </div>
+              <!-- Line spacing -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:13px;color:#6E675F;">Line spacing</div>
+                <div class="preset-chips">
+                  <div class="preset-chip">Compact</div>
+                  <div class="preset-chip">Normal</div>
+                  <div class="preset-chip active">Relaxed</div>
+                  <div class="preset-chip">Airy</div>
+                </div>
+              </div>
+              <!-- Margins -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:13px;color:#6E675F;">Margins</div>
+                <div class="preset-chips">
+                  <div class="preset-chip">Compact</div>
+                  <div class="preset-chip">Normal</div>
+                  <div class="preset-chip active">Wide</div>
+                  <div class="preset-chip">Extra Wide</div>
+                </div>
+              </div>
+              <!-- Theme -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:13px;color:#6E675F;">Theme</div>
+                <div class="theme-dots">
+                  <div class="theme-dot" style="background:#F5F0E8;box-shadow:0 0 0 2px #766655,0 0 0 4px #EDE8DF;" title="Paper"></div>
+                  <div class="theme-dot" style="background:#F2E8D5;" title="Sepia"></div>
+                  <div class="theme-dot" style="background:#1C1A16;" title="Night"></div>
+                  <div class="theme-dot" style="background:#111418;" title="Ink"></div>
+                </div>
+              </div>
+              <!-- Mark as Read -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:0.5px solid #DDD8CE;">
+                <div style="font-size:13px;color:#6E675F;">Mark as Read</div>
+                <div style="width:48px;height:28px;background:#766655;border-radius:14px;position:relative;">
+                  <div style="position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;background:white;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Sheet type</strong>.medium bottom sheet — slides up from bottom edge. Article remains visible underneath.</div>
+          <div class="annotation"><strong>Real-time preview</strong>Article re-renders as user changes settings. User sees the effect immediately.</div>
+          <div class="annotation"><strong>Line spacing presets</strong>Compact (1.3×), Normal (1.5×), Relaxed (1.75×), Airy (2.0×). Relaxed is default.</div>
+          <div class="annotation"><strong>Margin presets</strong>Compact (16px), Normal (24px), Wide (40px), Extra Wide (56px). Wide is default.</div>
+          <div class="annotation"><strong>Theme dots</strong>Tap to switch. Active theme shows Accent #766655 ring.</div>
+          <div class="annotation"><strong>Mark as Read toggle</strong>Toggle switch. On = Read status.</div>
+        </div>
+      </div>
+
+      <!-- 2D: Theme Chips Inline -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">2D — Theme Chips (inline, open state)</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="reading-top-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div class="back-btn" style="color:#766655;">‹ Home</div>
+              <div class="reading-bar-title" style="color:#2C2924;">Why Markdown Is the Future...</div>
+              <div style="font-size:12px;color:#6E675F;">5 min left</div>
+            </div>
+            <div class="reading-content" style="padding:24px 40px;">
+              <div class="article-big-title" style="color:#2C2924;">Why Markdown Is the Future of Writing</div>
+              <div class="article-source-line" style="color:#6E675F;">
+                <span>medium.com</span>
+                <span>·</span>
+                <span>Apr 18, 2026</span>
+              </div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line medium" style="background:#2C2924;"></div>
+            </div>
+            <div class="reading-controls" style="background:#EDE8DF;border-top:0.5px solid #DDD8CE;flex-wrap:wrap;gap:4px;height:auto;padding:8px 12px 12px;justify-content:flex-start;">
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A−</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A+</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">↕</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">⇔</div>
+              </div>
+              <!-- Theme expanded inline -->
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:#EDE8DF;border-radius:20px;">
+                <div style="width:24px;height:24px;border-radius:50%;border:2px solid #766655;background:#F5F0E8;"></div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#F2E8D5;border:1.5px solid #DDD8CE;"></div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#1C1A16;border:1.5px solid #DDD8CE;"></div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#111418;border:1.5px solid #DDD8CE;"></div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;margin-left:auto;">
+                <div class="ctrl-icon" style="font-size:18px;color:#766655;">✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Theme shows as 4 inline chips</strong>Tap theme icon → reveals 4 theme dots in a horizontal row. Active theme (Paper) has Accent ring.</div>
+          <div class="annotation"><strong>Inline expansion</strong>Theme chips expand in-place, expanding the bottom bar height. No popover needed.</div>
+          <div class="annotation"><strong>Tap outside to dismiss</strong>Tapping outside the expanded area collapses back to icon-only.</div>
+        </div>
+      </div>
+
+      <!-- 2E: Line Spacing Popover -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">2E — Line Spacing Popover</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="reading-top-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div class="back-btn" style="color:#766655;">‹ Home</div>
+              <div class="reading-bar-title" style="color:#2C2924;">Why Markdown Is the Future...</div>
+              <div style="font-size:12px;color:#6E675F;">5 min left</div>
+            </div>
+            <div class="reading-content" style="padding:24px 40px;">
+              <div class="article-big-title" style="color:#2C2924;">Why Markdown Is the Future of Writing</div>
+              <div class="article-source-line" style="color:#6E675F;">
+                <span>medium.com</span>
+                <span>·</span>
+                <span>Apr 18, 2026</span>
+              </div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line medium" style="background:#2C2924;"></div>
+            </div>
+            <!-- Bottom bar with popover -->
+            <div class="reading-controls" style="background:#EDE8DF;border-top:0.5px solid #DDD8CE;position:relative;">
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A−</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A+</div>
+              </div>
+              <!-- Popover showing -->
+              <div style="position:absolute;bottom:68px;left:50%;transform:translateX(-50%);background:#EDE8DF;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);padding:8px;display:flex;gap:4px;">
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#F5F0E8;color:#2C2924;">Compact</div>
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#F5F0E8;color:#2C2924;">Normal</div>
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#766655;color:white;">Relaxed</div>
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#F5F0E8;color:#2C2924;">Airy</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">↕</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">⇔</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="width:22px;height:22px;border-radius:50%;background:#F5F0E8;border:2px solid #766655;display:flex;align-items:center;justify-content:center;"></div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#766655;">✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Line spacing popover</strong>Tap ↕ icon → Shows 4 presets: Compact (1.3×), Normal (1.5×), Relaxed (1.75×), Airy (2.0×). Relaxed is default (Accent background).</div>
+          <div class="annotation"><strong>Popover position</strong>Appears above the bottom bar, centered. Background Surface with shadow.</div>
+          <div class="annotation"><strong>Tap outside to dismiss</strong>Tapping anywhere else closes the popover.</div>
+        </div>
+      </div>
+
+<!-- 2F: Margin Popover -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">2F — Margin Popover</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="reading-top-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div class="back-btn" style="color:#766655;">‹ Home</div>
+              <div class="reading-bar-title" style="color:#2C2924;">Why Markdown Is the Future...</div>
+              <div style="font-size:12px;color:#6E675F;">5 min left</div>
+            </div>
+            <div class="reading-content" style="padding:24px 40px;">
+              <div class="article-big-title" style="color:#2C2924;">Why Markdown Is the Future of Writing</div>
+              <div class="article-source-line" style="color:#6E675F;">
+                <span>medium.com</span>
+                <span>·</span>
+                <span>Apr 18, 2026</span>
+              </div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line full" style="background:#2C2924;"></div>
+              <div class="text-line medium" style="background:#2C2924;"></div>
+            </div>
+            <!-- Bottom bar with popover -->
+            <div class="reading-controls" style="background:#EDE8DF;border-top:0.5px solid #DDD8CE;position:relative;">
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A−</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">A+</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">↕</div>
+              </div>
+              <!-- Popover showing -->
+              <div style="position:absolute;bottom:68px;left:50%;transform:translateX(-50%);background:#EDE8DF;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);padding:8px;display:flex;gap:4px;">
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#F5F0E8;color:#2C2924;">Compact</div>
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#F5F0E8;color:#2C2924;">Normal</div>
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#766655;color:white;">Wide</div>
+                <div style="padding:6px 12px;font-size:12px;border-radius:8px;background:#F5F0E8;color:#2C2924;">Extra Wide</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#2C2924;">⇔</div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="width:22px;height:22px;border-radius:50%;background:#F5F0E8;border:2px solid #766655;display:flex;align-items:center;justify-content:center;"></div>
+              </div>
+              <div class="ctrl-btn" style="padding:10px;">
+                <div class="ctrl-icon" style="font-size:18px;color:#766655;">✓</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Margin popover</strong>Tap ⇔ icon → Shows 4 presets: Compact (16px), Normal (24px), Wide (40px), Extra Wide (56px). Wide is default (Accent background).</div>
+          <div class="annotation"><strong>Popover position</strong>Appears above the bottom bar, centered. Background Surface with shadow.</div>
+          <div class="annotation"><strong>Tap outside to dismiss</strong>Tapping anywhere else closes the popover.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: ONBOARDING FLOW              -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">03 — Onboarding Flow (4 screens)</div>
+    <div class="frames-row">
+
+      <!-- Screen 1: Welcome -->
+      <div class="frame-wrapper">
+        <div class="frame-label">3A — Welcome</div>
+        <div class="phone">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="icons">▶ ☁ 📶 🔋</div>
+          </div>
+          <div class="onboarding-body" style="justify-content:center;">
+            <div class="ob-icon">📖</div>
+            <div class="ob-headline">Your articles.<br>Your files.</div>
+            <div class="ob-subtext">Save articles from anywhere. They're stored as plain Markdown files in your iCloud Drive — always yours, forever readable.</div>
+            <div class="ob-spacer"></div>
+            <div class="btn-primary">Get started</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Theme Picker -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">3B — Theme Picker</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="onboarding-body">
+              <div style="height:24px;"></div>
+              <div class="ob-headline" style="font-size:22px;align-self:flex-start;">Choose your reading style</div>
+              <div style="font-size:14px;color:#636366;align-self:flex-start;margin-bottom:20px;">You can change this anytime in Settings.</div>
+              <div class="theme-grid">
+                <div class="theme-card theme-paper selected">
+                  <div class="tc-name" style="color:#6E675F;">● Paper</div>
+                  <div class="tc-title" style="color:#2C2924;">The quiet art of reading well.</div>
+                  <div class="tc-body" style="background:#2C2924;"></div>
+                  <div class="tc-body" style="background:#2C2924;width:70%;"></div>
+                </div>
+                <div class="theme-card theme-sepia">
+                  <div class="tc-name" style="color:#755E40;">○ Sepia</div>
+                  <div class="tc-title" style="color:#2E2013;">The quiet art of reading well.</div>
+                  <div class="tc-body" style="background:#2E2013;"></div>
+                  <div class="tc-body" style="background:#2E2013;width:70%;"></div>
+                </div>
+                <div class="theme-card theme-night">
+                  <div class="tc-name" style="color:#8F897F;">○ Night</div>
+                  <div class="tc-title" style="color:#E8E0D0;">The quiet art of reading well.</div>
+                  <div class="tc-body" style="background:#E8E0D0;"></div>
+                  <div class="tc-body" style="background:#E8E0D0;width:70%;"></div>
+                </div>
+                <div class="theme-card theme-ink">
+                  <div class="tc-name" style="color:#7E8492;">○ Ink</div>
+                  <div class="tc-title" style="color:#E4E6EB;">The quiet art of reading well.</div>
+                  <div class="tc-body" style="background:#E4E6EB;"></div>
+                  <div class="tc-body" style="background:#E4E6EB;width:70%;"></div>
+                </div>
+              </div>
+              <div class="ob-spacer"></div>
+              <div class="btn-primary">Continue</div>
+              <div class="btn-secondary">I'll decide later</div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Paper pre-selected</strong>Default. Blue border shows selection. No tap required to proceed.</div>
+          <div class="annotation"><strong>Sample text</strong>Each card renders the same short phrase in that theme's actual colors and font — a real preview, not a color swatch.</div>
+          <div class="annotation"><strong>"I'll decide later"</strong>Skips without penalty. Paper stays as the default.</div>
+        </div>
+      </div>
+
+      <!-- Screen 3: Combined Vault / Folder Setup — choice state -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">3C — Vault / Folder Setup (choose)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="onboarding-body">
+              <div style="height:16px;"></div>
+              <div class="ob-headline" style="font-size:22px;align-self:flex-start;">Set up your reading folder</div>
+              <div style="font-size:14px;color:#636366;margin-bottom:20px;line-height:1.5;">Articles are saved as Markdown files in iCloud Drive. Choose how you'd like to organise them.</div>
+
+              <!-- Option 1: Obsidian -->
+              <div style="width:100%;border:1.5px solid #C6C6C8;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;background:white;">
+                <div style="font-size:28px;line-height:1;padding-top:2px;">💎</div>
+                <div>
+                  <div style="font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">Connect my Obsidian vault</div>
+                  <div style="font-size:13px;color:#636366;line-height:1.4;">Articles appear as notes in your vault automatically. No plugin needed.</div>
+                </div>
+              </div>
+
+              <!-- Option 2: New folder -->
+              <div style="width:100%;border:1.5px solid #C6C6C8;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:24px;background:white;">
+                <div style="font-size:28px;line-height:1;padding-top:2px;">📁</div>
+                <div>
+                  <div style="font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">Create a new folder</div>
+                  <div style="font-size:13px;color:#636366;line-height:1.4;">A clean reading folder in iCloud Drive. Simple and portable.</div>
+                </div>
+              </div>
+
+              <div class="ob-spacer"></div>
+              <div class="btn-primary" style="opacity:0.35;">Continue →</div>
+              <div style="font-size:12px;color:#8E8E93;text-align:center;margin-top:12px;line-height:1.5;">Your articles stay on your devices — we never see them.</div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Two paths, one screen</strong>Obsidian users and non-Obsidian users get separate, clearly labelled options. No tip screen needed after — the context is right here.</div>
+          <div class="annotation"><strong>CTA disabled until choice</strong>"Continue" is grayed out until the user taps one of the two cards. Forces a deliberate decision.</div>
+          <div class="annotation"><strong>Both paths open the same iOS picker</strong>The difference is framing and the hint text shown before the picker opens — not a different technical flow.</div>
+          <div class="annotation"><strong>iCloud Drive error</strong>If iCloud Drive is off, both cards are replaced with an inline error and an "Open Settings" button.</div>
+        </div>
+      </div>
+
+      <!-- Screen 3 confirmed — Obsidian path -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">3C′ — Vault / Folder Setup (Obsidian confirmed)</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="onboarding-body">
+              <div style="height:16px;"></div>
+              <div class="ob-headline" style="font-size:22px;align-self:flex-start;">Set up your reading folder</div>
+              <div style="font-size:14px;color:#636366;margin-bottom:20px;line-height:1.5;">Articles are saved as Markdown files in iCloud Drive. Choose how you'd like to organise them.</div>
+
+              <!-- Option 1: Obsidian — selected -->
+              <div style="width:100%;border:2px solid #1C1C1E;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;background:white;">
+                <div style="font-size:28px;line-height:1;padding-top:2px;">💎</div>
+                <div style="flex:1;">
+                  <div style="font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">Connect my Obsidian vault</div>
+                  <div style="font-size:13px;color:#636366;line-height:1.4;margin-bottom:10px;">Articles appear as notes in your vault automatically. No plugin needed.</div>
+                  <!-- Confirmed folder -->
+                  <div style="background:#F2F2F7;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
+                    <span style="color:#34C759;font-size:16px;">✓</span>
+                    <div>
+                      <div style="font-size:13px;font-weight:600;color:#1C1C1E;">MyVault / Reading</div>
+                      <div style="font-size:11px;color:#8E8E93;">iCloud Drive</div>
+                    </div>
+                    <div style="margin-left:auto;font-size:12px;color:#007AFF;">Change</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Option 2: unselected, dimmed -->
+              <div style="width:100%;border:1.5px solid #E5E5EA;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:24px;background:white;opacity:0.4;">
+                <div style="font-size:28px;line-height:1;padding-top:2px;">📁</div>
+                <div>
+                  <div style="font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">Create a new folder</div>
+                  <div style="font-size:13px;color:#636366;line-height:1.4;">A clean reading folder in iCloud Drive. Simple and portable.</div>
+                </div>
+              </div>
+
+              <div class="ob-spacer"></div>
+              <div class="btn-primary">Continue →</div>
+              <div style="font-size:12px;color:#8E8E93;text-align:center;margin-top:12px;line-height:1.5;">Your articles stay on your devices — we never see them.</div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Selected card</strong>Dark border. The unselected card dims to 40% opacity — visually subordinate but still visible (user can switch).</div>
+          <div class="annotation"><strong>Confirmed folder inline</strong>The folder path appears inside the selected card — not on a separate screen. Compact, no extra step.</div>
+          <div class="annotation"><strong>"Change" link</strong>Re-opens the document picker. Always accessible until the user taps Continue.</div>
+          <div class="annotation"><strong>CTA now active</strong>Full opacity "Continue →" — ready to proceed to Quick Tour.</div>
+        </div>
+      </div>
+
+      <!-- Screen 3 confirmed — New folder path -->
+      <div class="frame-wrapper">
+        <div class="frame-label">3C″ — Vault / Folder Setup (New folder confirmed)</div>
+        <div class="phone">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="icons">▶ ☁ 📶 🔋</div>
+          </div>
+          <div class="onboarding-body">
+            <div style="height:16px;"></div>
+            <div class="ob-headline" style="font-size:22px;align-self:flex-start;">Set up your reading folder</div>
+            <div style="font-size:14px;color:#636366;margin-bottom:20px;line-height:1.5;">Articles are saved as Markdown files in iCloud Drive. Choose how you'd like to organise them.</div>
+
+            <!-- Option 1: dimmed -->
+            <div style="width:100%;border:1.5px solid #E5E5EA;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;background:white;opacity:0.4;">
+              <div style="font-size:28px;line-height:1;padding-top:2px;">💎</div>
+              <div>
+                <div style="font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">Connect my Obsidian vault</div>
+                <div style="font-size:13px;color:#636366;line-height:1.4;">Articles appear as notes in your vault automatically. No plugin needed.</div>
+              </div>
+            </div>
+
+            <!-- Option 2: New folder — selected + confirmed -->
+            <div style="width:100%;border:2px solid #1C1C1E;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start;margin-bottom:24px;background:white;">
+              <div style="font-size:28px;line-height:1;padding-top:2px;">📁</div>
+              <div style="flex:1;">
+                <div style="font-size:15px;font-weight:600;color:#1C1C1E;margin-bottom:4px;">Create a new folder</div>
+                <div style="font-size:13px;color:#636366;line-height:1.4;margin-bottom:10px;">A clean reading folder in iCloud Drive. Simple and portable.</div>
+                <div style="background:#F2F2F7;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
+                  <span style="color:#34C759;font-size:16px;">✓</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:#1C1C1E;">Reader</div>
+                    <div style="font-size:11px;color:#8E8E93;">iCloud Drive</div>
+                  </div>
+                  <div style="margin-left:auto;font-size:12px;color:#007AFF;">Change</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ob-spacer"></div>
+            <div class="btn-primary">Continue →</div>
+            <div style="font-size:12px;color:#8E8E93;text-align:center;margin-top:12px;line-height:1.5;">Your articles stay on your devices — we never see them.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 4: Quick Tour -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">3D — Quick Tour</div>
+          <div class="phone">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="icons">▶ ☁ 📶 🔋</div>
+            </div>
+            <div class="onboarding-body">
+              <div style="height:24px;"></div>
+              <div class="ob-headline" style="font-size:22px;align-self:flex-start;">Quick Tour</div>
+              <div style="font-size:14px;color:#636366;margin-bottom:20px;line-height:1.5;">Three things you can do with Verso.</div>
+
+              <!-- Step indicator: all 3 visible -->
+              <div style="display:flex;gap:8px;margin-bottom:24px;width:100%;">
+                <div style="flex:1;padding:10px 8px;border-radius:20px;background:#1C1C1E;color:white;font-size:12px;font-weight:600;text-align:center;">1. Save</div>
+                <div style="flex:1;padding:10px 8px;border-radius:20px;background:#1C1C1E;color:white;font-size:12px;font-weight:600;text-align:center;">2. Read</div>
+                <div style="flex:1;padding:10px 8px;border-radius:20px;background:#1C1C1E;color:white;font-size:12px;font-weight:600;text-align:center;">3. Archive</div>
+              </div>
+
+              <!-- Step illustrations: vertical stack -->
+              <div style="width:100%;display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+                <!-- Step 1: Save (share sheet) -->
+                <div style="background:#F2F2F7;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;">
+                  <div style="font-size:24px;width:40px;text-align:center;">📤</div>
+                  <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:2px;">Save</div>
+                    <div style="font-size:12px;color:#636366;line-height:1.4;">Tap Share in Safari → choose Verso. Article saves to your folder as Markdown.</div>
+                  </div>
+                </div>
+                <!-- Step 2: Read -->
+                <div style="background:#F2F2F7;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;">
+                  <div style="font-size:24px;width:40px;text-align:center;">📖</div>
+                  <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:2px;">Read</div>
+                    <div style="font-size:12px;color:#636366;line-height:1.4;">Tap any article to open. Scroll to the end to mark as Read automatically.</div>
+                  </div>
+                </div>
+                <!-- Step 3: Archive -->
+                <div style="background:#F2F2F7;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;">
+                  <div style="font-size:24px;width:40px;text-align:center;">📦</div>
+                  <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;color:#1C1C1E;margin-bottom:2px;">Archive</div>
+                    <div style="font-size:12px;color:#636366;line-height:1.4;">Swipe left on any article to archive. Keeps it handy but out of your main list.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ob-spacer"></div>
+              <div class="btn-primary">Start reading</div>
+              <div style="font-size:15px;color:#636366;text-align:center;padding:8px 0;">Skip</div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Skippable</strong>Users can tap "Skip" to go directly to Home. The tour is lightweight — users familiar with apps can bypass it entirely.</div>
+          <div class="annotation"><strong>Three steps shown together</strong>Save → Read → Archive all visible at once, not paginated. Matches the compact, scannable style of filter chips on the Home screen.</div>
+          <div class="annotation"><strong>Step 1: Save</strong>Via iOS Share Sheet. User shares from Safari or any app → Verso parses article → saves as Markdown file to configured iCloud Drive folder.</div>
+          <div class="annotation"><strong>Step 2: Read</strong>Tap article card → NavigationStack push to Reading View. Auto-updates status: Unread → Reading on open, Reading → Read when user scrolls to end.</div>
+          <div class="annotation"><strong>Step 3: Archive</strong>Swipe left on article card → reveals Archive action. Moves file to /Archived/ subfolder, updates status to Read.</div>
+          <div class="annotation"><strong>CTA: "Start reading"</strong>Replaces NavigationStack root, NOT a push. Uses <code>navigationDestination</code> path reset to clear the onboarding stack so users cannot swipe back into onboarding. This is critical — do NOT use a standard push transition.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: SETTINGS                     -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">04 — Settings (4 screens)</div>
+    <div class="frames-row">
+
+      <!-- 4A: Settings Main (full-screen modal) -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">4A — Settings (modal, root)</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar" style="background:#EDE8DF;">
+              <span class="time" style="color:#2C2924;">9:41</span>
+              <div class="icons" style="color:#2C2924;">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Nav bar: Settings title + Done -->
+            <div class="nav-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div style="font-size:15px;color:#766655;font-weight:500;">Cancel</div>
+              <span class="nav-bar-title" style="color:#2C2924;">Settings</span>
+              <div style="font-size:15px;color:#766655;font-weight:600;">Done</div>
+            </div>
+            <div class="screen-body" style="background:#F5F0E8;">
+              <!-- Section: General -->
+              <div class="settings-section">
+                <div class="settings-section-header" style="color:#6E675F;">General</div>
+                <div class="settings-group" style="background:#EDE8DF;">
+                  <div class="settings-row" style="border-bottom:0.5px solid #DDD8CE;">
+                    <div class="settings-row-label" style="color:#2C2924;">Folder Setup</div>
+                    <div style="color:#766655;">›</div>
+                  </div>
+                  <div class="settings-row" style="border-bottom:0.5px solid #DDD8CE;">
+                    <div class="settings-row-label" style="color:#2C2924;">Appearance</div>
+                    <div style="color:#766655;">›</div>
+                  </div>
+                  <div class="settings-row">
+                    <div class="settings-row-label" style="color:#2C2924;">About</div>
+                    <div style="color:#766655;">›</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Section: Links -->
+              <div class="settings-section">
+                <div class="settings-section-header" style="color:#6E675F;">Links</div>
+                <div class="settings-group" style="background:#EDE8DF;">
+                  <div class="settings-row" style="border-bottom:none;">
+                    <div class="settings-row-label" style="color:#2C2924;">Privacy Policy</div>
+                    <div style="color:#766655;">›</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Section: Info -->
+              <div class="settings-section">
+                <div class="settings-section-header" style="color:#6E675F;">Info</div>
+                <div class="settings-group" style="background:#EDE8DF;">
+                  <div class="settings-row" style="border-bottom:none;">
+                    <div class="settings-row-label" style="color:#2C2924;">Version</div>
+                    <div class="settings-row-value" style="color:#6E675F;">1.0.0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Modal presentation</strong>Presented as <code>.fullScreenCover</code> — full-screen modal (not push). Reason: Settings contains its own NavigationStack for sub-pages.</div>
+          <div class="annotation"><strong>Swipe to dismiss</strong>User can swipe down to return to Home. Also has Cancel/Done buttons.</div>
+          <div class="annotation"><strong>No tab bar</strong>Settings is a modal, not part of the main nav. No tab bar shown inside modal.</div>
+          <div class="annotation"><strong>Navigation pattern</strong>Tapping any row (Folder Setup, Appearance, About) triggers <code>NavigationStack push</code> within the modal.</div>
+        </div>
+      </div>
+
+      <!-- 4B: Folder Setup (pushed) -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">4B — Folder Setup (pushed)</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar" style="background:#EDE8DF;">
+              <span class="time" style="color:#2C2924;">9:41</span>
+              <div class="icons" style="color:#2C2924;">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Nav bar with back -->
+            <div class="nav-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div style="font-size:15px;color:#766655;font-weight:500;">‹ Back</div>
+              <span class="nav-bar-title" style="color:#2C2924;">Folder Setup</span>
+              <div style="width:36px;"></div>
+            </div>
+            <div class="screen-body" style="background:#F5F0E8;">
+              <div class="settings-section" style="margin-top:24px;">
+                <!-- Current folder display -->
+                <div style="background:#EDE8DF;border:1.5px dashed #DDD8CE;border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:16px;">
+                  <div style="font-size:40px;">📂</div>
+                  <div style="font-size:14px;color:#2C2924;text-align:center;line-height:1.4;font-weight:500;">iCloud Drive/ Verso/ Articles</div>
+                </div>
+                <!-- Change folder row -->
+                <div class="settings-group" style="background:#EDE8DF;">
+                  <div class="settings-row" style="border-bottom:none;">
+                    <div class="settings-row-label" style="color:#2C2924;font-weight:600;">Change Folder</div>
+                    <div style="color:#766655;">›</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Navigation</strong>Pushed via <code>NavigationStack push</code> from Settings modal. Back button returns to Settings.</div>
+          <div class="annotation"><strong>Change Folder tap</strong>Triggers native <code>UIDocumentPickerViewController</code> in folder-selection mode. User selects/creates iCloud Drive folder.</div>
+          <div class="annotation"><strong>Move dialog</strong>If articles exist in old folder: <em>"Move your existing articles to the new folder? Your old folder won't be touched if you choose No."</em> Actions: [Move Articles] [Keep in Old Folder]</div>
+          <div class="annotation"><strong>Folder icon</strong>Dashed border signals "editable" — the user can change this.</div>
+        </div>
+      </div>
+
+      <!-- 4C: Appearance (pushed) -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">4C — Appearance (pushed)</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar" style="background:#EDE8DF;">
+              <span class="time" style="color:#2C2924;">9:41</span>
+              <div class="icons" style="color:#2C2924;">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Nav bar with back -->
+            <div class="nav-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div style="font-size:15px;color:#766655;font-weight:500;">‹ Back</div>
+              <span class="nav-bar-title" style="color:#2C2924;">Appearance</span>
+              <div style="width:36px;"></div>
+            </div>
+            <div class="screen-body" style="background:#F5F0E8;">
+              <div class="settings-section" style="margin-top:24px;">
+                <!-- Theme -->
+                <div style="font-size:13px;color:#6E675F;text-transform:uppercase;letter-spacing:0.05em;padding:16px 0 8px;font-weight:600;">Theme</div>
+                <div class="settings-group" style="background:#EDE8DF;margin-bottom:24px;">
+                  <div class="settings-row" style="border-bottom:none;justify-content:center;gap:12px;padding:16px;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:#F5F0E8;border:3px solid #766655;box-shadow:0 0 0 2px #F5F0E8;" title="Paper"></div>
+                    <div style="width:32px;height:32px;border-radius:50%;background:#F2E8D5;border:1.5px solid #DDD8CE;" title="Sepia"></div>
+                    <div style="width:32px;height:32px;border-radius:50%;background:#1C1A16;border:1.5px solid #DDD8CE;" title="Night"></div>
+                    <div style="width:32px;height:32px;border-radius:50%;background:#111418;border:1.5px solid #DDD8CE;" title="Ink"></div>
+                  </div>
+                </div>
+                <!-- Font -->
+                <div style="font-size:13px;color:#6E675F;text-transform:uppercase;letter-spacing:0.05em;padding:16px 0 8px;font-weight:600;">Font</div>
+                <div class="settings-group" style="background:#EDE8DF;margin-bottom:24px;">
+                  <div class="settings-row" style="border-bottom:none;justify-content:center;gap:8px;padding:16px;flex-wrap:wrap;">
+                    <div class="font-chip active" style="border-color:#766655;color:#766655;">New York</div>
+                    <div class="font-chip" style="border-color:#DDD8CE;color:#6E675F;">Georgia</div>
+                    <div class="font-chip" style="border-color:#DDD8CE;color:#6E675F;">San Francisco</div>
+                    <div class="font-chip" style="border-color:#DDD8CE;color:#6E675F;">OpenDyslexic</div>
+                  </div>
+                </div>
+                <!-- Text Size -->
+                <div style="font-size:13px;color:#6E675F;text-transform:uppercase;letter-spacing:0.05em;padding:16px 0 8px;font-weight:600;">Text Size</div>
+                <div class="settings-group" style="background:#EDE8DF;">
+                  <div class="settings-row" style="border-bottom:none;justify-content:center;gap:16px;padding:16px;">
+                    <div style="font-size:20px;color:#6E675F;padding:8px 12px;">XS</div>
+                    <div style="font-size:22px;color:#6E675F;padding:8px 12px;">S</div>
+                    <div style="font-size:26px;color:#2C2924;background:#F5F0E8;border-radius:8px;padding:4px 12px;font-weight:600;">M</div>
+                    <div style="font-size:30px;color:#6E675F;padding:8px 12px;">L</div>
+                    <div style="font-size:34px;color:#6E675F;padding:8px 12px;">XL</div>
+                    <div style="font-size:38px;color:#6E675F;padding:8px 12px;">XXL</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Navigation</strong>Pushed via <code>NavigationStack push</code> from Settings modal. Back button returns to Settings.</div>
+          <div class="annotation"><strong>Theme default: Paper</strong>Visual dots — tap to switch. Selected theme shows Accent ring (#766655).</div>
+          <div class="annotation"><strong>Font default: New York</strong>Inline chips — all 4 options visible. Selected shows Accent color.</div>
+          <div class="annotation"><strong>Text Size default: M</strong>6 steps shown horizontally. Selected shows filled background.</div>
+          <div class="annotation"><strong>UI font</strong>These settings use San Francisco (system UI font) — NOT the user's reading font. Reading font applies only in Reading View.</div>
+        </div>
+      </div>
+
+      <!-- 4D: About (pushed) -->
+      <div class="frame-with-notes">
+        <div class="frame-wrapper">
+          <div class="frame-label">4D — About (pushed)</div>
+          <div class="phone" style="background:#F5F0E8;">
+            <div class="status-bar" style="background:#EDE8DF;">
+              <span class="time" style="color:#2C2924;">9:41</span>
+              <div class="icons" style="color:#2C2924;">▶ ☁ 📶 🔋</div>
+            </div>
+            <!-- Nav bar with back -->
+            <div class="nav-bar" style="background:#EDE8DF;border-bottom:0.5px solid #DDD8CE;">
+              <div style="font-size:15px;color:#766655;font-weight:500;">‹ Back</div>
+              <span class="nav-bar-title" style="color:#2C2924;">About</span>
+              <div style="width:36px;"></div>
+            </div>
+            <div class="screen-body" style="background:#F5F0E8;">
+              <div class="settings-section" style="margin-top:24px;">
+                <!-- Version -->
+                <div class="settings-group" style="background:#EDE8DF;margin-bottom:24px;">
+                  <div class="settings-row" style="border-bottom:0.5px solid #DDD8CE;">
+                    <div class="settings-row-label" style="color:#2C2924;">Version</div>
+                    <div class="settings-row-value" style="color:#6E675F;">1.0.0</div>
+                  </div>
+                  <div class="settings-row" style="border-bottom:none;">
+                    <div class="settings-row-label" style="color:#2C2924;">Build</div>
+                    <div class="settings-row-value" style="color:#6E675F;">1</div>
+                  </div>
+                </div>
+                <!-- Links -->
+                <div class="settings-section-header" style="color:#6E675F;">Links</div>
+                <div class="settings-group" style="background:#EDE8DF;margin-bottom:24px;">
+                  <div class="settings-row" style="border-bottom:none;">
+                    <div class="settings-row-label" style="color:#2C2924;">GitHub</div>
+                    <div style="color:#766655;">›</div>
+                  </div>
+                </div>
+                <!-- Open source -->
+                <div class="settings-section-header" style="color:#6E675F;">Open Source</div>
+                <div class="settings-group" style="background:#EDE8DF;">
+                  <div class="settings-row" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:8px;">
+                    <div style="font-size:13px;color:#2C2924;font-weight:600;">Acknowledgements</div>
+                    <div style="font-size:12px;color:#6E675F;line-height:1.5;">
+                      Verso uses the following open-source libraries:<br><br>
+                      • SwiftSoup — HTML parsing<br>
+                      • Down — Markdown rendering<br>
+                      • OpenDyslexic — accessible typeface
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="annotations">
+          <div class="annotation"><strong>Navigation</strong>Pushed via <code>NavigationStack push</code> from Settings modal. Back button returns to Settings.</div>
+          <div class="annotation"><strong>Version row</strong>Static display — not tappable. Shows current version and build number.</div>
+          <div class="annotation"><strong>GitHub link</strong>Tapping opens the repository in Safari or in-app browser.</div>
+          <div class="annotation"><strong>Acknowledgements</strong>Lists open-source libraries used. Read-only — no expand/collapse needed for MVP.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

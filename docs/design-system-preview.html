@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verso — Design System Foundations</title>
+  <style>
+    /* ─── Google Fonts fallback for Georgia / OpenDyslexic ─────────────────── */
+    @import url('https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap');
+
+    /* ─── Themes ─────────────────────────────────────────────────────────────── */
+    :root {
+      --background:    #F5F0E8;
+      --surface:       #EDE8DF;
+      --text-primary:  #2C2924;
+      --text-secondary:#6E675F;
+      --accent:        #766655;
+      --accent-hover:  #675746;
+      --border:        #DDD8CE;
+    }
+    [data-theme="sepia"] {
+      --background:    #F2E8D5;
+      --surface:       #E8DEC7;
+      --text-primary:  #2E2013;
+      --text-secondary:#755E40;
+      --accent:        #825A37;
+      --accent-hover:  #73502E;
+      --border:        #D9CAAC;
+    }
+    [data-theme="night"] {
+      --background:    #1C1A16;
+      --surface:       #252320;
+      --text-primary:  #E8E0D0;
+      --text-secondary:#8F897F;
+      --accent:        #C4A97D;
+      --accent-hover:  #D8BD91;
+      --border:        #2E2B26;
+    }
+    [data-theme="ink"] {
+      --background:    #111418;
+      --surface:       #181C22;
+      --text-primary:  #E4E6EB;
+      --text-secondary:#7E8492;
+      --accent:        #7B9FD4;
+      --accent-hover:  #8FB3E8;
+      --border:        #1E2228;
+    }
+
+    /* ─── Reset & Base ───────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 24px 20px 60px;
+      max-width: 720px;
+      margin: 0 auto;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* ─── Header ─────────────────────────────────────────────────────────────── */
+    .header { margin-bottom: 32px; }
+
+    .header h1 {
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .header .meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    }
+
+    /* ─── Theme Picker ───────────────────────────────────────────────────────── */
+    .theme-picker {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      font-family: inherit;
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+    .theme-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+
+    /* ─── Section ────────────────────────────────────────────────────────────── */
+    .section { margin-bottom: 32px; }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    /* ─── Color Tokens ───────────────────────────────────────────────────────── */
+    .token-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 6px 0;
+    }
+
+    .token-swatch {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+      transition: background 0.25s ease;
+    }
+
+    .token-info { flex: 1; min-width: 0; }
+
+    .token-name {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--text-primary);
+    }
+
+    .token-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .token-hex {
+      font-size: 11px;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    /* ─── Status Colors ──────────────────────────────────────────────────────── */
+    .status-row {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 4px 0;
+    }
+
+    .status-item { display: flex; align-items: center; gap: 8px; }
+
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-label { font-size: 15px; color: var(--text-primary); }
+
+    /* ─── Type Scale (shared row layout) ─────────────────────────────────────── */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .type-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .type-row:first-child { padding-top: 0; }
+
+    .type-label {
+      font-size: 11px;
+      font-weight: 500;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--text-secondary);
+      width: 130px;
+      flex-shrink: 0;
+    }
+
+    .type-sample { color: var(--text-primary); }
+
+    .badge-default {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ─── Spacing ────────────────────────────────────────────────────────────── */
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 6px 0;
+    }
+
+    .spacing-bar-track {
+      width: 80px;
+      height: 16px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: background 0.25s ease;
+    }
+
+    .spacing-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      opacity: 0.6;
+      border-radius: 99px;
+      transition: background 0.25s ease;
+    }
+
+    .spacing-info { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+
+    .spacing-name {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--text-primary);
+    }
+
+    .spacing-value {
+      font-size: 12px;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--text-secondary);
+    }
+
+    .spacing-dot { color: var(--border); }
+
+    .spacing-usage { font-size: 12px; color: var(--text-secondary); }
+
+    /* ─── Typefaces ──────────────────────────────────────────────────────────── */
+    .face-row {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .face-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .face-row:first-child { padding-top: 0; }
+
+    .face-meta {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+
+    .face-name {
+      font-size: 11px;
+      font-weight: 600;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      color: var(--text-secondary);
+    }
+
+    .face-note { font-size: 11px; color: var(--text-secondary); opacity: 0.7; }
+
+    .face-sample {
+      font-size: 19px;
+      color: var(--text-primary);
+      line-height: 1.55;
+    }
+
+    .font-new-york  { font-family: "New York", "Georgia", serif; }
+    .font-georgia   { font-family: "Georgia", serif; }
+    .font-sf        { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+    .font-dyslexic  { font-family: "OpenDyslexic", "Comic Sans MS", sans-serif; }
+
+    /* ─── Divider ────────────────────────────────────────────────────────────── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ────────────────────────────────────────────────────────────── -->
+  <div class="header">
+    <h1>Design System</h1>
+    <p class="meta">Verso iOS · FAB-92</p>
+
+    <div class="theme-picker">
+      <button class="theme-btn active" data-theme="paper" onclick="setTheme('paper', this)">
+        <span class="theme-dot" style="background:#F5F0E8;"></span> Paper
+      </button>
+      <button class="theme-btn" data-theme="sepia" onclick="setTheme('sepia', this)">
+        <span class="theme-dot" style="background:#F2E8D5;"></span> Sepia
+      </button>
+      <button class="theme-btn" data-theme="night" onclick="setTheme('night', this)">
+        <span class="theme-dot" style="background:#1C1A16; border-color:#2E2B26;"></span> Night
+      </button>
+      <button class="theme-btn" data-theme="ink" onclick="setTheme('ink', this)">
+        <span class="theme-dot" style="background:#111418; border-color:#1E2228;"></span> Ink
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Color Tokens ───────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Color Tokens</p>
+    <div class="card">
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-background" style="background:var(--background)"></div>
+        <div class="token-info">
+          <div class="token-name">background</div>
+          <div class="token-desc">Main screen and article background</div>
+        </div>
+        <span class="token-hex" id="hex-background"></span>
+      </div>
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-surface" style="background:var(--surface)"></div>
+        <div class="token-info">
+          <div class="token-name">surface</div>
+          <div class="token-desc">Cards, list rows, reading bar</div>
+        </div>
+        <span class="token-hex" id="hex-surface"></span>
+      </div>
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-text-primary" style="background:var(--text-primary)"></div>
+        <div class="token-info">
+          <div class="token-name">textPrimary</div>
+          <div class="token-desc">Body text, titles — WCAG AA ≥4.5:1</div>
+        </div>
+        <span class="token-hex" id="hex-text-primary"></span>
+      </div>
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-text-secondary" style="background:var(--text-secondary)"></div>
+        <div class="token-info">
+          <div class="token-name">textSecondary</div>
+          <div class="token-desc">Metadata, captions — WCAG AA ≥4.5:1</div>
+        </div>
+        <span class="token-hex" id="hex-text-secondary"></span>
+      </div>
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-accent" style="background:var(--accent)"></div>
+        <div class="token-info">
+          <div class="token-name">accent</div>
+          <div class="token-desc">Links, interactive elements</div>
+        </div>
+        <span class="token-hex" id="hex-accent"></span>
+      </div>
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-accent-hover" style="background:var(--accent-hover)"></div>
+        <div class="token-info">
+          <div class="token-name">accentHover</div>
+          <div class="token-desc">Pressed and active states</div>
+        </div>
+        <span class="token-hex" id="hex-accent-hover"></span>
+      </div>
+      <div class="token-row">
+        <div class="token-swatch" id="swatch-border" style="background:var(--border)"></div>
+        <div class="token-info">
+          <div class="token-name">border</div>
+          <div class="token-desc">Dividers and separators</div>
+        </div>
+        <span class="token-hex" id="hex-border"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Status Colors ──────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Status Colors</p>
+    <div class="card">
+      <div class="status-row">
+        <div class="status-item">
+          <div class="status-dot" style="background:#4A90D9;"></div>
+          <span class="status-label">Unread</span>
+        </div>
+        <div class="status-item">
+          <div class="status-dot" style="background:#D4A353;"></div>
+          <span class="status-label">Reading</span>
+        </div>
+        <div class="status-item">
+          <div class="status-dot" style="background:#5AAF7A;"></div>
+          <span class="status-label">Read</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Body Scale ─────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Typography — Body Scale</p>
+    <div class="card">
+      <div class="type-row">
+        <span class="type-label">XXL &nbsp;26pt &nbsp;×1.5</span>
+        <span class="type-sample" style="font-size:26px; line-height:1.5;">The verso is the second page you encounter.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">XL &nbsp;&nbsp;22pt &nbsp;×1.6</span>
+        <span class="type-sample" style="font-size:22px; line-height:1.6;">The verso is the second page you encounter.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">L &nbsp;&nbsp;&nbsp;20pt &nbsp;×1.75</span>
+        <span class="type-sample" style="font-size:20px; line-height:1.75;">The verso is the second page you encounter.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">M &nbsp;&nbsp;&nbsp;18pt &nbsp;×1.75 <span class="badge-default">default</span></span>
+        <span class="type-sample" style="font-size:18px; line-height:1.75;">The verso is the second page you encounter.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">S &nbsp;&nbsp;&nbsp;16pt &nbsp;×1.75</span>
+        <span class="type-sample" style="font-size:16px; line-height:1.75;">The verso is the second page you encounter.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">XS &nbsp;&nbsp;14pt &nbsp;×1.75</span>
+        <span class="type-sample" style="font-size:14px; line-height:1.75;">The verso is the second page you encounter.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Headings ───────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Typography — Headings</p>
+    <div class="card">
+      <div class="type-row">
+        <span class="type-label">H1 &nbsp;28pt &nbsp;Bold</span>
+        <span class="type-sample" style="font-size:28px; font-weight:700; line-height:1.2;">Article Heading</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">H2 &nbsp;24pt &nbsp;Semibold</span>
+        <span class="type-sample" style="font-size:24px; font-weight:600; line-height:1.25;">Article Heading</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">H3 &nbsp;20pt &nbsp;Semibold</span>
+        <span class="type-sample" style="font-size:20px; font-weight:600; line-height:1.3;">Article Heading</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">H4 &nbsp;18pt &nbsp;Semibold</span>
+        <span class="type-sample" style="font-size:18px; font-weight:600; line-height:1.35;">Article Heading</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── UI Typography ──────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Typography — UI</p>
+    <div class="card">
+      <div class="type-row">
+        <span class="type-label">Screen Title &nbsp;34pt</span>
+        <span class="type-sample" style="font-size:34px; font-weight:700; line-height:1.2;">Library</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">List Title &nbsp;&nbsp;&nbsp;&nbsp;17pt</span>
+        <span class="type-sample" style="font-size:17px; font-weight:600; line-height:1.3;">The Verge · Article Title</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">List Subtitle &nbsp;15pt</span>
+        <span class="type-sample" style="font-size:15px; font-weight:400; line-height:1.4;">5 min read · Saved today</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Button &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;17pt</span>
+        <span class="type-sample" style="font-size:17px; font-weight:600; line-height:1.0;">Save Article</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Caption &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;13pt</span>
+        <span class="type-sample" style="font-size:13px; font-weight:400; line-height:1.3;">April 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Spacing ────────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Spacing Tokens</p>
+    <div class="card">
+      <div class="spacing-row">
+        <div class="spacing-bar-track"><div class="spacing-bar-fill" style="width:calc(4px * 1.2);"></div></div>
+        <div class="spacing-info">
+          <span class="spacing-name">xs</span>
+          <span class="spacing-value">4pt</span>
+          <span class="spacing-dot">·</span>
+          <span class="spacing-usage">Icon-to-label gap</span>
+        </div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-bar-track"><div class="spacing-bar-fill" style="width:calc(8px * 1.2);"></div></div>
+        <div class="spacing-info">
+          <span class="spacing-name">sm</span>
+          <span class="spacing-value">8pt</span>
+          <span class="spacing-dot">·</span>
+          <span class="spacing-usage">Closely related elements</span>
+        </div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-bar-track"><div class="spacing-bar-fill" style="width:calc(16px * 1.2);"></div></div>
+        <div class="spacing-info">
+          <span class="spacing-name">md</span>
+          <span class="spacing-value">16pt</span>
+          <span class="spacing-dot">·</span>
+          <span class="spacing-usage">Standard element spacing</span>
+        </div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-bar-track"><div class="spacing-bar-fill" style="width:calc(24px * 1.2);"></div></div>
+        <div class="spacing-info">
+          <span class="spacing-name">lg</span>
+          <span class="spacing-value">24pt</span>
+          <span class="spacing-dot">·</span>
+          <span class="spacing-usage">Section spacing</span>
+        </div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-bar-track"><div class="spacing-bar-fill" style="width:80px;"></div></div>
+        <div class="spacing-info">
+          <span class="spacing-name">xl</span>
+          <span class="spacing-value">40pt</span>
+          <span class="spacing-dot">·</span>
+          <span class="spacing-usage">Screen padding, normal reading margin</span>
+        </div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-bar-track"><div class="spacing-bar-fill" style="width:80px;"></div></div>
+        <div class="spacing-info">
+          <span class="spacing-name">xxl</span>
+          <span class="spacing-value">56pt</span>
+          <span class="spacing-dot">·</span>
+          <span class="spacing-usage">Wide reading margin</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Typefaces ──────────────────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section-label">Typefaces</p>
+    <div class="card">
+      <div class="face-row">
+        <div class="face-meta">
+          <span class="face-name">New York</span>
+          <span class="face-note">Default · Apple serif</span>
+        </div>
+        <p class="face-sample font-new-york">The verso is the second page you encounter when you open a book.</p>
+      </div>
+      <div class="face-row">
+        <div class="face-meta">
+          <span class="face-name">Georgia</span>
+          <span class="face-note">Classic serif</span>
+        </div>
+        <p class="face-sample font-georgia">The verso is the second page you encounter when you open a book.</p>
+      </div>
+      <div class="face-row">
+        <div class="face-meta">
+          <span class="face-name">San Francisco</span>
+          <span class="face-note">System sans-serif</span>
+        </div>
+        <p class="face-sample font-sf">The verso is the second page you encounter when you open a book.</p>
+      </div>
+      <div class="face-row">
+        <div class="face-meta">
+          <span class="face-name">OpenDyslexic</span>
+          <span class="face-note">Accessibility · bundled</span>
+        </div>
+        <p class="face-sample font-dyslexic">The verso is the second page you encounter when you open a book.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────────────── -->
+  <script>
+    const THEMES = {
+      paper: {
+        background:     '#F5F0E8',
+        surface:        '#EDE8DF',
+        'text-primary': '#2C2924',
+        'text-secondary':'#6E675F',
+        accent:         '#766655',
+        'accent-hover': '#675746',
+        border:         '#DDD8CE',
+      },
+      sepia: {
+        background:     '#F2E8D5',
+        surface:        '#E8DEC7',
+        'text-primary': '#2E2013',
+        'text-secondary':'#755E40',
+        accent:         '#825A37',
+        'accent-hover': '#73502E',
+        border:         '#D9CAAC',
+      },
+      night: {
+        background:     '#1C1A16',
+        surface:        '#252320',
+        'text-primary': '#E8E0D0',
+        'text-secondary':'#8F897F',
+        accent:         '#C4A97D',
+        'accent-hover': '#D8BD91',
+        border:         '#2E2B26',
+      },
+      ink: {
+        background:     '#111418',
+        surface:        '#181C22',
+        'text-primary': '#E4E6EB',
+        'text-secondary':'#7E8492',
+        accent:         '#7B9FD4',
+        'accent-hover': '#8FB3E8',
+        border:         '#1E2228',
+      },
+    };
+
+    // Map CSS-var key → swatch/hex element IDs
+    const TOKEN_IDS = [
+      ['background',     'background'],
+      ['surface',        'surface'],
+      ['text-primary',   'text-primary'],
+      ['text-secondary', 'text-secondary'],
+      ['accent',         'accent'],
+      ['accent-hover',   'accent-hover'],
+      ['border',         'border'],
+    ];
+
+    function setTheme(name, btn) {
+      document.body.setAttribute('data-theme', name === 'paper' ? '' : name);
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateSwatches(name);
+    }
+
+    function updateSwatches(name) {
+      const t = THEMES[name];
+      TOKEN_IDS.forEach(([key, id]) => {
+        const hex = t[key];
+        const sw = document.getElementById('swatch-' + id);
+        const hx = document.getElementById('hex-' + id);
+        if (sw) sw.style.background = hex;
+        if (hx) hx.textContent = hex.toUpperCase();
+      });
+    }
+
+    // Initialise hex values on load
+    updateSwatches('paper');
+  </script>
+</body>
+</html>
