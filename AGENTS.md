@@ -31,7 +31,12 @@ File: https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
 
 ## Running Commands
 
-The Xcode project is generated via XcodeGen. To regenerate: `cd Verso && xcodegen generate`. No CLI build commands are configured yet.
+The Xcode project is generated via XcodeGen. To regenerate: `cd Verso && xcodegen generate`.
+
+To build from CLI:
+```bash
+cd Verso && xcodebuild -project Verso.xcodeproj -scheme Verso -destination 'platform=iOS Simulator,name=iPhone 17' build
+```
 
 ## Figma & Linear Tool Status
 

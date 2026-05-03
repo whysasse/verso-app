@@ -12,6 +12,8 @@ This system moves away from static UI consistency toward **Contextual Appropriat
 2.  **Focus (Intent):** Library (Discovery) vs. Reader (Immersion).
 3.  **Environment (Sensory):** System Light/Dark + Haptic feedback intensity.
 
+When the app detects the user switched context, it should inform them of the change with a witty quote from a real book. The quote should be related to the change. We might need to build a quote bank. The user has the option to accept the changer or to keep the current context. The labels of the two buttons should reflect the context change and the quote. 
+
 ---
 
 ### 2. Contextual Thresholds & Triggers
