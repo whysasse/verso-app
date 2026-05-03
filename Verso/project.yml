@@ -11,6 +11,7 @@ targets:
     sources:
       - Sources
       - Resources
+      - Model
     attributes:
       SystemCapabilities:
         com.apple.iCloud:

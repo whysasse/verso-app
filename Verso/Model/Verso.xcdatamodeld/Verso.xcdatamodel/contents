@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="1" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+  <entity name="Article" representedClassName="Article" syncable="YES" codeGenerationType="manual">
+    <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+    <attribute name="filePath" attributeType="String"/>
+    <attribute name="title" attributeType="String"/>
+    <attribute name="url" attributeType="URI" optional="YES"/>
+    <attribute name="status" attributeType="String"/>
+    <attribute name="dateAdded" attributeType="Date"/>
+    <attribute name="source" attributeType="String" optional="YES"/>
+  </entity>
+</model>
