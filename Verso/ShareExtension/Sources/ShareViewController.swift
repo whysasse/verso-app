@@ -1,62 +1,76 @@
 import UIKit
-import Social
+import SwiftUI
 import UniformTypeIdentifiers
 
-class ShareViewController: SLComposeServiceViewController {
+final class ShareViewController: UIViewController {
 
-    override func isContentValid() -> Bool {
-        return true
+    private let viewModel = ShareViewModel()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 0.973, green: 0.965, blue: 0.949, alpha: 1) // Paper background
+
+        let hostingController = UIHostingController(rootView: ShareView(viewModel: viewModel, extensionContext: extensionContext))
+        addChild(hostingController)
+        hostingController.view.frame = view.bounds
+        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        hostingController.view.backgroundColor = .clear
+        view.addSubview(hostingController.view)
+        hostingController.didMove(toParent: self)
+
+        extractURL()
     }
 
-    override func didSelectPost() {
-        guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem],
-              let item = extensionItems.first,
-              let attachments = item.attachments else {
-            self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+    // MARK: - URL extraction (FAB-17)
+
+    private func extractURL() {
+        guard let items = extensionContext?.inputItems as? [NSExtensionItem] else {
+            completeWithError()
             return
         }
 
-        for attachment in attachments {
-            if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
-                attachment.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, error in
-                    if let url = item as? URL {
-                        self.saveURLToSharedContainer(url)
+        for item in items {
+            guard let attachments = item.attachments else { continue }
+            for attachment in attachments {
+                if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+                    attachment.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { [weak self] item, _ in
+                        DispatchQueue.main.async {
+                            guard let self else { return }
+                            if let url = item as? URL, self.isValidWebURL(url) {
+                                self.viewModel.save(url: url)
+                            } else {
+                                self.completeWithError()
+                            }
+                        }
                     }
-                    self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+                    return
+                } else if attachment.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
+                    attachment.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { [weak self] item, _ in
+                        DispatchQueue.main.async {
+                            guard let self else { return }
+                            if let string = item as? String,
+                               let url = URL(string: string),
+                               self.isValidWebURL(url) {
+                                self.viewModel.save(url: url)
+                            } else {
+                                self.completeWithError()
+                            }
+                        }
+                    }
+                    return
                 }
-                return
             }
         }
 
-        self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+        completeWithError()
     }
 
-    private func saveURLToSharedContainer(_ url: URL) {
-        guard let sharedContainer = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: "group.com.fabiosasseron.verso"
-        ) else { return }
-
-        let savedURLsURL = savedURLsURL(in: sharedContainer)
-        var urls: [String] = []
-
-        if FileManager.default.fileExists(atPath: savedURLsURL.path),
-           let data = try? Data(contentsOf: savedURLsURL),
-           let existing = try? JSONDecoder().decode([String].self, from: data) {
-            urls = existing
-        }
-
-        urls.append(url.absoluteString)
-
-        if let data = try? JSONEncoder().encode(urls) {
-            try? data.write(to: savedURLsURL)
-        }
+    private func isValidWebURL(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased() else { return false }
+        return scheme == "http" || scheme == "https"
     }
 
-    private func savedURLsURL(in container: URL) -> URL {
-        container.appendingPathComponent("saved_urls.json")
-    }
-
-    override func configurationItems() -> [Any]! {
-        return []
+    private func completeWithError() {
+        extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
 }

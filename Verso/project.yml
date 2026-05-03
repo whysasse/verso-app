@@ -1,4 +1,10 @@
 name: Verso
+
+packages:
+  SwiftSoup:
+    url: https://github.com/scinfu/SwiftSoup.git
+    from: "2.7.6"
+
 options:
   bundleIdPrefix: com.fabiosasseron
   deploymentTarget:
@@ -12,6 +18,11 @@ targets:
       - Sources
       - Resources
       - Model
+      - path: Resources/readability
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: SwiftSoup
     attributes:
       SystemCapabilities:
         com.apple.iCloud:
@@ -57,6 +68,14 @@ targets:
     bundleId: com.fabiosasseron.verso.ShareExtension
     sources:
       - ShareExtension/Sources
+      - path: Sources/Services/ArticleParsingError.swift
+        type: file
+      - path: Sources/Services/PendingArticle.swift
+        type: file
+      - path: Sources/Services/SwiftSoupParser.swift
+        type: file
+    dependencies:
+      - package: SwiftSoup
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fabiosasseron.verso.ShareExtension

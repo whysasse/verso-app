@@ -35,7 +35,7 @@ struct MarkdownReader {
         guard let enumerator = fm.enumerator(at: directoryURL,
                                               includingPropertiesForKeys: nil,
                                               options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) else {
-            os_log(.error, log: log, "Could not enumerate directory: %@", directoryURL.path)
+            os_log("Could not enumerate directory: %@", log: log, type: .error, directoryURL.path)
             return []
         }
 
@@ -45,7 +45,7 @@ struct MarkdownReader {
                 let article = try read(fileURL: fileURL)
                 articles.append(article)
             } catch {
-                os_log(.warning, log: log, "Skipping %@: %@", fileURL.lastPathComponent, error.localizedDescription)
+                os_log("Skipping %@: %@", log: log, type: .default, fileURL.lastPathComponent, error.localizedDescription)
             }
         }
         return articles
@@ -93,7 +93,7 @@ struct MarkdownReader {
                 if let s = Article.Status(rawValue: raw) {
                     status = s
                 } else {
-                    os_log(.warning, log: log, "Invalid status '%@' in %@, defaulting to unread", raw, fileURL.lastPathComponent)
+                    os_log("Invalid status '%@' in %@, defaulting to unread", log: log, type: .default, raw, fileURL.lastPathComponent)
                 }
             } else if trimmed.hasPrefix("tags:") {
                 tags = extractTagsArray(from: trimmed)
@@ -102,7 +102,7 @@ struct MarkdownReader {
                 if let d = dateFormatter.date(from: raw) {
                     dateAdded = d
                 } else {
-                    os_log(.warning, log: log, "Invalid date '%@' in %@, will use default", raw, fileURL.lastPathComponent)
+                    os_log("Invalid date '%@' in %@, will use default", log: log, type: .default, raw, fileURL.lastPathComponent)
                 }
             }
         }
@@ -120,10 +120,10 @@ struct MarkdownReader {
             if let attrs = try? FileManager.default.attributesOfItem(atPath: fileURL.path),
                let creationDate = attrs[.creationDate] as? Date {
                 finalDateAdded = creationDate
-                os_log(.info, log: log, "Using file creation date for %@", fileURL.lastPathComponent)
+                os_log("Using file creation date for %@", log: log, type: .info, fileURL.lastPathComponent)
             } else {
                 finalDateAdded = Date()
-                os_log(.warning, log: log, "No date found for %@, using now", fileURL.lastPathComponent)
+                os_log("No date found for %@, using now", log: log, type: .default, fileURL.lastPathComponent)
             }
         }
 
