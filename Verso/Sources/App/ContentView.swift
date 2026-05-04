@@ -4,10 +4,13 @@ struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
 
     var body: some View {
-        NavigationStack {
-            ArticleListView()
+        ZStack {
+            themeManager.colors.background
+                .ignoresSafeArea()
+            NavigationStack {
+                ArticleListView()
+            }
         }
-        .background(themeManager.colors.background.ignoresSafeArea())
     }
 }
 
