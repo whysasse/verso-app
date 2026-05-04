@@ -1,45 +1,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var themeManager: ThemeManager
-    @State private var showDocumentPicker = false
-    @State private var selectedFolderURL: URL?
-
     var body: some View {
         NavigationStack {
-            ZStack {
-                themeManager.colors.background
-                    .ignoresSafeArea()
-
-                VStack(spacing: 16) {
-                    Button("Select iCloud Folder") {
-                        showDocumentPicker = true
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .padding()
-
-                    if let url = selectedFolderURL {
-                        Text("Selected: \(url.lastPathComponent)")
-                            .font(.caption)
-                            .foregroundColor(themeManager.colors.textSecondary)
-                    }
-
-                    ForEach(VersoTheme.allCases) { theme in
-                        ThemeCard(theme: theme)
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Verso")
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showDocumentPicker) {
-                DocumentPicker { urls in
-                    if let url = urls.first {
-                        selectedFolderURL = url
-                    }
-                    showDocumentPicker = false
-                }
-            }
+            ArticleListView()
         }
     }
 }
