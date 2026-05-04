@@ -13,6 +13,10 @@ File: https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
 - 📖 Reading view: node-id=31:1701
 - ⚙️ Settings screen: node-id=34:2877
 
+## Implementation Entry Point
+
+**Before starting any implementation task, read `docs/HANDOFF.md` first.** It is the authoritative entry point — inline essentials for the design system, screens, and services, plus a doc map that tells you which file to fetch for each domain (components, tokens, error states, animations, accessibility, copy, user flows).
+
 ## Architecture (from PRD)
 
 - **File-first**: Articles saved as Markdown files to user-selected iCloud Drive folder. No proprietary database.

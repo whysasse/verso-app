@@ -52,7 +52,7 @@ Defined in `ArticleStatus` enum in `Colors.swift`: Unread (blue `4A90D9`), Readi
 
 `docs/` contains design research, PRD, wireframes, and specs.
 
-**Start here for implementation:** `docs/HANDOFF.md` — thin index with inline essentials + pointers to authoritative docs by topic. Optimized for token efficiency.
+**Before starting any implementation task, read `docs/HANDOFF.md` first.** It is the authoritative entry point — a thin index with inline essentials and pointers to authoritative docs by topic, optimized for token efficiency.
 
 Other key files:
 - `PRD_MinimalistReaderApp.md` — full product requirements
