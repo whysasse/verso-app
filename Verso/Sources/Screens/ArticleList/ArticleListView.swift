@@ -63,22 +63,8 @@ struct ArticleListView: View {
             }
         }
         .background(themeManager.colors.background.ignoresSafeArea())
-        .navigationTitle("Verso")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    // FAB-21: add article action
-                } label: {
-                    Image(systemName: "plus.circle")
-                        .font(.system(size: 20))
-                        .foregroundColor(themeManager.colors.accent)
-                }
-                .buttonStyle(.plain)
-            }
+        .versoNavigationBar(title: "Verso") {
+            // FAB-21: add article action
         }
-        .toolbarBackground(themeManager.colors.background, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
     }
 }
