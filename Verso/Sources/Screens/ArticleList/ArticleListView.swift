@@ -14,8 +14,6 @@ struct ArticleListView: View {
     @State private var searchText = ""
     @State private var activeFilter: ArticleStatus?
 
-    private var colors: ThemeColors { themeManager.colors }
-
     private var filteredArticles: [Article] {
         articles.filter { article in
             let matchesFilter: Bool = {
@@ -37,28 +35,9 @@ struct ArticleListView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Search bar
-            HStack(spacing: VersoSpacing.xs) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(colors.textSecondary)
-                TextField("Search titles...", text: $searchText)
-                    .font(VersoTypography.UI.input)
-                    .foregroundColor(colors.textPrimary)
-                    .tint(colors.accent)
-                if !searchText.isEmpty {
-                    Button { searchText = "" } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(colors.placeholder)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, VersoSpacing.sm)
-            .frame(height: 44)
-            .background(colors.surface)
-            .cornerRadius(VersoRadius.sm)
-            .padding(.horizontal, VersoSpacing.md)
-            .padding(.top, VersoSpacing.md)
+            SearchBar(text: $searchText)
+                .padding(.horizontal, VersoSpacing.md)
+                .padding(.top, VersoSpacing.md)
 
             // Filter chips
             FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
@@ -66,13 +45,13 @@ struct ArticleListView: View {
 
             // Article list or empty state
             if filteredArticles.isEmpty {
-                EmptyStateView(hasSearch: !searchText.isEmpty, colors: colors)
+                EmptyState(variant: searchText.isEmpty ? .empty : .searchMiss)
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 9) {
+                    LazyVStack(spacing: 12) {
                         ForEach(filteredArticles) { article in
                             NavigationLink(destination: Text("Reading view coming soon")) {
-                                ArticleCardView(article: article)
+                                ArticleCard(article: article)
                             }
                             .buttonStyle(.plain)
                         }
@@ -83,7 +62,7 @@ struct ArticleListView: View {
                 }
             }
         }
-        .background(colors.background.ignoresSafeArea())
+        .background(themeManager.colors.background.ignoresSafeArea())
         .navigationTitle("Verso")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -93,40 +72,13 @@ struct ArticleListView: View {
                 } label: {
                     Image(systemName: "plus.circle")
                         .font(.system(size: 20))
-                        .foregroundColor(colors.accent)
+                        .foregroundColor(themeManager.colors.accent)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .toolbarBackground(colors.background, for: .navigationBar)
+        .toolbarBackground(themeManager.colors.background, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
-    }
-}
-
-private struct EmptyStateView: View {
-    let hasSearch: Bool
-    let colors: ThemeColors
-
-    var body: some View {
-        VStack(spacing: VersoSpacing.md) {
-            Spacer()
-
-            Image(systemName: hasSearch ? "magnifyingglass" : "tray")
-                .font(.system(size: 48))
-                .foregroundColor(colors.textSecondary)
-
-            Text(hasSearch ? "No articles match your search" : "No articles yet")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(colors.textPrimary)
-
-            Text(hasSearch ? "Try a different search term" : "Save your first article to get started")
-                .font(.system(size: 15))
-                .foregroundColor(colors.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, VersoSpacing.xl)
-
-            Spacer()
-        }
     }
 }

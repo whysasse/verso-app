@@ -34,26 +34,12 @@ struct FilterChipBar: View {
     }
 }
 
-private struct FilterChip: View {
-    let label: String
-    let count: Int
-    let isActive: Bool
-    let colors: ThemeColors
-    let action: () -> Void
+#Preview {
+    @Previewable @State var filter: ArticleStatus? = nil
 
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Text(label)
-                Text("\(count)")
-            }
-            .font(.system(size: 17, weight: .semibold))
-            .foregroundColor(isActive ? colors.accent : colors.textSecondary)
-            .padding(.horizontal, VersoSpacing.sm)
-            .frame(height: 36)
-            .background(isActive ? colors.accentSurface : Color.clear)
-            .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
+    FilterChipBar(
+        activeFilter: $filter,
+        counts: [.unread: 5, .reading: 3, .read: 4]
+    )
+    .environmentObject(ThemeManager())
 }
