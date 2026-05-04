@@ -54,6 +54,10 @@ const spacing = {
   '2xl': 48, '3xl': 64
 };
 
+const radius = {
+  'sm': 10, 'md': 12, 'lg': 18, 'pill': 20
+};
+
 let total = 0;
 
 // Create color collection with modes for each theme
@@ -95,5 +99,19 @@ for (const [name, value] of Object.entries(spacing)) {
   total++;
 }
 
-figma.notify('Created ' + total + ' Figma Variables:\n36 colors (4 themes) + 8 spacing');
+// Create radius collection
+const radiusCollection = figma.variables.createVariableCollection('Verso/Radius');
+const radiusModeId = radiusCollection.defaultModeId;
+
+for (const [name, value] of Object.entries(radius)) {
+  const variable = figma.variables.createVariable(
+    'radius/' + name,
+    radiusCollection,
+    'FLOAT'
+  );
+  variable.setValueForMode(radiusModeId, value);
+  total++;
+}
+
+figma.notify('Created ' + total + ' Figma Variables:\n36 colors (4 themes) + 8 spacing + 4 radius');
 console.log('Done:', total, 'variables');
