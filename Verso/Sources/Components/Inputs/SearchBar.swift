@@ -40,13 +40,17 @@ struct SearchBar: View {
 }
 
 #Preview {
-    @Previewable @State var text = ""
-    @Previewable @State var filled = "Swift"
-
-    VStack(spacing: 16) {
-        SearchBar(text: $text)
-        SearchBar(text: $filled)
+    struct PreviewWrapper: View {
+        @State private var text = ""
+        @State private var filled = "Swift"
+        var body: some View {
+            VStack(spacing: 16) {
+                SearchBar(text: $text)
+                SearchBar(text: $filled)
+            }
+            .padding()
+            .environmentObject(ThemeManager())
+        }
     }
-    .padding()
-    .environmentObject(ThemeManager())
+    return PreviewWrapper()
 }

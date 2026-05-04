@@ -62,12 +62,12 @@ struct ArticleCard: View {
 }
 
 #Preview {
-    let context = CoreDataStack.preview.persistentContainer.viewContext
+    let context = CoreDataStackValue.preview.persistentContainer.viewContext
     let unread = Article.create(in: context, filePath: "a", title: "The Future of Reading in a Digital Age", url: URL(string: "https://www.example.com/article"), status: .unread, source: "example.com")
     let reading = Article.create(in: context, filePath: "b", title: "How to Build a Minimalist Reading Habit", url: URL(string: "https://medium.com"), status: .reading, source: "medium.com")
     let read = Article.create(in: context, filePath: "c", title: "Why Paper Still Matters", status: .read, source: "nytimes.com")
 
-    return VStack(spacing: 12) {
+    VStack(spacing: 12) {
         ArticleCard(article: unread)
         ArticleCard(article: reading)
         ArticleCard(article: read)

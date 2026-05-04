@@ -64,17 +64,22 @@ struct VersoTextField: View {
 }
 
 #Preview {
-    @Previewable @State var text1 = ""
-    @Previewable @State var text2 = "hello@example.com"
-    @Previewable @State var text3 = "bad input"
-    @Previewable @State var text4 = "disabled"
+    struct PreviewWrapper: View {
+        @State var text1 = ""
+        @State var text2 = "hello@example.com"
+        @State var text3 = "bad input"
+        @State var text4 = "disabled"
 
-    return VStack(spacing: 16) {
-        VersoTextField(placeholder: "Email", text: $text1)
-        VersoTextField(placeholder: "Email", text: $text2)
-        VersoTextField(placeholder: "Email", text: $text3, fieldState: .error("Invalid email address"))
-        VersoTextField(placeholder: "Email", text: $text4, fieldState: .disabled)
+        var body: some View {
+            VStack(spacing: 16) {
+                VersoTextField(placeholder: "Email", text: $text1)
+                VersoTextField(placeholder: "Email", text: $text2)
+                VersoTextField(placeholder: "Email", text: $text3, fieldState: .error("Invalid email address"))
+                VersoTextField(placeholder: "Email", text: $text4, fieldState: .disabled)
+            }
+            .padding()
+            .environmentObject(ThemeManager())
+        }
     }
-    .padding()
-    .environmentObject(ThemeManager())
+    return PreviewWrapper()
 }

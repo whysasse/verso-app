@@ -34,12 +34,18 @@ struct FilterChipBar: View {
     }
 }
 
-#Preview {
-    @Previewable @State var filter: ArticleStatus? = nil
+struct FilterChipBar_Preview: View {
+    @State private var filter: ArticleStatus? = nil
 
-    FilterChipBar(
-        activeFilter: $filter,
-        counts: [.unread: 5, .reading: 3, .read: 4]
-    )
-    .environmentObject(ThemeManager())
+    var body: some View {
+        FilterChipBar(
+            activeFilter: $filter,
+            counts: [.unread: 5, .reading: 3, .read: 4]
+        )
+        .environmentObject(ThemeManager())
+    }
+}
+
+#Preview {
+    FilterChipBar_Preview()
 }

@@ -152,14 +152,20 @@ private struct ThemeChipView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var fontSize: CGFloat = 18
-    @Previewable @State var lineSpacing = 1
+private struct ReadingControlsPreview: View {
+    @State var fontSize: CGFloat = 18
+    @State var lineSpacing = 1
 
-    VStack {
-        Spacer()
-        ReadingControls(variant: .font, fontSize: $fontSize, lineSpacing: $lineSpacing)
-            .environmentObject(ThemeManager())
+    var body: some View {
+        VStack {
+            Spacer()
+            ReadingControls(variant: .font, fontSize: $fontSize, lineSpacing: $lineSpacing)
+                .environmentObject(ThemeManager())
+        }
+        .background(Color.gray.opacity(0.2))
     }
-    .background(Color.gray.opacity(0.2))
+}
+
+#Preview {
+    ReadingControlsPreview()
 }

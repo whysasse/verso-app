@@ -97,12 +97,16 @@ struct ReadingBottomBar: View {
 }
 
 #Preview {
-    @Previewable @State var visible = true
-
-    VStack {
-        ReadingTopBar(title: "The Future of Reading", isVisible: $visible)
-        Spacer()
-        ReadingBottomBar(isVisible: $visible)
+    struct PreviewWrapper: View {
+        @State var visible = true
+        var body: some View {
+            VStack {
+                ReadingTopBar(title: "The Future of Reading", isVisible: $visible)
+                Spacer()
+                ReadingBottomBar(isVisible: $visible)
+            }
+            .environmentObject(ThemeManager())
+        }
     }
-    .environmentObject(ThemeManager())
+    return PreviewWrapper()
 }

@@ -52,7 +52,7 @@ final class ReadabilityParser: NSObject {
 
     private func injectAndParse(html: String, url: URL) async {
         guard let wv = webView else { return }
-        guard let readabilityJS = loadReadabilityJS() else {
+        guard loadReadabilityJS() != nil else {
             logger.error("Readability.js resource not found in bundle")
             finish(throwing: ArticleParsingError.readabilityFailed(url))
             return

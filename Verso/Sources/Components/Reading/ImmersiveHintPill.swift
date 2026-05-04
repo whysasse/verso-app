@@ -20,16 +20,21 @@ struct ImmersiveHintPill: View {
     }
 }
 
-#Preview {
-    @Previewable @State var visible = true
-
-    ZStack {
-        Color.gray.opacity(0.3)
-        VStack {
-            Spacer()
-            ImmersiveHintPill(isVisible: $visible)
-                .padding(.bottom, 100)
+struct ImmersiveHintPill_Preview: View {
+    @State private var visible = true
+    var body: some View {
+        ZStack {
+            Color.gray.opacity(0.3)
+            VStack {
+                Spacer()
+                ImmersiveHintPill(isVisible: $visible)
+                    .padding(.bottom, 100)
+            }
         }
+        .ignoresSafeArea()
     }
-    .ignoresSafeArea()
+}
+
+#Preview {
+    ImmersiveHintPill_Preview()
 }
