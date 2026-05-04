@@ -291,24 +291,85 @@ All user-visible text strings for the Verso iOS app. Developers should treat thi
 | `share.save.success` | Save button (done) | Saved | — |
 | `share.save.error` | Save button (failed) | Try again | — |
 | `share.cancel` | Cancel button | Cancel | — |
-| `share.error.couldNotParse` | Error message | Could not extract article. | — |
-| `share.error.openInSafari` | Error link text | Open in Safari | — |
 | `share.error.noFolder.message` | No-folder-configured message | Folder not configured. | — |
 | `share.error.noFolder.cta` | No-folder-configured link | Open Verso to finish setup | — |
+
+> **Note:** `share.error.couldNotParse` and `share.error.openInSafari` are superseded by `share.error.*` keys in §9 (Scenario 8).
 
 ---
 
 ## 9. Error & System Messages
 
+Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
+
+### Offline / Network (Scenario 1)
+
 | Key | Location | String | Notes |
 |-----|----------|--------|-------|
-| `error.couldNotSave` | Share extension / import error | Could not save article. | — |
-| `error.couldNotParse` | Parse failure | Could not parse article. | Matches PRD wording exactly |
-| `error.fileWrite` | File system error | Could not write file. | — |
-| `error.iCloudUnavailable` | iCloud error banner | iCloud Drive is unavailable. Check Settings → [Your Name] → iCloud. | — |
-| `error.offline.banner` | Offline banner | You're offline. Saved articles are still available. | — |
-| `error.offline.articleUnavailable` | Article unavailable offline | Not available offline. | Shown on greyed-out article row |
-| `error.generic` | Generic fallback | Something went wrong. Please try again. | — |
+| `error.offline.banner.headline` | Inline banner headline | You're offline. | — |
+| `error.offline.banner.subheadline` | Inline banner subheadline | Saved articles are still available. | — |
+| `error.offline.articleUnavailable` | Article row (unavailable article) | Not available offline. | Greyed-out row only |
+
+### Parsing Failed (Scenario 2)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.parsing.headline` | Bottom sheet headline | Couldn't read this article. | — |
+| `error.parsing.subheadline` | Bottom sheet subheadline | The page may be behind a paywall or require a login. | — |
+| `error.parsing.openInSafari` | Primary CTA | Open in Safari | Accent fill |
+| `error.parsing.dismiss` | Secondary CTA | Dismiss | — |
+
+### Folder Not Configured (Scenario 3)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.noFolder.headline` | Full-screen error headline | No folder selected. | — |
+| `error.noFolder.subheadline` | Full-screen error subheadline | Choose a folder in iCloud Drive to start saving articles. | — |
+| `error.noFolder.cta` | CTA button | Choose folder | — |
+
+### Folder Not Found (Scenario 4)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.folderMissing.headline` | Full-screen error headline | Folder not found. | — |
+| `error.folderMissing.subheadline` | Full-screen error subheadline | The folder may have been moved or deleted. Choose a new one to continue. | — |
+| `error.folderMissing.cta` | CTA button | Choose new folder | — |
+
+### iCloud Unavailable (Scenario 5)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.iCloudUnavailable.headline` | Inline banner headline | iCloud Drive is unavailable. | — |
+| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | — |
+
+### File Write Error (Scenario 6)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.fileWrite.message` | Toast message | Couldn't save article. | 3s auto-dismiss |
+| `error.fileWrite.subtext` | Toast subtext | Check that your folder is accessible and try again. | — |
+
+### File Read Error (Scenario 7)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.fileRead.headline` | Inline reading view | This article couldn't be loaded. | — |
+| `error.fileRead.cta` | Text button | Open original | Opens sourceURL in Safari |
+
+### Share Extension — Parse Failure (Scenario 8)
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `share.error.headline` | Share sheet error state | Couldn't save this article. | Replaces §8 `share.error.couldNotParse` |
+| `share.error.subheadline` | Share sheet error subheadline | The page couldn't be read. You can open it directly in Safari. | — |
+| `share.error.openInSafari` | Primary CTA | Open in Safari | Accent color |
+| `share.error.dismiss` | Secondary CTA | Dismiss | — |
+
+### Generic Fallback
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `error.generic` | Last-resort fallback | Something went wrong. Please try again. | — |
 
 ---
 
