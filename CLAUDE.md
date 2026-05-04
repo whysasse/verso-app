@@ -39,7 +39,7 @@ Open `Verso/Verso.xcodeproj` in Xcode to build and run. No CLI build commands ar
 - `Design/` — design system: `Colors.swift` (4 themes × `ThemeColors`), `Typography.swift`, `Spacing.swift`, `Radius.swift`, `ThemeManager.swift`, `DesignSystemPreview.swift`
 
 ### Themes
-Four reading themes defined in `VersoTheme` enum: **Paper**, **Sepia**, **Night**, **Ink**. Each has 8 semantic color roles: `background`, `surface`, `textPrimary`, `textSecondary`, `accent`, `accentPressed`, `border`, `placeholder`.
+Four reading themes defined in `VersoTheme` enum: **Paper**, **Sepia**, **Night**, **Ink**. Each has 9 semantic color roles: `background`, `surface`, `textPrimary`, `textSecondary`, `accent`, `accentPressed`, `accentSurface`, `border`, `placeholder`.
 
 ### Article Status Colors
 Defined in `ArticleStatus` enum in `Colors.swift`: Unread (blue `4A90D9`), Reading (amber `D4A353`), Read (green `5AAF7A`).
@@ -50,7 +50,11 @@ Defined in `ArticleStatus` enum in `Colors.swift`: Unread (blue `4A90D9`), Readi
 
 ## Docs
 
-`docs/` contains design research, PRD, wireframes, and specs. Key files:
+`docs/` contains design research, PRD, wireframes, and specs.
+
+**Start here for implementation:** `docs/HANDOFF.md` — thin index with inline essentials + pointers to authoritative docs by topic. Optimized for token efficiency.
+
+Other key files:
 - `PRD_MinimalistReaderApp.md` — full product requirements
 - `DESIGN_SYSTEM_FOUNDATIONS.md` — typography, spacing, color system reference
 - `FIGMA_DESIGN_SYSTEM_REFERENCE.md` — Figma token naming conventions
