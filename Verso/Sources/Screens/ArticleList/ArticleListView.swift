@@ -22,12 +22,8 @@ struct ArticleListView: View {
                 guard let filter = activeFilter else { return true }
                 return article.statusEnum.rawValue == filter.rawValue.lowercased()
             }()
-
-            let matchesSearch: Bool = {
-                guard !searchText.isEmpty else { return true }
-                return article.title.localizedCaseInsensitiveContains(searchText)
-            }()
-
+            let matchesSearch: Bool = searchText.isEmpty
+                || article.title.localizedCaseInsensitiveContains(searchText)
             return matchesFilter && matchesSearch
         }
     }
@@ -40,42 +36,71 @@ struct ArticleListView: View {
     }
 
     var body: some View {
-        ZStack {
-            colors.background.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
-                    .padding(.vertical, VersoSpacing.xs)
-
-                if filteredArticles.isEmpty {
-                    EmptyStateView(hasSearch: !searchText.isEmpty, colors: colors)
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: VersoSpacing.sm) {
-                            ForEach(filteredArticles) { article in
-                                NavigationLink(destination: Text("Reading view coming soon")) {
-                                    ArticleCardView(article: article)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.horizontal, VersoSpacing.md)
-                        .padding(.vertical, VersoSpacing.sm)
+        VStack(spacing: 0) {
+            // Search bar
+            HStack(spacing: VersoSpacing.xs) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(colors.placeholder)
+                TextField("Search articles", text: $searchText)
+                    .font(VersoTypography.UI.input)
+                    .foregroundColor(colors.textPrimary)
+                    .tint(colors.accent)
+                if !searchText.isEmpty {
+                    Button { searchText = "" } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(colors.placeholder)
                     }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, VersoSpacing.md)
+            .frame(height: 44)
+            .background(colors.surface)
+            .cornerRadius(VersoRadius.sm)
+            .padding(.horizontal, VersoSpacing.md)
+            .padding(.top, VersoSpacing.xs)
+            .padding(.bottom, VersoSpacing.xs)
+
+            // Filter chips
+            FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
+                .padding(.bottom, VersoSpacing.xs)
+
+            Divider()
+                .background(colors.border)
+
+            // Article list or empty state
+            if filteredArticles.isEmpty {
+                EmptyStateView(hasSearch: !searchText.isEmpty, colors: colors)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: VersoSpacing.sm) {
+                        ForEach(filteredArticles) { article in
+                            NavigationLink(destination: Text("Reading view coming soon")) {
+                                ArticleCardView(article: article)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, VersoSpacing.md)
+                    .padding(.vertical, VersoSpacing.sm)
                 }
             }
         }
+        .background(colors.background.ignoresSafeArea())
         .navigationTitle("Verso")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavigationLink(destination: Text("Settings coming soon")) {
                     Image(systemName: "gearshape")
+                        .font(.system(size: 20))
                         .foregroundColor(colors.accent)
                 }
+                .buttonStyle(.plain)
             }
         }
-        .searchable(text: $searchText, prompt: "Search articles")
+        .toolbarBackground(colors.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
     }
 }

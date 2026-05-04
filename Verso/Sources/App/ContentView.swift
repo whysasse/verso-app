@@ -1,10 +1,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+
     var body: some View {
         NavigationStack {
             ArticleListView()
         }
+        .background(themeManager.colors.background.ignoresSafeArea())
     }
 }
 
