@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 
 @objc(Article)
-public class Article: NSManagedObject {
+public class Article: NSManagedObject, Identifiable {
     @NSManaged public var id: UUID
     @NSManaged public var filePath: String
     @NSManaged public var title: String
