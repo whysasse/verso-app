@@ -43,13 +43,16 @@ private struct FilterChip: View {
 
     var body: some View {
         Button(action: action) {
-            Text("\(label) \(count)")
-                .font(VersoTypography.UI.caption)
-                .foregroundColor(isActive ? .white : colors.accent)
-                .padding(.horizontal, VersoSpacing.sm)
-                .frame(height: 36)
-                .background(isActive ? colors.accent : colors.accentSurface)
-                .clipShape(Capsule())
+            HStack(spacing: 4) {
+                Text(label)
+                Text("\(count)")
+            }
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundColor(isActive ? colors.accent : colors.textSecondary)
+            .padding(.horizontal, VersoSpacing.sm)
+            .frame(height: 36)
+            .background(isActive ? colors.accentSurface : Color.clear)
+            .clipShape(Capsule())
         }
         .buttonStyle(.plain)
     }

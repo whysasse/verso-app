@@ -40,8 +40,8 @@ struct ArticleListView: View {
             // Search bar
             HStack(spacing: VersoSpacing.xs) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundColor(colors.placeholder)
-                TextField("Search articles", text: $searchText)
+                    .foregroundColor(colors.textSecondary)
+                TextField("Search titles...", text: $searchText)
                     .font(VersoTypography.UI.input)
                     .foregroundColor(colors.textPrimary)
                     .tint(colors.accent)
@@ -53,27 +53,23 @@ struct ArticleListView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, VersoSpacing.md)
+            .padding(.horizontal, VersoSpacing.sm)
             .frame(height: 44)
             .background(colors.surface)
             .cornerRadius(VersoRadius.sm)
             .padding(.horizontal, VersoSpacing.md)
-            .padding(.top, VersoSpacing.xs)
-            .padding(.bottom, VersoSpacing.xs)
+            .padding(.top, VersoSpacing.md)
 
             // Filter chips
             FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
-                .padding(.bottom, VersoSpacing.xs)
-
-            Divider()
-                .background(colors.border)
+                .padding(.top, VersoSpacing.lg)
 
             // Article list or empty state
             if filteredArticles.isEmpty {
                 EmptyStateView(hasSearch: !searchText.isEmpty, colors: colors)
             } else {
                 ScrollView {
-                    LazyVStack(spacing: VersoSpacing.sm) {
+                    LazyVStack(spacing: 9) {
                         ForEach(filteredArticles) { article in
                             NavigationLink(destination: Text("Reading view coming soon")) {
                                 ArticleCardView(article: article)
@@ -82,17 +78,20 @@ struct ArticleListView: View {
                         }
                     }
                     .padding(.horizontal, VersoSpacing.md)
-                    .padding(.vertical, VersoSpacing.sm)
+                    .padding(.top, VersoSpacing.lg)
+                    .padding(.bottom, VersoSpacing.md)
                 }
             }
         }
         .background(colors.background.ignoresSafeArea())
         .navigationTitle("Verso")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: Text("Settings coming soon")) {
-                    Image(systemName: "gearshape")
+                Button {
+                    // FAB-21: add article action
+                } label: {
+                    Image(systemName: "plus.circle")
                         .font(.system(size: 20))
                         .foregroundColor(colors.accent)
                 }
@@ -121,7 +120,7 @@ private struct EmptyStateView: View {
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundColor(colors.textPrimary)
 
-            Text(hasSearch ? "Try a different search term" : "Save articles from the share sheet to get started")
+            Text(hasSearch ? "Try a different search term" : "Save your first article to get started")
                 .font(.system(size: 15))
                 .foregroundColor(colors.textSecondary)
                 .multilineTextAlignment(.center)

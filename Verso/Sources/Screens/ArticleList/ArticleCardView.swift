@@ -28,40 +28,38 @@ struct ArticleCardView: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: VersoSpacing.sm) {
-            StatusBadge(status: articleStatus)
-
+        ZStack(alignment: .topTrailing) {
+            // Card content — right padding leaves room for the badge
             VStack(alignment: .leading, spacing: VersoSpacing.xxs) {
                 Text(article.title)
                     .font(VersoTypography.UI.listTitle)
                     .foregroundColor(colors.textPrimary)
                     .lineLimit(2)
 
-                HStack(spacing: VersoSpacing.xs) {
-                    if !sourceDomain.isEmpty {
-                        Text(sourceDomain)
-                            .font(VersoTypography.UI.caption)
-                            .foregroundColor(colors.textSecondary)
-                    }
-
-                    if !sourceDomain.isEmpty {
-                        Text("·")
-                            .font(VersoTypography.UI.caption)
-                            .foregroundColor(colors.textSecondary)
-                    }
-
-                    Text(formattedDate)
-                        .font(VersoTypography.UI.caption)
+                if !sourceDomain.isEmpty {
+                    Text(sourceDomain)
+                        .font(VersoTypography.UI.listSubtitle)
                         .foregroundColor(colors.textSecondary)
+                        .lineLimit(1)
                 }
-            }
 
-            Spacer(minLength: 0)
+                Text(formattedDate)
+                    .font(VersoTypography.UI.caption)
+                    .foregroundColor(colors.textSecondary)
+            }
+            .padding(.top, VersoSpacing.md)
+            .padding(.bottom, VersoSpacing.md)
+            .padding(.leading, VersoSpacing.md)
+            .padding(.trailing, 56)
+            .frame(maxWidth: .infinity, minHeight: 122, alignment: .leading)
+            .background(colors.surface)
+            .cornerRadius(VersoRadius.md)
+
+            // Status badge — 28×28pt circle, absolute top-right
+            StatusBadge(status: articleStatus)
+                .padding(.top, VersoSpacing.md)
+                .padding(.trailing, VersoSpacing.md)
         }
-        .padding(VersoSpacing.md)
-        .frame(minHeight: 44)
-        .background(colors.surface)
-        .cornerRadius(VersoRadius.md)
     }
 }
 
@@ -69,22 +67,13 @@ private struct StatusBadge: View {
     let status: ArticleStatus
 
     var body: some View {
-        switch status {
-        case .unread:
-            Circle()
-                .fill(status.color)
-                .frame(width: 12, height: 12)
-                .padding(.top, 4)
-
-        case .reading, .read:
-            Text(status.rawValue)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(.white)
-                .padding(.horizontal, 6)
-                .frame(height: 16)
-                .background(status.color)
-                .clipShape(Capsule())
-                .padding(.top, 2)
-        }
+        Circle()
+            .fill(status.color)
+            .frame(width: 28, height: 28)
+            .overlay(
+                Image(systemName: status.icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.white)
+            )
     }
 }
