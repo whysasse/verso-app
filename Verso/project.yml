@@ -16,6 +16,7 @@ targets:
     platform: iOS
     sources:
       - Sources
+      - Shared
       - Resources
       - Model
       - path: Resources/readability
@@ -68,12 +69,7 @@ targets:
     bundleId: com.fabiosasseron.verso.ShareExtension
     sources:
       - ShareExtension/Sources
-      - path: Sources/Services/ArticleParsingError.swift
-        type: file
-      - path: Sources/Services/PendingArticle.swift
-        type: file
-      - path: Sources/Services/SwiftSoupParser.swift
-        type: file
+      - Shared
     dependencies:
       - package: SwiftSoup
     settings:
