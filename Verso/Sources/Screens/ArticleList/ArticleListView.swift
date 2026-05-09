@@ -153,7 +153,7 @@ struct ArticleListView: View {
         let path = article.filePath
         viewContext.delete(article)
         try? viewContext.save()
-        try? MarkdownWriter.archive(filePath: path, in: folderURL)
+        _ = try? MarkdownWriter.archive(filePath: path, in: folderURL)
     }
 
     private func toggleReadStatus(_ article: Article) {
