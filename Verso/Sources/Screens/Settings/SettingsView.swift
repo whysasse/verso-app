@@ -154,7 +154,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 0) {
             sectionHeader("About")
 
-            NavigationLink(destination: Text("About screen — FAB-118").padding()) {
+            NavigationLink(destination: AboutView()) {
                 SettingsRow(type: .default(label: "Version \(appVersion)"))
                     .padding(.horizontal, VersoSpacing.md)
             }
@@ -162,20 +162,11 @@ struct SettingsView: View {
 
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
-            NavigationLink(destination: Text("Privacy Policy screen — FAB-119").padding()) {
+            NavigationLink(destination: PrivacyPolicyView()) {
                 SettingsRow(type: .default(label: "Privacy Policy"))
                     .padding(.horizontal, VersoSpacing.md)
             }
             .buttonStyle(.plain)
-
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
-
-            SettingsRow(type: .default(label: "Open Source"), action: {
-                if let url = URL(string: "https://github.com/whysasse/verso-app") {
-                    UIApplication.shared.open(url)
-                }
-            })
-            .padding(.horizontal, VersoSpacing.md)
         }
     }
 
