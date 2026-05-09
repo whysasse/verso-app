@@ -176,6 +176,10 @@ struct ArticleReaderView: View {
             .first?.windows.first?.safeAreaInsets.bottom) ?? 0
     }
 
+    private var parsedNodes: [MarkdownNode] {
+        MarkdownParser.parse(parsedContent)
+    }
+
     @ViewBuilder
     private var articleBody: some View {
         if parsedContent.isEmpty {
@@ -183,15 +187,13 @@ struct ArticleReaderView: View {
                 .font(.custom("Georgia", size: fontSize))
                 .foregroundColor(colors.textSecondary)
         } else {
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(paragraphs(from: parsedContent), id: \.self) { paragraph in
-                    Text(paragraph)
-                        .font(.custom("Georgia", size: fontSize))
-                        .lineSpacing(lineSpacingValue)
-                        .foregroundColor(colors.textPrimary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
+            MarkdownBodyView(
+                nodes: parsedNodes,
+                fontFamily: "",
+                fontSize: fontSize,
+                lineSpacingValue: lineSpacingValue,
+                colors: colors
+            )
         }
     }
 
@@ -204,30 +206,6 @@ struct ArticleReaderView: View {
         if let parsed = try? MarkdownReader.read(fileURL: fileURL) {
             parsedContent = parsed.contentMarkdown
         }
-    }
-
-    private func paragraphs(from markdown: String) -> [String] {
-        markdown
-            .components(separatedBy: "\n\n")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-            .map { stripMarkdownSyntax($0) }
-    }
-
-    private func stripMarkdownSyntax(_ text: String) -> String {
-        var result = text
-        // Strip heading markers
-        result = result.replacingOccurrences(of: #"^#{1,6}\s+"#, with: "", options: .regularExpression)
-        // Strip bold/italic markers
-        result = result.replacingOccurrences(of: #"\*{1,3}([^*]+)\*{1,3}"#, with: "$1", options: .regularExpression)
-        result = result.replacingOccurrences(of: #"_{1,3}([^_]+)_{1,3}"#, with: "$1", options: .regularExpression)
-        // Strip inline code
-        result = result.replacingOccurrences(of: #"`([^`]+)`"#, with: "$1", options: .regularExpression)
-        // Strip links
-        result = result.replacingOccurrences(of: #"\[([^\]]+)\]\([^)]+\)"#, with: "$1", options: .regularExpression)
-        // Collapse single newlines to space
-        result = result.replacingOccurrences(of: "\n", with: " ")
-        return result
     }
 
     private func advanceStatus(to status: Article.Status) {
