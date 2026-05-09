@@ -255,14 +255,14 @@ struct MarkdownBodyView: View {
         Group {
             switch node {
             case .paragraph(let inlines):
-                inlineText(inlines)
+                Text(inlineText(inlines))
                     .font(bodyFont)
                     .lineSpacing(lineSpacingValue)
                     .foregroundColor(colors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
             case .heading(let level, let inlines):
-                inlineText(inlines)
+                Text(inlineText(inlines))
                     .font(headingFont(level: level))
                     .foregroundColor(colors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -272,7 +272,7 @@ struct MarkdownBodyView: View {
                     Text("•")
                         .font(bodyFont)
                         .foregroundColor(colors.textSecondary)
-                    inlineText(inlines)
+                    Text(inlineText(inlines))
                         .font(bodyFont)
                         .lineSpacing(lineSpacingValue)
                         .foregroundColor(colors.textPrimary)
@@ -285,7 +285,7 @@ struct MarkdownBodyView: View {
                         .font(bodyFont)
                         .foregroundColor(colors.textSecondary)
                         .frame(minWidth: 24, alignment: .trailing)
-                    inlineText(inlines)
+                    Text(inlineText(inlines))
                         .font(bodyFont)
                         .lineSpacing(lineSpacingValue)
                         .foregroundColor(colors.textPrimary)
@@ -297,7 +297,7 @@ struct MarkdownBodyView: View {
                     Rectangle()
                         .fill(colors.accent)
                         .frame(width: 3)
-                    inlineText(inlines)
+                    Text(inlineText(inlines))
                         .font(bodyFont.italic())
                         .lineSpacing(lineSpacingValue)
                         .foregroundColor(colors.textSecondary)
@@ -359,31 +359,41 @@ struct MarkdownBodyView: View {
 
     // MARK: Inline text rendering
 
-    private func inlineText(_ inlines: [MarkdownNode.InlineNode]) -> Text {
-        inlines.reduce(Text("")) { result, inline in
+    private func inlineText(_ inlines: [MarkdownNode.InlineNode]) -> AttributedString {
+        inlines.reduce(AttributedString("")) { result, inline in
             result + textForInline(inline)
         }
     }
 
-    private func textForInline(_ inline: MarkdownNode.InlineNode) -> Text {
+    private func textForInline(_ inline: MarkdownNode.InlineNode) -> AttributedString {
         switch inline {
         case .text(let s):
-            return Text(s)
+            return AttributedString(s)
         case .bold(let s):
-            return Text(s).bold()
+            var a = AttributedString(s)
+            a.swiftUI.font = bodyFont.bold()
+            return a
         case .italic(let s):
-            return Text(s).italic()
+            var a = AttributedString(s)
+            a.swiftUI.font = bodyFont.italic()
+            return a
         case .boldItalic(let s):
-            return Text(s).bold().italic()
+            var a = AttributedString(s)
+            a.swiftUI.font = bodyFont.bold().italic()
+            return a
         case .code(let s):
-            return Text(s)
-                .font(.custom("SFMono-Regular", size: max(12, fontSize - 2)))
-                .foregroundColor(colors.accent)
-        case .link(let text, _):
-            // Rendered visually; tappability via AttributedString is a future enhancement
-            return Text(text)
-                .foregroundColor(colors.accent)
-                .underline()
+            var a = AttributedString(s)
+            a.swiftUI.font = .custom("SFMono-Regular", size: max(12, fontSize - 2))
+            a.swiftUI.foregroundColor = colors.accent
+            return a
+        case .link(let text, let url):
+            var a = AttributedString(text)
+            a.swiftUI.foregroundColor = colors.accent
+            a.swiftUI.underlineStyle = .single
+            if let resolved = URL(string: url) {
+                a.link = resolved
+            }
+            return a
         }
     }
 }
