@@ -3,6 +3,7 @@ import CoreData
 
 struct ArticleListView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var folderBookmarkService: FolderBookmarkService
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
@@ -13,6 +14,7 @@ struct ArticleListView: View {
 
     @State private var searchText = ""
     @State private var activeFilter: ArticleStatus?
+    @State private var showFolderPicker = false
 
     private var filteredArticles: [Article] {
         articles.filter { article in
@@ -64,6 +66,13 @@ struct ArticleListView: View {
         .background(themeManager.colors.background)
         .versoNavigationBar(title: "Verso") {
             // FAB-21: add article action
+        }
+        .sheet(isPresented: $showFolderPicker) {
+            DocumentPicker { urls in
+                guard let url = urls.first else { return }
+                folderBookmarkService.save(url: url)
+                showFolderPicker = false
+            }
         }
     }
 }
