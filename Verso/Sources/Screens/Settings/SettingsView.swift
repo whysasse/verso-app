@@ -17,7 +17,7 @@ struct SettingsView: View {
     private let availableFonts: [(name: String, displayName: String)] = [
         ("Georgia", "Georgia"),
         ("NewYork", "New York"),
-        (".AppleSystemUIFont", "System"),
+        ("", "System"),
     ]
 
     private var appVersion: String {
@@ -72,16 +72,14 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 ForEach(availableFonts, id: \.name) { font in
                     let isSelected = readingPreferences.fontFamily == font.name
-                    Button {
-                        readingPreferences.fontFamily = font.name
-                    } label: {
-                        SettingsRow(type: .font(
-                            name: font.name,
+                    SettingsRow(
+                        type: .font(
+                            name: font.displayName,
                             preview: "The quick brown fox jumps over the lazy dog",
                             isSelected: isSelected
-                        ))
-                    }
-                    .buttonStyle(.plain)
+                        ),
+                        action: { readingPreferences.fontFamily = font.name }
+                    )
                     .padding(.horizontal, VersoSpacing.md)
                     if font.name != availableFonts.last?.name {
                         Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
@@ -156,16 +154,20 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 0) {
             sectionHeader("About")
 
-            SettingsRow(type: .default(label: "Version \(appVersion)"))
-                .padding(.horizontal, VersoSpacing.md)
+            NavigationLink(destination: Text("About screen — FAB-118").padding()) {
+                SettingsRow(type: .default(label: "Version \(appVersion)"))
+                    .padding(.horizontal, VersoSpacing.md)
+            }
+            .buttonStyle(.plain)
+
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
-            SettingsRow(type: .default(label: "Privacy Policy"), action: {
-                if let url = URL(string: "https://fabiosasseron.com/verso/privacy") {
-                    UIApplication.shared.open(url)
-                }
-            })
-            .padding(.horizontal, VersoSpacing.md)
+            NavigationLink(destination: Text("Privacy Policy screen — FAB-119").padding()) {
+                SettingsRow(type: .default(label: "Privacy Policy"))
+                    .padding(.horizontal, VersoSpacing.md)
+            }
+            .buttonStyle(.plain)
+
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
             SettingsRow(type: .default(label: "Open Source"), action: {

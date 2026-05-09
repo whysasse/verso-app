@@ -63,11 +63,11 @@ struct SettingsRow: View {
         ZStack(alignment: .topTrailing) {
             VStack(alignment: .leading, spacing: VersoSpacing.xxs) {
                 Text(name)
-                    .font(.custom(name, size: 17).weight(.semibold))
+                    .font(name.isEmpty ? .system(size: 17, weight: .semibold) : .custom(name, size: 17).weight(.semibold))
                     .foregroundColor(colors.textPrimary)
 
                 Text(preview)
-                    .font(.custom(name, size: 15))
+                    .font(name.isEmpty ? .system(size: 15) : .custom(name, size: 15))
                     .foregroundColor(colors.textSecondary)
                     .lineLimit(1)
             }
