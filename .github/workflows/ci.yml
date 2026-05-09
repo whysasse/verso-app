@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: Verso
+        run: xcodegen generate
+
+      - name: Build (no code signing)
+        working-directory: Verso
+        run: |
+          xcodebuild \
+            -project Verso.xcodeproj \
+            -scheme Verso \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            CODE_SIGNING_ALLOWED=NO \
+            build | xcpretty && exit ${PIPESTATUS[0]}
