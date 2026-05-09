@@ -23,12 +23,11 @@ struct ArticleReaderView: View {
     @State private var isChromeVisible: Bool = true
     @State private var showFontControls: Bool = false
     @State private var showThemeControls: Bool = false
-    @State private var fontSize: CGFloat = 18
-    @State private var lineSpacing: Int = 2
     @State private var parsedContent: String = ""
     @State private var isPillVisible: Bool = false
 
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var readingPreferences: ReadingPreferencesService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -44,7 +43,7 @@ struct ArticleReaderView: View {
     private var lineSpacingValue: CGFloat {
         // Compact=1.2, Normal=1.5, Relaxed=1.75, Airy=2.0
         let multipliers: [CGFloat] = [1.2, 1.5, 1.75, 2.0]
-        return fontSize * (multipliers[lineSpacing] - 1)
+        return readingPreferences.fontSize * (multipliers[readingPreferences.lineSpacing] - 1)
     }
 
     var body: some View {
@@ -147,13 +146,13 @@ struct ArticleReaderView: View {
         .navigationBarHidden(true)
         .ignoresSafeArea(edges: .all)
         .sheet(isPresented: $showFontControls) {
-            ReadingControls(variant: .font, fontSize: $fontSize, lineSpacing: $lineSpacing)
+            ReadingControls(variant: .font, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
                 .presentationDetents([.height(245)])
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
         }
         .sheet(isPresented: $showThemeControls) {
-            ReadingControls(variant: .theme, fontSize: $fontSize, lineSpacing: $lineSpacing)
+            ReadingControls(variant: .theme, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
                 .presentationDetents([.height(200)])
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
@@ -184,13 +183,13 @@ struct ArticleReaderView: View {
     private var articleBody: some View {
         if parsedContent.isEmpty {
             Text("Loading…")
-                .font(.custom("Georgia", size: fontSize))
+                .font(.custom(readingPreferences.fontFamily, size: readingPreferences.fontSize))
                 .foregroundColor(colors.textSecondary)
         } else {
             MarkdownBodyView(
                 nodes: parsedNodes,
-                fontFamily: "",
-                fontSize: fontSize,
+                fontFamily: readingPreferences.fontFamily,
+                fontSize: readingPreferences.fontSize,
                 lineSpacingValue: lineSpacingValue,
                 colors: colors
             )
@@ -235,6 +234,7 @@ struct ArticleReaderView: View {
             article.status = "unread"
             return ArticleReaderView(article: article)
                 .environmentObject(ThemeManager())
+                .environmentObject(ReadingPreferencesService())
                 .environment(\.managedObjectContext, context)
         }
     }
