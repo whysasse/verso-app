@@ -25,6 +25,7 @@ struct ArticleReaderView: View {
     @State private var showThemeControls: Bool = false
     @State private var parsedContent: String = ""
     @State private var isPillVisible: Bool = false
+    @State private var relatedArticles: [Article] = []
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
@@ -70,6 +71,10 @@ struct ArticleReaderView: View {
                             )
 
                             articleBody
+
+                            if !relatedArticles.isEmpty {
+                                RelatedArticlesSection(articles: relatedArticles)
+                            }
                         }
                         .padding(.horizontal, 40)
                         .padding(.top, 44 + safeAreaTop + 24)
@@ -160,6 +165,7 @@ struct ArticleReaderView: View {
         .task {
             loadContent()
             advanceStatus(to: .reading)
+            relatedArticles = await RelatedArticlesService().related(to: article, in: viewContext)
         }
     }
 
