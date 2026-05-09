@@ -18,6 +18,7 @@ struct VersoApp: App {
                 .onAppear {
                     folderBookmarkService.restore()
                     applyWindowBackground()
+                    Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
                     #if DEBUG
                     DebugSeedService.seedIfNeeded(context: context)
                     #endif
@@ -26,8 +27,11 @@ struct VersoApp: App {
                 .onChange(of: scenePhase) { phase in
                     if phase == .background {
                         folderBookmarkService.stopAccess()
-                    } else if phase == .active, let url = folderBookmarkService.folderURL {
-                        Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+                    } else if phase == .active {
+                        Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
+                        if let url = folderBookmarkService.folderURL {
+                            Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+                        }
                     }
                 }
                 .onChange(of: folderBookmarkService.folderURL) { url in
