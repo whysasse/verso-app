@@ -30,6 +30,8 @@ struct ArticleReaderView: View {
 
     @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var colors: ThemeColors { themeManager.colors }
 
@@ -71,8 +73,8 @@ struct ArticleReaderView: View {
                             articleBody
                         }
                         .padding(.horizontal, 40)
-                        .padding(.top, 44 + geo.safeAreaInsets.top + 24)
-                        .padding(.bottom, 56 + geo.safeAreaInsets.bottom + 24)
+                        .padding(.top, 44 + safeAreaTop + 24)
+                        .padding(.bottom, 56 + safeAreaBottom + 24)
                         .background(
                             GeometryReader { content in
                                 Color.clear.preference(
@@ -86,14 +88,22 @@ struct ArticleReaderView: View {
                 .coordinateSpace(name: "scroll")
                 .onPreferenceChange(ScrollOffsetKey.self) { value in
                     scrollOffset = max(0, value)
+                    if scrollProgress >= 0.95 {
+                        advanceStatus(to: .read)
+                    }
                 }
                 .onPreferenceChange(ContentHeightKey.self) { value in
                     contentHeight = value
                 }
                 .onTapGesture {
-                    withAnimation(.easeOut(duration: 0.3)) {
+                    if reduceMotion {
                         isChromeVisible.toggle()
                         isPillVisible = !isChromeVisible
+                    } else {
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            isChromeVisible.toggle()
+                            isPillVisible = !isChromeVisible
+                        }
                     }
                 }
                 .onAppear {
@@ -150,6 +160,7 @@ struct ArticleReaderView: View {
         }
         .task {
             loadContent()
+            advanceStatus(to: .reading)
         }
     }
 
@@ -157,6 +168,12 @@ struct ArticleReaderView: View {
         (UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first?.windows.first?.safeAreaInsets.top) ?? 0
+    }
+
+    private var safeAreaBottom: CGFloat {
+        (UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.safeAreaInsets.bottom) ?? 0
     }
 
     @ViewBuilder
@@ -211,6 +228,15 @@ struct ArticleReaderView: View {
         // Collapse single newlines to space
         result = result.replacingOccurrences(of: "\n", with: " ")
         return result
+    }
+
+    private func advanceStatus(to status: Article.Status) {
+        let order: [Article.Status] = [.unread, .reading, .read]
+        guard let current = order.firstIndex(of: article.statusEnum),
+              let target = order.firstIndex(of: status),
+              current < target else { return }
+        article.statusEnum = status
+        try? viewContext.save()
     }
 
     private func estimatedReadTime(for text: String) -> Int? {
