@@ -4,7 +4,7 @@ import Foundation
 
 enum DebugSeedService {
 
-    private static let expectedCount = 13
+    private static let expectedCount = 14
 
     static func seedIfNeeded(context: NSManagedObjectContext) {
         let request = NSFetchRequest<Article>(entityName: "Article")
@@ -30,6 +30,7 @@ enum DebugSeedService {
             ("rethinking-success.md", "Rethinking What Success Actually Means", "Harvard Business Review", "https://hbr.org/2023/05/rethinking-what-success-actually-means", .unread, 17),
             ("the-history-of-silence.md", "A Short History of Silence", "London Review of Books", "https://www.lrb.co.uk/the-paper/v45/n12/silence-history", .reading, 21),
             ("learning-to-draw-at-50.md", "What I Learned From Learning to Draw at 50", "The New Yorker", "https://www.newyorker.com/culture/personal-history/learning-to-draw-at-fifty", .read, 34),
+            ("markdown-renderer-test.md", "Markdown Renderer Test", "Verso QA", "https://example.com", .unread, 0),
         ]
 
         for item in articles {
@@ -48,17 +49,13 @@ enum DebugSeedService {
     }
 
     private static func sampleArticlesDirectory() -> URL {
-        // Resolve SampleArticles/ relative to the app bundle, falling back to the
-        // project root sibling so it works both on device and in the simulator.
-        if let bundlePath = Bundle.main.resourceURL?
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("SampleArticles") {
-            if FileManager.default.fileExists(atPath: bundlePath.path) {
-                return bundlePath
-            }
+        // On device (and simulator after xcodegen regeneration) SampleArticles is
+        // copied into the bundle as a folder resource.
+        if let bundled = Bundle.main.resourceURL?.appendingPathComponent("SampleArticles"),
+           FileManager.default.fileExists(atPath: bundled.path) {
+            return bundled
         }
-        // Fallback: resolve from source file location at compile time
+        // Fallback for running directly from the source tree in the simulator.
         let sourceFile = URL(fileURLWithPath: #filePath)
         return sourceFile
             .deletingLastPathComponent() // Services/

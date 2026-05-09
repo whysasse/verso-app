@@ -199,10 +199,8 @@ struct ArticleReaderView: View {
 
     private func loadContent() {
         let filePath = article.filePath
-        guard !filePath.isEmpty, let fileURL = URL(string: filePath) ?? URL(string: "file://" + filePath) else {
-            parsedContent = ""
-            return
-        }
+        guard !filePath.isEmpty else { return }
+        let fileURL = URL(fileURLWithPath: filePath)
         if let parsed = try? MarkdownReader.read(fileURL: fileURL) {
             parsedContent = parsed.contentMarkdown
         }
