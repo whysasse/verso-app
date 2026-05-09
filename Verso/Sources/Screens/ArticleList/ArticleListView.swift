@@ -17,6 +17,7 @@ struct ArticleListView: View {
     @State private var activeFilter: ArticleStatus?
     @State private var showFolderPicker = false
     @State private var showAddArticle = false
+    @State private var showSettings = false
 
     private var filteredArticles: [Article] {
         articles.filter { article in
@@ -116,8 +117,8 @@ struct ArticleListView: View {
             guard let url = folderBookmarkService.folderURL else { return }
             await articleLibraryService.rebuildCache(from: url, context: viewContext)
         }
-        .versoNavigationBar(title: "Verso", trailingIcon: "folder") {
-            showFolderPicker = true
+        .versoNavigationBar(title: "Verso", trailingIcon: "gear") {
+            showSettings = true
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -131,6 +132,9 @@ struct ArticleListView: View {
                 .tint(.clear)
             }
         }
+        .background(
+            NavigationLink(destination: SettingsView(), isActive: $showSettings) { EmptyView() }
+        )
         .sheet(isPresented: $showFolderPicker) {
             DocumentPicker(onDocumentsPicked: { urls in
                 guard let url = urls.first else { return }

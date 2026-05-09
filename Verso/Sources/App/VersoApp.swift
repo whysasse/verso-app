@@ -6,6 +6,7 @@ struct VersoApp: App {
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var folderBookmarkService = FolderBookmarkService()
     @StateObject private var articleLibraryService = ArticleLibraryService()
+    @StateObject private var readingPreferences = ReadingPreferencesService()
     @Environment(\.scenePhase) private var scenePhase
     private let context = CoreDataStack.shared.persistentContainer.viewContext
 
@@ -16,6 +17,7 @@ struct VersoApp: App {
                 .environmentObject(themeManager)
                 .environmentObject(folderBookmarkService)
                 .environmentObject(articleLibraryService)
+                .environmentObject(readingPreferences)
                 .onAppear {
                     folderBookmarkService.restore()
                     applyWindowBackground()
