@@ -22,7 +22,7 @@ struct ArticleCard: View {
 
     private var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.dateFormat = "MMM d, yyyy"
         return formatter.string(from: article.dateAdded)
     }
 
@@ -54,10 +54,6 @@ struct ArticleCard: View {
         .padding(VersoSpacing.md)
         .background(colors.surface)
         .cornerRadius(VersoRadius.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: VersoRadius.md)
-                .stroke(colors.border, lineWidth: 1)
-        )
     }
 }
 

@@ -11,6 +11,7 @@ struct ContentView: View {
                 ArticleListView()
             }
         }
+        .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
     }
 }
 

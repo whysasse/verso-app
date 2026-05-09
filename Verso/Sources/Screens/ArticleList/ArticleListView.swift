@@ -34,23 +34,22 @@ struct ArticleListView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            SearchBar(text: $searchText)
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.top, VersoSpacing.md)
+        ScrollView {
+            VStack(spacing: 0) {
+                SearchBar(text: $searchText)
+                    .padding(.horizontal, VersoSpacing.md)
+                    .padding(.top, VersoSpacing.md)
 
-            // Filter chips
-            FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
-                .padding(.top, VersoSpacing.lg)
+                FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
+                    .padding(.top, VersoSpacing.lg)
 
-            // Article list or empty state
-            if filteredArticles.isEmpty {
-                EmptyState(variant: searchText.isEmpty ? .empty : .searchMiss)
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 12) {
+                if filteredArticles.isEmpty {
+                    EmptyState(variant: searchText.isEmpty ? .empty : .searchMiss)
+                        .padding(.top, VersoSpacing.xl)
+                } else {
+                    LazyVStack(spacing: 9) {
                         ForEach(filteredArticles) { article in
-                            NavigationLink(destination: Text("Reading view coming soon")) {
+                            NavigationLink(destination: ArticleReaderView(article: article)) {
                                 ArticleCard(article: article)
                             }
                             .buttonStyle(.plain)
@@ -62,7 +61,7 @@ struct ArticleListView: View {
                 }
             }
         }
-        .background(themeManager.colors.background.ignoresSafeArea())
+        .background(themeManager.colors.background)
         .versoNavigationBar(title: "Verso") {
             // FAB-21: add article action
         }

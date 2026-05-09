@@ -1,0 +1,240 @@
+import SwiftUI
+
+private struct ScrollOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+private struct ContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+struct ArticleReaderView: View {
+    let article: Article
+
+    @State private var scrollOffset: CGFloat = 0
+    @State private var contentHeight: CGFloat = 0
+    @State private var screenHeight: CGFloat = UIScreen.main.bounds.height
+    @State private var isChromeVisible: Bool = true
+    @State private var showFontControls: Bool = false
+    @State private var showThemeControls: Bool = false
+    @State private var fontSize: CGFloat = 18
+    @State private var lineSpacing: Int = 2
+    @State private var parsedContent: String = ""
+    @State private var isPillVisible: Bool = false
+
+    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) private var dismiss
+
+    private var colors: ThemeColors { themeManager.colors }
+
+    private var scrollProgress: Double {
+        let scrollable = contentHeight - screenHeight
+        guard scrollable > 0 else { return 0 }
+        return min(1, max(0, Double(scrollOffset / scrollable)))
+    }
+
+    private var lineSpacingValue: CGFloat {
+        // Compact=1.2, Normal=1.5, Relaxed=1.75, Airy=2.0
+        let multipliers: [CGFloat] = [1.2, 1.5, 1.75, 2.0]
+        return fontSize * (multipliers[lineSpacing] - 1)
+    }
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            colors.background.ignoresSafeArea()
+
+            GeometryReader { geo in
+                ScrollView {
+                    ZStack(alignment: .top) {
+                        GeometryReader { inner in
+                            Color.clear.preference(
+                                key: ScrollOffsetKey.self,
+                                value: -inner.frame(in: .named("scroll")).minY
+                            )
+                        }
+                        .frame(height: 0)
+
+                        VStack(alignment: .leading, spacing: 40) {
+                            ArticleHeader(
+                                title: article.title,
+                                source: article.source ?? "",
+                                date: article.dateAdded,
+                                readTime: estimatedReadTime(for: parsedContent)
+                            )
+
+                            articleBody
+                        }
+                        .padding(.horizontal, 40)
+                        .padding(.top, 44 + geo.safeAreaInsets.top + 24)
+                        .padding(.bottom, 56 + geo.safeAreaInsets.bottom + 24)
+                        .background(
+                            GeometryReader { content in
+                                Color.clear.preference(
+                                    key: ContentHeightKey.self,
+                                    value: content.size.height
+                                )
+                            }
+                        )
+                    }
+                }
+                .coordinateSpace(name: "scroll")
+                .onPreferenceChange(ScrollOffsetKey.self) { value in
+                    scrollOffset = max(0, value)
+                }
+                .onPreferenceChange(ContentHeightKey.self) { value in
+                    contentHeight = value
+                }
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        isChromeVisible.toggle()
+                        isPillVisible = !isChromeVisible
+                    }
+                }
+                .onAppear {
+                    screenHeight = geo.size.height
+                }
+            }
+
+            VStack(spacing: 0) {
+                ReadingTopBar(
+                    title: article.title,
+                    onBack: { dismiss() },
+                    onOpenExternal: {
+                        if let url = article.url {
+                            UIApplication.shared.open(url)
+                        }
+                    },
+                    isVisible: $isChromeVisible
+                )
+                .padding(.top, safeAreaTop)
+                Spacer()
+            }
+
+            if isPillVisible {
+                VStack {
+                    Spacer()
+                    ImmersiveHintPill(isVisible: $isPillVisible)
+                        .padding(.bottom, 80)
+                }
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            ReadingBottomBar(
+                scrollProgress: scrollProgress,
+                onControls: { showFontControls = true },
+                onTheme: { showThemeControls = true },
+                isVisible: $isChromeVisible
+            )
+            .frame(height: isChromeVisible ? 56 : 0)
+            .clipped()
+        }
+        .navigationBarHidden(true)
+        .ignoresSafeArea(edges: .all)
+        .sheet(isPresented: $showFontControls) {
+            ReadingControls(variant: .font, fontSize: $fontSize, lineSpacing: $lineSpacing)
+                .presentationDetents([.height(245)])
+                .presentationDragIndicator(.hidden)
+                .environmentObject(themeManager)
+        }
+        .sheet(isPresented: $showThemeControls) {
+            ReadingControls(variant: .theme, fontSize: $fontSize, lineSpacing: $lineSpacing)
+                .presentationDetents([.height(200)])
+                .presentationDragIndicator(.hidden)
+                .environmentObject(themeManager)
+        }
+        .task {
+            loadContent()
+        }
+    }
+
+    private var safeAreaTop: CGFloat {
+        (UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.safeAreaInsets.top) ?? 0
+    }
+
+    @ViewBuilder
+    private var articleBody: some View {
+        if parsedContent.isEmpty {
+            Text("Loading…")
+                .font(.custom("Georgia", size: fontSize))
+                .foregroundColor(colors.textSecondary)
+        } else {
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(paragraphs(from: parsedContent), id: \.self) { paragraph in
+                    Text(paragraph)
+                        .font(.custom("Georgia", size: fontSize))
+                        .lineSpacing(lineSpacingValue)
+                        .foregroundColor(colors.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    private func loadContent() {
+        let filePath = article.filePath
+        guard !filePath.isEmpty, let fileURL = URL(string: filePath) ?? URL(string: "file://" + filePath) else {
+            parsedContent = ""
+            return
+        }
+        if let parsed = try? MarkdownReader.read(fileURL: fileURL) {
+            parsedContent = parsed.contentMarkdown
+        }
+    }
+
+    private func paragraphs(from markdown: String) -> [String] {
+        markdown
+            .components(separatedBy: "\n\n")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .map { stripMarkdownSyntax($0) }
+    }
+
+    private func stripMarkdownSyntax(_ text: String) -> String {
+        var result = text
+        // Strip heading markers
+        result = result.replacingOccurrences(of: #"^#{1,6}\s+"#, with: "", options: .regularExpression)
+        // Strip bold/italic markers
+        result = result.replacingOccurrences(of: #"\*{1,3}([^*]+)\*{1,3}"#, with: "$1", options: .regularExpression)
+        result = result.replacingOccurrences(of: #"_{1,3}([^_]+)_{1,3}"#, with: "$1", options: .regularExpression)
+        // Strip inline code
+        result = result.replacingOccurrences(of: #"`([^`]+)`"#, with: "$1", options: .regularExpression)
+        // Strip links
+        result = result.replacingOccurrences(of: #"\[([^\]]+)\]\([^)]+\)"#, with: "$1", options: .regularExpression)
+        // Collapse single newlines to space
+        result = result.replacingOccurrences(of: "\n", with: " ")
+        return result
+    }
+
+    private func estimatedReadTime(for text: String) -> Int? {
+        guard !text.isEmpty else { return nil }
+        let wordCount = text.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
+        return max(1, wordCount / 200)
+    }
+}
+
+#Preview {
+    struct PreviewWrapper: View {
+        var body: some View {
+            let context = CoreDataStackValue.preview.persistentContainer.viewContext
+            let article = Article(context: context)
+            article.id = UUID()
+            article.title = "The Quiet Revolution in How We Read Long-Form Content Online"
+            article.source = "The Atlantic"
+            article.dateAdded = Date()
+            article.filePath = ""
+            article.status = "unread"
+            return ArticleReaderView(article: article)
+                .environmentObject(ThemeManager())
+                .environment(\.managedObjectContext, context)
+        }
+    }
+    return PreviewWrapper()
+}
