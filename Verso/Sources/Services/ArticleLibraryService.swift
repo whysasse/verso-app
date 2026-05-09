@@ -14,9 +14,14 @@ final class ArticleLibraryService: ObservableObject {
         isRebuilding = true
         defer { isRebuilding = false }
 
-        let parsedArticles = await Task.detached(priority: .userInitiated) {
+        let mainArticles = await Task.detached(priority: .userInitiated) {
             MarkdownReader.readAll(from: folderURL)
         }.value
+        let archiveDir = folderURL.appendingPathComponent("Archive", isDirectory: true)
+        let archivedArticles = await Task.detached(priority: .userInitiated) {
+            MarkdownReader.readAll(from: archiveDir)
+        }.value
+        let parsedArticles = mainArticles + archivedArticles
 
         let filePaths = Set(parsedArticles.map { $0.filePath.path })
 

@@ -17,6 +17,7 @@ extension Article {
         case unread
         case reading
         case read
+        case archived
     }
 
     var statusEnum: Status {
