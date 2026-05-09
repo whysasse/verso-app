@@ -32,10 +32,6 @@ struct SearchBar: View {
         .frame(height: 44)
         .background(colors.surface)
         .cornerRadius(VersoRadius.sm)
-        .overlay(
-            RoundedRectangle(cornerRadius: VersoRadius.sm)
-                .stroke(isFocused ? colors.accent : colors.border, lineWidth: isFocused ? 2 : 1)
-        )
     }
 }
 

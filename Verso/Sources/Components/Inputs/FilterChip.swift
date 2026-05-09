@@ -13,15 +13,12 @@ struct FilterChip: View {
                 Text(label)
                 Text("\(count)")
             }
-            .font(.system(size: 15, weight: .semibold))
+            .font(.system(size: 17, weight: .semibold))
             .foregroundColor(isActive ? colors.accent : colors.textSecondary)
             .padding(.horizontal, VersoSpacing.sm)
             .frame(height: 36)
             .background(
                 Capsule().fill(isActive ? colors.accentSurface : Color.clear)
-            )
-            .overlay(
-                Capsule().stroke(isActive ? Color.clear : colors.border, lineWidth: 1)
             )
             .opacity(count == 0 && !isActive ? 0.5 : 1)
         }

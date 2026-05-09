@@ -11,6 +11,16 @@ struct VersoApp: App {
             ContentView()
                 .environment(\.managedObjectContext, context)
                 .environmentObject(themeManager)
+                .onAppear { applyWindowBackground() }
+                .onChange(of: themeManager.currentTheme) { _ in applyWindowBackground() }
         }
+    }
+
+    private func applyWindowBackground() {
+        let color = UIColor(themeManager.colors.background)
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .forEach { $0.backgroundColor = color }
     }
 }

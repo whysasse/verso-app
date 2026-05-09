@@ -8,14 +8,14 @@ struct ScrollProgress: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Rectangle()
+                Capsule()
                     .fill(colors.border)
-                Rectangle()
+                Capsule()
                     .fill(colors.accent)
                     .frame(width: geo.size.width * max(0, min(1, progress)))
             }
         }
-        .frame(height: 3)
+        .frame(height: 4)
     }
 }
 
