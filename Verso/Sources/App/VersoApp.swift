@@ -5,6 +5,7 @@ import CoreData
 struct VersoApp: App {
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var folderBookmarkService = FolderBookmarkService()
+    @StateObject private var articleLibraryService = ArticleLibraryService()
     @Environment(\.scenePhase) private var scenePhase
     private let context = CoreDataStack.shared.persistentContainer.viewContext
 
@@ -23,7 +24,15 @@ struct VersoApp: App {
                 }
                 .onChange(of: themeManager.currentTheme) { _ in applyWindowBackground() }
                 .onChange(of: scenePhase) { phase in
-                    if phase == .background { folderBookmarkService.stopAccess() }
+                    if phase == .background {
+                        folderBookmarkService.stopAccess()
+                    } else if phase == .active, let url = folderBookmarkService.folderURL {
+                        Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+                    }
+                }
+                .onChange(of: folderBookmarkService.folderURL) { url in
+                    guard let url else { return }
+                    Task { await articleLibraryService.rebuildCache(from: url, context: context) }
                 }
         }
     }
