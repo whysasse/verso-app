@@ -10,6 +10,9 @@ struct VersoTextField: View {
     let placeholder: String
     @Binding var text: String
     var fieldState: FieldState = .default
+    var keyboardType: UIKeyboardType = .default
+    var autocapitalization: TextInputAutocapitalization = .sentences
+    var autocorrectionDisabled: Bool = false
     @EnvironmentObject var themeManager: ThemeManager
     @FocusState private var isFocused: Bool
     private var colors: ThemeColors { themeManager.colors }
@@ -23,6 +26,9 @@ struct VersoTextField: View {
                 .tint(colors.accent)
                 .focused($isFocused)
                 .disabled(isDisabled)
+                .keyboardType(keyboardType)
+                .textInputAutocapitalization(autocapitalization)
+                .autocorrectionDisabled(autocorrectionDisabled)
                 .padding(.horizontal, VersoSpacing.md)
                 .padding(.vertical, VersoSpacing.sm)
                 .background(colors.surface)

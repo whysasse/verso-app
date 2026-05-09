@@ -16,8 +16,7 @@ struct VersoNavigationBar: ViewModifier {
                 if let action = trailingAction {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: action) {
-                            Text("⊕")
-                                .font(.system(size: 20))
+                            Image(systemName: trailingIcon)
                                 .foregroundColor(themeManager.colors.accent)
                         }
                         .buttonStyle(.plain)
