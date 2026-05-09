@@ -4,6 +4,7 @@ import CoreData
 struct ArticleListView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
+    @EnvironmentObject var articleLibraryService: ArticleLibraryService
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
@@ -37,49 +38,91 @@ struct ArticleListView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                if folderBookmarkService.folderURL == nil {
-                    FolderPickerPrompt {
-                        showFolderPicker = true
-                    }
-                    .padding(.horizontal, VersoSpacing.md)
-                    .padding(.top, VersoSpacing.md)
+        List {
+            // Header rows (search + filter chips)
+            if folderBookmarkService.folderURL == nil {
+                FolderPickerPrompt {
+                    showFolderPicker = true
                 }
+                .padding(.horizontal, VersoSpacing.md)
+                .padding(.top, VersoSpacing.md)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
 
-                SearchBar(text: $searchText)
-                    .padding(.horizontal, VersoSpacing.md)
-                    .padding(.top, VersoSpacing.md)
+            SearchBar(text: $searchText)
+                .padding(.horizontal, VersoSpacing.md)
+                .padding(.top, VersoSpacing.md)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
 
-                FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
-                    .padding(.top, VersoSpacing.lg)
+            FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
+                .padding(.top, VersoSpacing.lg)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
 
-                if filteredArticles.isEmpty {
-                    EmptyState(variant: searchText.isEmpty ? .empty : .searchMiss)
-                        .padding(.top, VersoSpacing.xl)
-                } else {
-                    LazyVStack(spacing: 9) {
-                        ForEach(filteredArticles) { article in
-                            NavigationLink(destination: ArticleReaderView(article: article)) {
-                                ArticleCard(article: article)
-                            }
-                            .buttonStyle(.plain)
-                        }
+            // Article rows or empty state
+            if filteredArticles.isEmpty {
+                EmptyState(variant: searchText.isEmpty ? .empty : .searchMiss)
+                    .padding(.top, VersoSpacing.xl)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            } else {
+                ForEach(filteredArticles) { article in
+                    NavigationLink(destination: ArticleReaderView(article: article)) {
+                        ArticleCard(article: article)
                     }
-                    .padding(.horizontal, VersoSpacing.md)
-                    .padding(.top, VersoSpacing.lg)
-                    .padding(.bottom, VersoSpacing.md)
+                    .buttonStyle(.plain)
+                    .listRowInsets(EdgeInsets(
+                        top: 4.5, leading: VersoSpacing.md,
+                        bottom: 4.5, trailing: VersoSpacing.md
+                    ))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    // FAB-22: swipe-left to archive
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button {
+                            archiveArticle(article)
+                        } label: {
+                            Label("Archive", systemImage: "archivebox")
+                        }
+                        .tint(Color(hex: "766655"))
+                    }
+                    // FAB-23: swipe-right to toggle read/unread
+                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                        let isRead = article.statusEnum == .read
+                        Button {
+                            toggleReadStatus(article)
+                        } label: {
+                            Label(
+                                isRead ? "Mark Unread" : "Mark Read",
+                                systemImage: isRead ? "circle" : "checkmark.circle"
+                            )
+                        }
+                        .tint(isRead ? Color(hex: "4A90D9") : Color(hex: "5AAF7A"))
+                    }
                 }
             }
         }
+        .listStyle(.plain)
         .background(themeManager.colors.background)
+        .scrollContentBackground(.hidden)
+        // FAB-25: pull-to-refresh
+        .refreshable {
+            guard let url = folderBookmarkService.folderURL else { return }
+            await articleLibraryService.rebuildCache(from: url, context: viewContext)
+        }
         .versoNavigationBar(title: "Verso", trailingIcon: "folder") {
             showFolderPicker = true
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    showAddArticle = true // FAB-21: add article action
+                    showAddArticle = true
                 } label: {
                     Image(systemName: "plus.circle")
                         .foregroundColor(themeManager.colors.accent)
@@ -101,5 +144,22 @@ struct ArticleListView: View {
                 .environmentObject(folderBookmarkService)
                 .environment(\.managedObjectContext, viewContext)
         }
+    }
+
+    // MARK: - Actions
+
+    private func archiveArticle(_ article: Article) {
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        let path = article.filePath
+        viewContext.delete(article)
+        try? viewContext.save()
+        try? MarkdownWriter.archive(filePath: path, in: folderURL)
+    }
+
+    private func toggleReadStatus(_ article: Article) {
+        let newStatus: Article.Status = article.statusEnum == .read ? .unread : .read
+        article.statusEnum = newStatus
+        try? viewContext.save()
+        try? MarkdownWriter.updateStatus(newStatus, for: article.filePath)
     }
 }
