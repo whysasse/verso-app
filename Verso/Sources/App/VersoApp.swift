@@ -17,6 +17,7 @@ struct VersoApp: App {
                 .onAppear {
                     folderBookmarkService.restore()
                     applyWindowBackground()
+                    Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
                     #if DEBUG
                     DebugSeedService.seedIfNeeded(context: context)
                     #endif
@@ -24,6 +25,9 @@ struct VersoApp: App {
                 .onChange(of: themeManager.currentTheme) { _ in applyWindowBackground() }
                 .onChange(of: scenePhase) { phase in
                     if phase == .background { folderBookmarkService.stopAccess() }
+                    if phase == .active {
+                        Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
+                    }
                 }
         }
     }
