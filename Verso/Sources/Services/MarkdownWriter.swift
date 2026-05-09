@@ -104,6 +104,39 @@ struct MarkdownWriter {
         return lines.joined(separator: "\n") + "\n"
     }
 
+    /// Deletes the .md file at the given path.
+    static func delete(at filePath: String) throws {
+        try FileManager.default.removeItem(atPath: filePath)
+    }
+
+    /// Moves the .md file into an Archive/ subfolder of the given folder, creating it if needed.
+    /// Returns the destination URL.
+    @discardableResult
+    static func archive(filePath: String, in folderURL: URL) throws -> URL {
+        let archiveDir = folderURL.appendingPathComponent("Archive", isDirectory: true)
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: archiveDir.path) {
+            try fm.createDirectory(at: archiveDir, withIntermediateDirectories: true)
+        }
+        let filename = URL(fileURLWithPath: filePath).lastPathComponent
+        let destination = archiveDir.appendingPathComponent(filename)
+        try fm.moveItem(atPath: filePath, toPath: destination.path)
+        return destination
+    }
+
+    /// Updates the `status:` line in the YAML frontmatter of an existing .md file.
+    static func updateStatus(_ status: Article.Status, for filePath: String) throws {
+        let url = URL(fileURLWithPath: filePath)
+        var content = try String(contentsOf: url, encoding: .utf8)
+        let pattern = #"(?m)^status: \S+$"#
+        let replacement = "status: \(status.rawValue)"
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let range = NSRange(content.startIndex..., in: content)
+            content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: replacement)
+        }
+        try content.write(to: url, atomically: true, encoding: .utf8)
+    }
+
     /// Writes a ParsedArticle to a .md file in the specified directory.
     /// - Parameters:
     ///   - article: The parsed article to write.

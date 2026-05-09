@@ -215,7 +215,7 @@ struct AddArticleView: View {
                     url: pending.url,
                     status: .unread,
                     dateAdded: pending.dateAdded,
-                    source: pending.url?.host
+                    source: pending.url.host
                 )
                 if viewContext.hasChanges {
                     try viewContext.save()
