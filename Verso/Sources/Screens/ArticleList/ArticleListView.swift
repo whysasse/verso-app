@@ -15,6 +15,7 @@ struct ArticleListView: View {
     @State private var searchText = ""
     @State private var activeFilter: ArticleStatus?
     @State private var showFolderPicker = false
+    @State private var showAddArticle = false
 
     private var filteredArticles: [Article] {
         articles.filter { article in
@@ -38,6 +39,14 @@ struct ArticleListView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
+                if folderBookmarkService.folderURL == nil {
+                    FolderPickerPrompt {
+                        showFolderPicker = true
+                    }
+                    .padding(.horizontal, VersoSpacing.md)
+                    .padding(.top, VersoSpacing.md)
+                }
+
                 SearchBar(text: $searchText)
                     .padding(.horizontal, VersoSpacing.md)
                     .padding(.top, VersoSpacing.md)
@@ -64,15 +73,33 @@ struct ArticleListView: View {
             }
         }
         .background(themeManager.colors.background)
-        .versoNavigationBar(title: "Verso") {
-            // FAB-21: add article action
+        .versoNavigationBar(title: "Verso", trailingIcon: "folder") {
+            showFolderPicker = true
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showAddArticle = true // FAB-21: add article action
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .foregroundColor(themeManager.colors.accent)
+                }
+                .buttonStyle(.plain)
+                .tint(.clear)
+            }
         }
         .sheet(isPresented: $showFolderPicker) {
-            DocumentPicker { urls in
+            DocumentPicker(onDocumentsPicked: { urls in
                 guard let url = urls.first else { return }
                 folderBookmarkService.save(url: url)
                 showFolderPicker = false
-            }
+            })
+        }
+        .sheet(isPresented: $showAddArticle) {
+            AddArticleView()
+                .environmentObject(themeManager)
+                .environmentObject(folderBookmarkService)
+                .environment(\.managedObjectContext, viewContext)
         }
     }
 }
