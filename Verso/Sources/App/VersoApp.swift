@@ -7,6 +7,7 @@ struct VersoApp: App {
     @StateObject private var folderBookmarkService = FolderBookmarkService()
     @StateObject private var articleLibraryService = ArticleLibraryService()
     @StateObject private var readingPreferences = ReadingPreferencesService()
+    @StateObject private var fileWatcher = ICloudFileWatcher()
     @Environment(\.scenePhase) private var scenePhase
     private let context = CoreDataStack.shared.persistentContainer.viewContext
 
@@ -22,6 +23,9 @@ struct VersoApp: App {
                     folderBookmarkService.restore()
                     applyWindowBackground()
                     Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
+                    if let url = folderBookmarkService.folderURL {
+                        startWatcher(url: url)
+                    }
                     #if DEBUG
                     DebugSeedService.seedIfNeeded(context: context)
                     #endif
@@ -29,23 +33,32 @@ struct VersoApp: App {
                 .onChange(of: themeManager.currentTheme) { _ in applyWindowBackground() }
                 .onChange(of: scenePhase) { phase in
                     if phase == .background {
+                        fileWatcher.stop()
                         folderBookmarkService.stopAccess()
                     } else if phase == .active {
                         Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
                         if let url = folderBookmarkService.folderURL {
-                            Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+                            startWatcher(url: url)
                         }
                     }
                 }
                 .onChange(of: folderBookmarkService.folderURL) { url in
                     guard let url else { return }
                     Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+                    startWatcher(url: url)
                     if scenePhase == .background { folderBookmarkService.stopAccess() }
                     if scenePhase == .active {
                         Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
                     }
                 }
         }
+    }
+
+    private func startWatcher(url: URL) {
+        fileWatcher.onChange = { [self] in
+            Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+        }
+        fileWatcher.start(folderURL: url)
     }
 
     private func applyWindowBackground() {
