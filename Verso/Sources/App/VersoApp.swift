@@ -11,7 +11,12 @@ struct VersoApp: App {
             ContentView()
                 .environment(\.managedObjectContext, context)
                 .environmentObject(themeManager)
-                .onAppear { applyWindowBackground() }
+                .onAppear {
+                    applyWindowBackground()
+                    #if DEBUG
+                    DebugSeedService.seedIfNeeded(context: context)
+                    #endif
+                }
                 .onChange(of: themeManager.currentTheme) { _ in applyWindowBackground() }
         }
     }
