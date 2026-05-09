@@ -37,6 +37,10 @@ struct VersoApp: App {
                 .onChange(of: folderBookmarkService.folderURL) { url in
                     guard let url else { return }
                     Task { await articleLibraryService.rebuildCache(from: url, context: context) }
+                    if phase == .background { folderBookmarkService.stopAccess() }
+                    if phase == .active {
+                        Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
+                    }
                 }
         }
     }
