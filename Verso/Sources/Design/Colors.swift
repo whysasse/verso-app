@@ -128,6 +128,7 @@ enum ArticleStatus: String, CaseIterable {
     case unread = "Unread"
     case reading = "Reading"
     case read = "Read"
+    case archived = "Archived"
 
     // Badge background color.
     var color: Color {
@@ -135,15 +136,17 @@ enum ArticleStatus: String, CaseIterable {
         case .unread:   return Color(hex: "4A90D9")
         case .reading:  return Color(hex: "D4A353")
         case .read:     return Color(hex: "5AAF7A")
+        case .archived: return Color(hex: "8E8E93")
         }
     }
 
     // SF Symbol name for the status icon (white, 16pt, inside 28×28 circular badge)
     var icon: String {
         switch self {
-        case .unread:  return "circle"
-        case .reading: return "book.open"
-        case .read:    return "checkmark"
+        case .unread:   return "circle"
+        case .reading:  return "book.open"
+        case .read:     return "checkmark"
+        case .archived: return "archivebox"
         }
     }
 }

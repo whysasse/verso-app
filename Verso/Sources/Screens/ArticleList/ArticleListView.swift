@@ -22,7 +22,9 @@ struct ArticleListView: View {
     private var filteredArticles: [Article] {
         articles.filter { article in
             let matchesFilter: Bool = {
-                guard let filter = activeFilter else { return true }
+                guard let filter = activeFilter else {
+                    return article.statusEnum != .archived
+                }
                 return article.statusEnum.rawValue == filter.rawValue.lowercased()
             }()
             let matchesSearch: Bool = searchText.isEmpty
@@ -67,7 +69,7 @@ struct ArticleListView: View {
 
             // Article rows or empty state
             if filteredArticles.isEmpty {
-                EmptyState(variant: searchText.isEmpty ? .empty : .searchMiss)
+                EmptyState(variant: activeFilter == .archived && searchText.isEmpty ? .noArchived : (searchText.isEmpty ? .empty : .searchMiss))
                     .padding(.top, VersoSpacing.xl)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
@@ -84,14 +86,16 @@ struct ArticleListView: View {
                     ))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                    // FAB-22: swipe-left to archive
+                    // FAB-22: swipe-left to archive (hidden for already-archived articles)
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button {
-                            archiveArticle(article)
-                        } label: {
-                            Label("Archive", systemImage: "archivebox")
+                        if article.statusEnum != .archived {
+                            Button {
+                                archiveArticle(article)
+                            } label: {
+                                Label("Archive", systemImage: "archivebox")
+                            }
+                            .tint(Color(hex: "766655"))
                         }
-                        .tint(Color(hex: "766655"))
                     }
                     // FAB-23: swipe-right to toggle read/unread
                     .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -154,10 +158,15 @@ struct ArticleListView: View {
 
     private func archiveArticle(_ article: Article) {
         guard let folderURL = folderBookmarkService.folderURL else { return }
-        let path = article.filePath
-        viewContext.delete(article)
-        try? viewContext.save()
-        _ = try? MarkdownWriter.archive(filePath: path, in: folderURL)
+        do {
+            let destination = try MarkdownWriter.archive(filePath: article.filePath, in: folderURL)
+            try MarkdownWriter.updateStatus(.archived, for: destination.path)
+            article.filePath = destination.path
+            article.statusEnum = .archived
+            try viewContext.save()
+        } catch {
+            // silently ignore — matches existing behaviour
+        }
     }
 
     private func toggleReadStatus(_ article: Article) {

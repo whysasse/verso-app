@@ -4,6 +4,7 @@ struct EmptyState: View {
     enum Variant {
         case empty
         case searchMiss
+        case noArchived
     }
 
     let variant: Variant
@@ -38,6 +39,7 @@ struct EmptyState: View {
         switch variant {
         case .empty:      return "tray"
         case .searchMiss: return "doc.text.magnifyingglass"
+        case .noArchived: return "archivebox"
         }
     }
 
@@ -45,6 +47,7 @@ struct EmptyState: View {
         switch variant {
         case .empty:      return "No articles yet"
         case .searchMiss: return "No articles match your search"
+        case .noArchived: return "Nothing archived"
         }
     }
 
@@ -52,6 +55,7 @@ struct EmptyState: View {
         switch variant {
         case .empty:      return "Save your first article to get started"
         case .searchMiss: return "Try a different search term"
+        case .noArchived: return "Articles you archive will appear here"
         }
     }
 }
