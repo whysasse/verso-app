@@ -2,13 +2,18 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     var body: some View {
         ZStack {
             themeManager.colors.background
                 .ignoresSafeArea()
-            NavigationStack {
-                ArticleListView()
+            if hasCompletedOnboarding {
+                NavigationStack {
+                    ArticleListView()
+                }
+            } else {
+                OnboardingFlowView(onComplete: { hasCompletedOnboarding = true })
             }
         }
         .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
