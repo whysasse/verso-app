@@ -22,9 +22,11 @@ struct ArticleCard: View {
     }
 
     private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, yyyy"
-        return formatter.string(from: article.dateAdded)
+        // Avoid rebuilding DateFormatter on every body pass; guard stale Core Data objects during churn (e.g. theme refresh).
+        guard article.managedObjectContext != nil, !article.isDeleted else {
+            return "—"
+        }
+        return article.dateAdded.formatted(date: .abbreviated, time: .omitted)
     }
 
     var body: some View {
