@@ -34,6 +34,7 @@ struct PendingArticleIngester {
                 let writtenURL = try writeToDisk(pending: pending, folderURL: folderURL)
                 try insertIntoCoreData(pending: pending, filePath: writtenURL, context: context)
                 try FileManager.default.removeItem(at: fileURL)
+                AnalyticsService.shared.track("article.saved", parameters: ["source": "share_extension"])
                 logger.info("Ingested article: \(pending.title, privacy: .public)")
             } catch {
                 logger.warning("Failed to ingest \(fileURL.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")

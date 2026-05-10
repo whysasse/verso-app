@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var showMoveDialog = false
     @State private var pendingNewURL: URL? = nil
     @State private var showImport = false
+    @State private var analyticsOptIn = AnalyticsService.shared.isOptedIn
 
     private var colors: ThemeColors { themeManager.colors }
 
@@ -33,6 +34,8 @@ struct SettingsView: View {
                 storageSection
                 Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
                 aboutSection
+                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                privacySection
             }
         }
         .background(colors.background.ignoresSafeArea())
@@ -182,6 +185,37 @@ struct SettingsView: View {
                     .padding(.horizontal, VersoSpacing.md)
             }
             .buttonStyle(.plain)
+        }
+    }
+
+    private var privacySection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader("Privacy")
+
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Share anonymous data")
+                        .font(VersoTypography.UI.input)
+                        .foregroundColor(colors.textPrimary)
+                    Text("No personal info or article content, ever.")
+                        .font(VersoTypography.UI.caption)
+                        .foregroundColor(colors.textSecondary)
+                }
+                Spacer()
+                Toggle("", isOn: $analyticsOptIn)
+                    .labelsHidden()
+                    .tint(colors.accent)
+                    .onChange(of: analyticsOptIn) { newValue in
+                        if newValue {
+                            AnalyticsService.shared.optIn()
+                        } else {
+                            AnalyticsService.shared.isOptedIn = false
+                        }
+                    }
+            }
+            .frame(minHeight: 44)
+            .padding(.horizontal, VersoSpacing.md)
+            .padding(.vertical, VersoSpacing.sm)
         }
     }
 

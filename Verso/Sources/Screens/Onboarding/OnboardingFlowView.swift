@@ -5,7 +5,7 @@ struct OnboardingFlowView: View {
     let onComplete: () -> Void
 
     @State private var currentPage = 0
-    private let pageCount = 3
+    private let pageCount = 4
 
     private var colors: ThemeColors { themeManager.colors }
 
@@ -14,14 +14,26 @@ struct OnboardingFlowView: View {
             colors.background.ignoresSafeArea()
 
             TabView(selection: $currentPage) {
-                WelcomeView(onNext: { advance() })
-                    .tag(0)
+                WelcomeView(onNext: {
+                    AnalyticsService.shared.track("onboarding.stepCompleted", parameters: ["step": "welcome"])
+                    advance()
+                })
+                .tag(0)
 
-                OnboardingThemePickerView(onNext: { advance() })
-                    .tag(1)
+                OnboardingThemePickerView(onNext: {
+                    AnalyticsService.shared.track("onboarding.stepCompleted", parameters: ["step": "folder_picker"])
+                    advance()
+                })
+                .tag(1)
 
-                QuickTourView(onComplete: onComplete)
+                AnalyticsConsentView(onNext: { advance() })
                     .tag(2)
+
+                QuickTourView(onComplete: {
+                    AnalyticsService.shared.track("onboarding.stepCompleted", parameters: ["step": "done"])
+                    onComplete()
+                })
+                .tag(3)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(VersoAnimation.normal, value: currentPage)

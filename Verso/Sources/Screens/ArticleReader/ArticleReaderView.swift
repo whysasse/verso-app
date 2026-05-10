@@ -102,6 +102,7 @@ struct ArticleReaderView: View {
                     contentHeight = value
                 }
                 .onTapGesture {
+                    let enteringImmersive = isChromeVisible
                     if reduceMotion {
                         isChromeVisible.toggle()
                         isPillVisible = !isChromeVisible
@@ -111,6 +112,7 @@ struct ArticleReaderView: View {
                             isPillVisible = !isChromeVisible
                         }
                     }
+                    AnalyticsService.shared.track("reader.immersiveModeToggled", parameters: ["enabled": enteringImmersive ? "true" : "false"])
                 }
                 .onAppear {
                     screenHeight = geo.size.height
@@ -170,6 +172,7 @@ struct ArticleReaderView: View {
         .task {
             loadContent()
             advanceStatus(to: .reading)
+            AnalyticsService.shared.track("article.opened")
             relatedArticles = await RelatedArticlesService().related(to: article, in: viewContext)
         }
         .onDisappear {
@@ -234,6 +237,9 @@ struct ArticleReaderView: View {
               current < target else { return }
         article.statusEnum = status
         try? viewContext.save()
+        if status == .read {
+            AnalyticsService.shared.track("article.readCompleted")
+        }
     }
 
     private func toggleTTS() {
