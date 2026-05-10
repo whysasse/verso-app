@@ -27,35 +27,37 @@ struct ArticleHeader: View {
         publicationFallback.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    private var hasAttributionLine: Bool {
+        !authorTrimmed.isEmpty || !publicationTrimmed.isEmpty
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(VersoTypography.Reading(fontFamily: fontFamily).h1)
                 .foregroundColor(colors.textPrimary)
 
-            HStack(spacing: 6) {
-                if !authorTrimmed.isEmpty {
-                    Text("By \(authorTrimmed)")
-                        .font(.system(size: 15))
-                } else if !publicationTrimmed.isEmpty {
-                    Text(publicationTrimmed)
-                        .font(.system(size: 15))
+            VStack(alignment: .leading, spacing: 4) {
+                if hasAttributionLine {
+                    if !authorTrimmed.isEmpty {
+                        Text("By \(authorTrimmed)")
+                            .font(.system(size: 15))
+                    } else {
+                        Text(publicationTrimmed)
+                            .font(.system(size: 15))
+                    }
                 }
 
-                if !authorTrimmed.isEmpty || !publicationTrimmed.isEmpty {
-                    Text("·")
-                        .font(.system(size: 13))
+                HStack(spacing: 6) {
+                    Text(formattedDate)
+                    if let readTime {
+                        Text("·")
+                            .font(.system(size: 13))
+                        Text("\(readTime) min read")
+                            .font(.system(size: 13))
+                    }
                 }
-
-                Text(formattedDate)
-                    .font(.system(size: 13))
-
-                if let readTime {
-                    Text("·")
-                        .font(.system(size: 13))
-                    Text("\(readTime) min read")
-                        .font(.system(size: 13))
-                }
+                .font(.system(size: 13))
             }
             .foregroundColor(colors.textSecondary)
         }
