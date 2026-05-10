@@ -8,4 +8,26 @@ struct PendingArticle: Codable {
     let title: String
     let contentMarkdown: String
     let dateAdded: Date
+    /// Readability-byline-style author attribution when known.
+    var author: String?
+    /// Site / publication label (e.g. Readability `siteName`).
+    var siteName: String?
+
+    init(
+        id: UUID,
+        url: URL,
+        title: String,
+        contentMarkdown: String,
+        dateAdded: Date,
+        author: String? = nil,
+        siteName: String? = nil
+    ) {
+        self.id = id
+        self.url = url
+        self.title = title
+        self.contentMarkdown = contentMarkdown
+        self.dateAdded = dateAdded
+        self.author = author
+        self.siteName = siteName
+    }
 }

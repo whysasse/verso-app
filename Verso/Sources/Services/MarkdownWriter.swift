@@ -88,6 +88,16 @@ struct MarkdownWriter {
             lines.append("url: \"\(url.absoluteString)\"")
         }
 
+        if let author = article.author?.trimmingCharacters(in: .whitespacesAndNewlines), !author.isEmpty {
+            let escaped = author.replacingOccurrences(of: "\"", with: "\\\"")
+            lines.append("author: \"\(escaped)\"")
+        }
+
+        if let site = article.siteName?.trimmingCharacters(in: .whitespacesAndNewlines), !site.isEmpty {
+            let escaped = site.replacingOccurrences(of: "\"", with: "\\\"")
+            lines.append("site_name: \"\(escaped)\"")
+        }
+
         // Status
         lines.append("status: \(article.status.rawValue)")
 

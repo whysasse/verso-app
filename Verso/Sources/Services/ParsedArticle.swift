@@ -9,4 +9,6 @@ struct ParsedArticle {
     let tags: [String]?
     let dateAdded: Date
     let status: Article.Status
+    let author: String?
+    let siteName: String?
 }

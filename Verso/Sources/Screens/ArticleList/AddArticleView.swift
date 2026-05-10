@@ -208,7 +208,9 @@ struct AddArticleView: View {
                     contentMarkdown: pending.contentMarkdown,
                     tags: nil,
                     dateAdded: pending.dateAdded,
-                    status: .unread
+                    status: .unread,
+                    author: pending.author,
+                    siteName: pending.siteName
                 )
                 let fileURL = try MarkdownWriter.write(article: parsed, to: folderURL)
 
@@ -221,7 +223,9 @@ struct AddArticleView: View {
                     url: pending.url,
                     status: .unread,
                     dateAdded: pending.dateAdded,
-                    source: pending.url.host
+                    source: pending.url.host,
+                    author: pending.author,
+                    siteName: pending.siteName
                 )
                 if viewContext.hasChanges {
                     try viewContext.save()

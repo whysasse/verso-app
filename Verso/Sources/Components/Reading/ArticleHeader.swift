@@ -2,7 +2,10 @@ import SwiftUI
 
 struct ArticleHeader: View {
     let title: String
-    let source: String
+    /// Shown after "By …" when non-empty (FAB-144).
+    let author: String?
+    /// Shown alone when author is unavailable (pretty host fallback comes from Article).
+    let publicationFallback: String
     let date: Date
     var readTime: Int? = nil
     var fontFamily: String = ""
@@ -16,6 +19,14 @@ struct ArticleHeader: View {
         return formatter.string(from: date)
     }
 
+    private var authorTrimmed: String {
+        author?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+
+    private var publicationTrimmed: String {
+        publicationFallback.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
@@ -23,12 +34,22 @@ struct ArticleHeader: View {
                 .foregroundColor(colors.textPrimary)
 
             HStack(spacing: 6) {
-                Text("By \(source)")
-                    .font(.system(size: 15))
-                Text("·")
-                    .font(.system(size: 13))
+                if !authorTrimmed.isEmpty {
+                    Text("By \(authorTrimmed)")
+                        .font(.system(size: 15))
+                } else if !publicationTrimmed.isEmpty {
+                    Text(publicationTrimmed)
+                        .font(.system(size: 15))
+                }
+
+                if !authorTrimmed.isEmpty || !publicationTrimmed.isEmpty {
+                    Text("·")
+                        .font(.system(size: 13))
+                }
+
                 Text(formattedDate)
                     .font(.system(size: 13))
+
                 if let readTime {
                     Text("·")
                         .font(.system(size: 13))
@@ -45,7 +66,8 @@ struct ArticleHeader: View {
 #Preview {
     ArticleHeader(
         title: "The Quiet Revolution in How We Read Long-Form Content Online",
-        source: "The Atlantic",
+        author: "Ada Lovelace",
+        publicationFallback: "The Atlantic",
         date: Date(),
         readTime: 5
     )

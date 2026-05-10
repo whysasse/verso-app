@@ -56,7 +56,9 @@ struct PendingArticleIngester {
             contentMarkdown: pending.contentMarkdown,
             tags: nil,
             dateAdded: pending.dateAdded,
-            status: .unread
+            status: .unread,
+            author: pending.author,
+            siteName: pending.siteName
         )
         return try MarkdownWriter.write(article: parsed, to: folderURL)
     }
@@ -69,6 +71,8 @@ struct PendingArticleIngester {
         article.filePath = filePath.path
         article.status = Article.Status.unread.rawValue
         article.dateAdded = pending.dateAdded
+        article.author = pending.author
+        article.siteName = pending.siteName
         try context.save()
     }
 }
