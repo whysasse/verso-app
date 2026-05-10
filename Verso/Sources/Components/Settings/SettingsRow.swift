@@ -10,23 +10,34 @@ enum SettingsRowType {
 struct SettingsRow: View {
     let type: SettingsRowType
     var action: () -> Void = {}
+    /// When `false`, the row is not its own button so an outer `NavigationLink` can receive taps (FAB-137).
+    var usesButtonChrome: Bool = true
     @EnvironmentObject var themeManager: ThemeManager
     private var colors: ThemeColors { themeManager.colors }
 
     var body: some View {
-        Button(action: action) {
-            switch type {
-            case .default(let label):
-                defaultRow(label: label)
-            case .folder(let label, let path):
-                folderRow(label: label, path: path)
-            case .font(let name, let preview, let isSelected):
-                fontRow(name: name, preview: preview, isSelected: isSelected)
-            case .theme:
-                ThemeSelector()
+        Group {
+            if usesButtonChrome {
+                Button(action: action) { rowBody }
+                    .buttonStyle(.plain)
+            } else {
+                rowBody
             }
         }
-        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var rowBody: some View {
+        switch type {
+        case .default(let label):
+            defaultRow(label: label)
+        case .folder(let label, let path):
+            folderRow(label: label, path: path)
+        case .font(let name, let preview, let isSelected):
+            fontRow(name: name, preview: preview, isSelected: isSelected)
+        case .theme:
+            ThemeSelector()
+        }
     }
 
     private func defaultRow(label: String) -> some View {
@@ -60,7 +71,7 @@ struct SettingsRow: View {
     }
 
     private func fontRow(name: String, preview: String, isSelected: Bool) -> some View {
-        ZStack(alignment: .topTrailing) {
+        HStack(alignment: .center, spacing: VersoSpacing.md) {
             VStack(alignment: .leading, spacing: VersoSpacing.xxs) {
                 Text(name)
                     .font(name.isEmpty ? .system(size: 17, weight: .semibold) : .custom(name, size: 17).weight(.semibold))
@@ -72,7 +83,6 @@ struct SettingsRow: View {
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(minHeight: 78)
 
             if isSelected {
                 Circle()
@@ -80,6 +90,7 @@ struct SettingsRow: View {
                     .frame(width: 8, height: 8)
             }
         }
+        .frame(minHeight: 78)
     }
 }
 
