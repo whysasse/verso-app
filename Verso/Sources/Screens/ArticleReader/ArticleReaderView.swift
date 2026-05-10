@@ -31,6 +31,7 @@ struct ArticleReaderView: View {
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
+    @EnvironmentObject var folderBookmarkService: FolderBookmarkService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -225,6 +226,9 @@ struct ArticleReaderView: View {
         let filePath = article.filePath
         guard !filePath.isEmpty else { return }
         let fileURL = URL(fileURLWithPath: filePath)
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        let accessed = folderURL.startAccessingSecurityScopedResource()
+        defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
         if let parsed = try? MarkdownReader.read(fileURL: fileURL) {
             parsedContent = parsed.contentMarkdown
         }
