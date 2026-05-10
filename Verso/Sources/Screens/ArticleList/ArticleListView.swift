@@ -43,7 +43,6 @@ struct ArticleListView: View {
     @State private var searchText = ""
     @State private var activeFilter: ArticleStatus?
     @State private var datePreset: ArticleListDatePreset = .any
-    @State private var domainFilter: String = ""
     @State private var showFolderPicker = false
     @State private var showAddArticle = false
     @State private var showSettings = false
@@ -57,8 +56,7 @@ struct ArticleListView: View {
         Self.makeListPredicate(
             activeFilter: activeFilter,
             searchText: searchText,
-            datePreset: datePreset,
-            domainFilter: domainFilter
+            datePreset: datePreset
         )
     }
 
@@ -67,8 +65,7 @@ struct ArticleListView: View {
         Self.listPredicateSignature(
             activeFilter: activeFilter,
             searchText: searchText,
-            datePreset: datePreset,
-            domainFilter: domainFilter
+            datePreset: datePreset
         )
     }
 
@@ -82,28 +79,45 @@ struct ArticleListView: View {
 
     var body: some View {
         GeometryReader { listGeometry in
-            ArticleListFetchedBody(
-                listGeometry: listGeometry,
-                listPredicate: listPredicate,
-                searchText: $searchText,
-                activeFilter: $activeFilter,
-                datePreset: $datePreset,
-                domainFilter: $domainFilter,
-                selectedTag: $selectedTag,
-                isSelecting: $isSelecting,
-                selectedArticleIds: $selectedArticleIds,
-                navigationArticle: $navigationArticle,
-                confirmBulkDelete: $confirmBulkDelete,
-                statusCounts: statusCounts,
-                showFolderPicker: $showFolderPicker,
-                showAddArticle: $showAddArticle,
-                showSettings: $showSettings
-            )
-            .environmentObject(themeManager)
-            .environmentObject(folderBookmarkService)
-            .environmentObject(articleLibraryService)
-            .environment(\.managedObjectContext, viewContext)
-            .id(listFetchIdentity)
+            VStack(spacing: 0) {
+                if folderBookmarkService.folderURL == nil {
+                    FolderPickerPrompt {
+                        showFolderPicker = true
+                    }
+                    .padding(.horizontal, VersoSpacing.md)
+                    .padding(.top, VersoSpacing.md)
+                }
+
+                // Outside `.id(listFetchIdentity)` so typing doesn’t recreate this view and drop keyboard focus.
+                SearchBar(text: $searchText, placeholder: "Search titles, text, or site…")
+                    .padding(.horizontal, VersoSpacing.md)
+                    .padding(.top, VersoSpacing.md)
+                    .environmentObject(themeManager)
+
+                ArticleListFetchedBody(
+                    listGeometry: listGeometry,
+                    listPredicate: listPredicate,
+                    searchText: $searchText,
+                    activeFilter: $activeFilter,
+                    datePreset: $datePreset,
+                    selectedTag: $selectedTag,
+                    isSelecting: $isSelecting,
+                    selectedArticleIds: $selectedArticleIds,
+                    navigationArticle: $navigationArticle,
+                    confirmBulkDelete: $confirmBulkDelete,
+                    statusCounts: statusCounts,
+                    showFolderPicker: $showFolderPicker,
+                    showAddArticle: $showAddArticle,
+                    showSettings: $showSettings
+                )
+                .environmentObject(themeManager)
+                .environmentObject(folderBookmarkService)
+                .environmentObject(articleLibraryService)
+                .environment(\.managedObjectContext, viewContext)
+                .id(listFetchIdentity)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(themeManager.colors.background)
         }
     }
 
@@ -112,17 +126,15 @@ struct ArticleListView: View {
     private static func listPredicateSignature(
         activeFilter: ArticleStatus?,
         searchText: String,
-        datePreset: ArticleListDatePreset,
-        domainFilter: String
+        datePreset: ArticleListDatePreset
     ) -> String {
-        "\(activeFilter?.storageStatusValue ?? "all")|\(searchText)|\(datePreset.rawValue)|\(domainFilter)"
+        "\(activeFilter?.storageStatusValue ?? "all")|\(searchText)|\(datePreset.rawValue)"
     }
 
     private static func makeListPredicate(
         activeFilter: ArticleStatus?,
         searchText: String,
-        datePreset: ArticleListDatePreset,
-        domainFilter: String
+        datePreset: ArticleListDatePreset
     ) -> NSPredicate {
         var parts: [NSPredicate] = []
 
@@ -134,16 +146,14 @@ struct ArticleListView: View {
 
         let term = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !term.isEmpty {
-            parts.append(NSPredicate(format: "(title CONTAINS[cd] %@) OR (searchableBody CONTAINS[cd] %@)", term, term))
+            parts.append(NSPredicate(
+                format: "(title CONTAINS[cd] %@) OR (searchableBody CONTAINS[cd] %@) OR (siteName CONTAINS[cd] %@) OR (url.absoluteString CONTAINS[cd] %@) OR (source CONTAINS[cd] %@)",
+                term, term, term, term, term
+            ))
         }
 
         if let start = datePreset.intervalStart {
             parts.append(NSPredicate(format: "dateAdded >= %@", start as NSDate))
-        }
-
-        let domain = domainFilter.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !domain.isEmpty {
-            parts.append(NSPredicate(format: "(siteName CONTAINS[cd] %@) OR (url.absoluteString CONTAINS[cd] %@)", domain, domain))
         }
 
         return NSCompoundPredicate(andPredicateWithSubpredicates: parts)
@@ -159,7 +169,6 @@ private struct ArticleListFetchedBody: View {
     @Binding var searchText: String
     @Binding var activeFilter: ArticleStatus?
     @Binding var datePreset: ArticleListDatePreset
-    @Binding var domainFilter: String
     @Binding var selectedTag: String?
     @Binding var isSelecting: Bool
     @Binding var selectedArticleIds: Set<UUID>
@@ -185,7 +194,6 @@ private struct ArticleListFetchedBody: View {
         searchText: Binding<String>,
         activeFilter: Binding<ArticleStatus?>,
         datePreset: Binding<ArticleListDatePreset>,
-        domainFilter: Binding<String>,
         selectedTag: Binding<String?>,
         isSelecting: Binding<Bool>,
         selectedArticleIds: Binding<Set<UUID>>,
@@ -201,7 +209,6 @@ private struct ArticleListFetchedBody: View {
         _searchText = searchText
         _activeFilter = activeFilter
         _datePreset = datePreset
-        _domainFilter = domainFilter
         _selectedTag = selectedTag
         _isSelecting = isSelecting
         _selectedArticleIds = selectedArticleIds
@@ -231,7 +238,7 @@ private struct ArticleListFetchedBody: View {
 
     private var emptyUsesArchivedVariant: Bool {
         activeFilter == .archived && searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && datePreset == .any && domainFilter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && datePreset == .any
     }
 
     /// Empty state when filters/search narrow the list but nothing matches.
@@ -239,32 +246,13 @@ private struct ArticleListFetchedBody: View {
         let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !q.isEmpty { return true }
         if datePreset != .any { return true }
-        if !domainFilter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return true }
         if selectedTag != nil { return true }
         return false
     }
 
     var body: some View {
         List {
-            if folderBookmarkService.folderURL == nil {
-                FolderPickerPrompt {
-                    showFolderPicker = true
-                }
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.top, VersoSpacing.md)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-            }
-
-            SearchBar(text: $searchText, placeholder: "Search titles and text…")
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.top, VersoSpacing.md)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-
-            filterChromeRow
+            dateFilterRow
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
@@ -355,7 +343,7 @@ private struct ArticleListFetchedBody: View {
             }
         }
         .listStyle(.plain)
-        .frame(width: listGeometry.size.width, height: listGeometry.size.height)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(themeManager.colors.background)
         .scrollContentBackground(.hidden)
         .refreshable {
@@ -410,14 +398,17 @@ private struct ArticleListFetchedBody: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.horizontal, VersoSpacing.lg)
-                .padding(.vertical, VersoSpacing.md)
-                .background(themeManager.colors.background.opacity(0.94))
+                .padding(.top, VersoSpacing.md)
+                .padding(.bottom, VersoSpacing.xs)
+                .frame(maxWidth: .infinity)
                 .overlay(
                     Rectangle()
                         .frame(height: 0.5)
                         .foregroundColor(themeManager.colors.border),
                     alignment: .top
                 )
+                // Match ReadingBottomBar: opaque fill through home indicator so controls aren’t clipped.
+                .background(themeManager.colors.background.ignoresSafeArea(edges: .bottom))
             }
         }
         .confirmationDialog(
@@ -457,46 +448,29 @@ private struct ArticleListFetchedBody: View {
         }
     }
 
-    @ViewBuilder
-    private var filterChromeRow: some View {
-        VStack(alignment: .leading, spacing: VersoSpacing.sm) {
-            HStack {
-                Text("Added")
-                    .font(VersoTypography.UI.caption)
-                    .foregroundColor(themeManager.colors.textSecondary)
-                Spacer()
-                Menu {
-                    ForEach(ArticleListDatePreset.allCases) { preset in
-                        Button(preset.rawValue) {
-                            datePreset = preset
-                        }
+    private var dateFilterRow: some View {
+        HStack {
+            Text("Added")
+                .font(VersoTypography.UI.caption)
+                .foregroundColor(themeManager.colors.textSecondary)
+            Spacer()
+            Menu {
+                ForEach(ArticleListDatePreset.allCases) { preset in
+                    Button(preset.rawValue) {
+                        datePreset = preset
                     }
-                } label: {
-                    HStack(spacing: VersoSpacing.xs) {
-                        Text(datePreset.rawValue)
-                            .font(VersoTypography.UI.listSubtitle)
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(themeManager.colors.textSecondary)
-                    }
-                    .foregroundColor(themeManager.colors.textPrimary)
                 }
-                .buttonStyle(.plain)
+            } label: {
+                HStack(spacing: VersoSpacing.xs) {
+                    Text(datePreset.rawValue)
+                        .font(VersoTypography.UI.listSubtitle)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(themeManager.colors.textSecondary)
+                }
+                .foregroundColor(themeManager.colors.textPrimary)
             }
-
-            VStack(alignment: .leading, spacing: VersoSpacing.xs) {
-                Text("Site contains")
-                    .font(VersoTypography.UI.caption)
-                    .foregroundColor(themeManager.colors.textSecondary)
-                TextField("Domain or site name", text: $domainFilter)
-                    .font(VersoTypography.UI.input)
-                    .foregroundColor(themeManager.colors.textPrimary)
-                    .padding(VersoSpacing.sm)
-                    .background(themeManager.colors.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: VersoRadius.sm, style: .continuous))
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-            }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal, VersoSpacing.md)
         .padding(.top, VersoSpacing.sm)
