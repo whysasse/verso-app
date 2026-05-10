@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 private let logger = Logger(subsystem: "com.fabiosasseron.verso.ShareExtension", category: "parsing")
-private let appGroupID = "group.com.fabiosasseron.verso"
+private let appGroupID = AppConstants.appGroupID
 
 enum ShareState {
     case idle

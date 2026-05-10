@@ -1,10 +1,13 @@
 import CoreData
+import OSLog
 
 enum CoreDataStack {
     static let shared = CoreDataStackValue()
 }
 
 class CoreDataStackValue: ObservableObject {
+    private static let logger = Logger(subsystem: "com.fabiosasseron.verso", category: "CoreData")
+
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Verso")
         container.loadPersistentStores { _, error in
@@ -35,8 +38,7 @@ class CoreDataStackValue: ObservableObject {
         do {
             try context.save()
         } catch {
-            let nsError = error as NSError
-            print("Core Data save error: \(nsError), \(nsError.userInfo)")
+            Self.logger.error("Core Data save error: \(error.localizedDescription)")
         }
     }
 }

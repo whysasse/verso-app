@@ -2,7 +2,7 @@ import Foundation
 
 final class FolderBookmarkService: ObservableObject {
     private static let defaultsKey = "folderBookmark"
-    private static let suiteName = "group.com.fabiosasseron.verso"
+    private static let suiteName = AppConstants.appGroupID
 
     @Published private(set) var folderURL: URL?
 

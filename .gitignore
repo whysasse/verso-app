@@ -69,3 +69,6 @@ Verso.xcodeproj/
 
 # Claude local settings
 .claude/
+
+# Local build secrets (see Verso/Secrets.xcconfig.template)
+Verso/Secrets.xcconfig

@@ -32,6 +32,8 @@
 			<string>Any</string>
 		</dict>
 	</dict>
+	<key>TelemetryDeckAppID</key>
+	<string>$(TELEMETRY_DECK_APP_ID)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
