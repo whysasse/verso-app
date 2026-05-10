@@ -9,7 +9,7 @@ struct StatusBadge: View {
             Circle()
                 .fill(status.color)
                 .frame(width: 12, height: 12)
-        case .reading, .read:
+        case .reading, .read, .archived:
             Text(status.rawValue)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(.white)

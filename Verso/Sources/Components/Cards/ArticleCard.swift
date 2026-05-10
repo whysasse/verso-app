@@ -7,9 +7,10 @@ struct ArticleCard: View {
 
     private var displayStatus: ArticleStatus {
         switch article.statusEnum {
-        case .unread:  return .unread
-        case .reading: return .reading
-        case .read:    return .read
+        case .unread:    return .unread
+        case .reading:   return .reading
+        case .read:      return .read
+        case .archived:  return .read
         }
     }
 

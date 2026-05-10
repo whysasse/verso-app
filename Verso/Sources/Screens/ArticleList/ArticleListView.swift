@@ -136,9 +136,9 @@ struct ArticleListView: View {
                 .tint(.clear)
             }
         }
-        .background(
-            NavigationLink(destination: SettingsView(), isActive: $showSettings) { EmptyView() }
-        )
+        .navigationDestination(isPresented: $showSettings) {
+            SettingsView()
+        }
         .sheet(isPresented: $showFolderPicker) {
             DocumentPicker(onDocumentsPicked: { urls in
                 guard let url = urls.first else { return }

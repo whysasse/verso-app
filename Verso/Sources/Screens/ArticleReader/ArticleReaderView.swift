@@ -26,6 +26,8 @@ struct ArticleReaderView: View {
     @State private var parsedContent: String = ""
     @State private var isPillVisible: Bool = false
     @State private var relatedArticles: [Article] = []
+    @State private var isTTSActive: Bool = false
+    @StateObject private var ttsService = TTSService()
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
@@ -143,9 +145,12 @@ struct ArticleReaderView: View {
                 scrollProgress: scrollProgress,
                 onControls: { showFontControls = true },
                 onTheme: { showThemeControls = true },
+                tts: ttsService,
+                isTTSActive: isTTSActive,
+                onToggleTTS: toggleTTS,
                 isVisible: $isChromeVisible
             )
-            .frame(height: isChromeVisible ? 56 : 0)
+            .frame(height: isChromeVisible ? (isTTSActive ? 100 : 56) : 0)
             .clipped()
         }
         .navigationBarHidden(true)
@@ -167,6 +172,9 @@ struct ArticleReaderView: View {
             advanceStatus(to: .reading)
             relatedArticles = await RelatedArticlesService().related(to: article, in: viewContext)
         }
+        .onDisappear {
+            ttsService.stop()
+        }
     }
 
     private var safeAreaTop: CGFloat {
@@ -185,6 +193,13 @@ struct ArticleReaderView: View {
         MarkdownParser.parse(parsedContent)
     }
 
+    private var ttsParagraphs: [(index: Int, text: String)] {
+        parsedNodes.enumerated().compactMap { offset, node in
+            guard case .paragraph = node else { return nil }
+            return (index: offset, text: node.plainText)
+        }
+    }
+
     @ViewBuilder
     private var articleBody: some View {
         if parsedContent.isEmpty {
@@ -197,7 +212,8 @@ struct ArticleReaderView: View {
                 fontFamily: readingPreferences.fontFamily,
                 fontSize: readingPreferences.fontSize,
                 lineSpacingValue: lineSpacingValue,
-                colors: colors
+                colors: colors,
+                highlightedParagraphIndex: isTTSActive ? ttsParagraphs[safe: ttsService.currentParagraphIndex]?.index : nil
             )
         }
     }
@@ -220,10 +236,28 @@ struct ArticleReaderView: View {
         try? viewContext.save()
     }
 
+    private func toggleTTS() {
+        if isTTSActive {
+            ttsService.stop()
+            isTTSActive = false
+        } else {
+            isTTSActive = true
+            let texts = ttsParagraphs.map(\.text)
+            guard !texts.isEmpty else { return }
+            ttsService.start(paragraphs: texts, from: 0)
+        }
+    }
+
     private func estimatedReadTime(for text: String) -> Int? {
         guard !text.isEmpty else { return nil }
         let wordCount = text.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
         return max(1, wordCount / 200)
+    }
+}
+
+private extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
 
