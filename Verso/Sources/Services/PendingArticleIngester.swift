@@ -27,6 +27,9 @@ struct PendingArticleIngester {
             return
         }
 
+        let folderAccessed = folderURL.startAccessingSecurityScopedResource()
+        defer { if folderAccessed { folderURL.stopAccessingSecurityScopedResource() } }
+
         for fileURL in files {
             do {
                 let data = try Data(contentsOf: fileURL)
