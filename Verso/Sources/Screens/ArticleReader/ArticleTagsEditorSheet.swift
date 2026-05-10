@@ -28,6 +28,8 @@ struct ArticleTagsEditorSheet: View {
                     .padding(VersoSpacing.md)
                     .background(colors.surface)
                     .clipShape(RoundedRectangle(cornerRadius: VersoRadius.md, style: .continuous))
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                     .focused($fieldFocused)
 
                 Spacer()
