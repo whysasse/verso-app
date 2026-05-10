@@ -62,7 +62,9 @@ struct ReadwiseParser: ImportFileParser {
                 contentMarkdown: "",
                 tags: tags,
                 dateAdded: dateAdded,
-                status: status
+                status: status,
+                author: nil,
+                siteName: nil
             )
         }
     }

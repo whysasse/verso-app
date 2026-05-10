@@ -76,6 +76,8 @@ struct MarkdownReader {
         var status = Article.Status.unread
         var tags: [String]?
         var dateAdded: Date?
+        var author: String?
+        var siteName: String?
 
         let lines = frontmatterRaw.components(separatedBy: .newlines)
         for line in lines {
@@ -104,6 +106,12 @@ struct MarkdownReader {
                 } else {
                     os_log("Invalid date '%@' in %@, will use default", log: log, type: .default, raw, fileURL.lastPathComponent)
                 }
+            } else if trimmed.hasPrefix("author:") {
+                author = Self.extractValue(from: trimmed, key: "author:")?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if trimmed.hasPrefix("site_name:") {
+                siteName = Self.extractValue(from: trimmed, key: "site_name:")?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }
 
@@ -127,6 +135,9 @@ struct MarkdownReader {
             }
         }
 
+        let authorTrimmed = author?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let siteTrimmed = siteName?.trimmingCharacters(in: .whitespacesAndNewlines)
+
         return ParsedArticle(
             id: UUID(),
             filePath: fileURL,
@@ -135,7 +146,9 @@ struct MarkdownReader {
             contentMarkdown: body,
             tags: tags,
             dateAdded: finalDateAdded,
-            status: status
+            status: status,
+            author: (authorTrimmed?.isEmpty == false) ? authorTrimmed : nil,
+            siteName: (siteTrimmed?.isEmpty == false) ? siteTrimmed : nil
         )
     }
 

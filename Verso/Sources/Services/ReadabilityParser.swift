@@ -88,7 +88,9 @@ final class ReadabilityParser: NSObject {
                 return JSON.stringify({
                     title: article.title || "",
                     content: article.content || "",
-                    excerpt: article.excerpt || ""
+                    excerpt: article.excerpt || "",
+                    byline: article.byline || "",
+                    siteName: article.siteName || ""
                 });
             } catch(e) {
                 return JSON.stringify({error: e.toString()});
@@ -117,12 +119,16 @@ final class ReadabilityParser: NSObject {
             }
 
             let markdown = HTMLToMarkdownConverter.convert(parsed.content)
+            let trimmedByline = parsed.byline?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmedSite = parsed.siteName?.trimmingCharacters(in: .whitespacesAndNewlines)
             let article = PendingArticle(
                 id: UUID(),
                 url: sourceURL,
                 title: parsed.title.trimmingCharacters(in: .whitespacesAndNewlines),
                 contentMarkdown: markdown,
-                dateAdded: Date()
+                dateAdded: Date(),
+                author: (trimmedByline?.isEmpty == false) ? trimmedByline : nil,
+                siteName: (trimmedSite?.isEmpty == false) ? trimmedSite : nil
             )
             self.finish(with: article)
         }
@@ -168,6 +174,8 @@ private struct ReadabilityResult: Decodable {
     let title: String
     let content: String
     let excerpt: String?
+    let byline: String?
+    let siteName: String?
     let error: String?
 
     init(from decoder: Decoder) throws {
@@ -175,10 +183,14 @@ private struct ReadabilityResult: Decodable {
         title = (try? c.decode(String.self, forKey: .title)) ?? ""
         content = (try? c.decode(String.self, forKey: .content)) ?? ""
         excerpt = try? c.decode(String.self, forKey: .excerpt)
+        byline = try? c.decode(String.self, forKey: .byline)
+        siteName = try? c.decode(String.self, forKey: .siteName)
         error = try? c.decode(String.self, forKey: .error)
     }
 
-    enum CodingKeys: String, CodingKey { case title, content, excerpt, error }
+    enum CodingKeys: String, CodingKey {
+        case title, content, excerpt, byline, siteName, error
+    }
 }
 
 // MARK: - Minimal HTML → Markdown converter (shared use)

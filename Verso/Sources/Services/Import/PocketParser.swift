@@ -63,7 +63,9 @@ struct PocketParser: ImportFileParser {
                     contentMarkdown: "",
                     tags: tags,
                     dateAdded: dateAdded,
-                    status: isRead ? .read : .unread
+                    status: isRead ? .read : .unread,
+                    author: nil,
+                    siteName: nil
                 ))
             }
         }
@@ -85,7 +87,9 @@ struct PocketParser: ImportFileParser {
                     contentMarkdown: "",
                     tags: nil,
                     dateAdded: Date(),
-                    status: .unread
+                    status: .unread,
+                    author: nil,
+                    siteName: nil
                 ))
             }
         }

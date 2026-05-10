@@ -90,7 +90,9 @@ final class ImportOrchestrator: ObservableObject {
             url: article.url,
             status: article.status,
             dateAdded: article.dateAdded,
-            source: article.url.flatMap { URL(string: $0.absoluteString)?.host }
+            source: article.url.flatMap { URL(string: $0.absoluteString)?.host },
+            author: article.author,
+            siteName: article.siteName
         )
     }
 }

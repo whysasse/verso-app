@@ -8,5 +8,7 @@
     <attribute name="status" attributeType="String"/>
     <attribute name="dateAdded" attributeType="Date"/>
     <attribute name="source" attributeType="String" optional="YES"/>
+    <attribute name="author" attributeType="String" optional="YES"/>
+    <attribute name="siteName" attributeType="String" optional="YES"/>
   </entity>
 </model>

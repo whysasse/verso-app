@@ -38,6 +38,8 @@ final class ArticleLibraryService: ObservableObject {
                     // Update mutable fields (title, url, status) but preserve status if user changed it
                     article.title = parsed.title
                     article.url = parsed.url
+                    article.author = parsed.author
+                    article.siteName = parsed.siteName
                     // Only sync status from file if it differs — file is source of truth on rebuild
                     article.statusEnum = parsed.status
                 } else {
@@ -48,7 +50,9 @@ final class ArticleLibraryService: ObservableObject {
                         title: parsed.title,
                         url: parsed.url,
                         status: parsed.status,
-                        dateAdded: parsed.dateAdded
+                        dateAdded: parsed.dateAdded,
+                        author: parsed.author,
+                        siteName: parsed.siteName
                     )
                 }
             }
