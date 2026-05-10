@@ -254,9 +254,20 @@ struct ArticleReaderView: View {
               current < target else { return }
         article.statusEnum = status
         try? viewContext.save()
+        persistStatusToMarkdownFile(status)
         if status == .read {
             AnalyticsService.shared.track("article.readCompleted")
         }
+    }
+
+    /// Matches list swipe semantics: YAML is source of truth for rebuilds (`ArticleLibraryService`); keep file in sync.
+    private func persistStatusToMarkdownFile(_ status: Article.Status) {
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !path.isEmpty else { return }
+        let accessed = folderURL.startAccessingSecurityScopedResource()
+        defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
+        try? MarkdownWriter.updateStatus(status, for: path)
     }
 
     private func toggleTTS() {

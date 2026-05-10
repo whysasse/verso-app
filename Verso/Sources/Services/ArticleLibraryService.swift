@@ -40,7 +40,7 @@ final class ArticleLibraryService: ObservableObject {
                     article.url = parsed.url
                     article.author = parsed.author
                     article.siteName = parsed.siteName
-                    // Only sync status from file if it differs — file is source of truth on rebuild
+                    // File-first: YAML `status:` wins on rebuild — reader / list must keep the .md in sync with Core Data.
                     article.statusEnum = parsed.status
                 } else {
                     _ = Article.create(
