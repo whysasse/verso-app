@@ -6,7 +6,9 @@ Verso is a minimalist article reader that stores everything locally on your devi
 
 ## What We Collect
 
-**Nothing.** Verso does not collect, transmit, or share any personal information, usage data, or analytics.
+**By default: nothing.** Verso does not collect, transmit, or share any personal information, usage data, or analytics.
+
+**Optional anonymous analytics:** During setup, you may choose to share anonymous usage data to help improve Verso. If you opt in, Verso uses [TelemetryDeck](https://telemetrydeck.com) to send privacy-preserving signals (e.g., "an article was saved"). No personal data, article content, IP addresses, or identifying information is ever collected. You can change this preference at any time in Settings → Privacy.
 
 ## How Your Data Is Stored
 
