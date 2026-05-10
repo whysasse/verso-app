@@ -1,25 +1,5 @@
 import SwiftUI
 
-/// Offset + full content height from one reading so preference updates stay in sync (avoids bar stuck at 0).
-private struct ReaderScrollContentPreference: Equatable {
-    var scrollOffsetY: CGFloat
-    var contentHeight: CGFloat
-}
-
-private struct ReaderScrollContentKey: PreferenceKey {
-    static var defaultValue = ReaderScrollContentPreference(scrollOffsetY: 0, contentHeight: 0)
-    static func reduce(value: inout ReaderScrollContentPreference, nextValue: () -> ReaderScrollContentPreference) {
-        value = nextValue()
-    }
-}
-
-private struct ViewportHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 struct ArticleReaderView: View {
     let article: Article
 
@@ -87,6 +67,15 @@ struct ArticleReaderView: View {
         }
     }
 
+    private func applyScrollMetrics(offset: CGFloat, contentH: CGFloat, viewportH: CGFloat) {
+        scrollOffset = offset
+        contentHeight = contentH
+        screenHeight = viewportH
+        let frac = Self.scrollFraction(offset: offset, contentHeight: contentH, viewportHeight: viewportH)
+        evaluateReadCompletion(scrollFraction: frac)
+        scheduleScrollPersist(fraction: frac)
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             colors.background.ignoresSafeArea()
@@ -114,41 +103,13 @@ struct ArticleReaderView: View {
                 .padding(.horizontal, 40)
                 .padding(.top, 44 + safeAreaTop + 24)
                 .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
-                // Critical: ScrollView proposes unbounded vertical space; without this the background
-                // GeometryReader only sees viewport height → scroll progress denominator ≤ 0 and the bar stays empty.
+                // Critical: ScrollView proposes unbounded vertical space; intrinsic height drives backing UIScrollView contentSize.
                 .fixedSize(horizontal: false, vertical: true)
                 .background(
-                    GeometryReader { geo in
-                        Color.clear
-                            .preference(
-                                key: ReaderScrollContentKey.self,
-                                value: ReaderScrollContentPreference(
-                                    scrollOffsetY: max(0, -geo.frame(in: .named("scroll")).minY),
-                                    contentHeight: geo.size.height
-                                )
-                            )
-                    }
+                    ScrollViewScrollMetricsTracker(onScrollMetrics: applyScrollMetrics)
+                        .frame(width: 0, height: 0)
+                        .allowsHitTesting(false)
                 )
-            }
-            .coordinateSpace(name: "scroll")
-            .background(
-                GeometryReader { viewport in
-                    Color.clear.preference(key: ViewportHeightKey.self, value: viewport.size.height)
-                }
-            )
-            .onPreferenceChange(ReaderScrollContentKey.self) { metrics in
-                let y = max(0, metrics.scrollOffsetY)
-                let h = metrics.contentHeight
-                scrollOffset = y
-                contentHeight = h
-                let frac = Self.scrollFraction(offset: y, contentHeight: h, viewportHeight: screenHeight)
-                evaluateReadCompletion(scrollFraction: frac)
-                scheduleScrollPersist(fraction: frac)
-            }
-            .onPreferenceChange(ViewportHeightKey.self) { value in
-                guard value > 0, value.isFinite else { return }
-                screenHeight = value
-                evaluateReadCompletion(scrollFraction: Self.scrollFraction(offset: scrollOffset, contentHeight: contentHeight, viewportHeight: value))
             }
             .onChange(of: contentHeight) { newHeight in
                 guard !didApplyScrollRestore,
