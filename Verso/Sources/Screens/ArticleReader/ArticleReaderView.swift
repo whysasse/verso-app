@@ -1,15 +1,14 @@
 import SwiftUI
 
-private struct ScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
+/// Offset + full content height from one reading so preference updates stay in sync (avoids bar stuck at 0).
+private struct ReaderScrollContentPreference: Equatable {
+    var scrollOffsetY: CGFloat
+    var contentHeight: CGFloat
 }
 
-private struct ContentHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+private struct ReaderScrollContentKey: PreferenceKey {
+    static var defaultValue = ReaderScrollContentPreference(scrollOffsetY: 0, contentHeight: 0)
+    static func reduce(value: inout ReaderScrollContentPreference, nextValue: () -> ReaderScrollContentPreference) {
         value = nextValue()
     }
 }
@@ -46,9 +45,7 @@ struct ArticleReaderView: View {
     private var colors: ThemeColors { themeManager.colors }
 
     private var scrollProgress: Double {
-        let scrollable = contentHeight - screenHeight
-        guard scrollable > 0 else { return 0 }
-        return min(1, max(0, Double(scrollOffset / scrollable)))
+        Self.scrollFraction(offset: scrollOffset, contentHeight: contentHeight, viewportHeight: screenHeight)
     }
 
     private var lineSpacingValue: CGFloat {
@@ -61,6 +58,26 @@ struct ArticleReaderView: View {
     private var readingBottomBarContentHeight: CGFloat {
         let base: CGFloat = isTTSActive ? 101 : 56
         return base + VersoSpacing.xs
+    }
+
+    /// Visible scroll fraction; short articles fit in less than one viewport so we interpolate from drag distance instead.
+    private static func scrollFraction(offset: CGFloat, contentHeight: CGFloat, viewportHeight: CGFloat) -> Double {
+        let o = max(0, offset)
+        guard contentHeight.isFinite, viewportHeight.isFinite else { return 0 }
+        let v = max(viewportHeight, 1)
+        let c = max(contentHeight, 1)
+        let scrollable = c - v
+        if scrollable <= 1 {
+            let denom = max(v * 0.45, 120)
+            return min(1, Double(o / denom))
+        }
+        return min(1, max(0, Double(o / scrollable)))
+    }
+
+    private func evaluateReadCompletion(scrollFraction: Double) {
+        if scrollFraction >= 0.95 {
+            advanceStatus(to: .read)
+        }
     }
 
     var body: some View {
@@ -86,14 +103,19 @@ struct ArticleReaderView: View {
                 .padding(.horizontal, 40)
                 .padding(.top, 44 + safeAreaTop + 24)
                 .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
+                // Critical: ScrollView proposes unbounded vertical space; without this the background
+                // GeometryReader only sees viewport height → scroll progress denominator ≤ 0 and the bar stays empty.
+                .fixedSize(horizontal: false, vertical: true)
                 .background(
                     GeometryReader { proxy in
                         Color.clear
                             .preference(
-                                key: ScrollOffsetKey.self,
-                                value: max(0, -proxy.frame(in: .named("scroll")).minY)
+                                key: ReaderScrollContentKey.self,
+                                value: ReaderScrollContentPreference(
+                                    scrollOffsetY: max(0, -proxy.frame(in: .named("scroll")).minY),
+                                    contentHeight: proxy.size.height
+                                )
                             )
-                            .preference(key: ContentHeightKey.self, value: proxy.size.height)
                     }
                 )
             }
@@ -103,18 +125,17 @@ struct ArticleReaderView: View {
                     Color.clear.preference(key: ViewportHeightKey.self, value: viewport.size.height)
                 }
             )
-            .onPreferenceChange(ScrollOffsetKey.self) { value in
-                scrollOffset = max(0, value)
-                if scrollProgress >= 0.95 {
-                    advanceStatus(to: .read)
-                }
-            }
-            .onPreferenceChange(ContentHeightKey.self) { value in
-                contentHeight = value
+            .onPreferenceChange(ReaderScrollContentKey.self) { metrics in
+                let y = max(0, metrics.scrollOffsetY)
+                let h = metrics.contentHeight
+                scrollOffset = y
+                contentHeight = h
+                evaluateReadCompletion(scrollFraction: Self.scrollFraction(offset: y, contentHeight: h, viewportHeight: screenHeight))
             }
             .onPreferenceChange(ViewportHeightKey.self) { value in
-                guard value > 0 else { return }
+                guard value > 0, value.isFinite else { return }
                 screenHeight = value
+                evaluateReadCompletion(scrollFraction: Self.scrollFraction(offset: scrollOffset, contentHeight: contentHeight, viewportHeight: value))
             }
             .onTapGesture {
                 let enteringImmersive = isChromeVisible
