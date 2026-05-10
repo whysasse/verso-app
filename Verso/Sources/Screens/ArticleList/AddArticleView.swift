@@ -225,6 +225,7 @@ struct AddArticleView: View {
                 try writeToPendingQueue(pending)
             }
 
+            AnalyticsService.shared.track("article.saved", parameters: ["source": "in_app"])
             viewState = .success
         } catch {
             errorMessage = error.localizedDescription

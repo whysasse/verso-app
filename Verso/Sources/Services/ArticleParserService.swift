@@ -32,7 +32,9 @@ final class ArticleParserService {
             logger.warning("SwiftSoup also failed for \(url.host ?? url.absoluteString, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
 
-        throw ArticleParsingError.allParsersFailed(url)
+        let error = ArticleParsingError.allParsersFailed(url)
+        AnalyticsService.shared.track("article.parseFailed", parameters: ["errorType": "allParsersFailed"])
+        throw error
     }
 
     // MARK: - Private

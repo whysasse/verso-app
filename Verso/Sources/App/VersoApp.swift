@@ -12,6 +12,10 @@ struct VersoApp: App {
     @Environment(\.scenePhase) private var scenePhase
     private let context = CoreDataStack.shared.persistentContainer.viewContext
 
+    init() {
+        AnalyticsService.shared.initializeIfOptedIn()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -21,9 +25,6 @@ struct VersoApp: App {
                 .environmentObject(articleLibraryService)
                 .environmentObject(readingPreferences)
                 .onAppear {
-                    if AnalyticsService.shared.isOptedIn {
-                        TelemetryDeck.initialize(config: .init(appID: "AF772698-A152-4DBF-AEAA-B49EFDC7BF8C"))
-                    }
                     folderBookmarkService.restore()
                     applyWindowBackground()
                     Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }

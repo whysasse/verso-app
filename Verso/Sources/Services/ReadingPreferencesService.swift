@@ -2,7 +2,10 @@ import SwiftUI
 
 final class ReadingPreferencesService: ObservableObject {
     @Published var fontFamily: String {
-        didSet { UserDefaults.standard.set(fontFamily, forKey: Keys.fontFamily) }
+        didSet {
+            UserDefaults.standard.set(fontFamily, forKey: Keys.fontFamily)
+            AnalyticsService.shared.track("settings.fontChanged", parameters: ["font": fontFamily.isEmpty ? "System" : fontFamily])
+        }
     }
     @Published var fontSize: CGFloat {
         didSet { UserDefaults.standard.set(Double(fontSize), forKey: Keys.fontSize) }
