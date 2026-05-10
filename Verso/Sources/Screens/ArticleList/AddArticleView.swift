@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import UIKit
 
 struct AddArticleView: View {
     @EnvironmentObject var themeManager: ThemeManager
@@ -70,6 +71,12 @@ struct AddArticleView: View {
                         .foregroundColor(themeManager.colors.textPrimary)
                 }
             }
+        }
+        .onAppear {
+            prefillURLFromClipboardIfNeeded()
+        }
+        .onChange(of: viewState) { _ in
+            prefillURLFromClipboardIfNeeded()
         }
     }
 
@@ -184,6 +191,35 @@ struct AddArticleView: View {
             Spacer()
         }
         .padding(.horizontal, VersoSpacing.md)
+    }
+
+    /// FAB-135: Prefill URL field when the sheet opens with a plausible HTTP(S) URL on the pasteboard.
+    private func prefillURLFromClipboardIfNeeded() {
+        guard viewState == .idle else { return }
+        guard urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard let raw = UIPasteboard.general.string else { return }
+        let trimmedClipboard = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let urlString = Self.firstHTTPURLString(in: trimmedClipboard) else { return }
+        guard let parsed = URL(string: urlString),
+              let scheme = parsed.scheme?.lowercased(),
+              scheme == "http" || scheme == "https",
+              parsed.host != nil
+        else { return }
+        urlText = urlString
+    }
+
+    private static func firstHTTPURLString(in string: String) -> String? {
+        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
+            return nil
+        }
+        let range = NSRange(string.startIndex..<string.endIndex, in: string)
+        guard let match = detector.firstMatch(in: string, options: [], range: range),
+              let url = match.url,
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https",
+              url.host != nil
+        else { return nil }
+        return url.absoluteString
     }
 
     // MARK: - Save Logic
