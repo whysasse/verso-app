@@ -40,7 +40,8 @@ targets:
           UIApplicationSupportsMultipleScenes: true
         UIApplicationSupportsIndirectInputEvents: true
         UIRequiresFullScreen: true
-        UILaunchScreen: {}
+        UILaunchScreen:
+          UIColorName: LaunchBackground
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations_iPad:
