@@ -19,6 +19,7 @@ struct SettingsView: View {
     private let availableFonts: [(name: String, displayName: String)] = [
         ("Georgia", "Georgia"),
         ("NewYork", "New York"),
+        ("OpenDyslexic-Regular", "OpenDyslexic"),
         ("", "System"),
     ]
 
@@ -173,7 +174,7 @@ struct SettingsView: View {
             sectionHeader("About")
 
             NavigationLink(destination: AboutView()) {
-                SettingsRow(type: .default(label: "Version \(appVersion)"))
+                SettingsRow(type: .default(label: "Version \(appVersion)"), usesButtonChrome: false)
                     .padding(.horizontal, VersoSpacing.md)
             }
             .buttonStyle(.plain)
@@ -181,7 +182,7 @@ struct SettingsView: View {
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
             NavigationLink(destination: PrivacyPolicyView()) {
-                SettingsRow(type: .default(label: "Privacy Policy"))
+                SettingsRow(type: .default(label: "Privacy Policy"), usesButtonChrome: false)
                     .padding(.horizontal, VersoSpacing.md)
             }
             .buttonStyle(.plain)
