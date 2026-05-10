@@ -32,6 +32,6 @@ jobs:
             -project Verso.xcodeproj \
             -scheme Verso \
             -configuration Debug \
-            -destination "platform=iOS Simulator,name=Any iOS Simulator Device" \
+            -destination "platform=macOS,variant=Designed for iPad" \
             CODE_SIGNING_ALLOWED=NO \
             build | xcpretty && exit ${PIPESTATUS[0]}
