@@ -57,6 +57,12 @@ struct ArticleReaderView: View {
         return readingPreferences.fontSize * (multipliers[readingPreferences.lineSpacing] - 1)
     }
 
+    /// Matches `ReadingBottomBar`: main row 56pt, + TTS divider + controls when active; plus comfort gap below.
+    private var readingBottomBarContentHeight: CGFloat {
+        let base = isTTSActive ? 101 : 56
+        return base + VersoSpacing.xs
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             colors.background.ignoresSafeArea()
@@ -78,7 +84,7 @@ struct ArticleReaderView: View {
                 }
                 .padding(.horizontal, 40)
                 .padding(.top, 44 + safeAreaTop + 24)
-                .padding(.bottom, 56 + safeAreaBottom + 24)
+                .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
                 .background(
                     GeometryReader { proxy in
                         Color.clear
@@ -156,11 +162,12 @@ struct ArticleReaderView: View {
                 onToggleTTS: toggleTTS,
                 isVisible: $isChromeVisible
             )
-            .frame(height: isChromeVisible ? (isTTSActive ? 100 : 56) : 0)
+            .padding(.bottom, VersoSpacing.xs)
+            .frame(height: isChromeVisible ? readingBottomBarContentHeight : 0)
             .clipped()
         }
         .navigationBarHidden(true)
-        .ignoresSafeArea(edges: .all)
+        .ignoresSafeArea(edges: .top)
         .sheet(isPresented: $showFontControls) {
             ReadingControls(variant: .font, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
                 .presentationDetents([.height(245)])
