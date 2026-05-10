@@ -44,6 +44,8 @@ targets:
         UIRequiresFullScreen: true
         UILaunchScreen:
           UIColorName: LaunchBackground
+          UIImageName: LaunchScreenIcon
+          UIImageRespectsSafeAreaInsets: false
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations_iPad:

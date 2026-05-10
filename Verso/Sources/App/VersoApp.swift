@@ -14,6 +14,9 @@ struct VersoApp: App {
 
     init() {
         AnalyticsService.shared.initializeIfOptedIn()
+        let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme")
+        let theme = VersoTheme(rawValue: savedTheme ?? "Paper") ?? .paper
+        UIWindow.appearance().backgroundColor = UIColor(ThemeColors.colors(for: theme).background)
     }
 
     var body: some Scene {
