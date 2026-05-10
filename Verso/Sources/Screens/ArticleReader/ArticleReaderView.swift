@@ -172,13 +172,13 @@ struct ArticleReaderView: View {
         .ignoresSafeArea(edges: .top)
         .sheet(isPresented: $showFontControls) {
             ReadingControls(variant: .font, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
-                .presentationDetents([.height(245)])
+                .presentationDetents([.height(218)])
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
         }
         .sheet(isPresented: $showThemeControls) {
             ReadingControls(variant: .theme, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
-                .presentationDetents([.height(200)])
+                .presentationDetents([.height(168)])
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
         }

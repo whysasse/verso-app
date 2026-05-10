@@ -22,11 +22,16 @@ struct ImportView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { dismiss() }
-                        .font(VersoTypography.UI.input)
-                        .foregroundColor(colors.accent)
-                        .buttonStyle(.plain)
-                        .tint(.clear)
+                    VersoToolbarIconButton(
+                        systemName: "xmark",
+                        accent: colors.accent,
+                        action: { dismiss() },
+                        iconPointSize: 17,
+                        labelWidth: 44,
+                        labelHeight: 44,
+                        accessibilityLabel: String(localized: "Close"),
+                        accessibilityHint: String(localized: "Dismiss import sheet")
+                    )
                 }
             }
         }

@@ -52,12 +52,16 @@ struct AddArticleView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if viewState == .idle || viewState == .failure {
-                        Button("Cancel") {
-                            dismiss()
-                        }
-                        .foregroundColor(themeManager.colors.accent)
-                        .buttonStyle(.plain)
-                        .tint(.clear)
+                        VersoToolbarIconButton(
+                            systemName: "xmark",
+                            accent: themeManager.colors.accent,
+                            action: { dismiss() },
+                            iconPointSize: 17,
+                            labelWidth: 44,
+                            labelHeight: 44,
+                            accessibilityLabel: String(localized: "Close"),
+                            accessibilityHint: String(localized: "Dismiss add article sheet")
+                        )
                     }
                 }
                 ToolbarItem(placement: .principal) {
