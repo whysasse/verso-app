@@ -2,7 +2,9 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var articleLibraryService: ArticleLibraryService
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var showLaunch = true
 
     var body: some View {
         ZStack {
@@ -15,8 +17,23 @@ struct ContentView: View {
             } else {
                 OnboardingFlowView(onComplete: { hasCompletedOnboarding = true })
             }
+            if hasCompletedOnboarding && showLaunch {
+                LaunchView()
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
         }
         .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
+        .onReceive(articleLibraryService.$isRebuilding) { rebuilding in
+            guard showLaunch, !rebuilding else { return }
+            withAnimation(.easeOut(duration: 0.25)) { showLaunch = false }
+        }
+        .task {
+            // Safety net: dismiss launch view after 1.5s if rebuild never fires
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            guard showLaunch else { return }
+            withAnimation(.easeOut(duration: 0.25)) { showLaunch = false }
+        }
     }
 }
 
