@@ -59,7 +59,7 @@ struct ArticleReaderView: View {
 
     /// Matches `ReadingBottomBar`: main row 56pt, + TTS divider + controls when active; plus comfort gap below.
     private var readingBottomBarContentHeight: CGFloat {
-        let base = isTTSActive ? 101 : 56
+        let base: CGFloat = isTTSActive ? 101 : 56
         return base + VersoSpacing.xs
     }
 
