@@ -71,7 +71,7 @@ struct ArticleReaderView: View {
                 VStack(alignment: .leading, spacing: 40) {
                     ArticleHeader(
                         title: article.title,
-                        author: article.author,
+                        author: article.readerDisplayAuthor,
                         publicationFallback: article.readerPublicationFallback,
                         date: article.dateAdded,
                         readTime: estimatedReadTime(for: parsedContent)
