@@ -34,4 +34,5 @@ jobs:
             -configuration Debug \
             -destination "platform=macOS,variant=Designed for iPad" \
             CODE_SIGNING_ALLOWED=NO \
+            ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
             build | xcpretty && exit ${PIPESTATUS[0]}
