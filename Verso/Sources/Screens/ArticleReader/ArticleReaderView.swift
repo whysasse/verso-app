@@ -164,7 +164,9 @@ struct ArticleReaderView: View {
             )
             .padding(.bottom, VersoSpacing.xs)
             .frame(height: isChromeVisible ? readingBottomBarContentHeight : 0)
-            .clipped()
+            .frame(maxWidth: .infinity)
+            // Padded region above must be opaque; extend through home indicator so article text cannot show through.
+            .background(colors.background.ignoresSafeArea(edges: .bottom))
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(edges: .top)
