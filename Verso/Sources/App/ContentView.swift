@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject var articleLibraryService: ArticleLibraryService
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var showLaunch = true
+    @State private var hasSeenRebuilding = false
 
     var body: some View {
         ZStack {
@@ -25,7 +26,8 @@ struct ContentView: View {
         }
         .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
         .onReceive(articleLibraryService.$isRebuilding) { rebuilding in
-            guard showLaunch, !rebuilding else { return }
+            if rebuilding { hasSeenRebuilding = true }
+            guard showLaunch, hasSeenRebuilding, !rebuilding else { return }
             withAnimation(.easeOut(duration: 0.25)) { showLaunch = false }
         }
         .task {
