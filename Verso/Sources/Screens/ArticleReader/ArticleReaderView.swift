@@ -243,7 +243,7 @@ struct ArticleReaderView: View {
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
         if let parsed = try? MarkdownReader.read(fileURL: fileURL) {
-            parsedContent = parsed.contentMarkdown
+            parsedContent = HTMLToMarkdownConverter.sanitizeMarkdownBody(parsed.contentMarkdown, articleTitle: article.title)
         }
     }
 

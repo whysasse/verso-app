@@ -220,7 +220,20 @@ enum HTMLToMarkdownConverter {
         while text.contains("\n\n\n") {
             text = text.replacingOccurrences(of: "\n\n\n", with: "\n\n")
         }
+        text = sanitizeMarkdownBody(text, articleTitle: articleTitle)
+        return text
+    }
+
+    /// Normalizes Readability / saved markdown: drop lightbox UI lines, repeated title blocks, and duplicate paragraphs.
+    /// Also used when loading an article from disk so older saves get the same cleanup.
+    static func sanitizeMarkdownBody(_ markdown: String, articleTitle: String?) -> String {
+        var text = markdown
+        while text.contains("\n\n\n") {
+            text = text.replacingOccurrences(of: "\n\n\n", with: "\n\n")
+        }
+        text = stripFullscreenNoiseFromMarkdown(text)
         text = stripLeadingTitleEcho(markdown: text, title: articleTitle)
+        text = stripAllBlocksMatchingTitle(markdown: text, title: articleTitle)
         text = collapseMarkdownDuplicateBlocks(text)
         text = collapseImageCaptionEcho(text)
         return text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -265,6 +278,7 @@ enum HTMLToMarkdownConverter {
         let patterns = [
             #"<a\b[^>]*>[\s\S]*?(?:View image in fullscreen|open image in fullscreen|view fullscreen|full screen image)[\s\S]*?</a>"#,
             #"<button\b[^>]*>[\s\S]*?(?:View image in fullscreen|open image in fullscreen|view fullscreen)[\s\S]*?</button>"#,
+            #"<span\b[^>]*>[\s\S]*?(?:View image in fullscreen|open image in fullscreen)[\s\S]*?</span>"#,
         ]
         for p in patterns {
             guard let re = try? NSRegularExpression(pattern: p, options: [.caseInsensitive, .dotMatchesLineSeparators]) else { continue }
@@ -309,7 +323,8 @@ enum HTMLToMarkdownConverter {
         var altOut = ""
         if let imgRe = try? NSRegularExpression(pattern: #"<img[^>]*>"#, options: [.caseInsensitive]) {
             let i = inner as NSString
-            for m in imgRe.matches(in: inner, options: [], range: NSRange(location: 0, length: i.length)) {
+            let imgMatches = imgRe.matches(in: inner, options: [], range: NSRange(location: 0, length: i.length))
+            for m in imgMatches.reversed() {
                 let tag = i.substring(with: m.range)
                 if let u = resolvedHTTPImageURL(forImgTag: tag, baseURL: baseURL) {
                     bestURL = u
@@ -400,6 +415,66 @@ enum HTMLToMarkdownConverter {
 
     // MARK: - Markdown post-process
 
+    private static let fullscreenLineFingerprints: Set<String> = [
+        "view image in fullscreen",
+        "open image in fullscreen",
+        "view fullscreen",
+        "full screen image",
+        "tap to expand image",
+        "tap to expand",
+        "click to view larger image",
+    ]
+
+    /// Removes standalone UI lines (often left after HTML strip) and blocks that are only that label.
+    private static func stripFullscreenNoiseFromMarkdown(_ markdown: String) -> String {
+        let blocks = markdown.components(separatedBy: "\n\n")
+        var out: [String] = []
+        for block in blocks {
+            let trimmed = block.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty { continue }
+
+            let nonEmptyLines = trimmed.split(separator: "\n").filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            if nonEmptyLines.count == 1,
+               fullscreenLineFingerprints.contains(lineFingerprint(String(nonEmptyLines[0]))) {
+                continue
+            }
+
+            let lines = trimmed.components(separatedBy: "\n")
+            let kept: [String] = lines.compactMap { raw in
+                let L = raw.trimmingCharacters(in: .whitespaces)
+                if L.isEmpty { return nil }
+                if fullscreenLineFingerprints.contains(lineFingerprint(L)) { return nil }
+                return raw.trimmingCharacters(in: .whitespaces)
+            }
+            guard !kept.isEmpty else { continue }
+            out.append(kept.joined(separator: "\n"))
+        }
+        return out.joined(separator: "\n\n")
+    }
+
+    private static func lineFingerprint(_ line: String) -> String {
+        fingerprint(block: line)
+    }
+
+    /// Drops any paragraph / heading block that matches the article title (header already shows it).
+    private static func stripAllBlocksMatchingTitle(markdown: String, title: String?) -> String {
+        guard let title = title?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty else { return markdown }
+        let nTitle = fingerprint(block: title)
+        let blocks = markdown.components(separatedBy: "\n\n")
+        var out: [String] = []
+        for block in blocks {
+            let trimmed = block.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty { continue }
+            var rest = trimmed
+            while rest.hasPrefix("#") {
+                rest = String(rest.dropFirst()).trimmingCharacters(in: .whitespaces)
+            }
+            if fingerprint(block: rest) == nTitle { continue }
+            out.append(trimmed)
+        }
+        return out.joined(separator: "\n\n")
+    }
+
     private static func stripLeadingTitleEcho(markdown: String, title: String?) -> String {
         guard let title = title?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty else { return markdown }
         var blocks = markdown.components(separatedBy: "\n\n")
@@ -480,6 +555,10 @@ enum HTMLToMarkdownConverter {
         var b = block
         b = b.replacingOccurrences(of: "\u{2019}", with: "'")
         b = b.replacingOccurrences(of: "\u{2018}", with: "'")
+        b = b.replacingOccurrences(of: "\u{201c}", with: "\"")
+        b = b.replacingOccurrences(of: "\u{201d}", with: "\"")
+        b = b.replacingOccurrences(of: "\u{2013}", with: "-")
+        b = b.replacingOccurrences(of: "\u{2014}", with: "-")
         return b
             .lowercased()
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
