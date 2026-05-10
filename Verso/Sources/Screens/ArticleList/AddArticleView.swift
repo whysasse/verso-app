@@ -193,6 +193,8 @@ struct AddArticleView: View {
             let pending = try await parserService.parse(url: url)
 
             if let folderURL = folderBookmarkService.folderURL {
+                let folderAccessed = folderURL.startAccessingSecurityScopedResource()
+                defer { if folderAccessed { folderURL.stopAccessingSecurityScopedResource() } }
                 // Write markdown file directly
                 let parsed = ParsedArticle(
                     id: pending.id,
