@@ -33,7 +33,11 @@ final class ScrollMetricsTrackerUIView: UIView {
 
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
-        reconnectIfNeeded()
+        if superview == nil {
+            clearTracking()
+        } else {
+            reconnectIfNeeded()
+        }
     }
 
     override func layoutSubviews() {
@@ -53,10 +57,9 @@ final class ScrollMetricsTrackerUIView: UIView {
     }
 
     private func reconnectIfNeeded() {
-        guard let scrollView = enclosingScrollView() else {
-            clearTracking()
-            return
-        }
+        // Avoid clearTracking() when the scroll view is briefly unreachable during layout;
+        // that dropped KVO and left progress stuck at 0.
+        guard let scrollView = enclosingScrollView() else { return }
 
         if scrollView !== trackedScrollView {
             clearTracking()

@@ -105,11 +105,13 @@ struct ArticleReaderView: View {
                 .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
                 // Critical: ScrollView proposes unbounded vertical space; intrinsic height drives backing UIScrollView contentSize.
                 .fixedSize(horizontal: false, vertical: true)
-                .background(
+                .overlay(alignment: .topLeading) {
+                    // Non-zero frame so the bridge view stays in the scroll content hierarchy (0×0 can skip layout / break KVO).
                     ScrollViewScrollMetricsTracker(onScrollMetrics: applyScrollMetrics)
-                        .frame(width: 0, height: 0)
+                        .frame(width: 1, height: 1)
                         .allowsHitTesting(false)
-                )
+                        .accessibilityHidden(true)
+                }
             }
             .onChange(of: contentHeight) { newHeight in
                 guard !didApplyScrollRestore,
