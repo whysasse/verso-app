@@ -10,5 +10,8 @@
     <attribute name="source" attributeType="String" optional="YES"/>
     <attribute name="author" attributeType="String" optional="YES"/>
     <attribute name="siteName" attributeType="String" optional="YES"/>
+    <attribute name="scrollPosition" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
+    <attribute name="tagsSerialized" optional="YES" attributeType="String"/>
+    <attribute name="searchableBody" optional="YES" attributeType="String"/>
   </entity>
 </model>

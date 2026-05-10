@@ -92,7 +92,10 @@ final class ImportOrchestrator: ObservableObject {
             dateAdded: article.dateAdded,
             source: article.url.flatMap { URL(string: $0.absoluteString)?.host },
             author: article.author,
-            siteName: article.siteName
+            siteName: article.siteName,
+            scrollPosition: article.scrollPosition.map { NSNumber(value: $0) },
+            tagsSerialized: Article.makeTagsSerialized(from: article.tags),
+            searchableBody: ArticlePlainText.fromMarkdown(article.contentMarkdown)
         )
     }
 }

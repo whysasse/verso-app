@@ -101,6 +101,11 @@ struct MarkdownWriter {
         // Status
         lines.append("status: \(article.status.rawValue)")
 
+        if let sp = article.scrollPosition {
+            let clamped = min(1, max(0, sp))
+            lines.append(String(format: "scroll_position: %.4f", clamped))
+        }
+
         // Tags (optional)
         if let tags = article.tags, !tags.isEmpty {
             let tagsStr = tags.map { "\"\($0.replacingOccurrences(of: "\"", with: "\\\""))\"" }.joined(separator: ", ")
@@ -146,6 +151,67 @@ struct MarkdownWriter {
             content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: replacement)
         }
         try content.write(to: url, atomically: true, encoding: .utf8)
+    }
+
+    /// Persists normalized scroll depth (0...1) in frontmatter for cross-device resume via iCloud Drive.
+    static func updateScrollPosition(_ fraction: Double, for filePath: String) throws {
+        let clamped = min(1, max(0, fraction))
+        let line = String(format: "scroll_position: %.4f", clamped)
+        let url = URL(fileURLWithPath: filePath)
+        var content = try String(contentsOf: url, encoding: .utf8)
+        let pattern = #"(?m)^scroll_position:.*$"#
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let range = NSRange(content.startIndex..., in: content)
+            if regex.firstMatch(in: content, options: [], range: range) != nil {
+                content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: line)
+                try content.write(to: url, atomically: true, encoding: .utf8)
+                return
+            }
+        }
+        // Insert after `status:` line when missing
+        let statusPattern = #"(?m)^(status: \S+)$"#
+        if let regex = try? NSRegularExpression(pattern: statusPattern) {
+            let range = NSRange(content.startIndex..., in: content)
+            if regex.firstMatch(in: content, options: [], range: range) != nil {
+                let template = "$1\n\(line)"
+                content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: template)
+                try content.write(to: url, atomically: true, encoding: .utf8)
+                return
+            }
+        }
+        throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 1, userInfo: [NSLocalizedDescriptionKey: "Could not insert scroll_position into frontmatter"]))
+    }
+
+    /// Replaces or inserts the `tags:` YAML line (JSON-array style, same as new articles).
+    static func updateTags(_ tags: [String], for filePath: String) throws {
+        let url = URL(fileURLWithPath: filePath)
+        var content = try String(contentsOf: url, encoding: .utf8)
+        let sorted = tags.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        let tagsLine: String
+        if sorted.isEmpty {
+            tagsLine = "tags: []"
+        } else {
+            let inner = sorted.map { "\"\($0.replacingOccurrences(of: "\\\"", with: "\\\\\""))\"" }.joined(separator: ", ")
+            tagsLine = "tags: [\(inner)]"
+        }
+        let pattern = #"(?m)^tags:.*$"#
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let range = NSRange(content.startIndex..., in: content)
+            if regex.firstMatch(in: content, options: [], range: range) != nil {
+                content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: tagsLine)
+                try content.write(to: url, atomically: true, encoding: .utf8)
+                return
+            }
+        }
+        if let regex = try? NSRegularExpression(pattern: #"(?m)^(status: \S+)$"#) {
+            let range = NSRange(content.startIndex..., in: content)
+            if regex.firstMatch(in: content, options: [], range: range) != nil {
+                content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: "$1\n\(tagsLine)")
+                try content.write(to: url, atomically: true, encoding: .utf8)
+                return
+            }
+        }
+        throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 2, userInfo: [NSLocalizedDescriptionKey: "Could not insert tags into frontmatter"]))
     }
 
     /// Writes a ParsedArticle to a .md file in the specified directory.

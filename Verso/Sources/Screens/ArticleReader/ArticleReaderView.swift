@@ -34,6 +34,13 @@ struct ArticleReaderView: View {
     @State private var relatedArticles: [Article] = []
     @State private var isTTSActive: Bool = false
     @StateObject private var ttsService = TTSService()
+    /// Leading spacer height to align saved read position (see `scroll_position` frontmatter).
+    @State private var restorePadHeight: CGFloat = 0
+    @State private var didApplyScrollRestore = false
+    @State private var pendingRestoreFraction: Double?
+    @State private var scrollSaveTask: Task<Void, Never>?
+    @State private var lastPersistedScroll: Double = -1
+    @State private var showTagsEditor = false
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
@@ -84,8 +91,12 @@ struct ArticleReaderView: View {
         ZStack(alignment: .top) {
             colors.background.ignoresSafeArea()
 
+            ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 40) {
+                    Color.clear
+                        .frame(height: restorePadHeight)
+                        .id("verscroll")
                     ArticleHeader(
                         title: article.title,
                         author: article.readerDisplayAuthor,
@@ -107,13 +118,13 @@ struct ArticleReaderView: View {
                 // GeometryReader only sees viewport height → scroll progress denominator ≤ 0 and the bar stays empty.
                 .fixedSize(horizontal: false, vertical: true)
                 .background(
-                    GeometryReader { proxy in
+                    GeometryReader { geo in
                         Color.clear
                             .preference(
                                 key: ReaderScrollContentKey.self,
                                 value: ReaderScrollContentPreference(
-                                    scrollOffsetY: max(0, -proxy.frame(in: .named("scroll")).minY),
-                                    contentHeight: proxy.size.height
+                                    scrollOffsetY: max(0, -geo.frame(in: .named("scroll")).minY),
+                                    contentHeight: geo.size.height
                                 )
                             )
                     }
@@ -130,12 +141,34 @@ struct ArticleReaderView: View {
                 let h = metrics.contentHeight
                 scrollOffset = y
                 contentHeight = h
-                evaluateReadCompletion(scrollFraction: Self.scrollFraction(offset: y, contentHeight: h, viewportHeight: screenHeight))
+                let frac = Self.scrollFraction(offset: y, contentHeight: h, viewportHeight: screenHeight)
+                evaluateReadCompletion(scrollFraction: frac)
+                scheduleScrollPersist(fraction: frac)
             }
             .onPreferenceChange(ViewportHeightKey.self) { value in
                 guard value > 0, value.isFinite else { return }
                 screenHeight = value
                 evaluateReadCompletion(scrollFraction: Self.scrollFraction(offset: scrollOffset, contentHeight: contentHeight, viewportHeight: value))
+            }
+            .onChange(of: contentHeight) { newHeight in
+                guard !didApplyScrollRestore,
+                      let f = pendingRestoreFraction,
+                      newHeight > 0, screenHeight > 0 else { return }
+                let scrollable = CGFloat(max(0, newHeight - screenHeight))
+                guard scrollable > 1 else {
+                    didApplyScrollRestore = true
+                    pendingRestoreFraction = nil
+                    return
+                }
+                restorePadHeight = CGFloat(f) * scrollable
+            }
+            .onChange(of: restorePadHeight) { newPad in
+                guard newPad > 0, !didApplyScrollRestore else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+                    proxy.scrollTo("verscroll", anchor: .top)
+                    didApplyScrollRestore = true
+                    pendingRestoreFraction = nil
+                }
             }
             .onTapGesture {
                 let enteringImmersive = isChromeVisible
@@ -150,6 +183,7 @@ struct ArticleReaderView: View {
                 }
                 AnalyticsService.shared.track("reader.immersiveModeToggled", parameters: ["enabled": enteringImmersive ? "true" : "false"])
             }
+            }
 
             VStack(spacing: 0) {
                 ReadingTopBar(
@@ -160,6 +194,7 @@ struct ArticleReaderView: View {
                             UIApplication.shared.open(url)
                         }
                     },
+                    onEditTags: { showTagsEditor = true },
                     isVisible: $isChromeVisible
                 )
                 .padding(.top, safeAreaTop)
@@ -204,14 +239,29 @@ struct ArticleReaderView: View {
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
         }
+        .sheet(isPresented: $showTagsEditor) {
+            ArticleTagsEditorSheet(article: article)
+                .environmentObject(themeManager)
+                .environmentObject(folderBookmarkService)
+                .environment(\.managedObjectContext, viewContext)
+        }
         .task {
+            if let s = article.scrollPosition?.doubleValue {
+                lastPersistedScroll = s
+            }
+            pendingRestoreFraction = article.scrollPosition?.doubleValue
             loadContent()
             advanceStatus(to: .reading)
             AnalyticsService.shared.track("article.opened")
             relatedArticles = await RelatedArticlesService().related(to: article, in: viewContext)
         }
         .onDisappear {
+            scrollSaveTask?.cancel()
             ttsService.stop()
+            persistScrollToDisk(
+                Self.scrollFraction(offset: scrollOffset, contentHeight: contentHeight, viewportHeight: screenHeight),
+                force: true
+            )
         }
     }
 
@@ -289,6 +339,34 @@ struct ArticleReaderView: View {
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
         try? MarkdownWriter.updateStatus(status, for: path)
+    }
+
+    private func scheduleScrollPersist(fraction: Double) {
+        scrollSaveTask?.cancel()
+        scrollSaveTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 450_000_000)
+            guard !Task.isCancelled else { return }
+            persistScrollToDisk(fraction, force: false)
+        }
+    }
+
+    private func persistScrollToDisk(_ fraction: Double, force: Bool) {
+        if !force, lastPersistedScroll >= 0, abs(fraction - lastPersistedScroll) < 0.02 {
+            return
+        }
+        lastPersistedScroll = fraction
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !path.isEmpty else { return }
+        let accessed = folderURL.startAccessingSecurityScopedResource()
+        defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
+        do {
+            try MarkdownWriter.updateScrollPosition(fraction, for: path)
+            article.scrollPosition = NSNumber(value: fraction)
+            try? viewContext.save()
+        } catch {
+            // Best-effort; iCloud or sandbox may occasionally fail
+        }
     }
 
     private func toggleTTS() {

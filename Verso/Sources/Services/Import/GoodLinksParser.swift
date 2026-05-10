@@ -32,6 +32,7 @@ struct GoodLinksParser: ImportFileParser {
                 url: articleURL,
                 contentMarkdown: "",
                 tags: item.tags.isEmpty ? nil : item.tags,
+                scrollPosition: nil,
                 dateAdded: item.createdAt ?? Date(),
                 status: status,
                 author: nil,

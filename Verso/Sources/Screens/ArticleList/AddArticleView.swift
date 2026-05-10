@@ -243,6 +243,7 @@ struct AddArticleView: View {
                     url: pending.url,
                     contentMarkdown: pending.contentMarkdown,
                     tags: nil,
+                    scrollPosition: nil,
                     dateAdded: pending.dateAdded,
                     status: .unread,
                     author: pending.author,
@@ -261,7 +262,8 @@ struct AddArticleView: View {
                     dateAdded: pending.dateAdded,
                     source: pending.url.host,
                     author: pending.author,
-                    siteName: pending.siteName
+                    siteName: pending.siteName,
+                    searchableBody: ArticlePlainText.fromMarkdown(pending.contentMarkdown)
                 )
                 if viewContext.hasChanges {
                     try viewContext.save()

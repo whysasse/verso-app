@@ -61,6 +61,7 @@ struct ReadingTopBar: View {
     let title: String
     var onBack: () -> Void = {}
     var onOpenExternal: () -> Void = {}
+    var onEditTags: (() -> Void)? = nil
     @EnvironmentObject var themeManager: ThemeManager
     @Binding var isVisible: Bool
     private var colors: ThemeColors { themeManager.colors }
@@ -83,6 +84,19 @@ struct ReadingTopBar: View {
                 .foregroundColor(colors.textPrimary)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
+
+            if let onEditTags {
+                VersoToolbarIconButton(
+                    systemName: "tag",
+                    accent: colors.accent,
+                    action: onEditTags,
+                    iconPointSize: readingChromeIconSize,
+                    labelWidth: 44,
+                    labelHeight: 44,
+                    accessibilityLabel: "Tags",
+                    accessibilityHint: "Edit tags for this article"
+                )
+            }
 
             VersoToolbarIconButton(
                 systemName: "arrow.up.right",

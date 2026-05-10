@@ -1,7 +1,7 @@
 # Product Requirements Document: Verso
 
-**Version:** 1.6  
-**Date:** 2026-05-02  
+**Version:** 1.7  
+**Date:** 2026-05-10  
 **Status:** Draft  
 **Owner:** [Your Name]
 
@@ -355,7 +355,7 @@ The app never overwrites user-added fields or content. If a file with the same n
 | Article parsing fails for many sites | Low | Test on 20+ major news sites. Provide fallback. User can open in Safari. |
 | iCloud sync conflicts cause data loss | High | Implement last-write-wins. Test heavily. Regular local backups. |
 | Poor performance on older devices | Medium | Profile and optimize. Test on iPhone 11. Target 60fps only. |
-| User data privacy concerns | High | Clear privacy policy. Open-source code. No tracking. Data export. |
+| User data privacy concerns | High | Clear privacy policy. Open-source code. No tracking. File-first storage so users always keep raw Markdown in their chosen folder. |
 | Instapaper/Pocket copy our feature | Low | Differentiate on UX polish, not features. Stay focused on reading. |
 
 ---
@@ -375,16 +375,17 @@ The app never overwrites user-added fields or content. If a file with the same n
 **Definition of Done:** User can save 5 articles from various sources and read them beautifully offline.
 
 ### Phase 2: Polish & Core Features (Weeks 9-12)
-- Search functionality
+- Search functionality (full-text body search, filters)
 - Progress saving (scroll position)
-- Data export
+- Tagging system (flat tags; stored in frontmatter; filter by tag)
 - Improved onboarding
 - App Store submission
+
+Articles remain accessible outside the app as plain Markdown in the user’s iCloud Drive folder — **no separate in-app data export feature** (see §4.4).
 
 **Definition of Done:** Feature-complete for Phase 2 priorities. App store ready.
 
 ### Phase 3: Enhancement (Weeks 13+)
-- Tagging system
 - Highlighting & notes
 - Reading time estimates
 - Additional customization
@@ -486,4 +487,5 @@ See Section 6.2 for the canonical data model. The app writes full parsed article
 | 1.4 | 2026-04-19 | App named: **Verso** | [Your Name] |
 | 1.5 | 2026-04-19 | Added three-state article status (Unread / Reading / Read), filter chips on Home screen, and folder-change dialog behavior in Settings | [Your Name] |
 | 1.6 | 2026-05-02 | Sync with current architecture: §4.1.2 Dark Mode → Theme system (Paper/Sepia/Night/Ink); §4.1.10 tab navigation → Single NavigationStack; §4.3.3 removed background color options (already MVP via theme system); §5.1 Settings dark-mode toggle → theme picker; §5.3 onboarding reduced to 4 screens (Welcome → Theme Picker → Vault Setup → Quick Tour); §10 removed iCloud sync from Phase 2 (handled natively by iCloud Drive). | Claude |
+| 1.7 | 2026-05-10 | §10 Phase 2: removed in-app data export (files are user-accessible per §4.4); moved tagging from Phase 3 into Phase 2 roadmap; §9 privacy risk mitigation wording aligned with file-first model. | Claude |
 

@@ -64,6 +64,7 @@ struct MatterParser: ImportFileParser {
                 url: articleURL,
                 contentMarkdown: "",
                 tags: tags,
+                scrollPosition: nil,
                 dateAdded: dateAdded,
                 status: status,
                 author: nil,

@@ -14,6 +14,12 @@ public class Article: NSManagedObject, Identifiable {
     @NSManaged public var author: String?
     /// Publication / site label (e.g. from Readability siteName).
     @NSManaged public var siteName: String?
+    /// Last-read position in the article body (0...1); mirrored from frontmatter `scroll_position`.
+    @NSManaged public var scrollPosition: NSNumber?
+    /// JSON-encoded tag list for fast Core Data filtering (`["a","b"]`).
+    @NSManaged public var tagsSerialized: String?
+    /// Plain text derived from Markdown body for full-text search (cache only).
+    @NSManaged public var searchableBody: String?
 }
 
 extension Article {
@@ -39,7 +45,10 @@ extension Article {
         dateAdded: Date = Date(),
         source: String? = nil,
         author: String? = nil,
-        siteName: String? = nil
+        siteName: String? = nil,
+        scrollPosition: NSNumber? = nil,
+        tagsSerialized: String? = nil,
+        searchableBody: String? = nil
     ) -> Article {
         let article = Article(context: context)
         article.id = id
@@ -51,7 +60,27 @@ extension Article {
         article.source = source
         article.author = author
         article.siteName = siteName
+        article.scrollPosition = scrollPosition
+        article.tagsSerialized = tagsSerialized
+        article.searchableBody = searchableBody
         return article
+    }
+
+    /// JSON cache for tag filtering (mirrors YAML `tags:` on rebuild).
+    static func makeTagsSerialized(from tags: [String]?) -> String? {
+        guard let tags else { return nil }
+        guard let data = try? JSONEncoder().encode(tags),
+              let s = String(data: data, encoding: .utf8) else { return nil }
+        return s
+    }
+
+    /// Parsed tags for UI and filtering (Core Data cache).
+    var tagList: [String] {
+        guard let tagsSerialized, let data = tagsSerialized.data(using: .utf8),
+              let decoded = try? JSONDecoder().decode([String].self, from: data) else {
+            return []
+        }
+        return decoded
     }
 
     /// Text below the title when the raw URL must not appear (FAB-144).

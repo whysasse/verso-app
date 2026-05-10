@@ -78,6 +78,7 @@ struct MarkdownReader {
         var dateAdded: Date?
         var author: String?
         var siteName: String?
+        var scrollPosition: Double?
 
         let lines = frontmatterRaw.components(separatedBy: .newlines)
         for line in lines {
@@ -112,6 +113,9 @@ struct MarkdownReader {
             } else if trimmed.hasPrefix("site_name:") {
                 siteName = Self.extractValue(from: trimmed, key: "site_name:")?
                     .trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if trimmed.hasPrefix("scroll_position:") {
+                let raw = trimmed.dropFirst("scroll_position:".count).trimmingCharacters(in: .whitespaces)
+                scrollPosition = Double(raw)
             }
         }
 
@@ -145,6 +149,7 @@ struct MarkdownReader {
             url: url,
             contentMarkdown: body,
             tags: tags,
+            scrollPosition: scrollPosition,
             dateAdded: finalDateAdded,
             status: status,
             author: (authorTrimmed?.isEmpty == false) ? authorTrimmed : nil,

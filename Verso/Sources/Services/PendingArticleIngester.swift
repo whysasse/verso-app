@@ -55,6 +55,7 @@ struct PendingArticleIngester {
             url: pending.url,
             contentMarkdown: pending.contentMarkdown,
             tags: nil,
+            scrollPosition: nil,
             dateAdded: pending.dateAdded,
             status: .unread,
             author: pending.author,
@@ -73,6 +74,7 @@ struct PendingArticleIngester {
         article.dateAdded = pending.dateAdded
         article.author = pending.author
         article.siteName = pending.siteName
+        article.searchableBody = ArticlePlainText.fromMarkdown(pending.contentMarkdown)
         try context.save()
     }
 }

@@ -38,6 +38,7 @@ struct InstapaperParser: ImportFileParser {
                 url: articleURL,
                 contentMarkdown: "",
                 tags: nil,
+                scrollPosition: nil,
                 dateAdded: dateAdded,
                 status: status,
                 author: nil,

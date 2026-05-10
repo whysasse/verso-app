@@ -35,13 +35,18 @@ final class ArticleLibraryService: ObservableObject {
             for parsed in parsedArticles {
                 let path = parsed.filePath.path
                 if let article = existingByPath[path] {
-                    // Update mutable fields (title, url, status) but preserve status if user changed it
                     article.title = parsed.title
                     article.url = parsed.url
                     article.author = parsed.author
                     article.siteName = parsed.siteName
-                    // File-first: YAML `status:` wins on rebuild — reader / list must keep the .md in sync with Core Data.
                     article.statusEnum = parsed.status
+                    article.searchableBody = ArticlePlainText.fromMarkdown(parsed.contentMarkdown)
+                    article.tagsSerialized = Article.makeTagsSerialized(from: parsed.tags)
+                    if let sp = parsed.scrollPosition {
+                        article.scrollPosition = NSNumber(value: sp)
+                    } else {
+                        article.scrollPosition = nil
+                    }
                 } else {
                     _ = Article.create(
                         in: context,
@@ -52,7 +57,10 @@ final class ArticleLibraryService: ObservableObject {
                         status: parsed.status,
                         dateAdded: parsed.dateAdded,
                         author: parsed.author,
-                        siteName: parsed.siteName
+                        siteName: parsed.siteName,
+                        scrollPosition: parsed.scrollPosition.map { NSNumber(value: $0) },
+                        tagsSerialized: Article.makeTagsSerialized(from: parsed.tags),
+                        searchableBody: ArticlePlainText.fromMarkdown(parsed.contentMarkdown)
                     )
                 }
             }

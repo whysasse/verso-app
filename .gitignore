@@ -70,5 +70,8 @@ Verso.xcodeproj/
 # Claude local settings
 .claude/
 
+# Git worktree clones (optional local layout)
+.clone/
+
 # Local build secrets (see Verso/Secrets.xcconfig.template)
 Verso/Secrets.xcconfig
