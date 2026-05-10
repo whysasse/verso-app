@@ -221,12 +221,36 @@ struct MarkdownParser {
 
 // MARK: - View
 
+extension MarkdownNode {
+    var plainText: String {
+        switch self {
+        case .paragraph(let inlines), .heading(_, let inlines),
+             .unorderedListItem(let inlines), .orderedListItem(_, let inlines),
+             .blockquote(let inlines):
+            return inlines.map(\.plainText).joined()
+        case .codeBlock(_, let code): return code
+        case .image(_, let alt): return alt
+        case .horizontalRule: return ""
+        }
+    }
+}
+
+extension MarkdownNode.InlineNode {
+    var plainText: String {
+        switch self {
+        case .text(let s), .bold(let s), .italic(let s), .boldItalic(let s), .code(let s): return s
+        case .link(let text, _): return text
+        }
+    }
+}
+
 struct MarkdownBodyView: View {
     let nodes: [MarkdownNode]
     let fontFamily: String
     let fontSize: CGFloat
     let lineSpacingValue: CGFloat
     let colors: ThemeColors
+    var highlightedParagraphIndex: Int? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -260,6 +284,11 @@ struct MarkdownBodyView: View {
                     .lineSpacing(lineSpacingValue)
                     .foregroundColor(colors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        highlightedParagraphIndex == index
+                            ? colors.accent.opacity(0.15)
+                            : Color.clear
+                    )
 
             case .heading(let level, let inlines):
                 Text(inlineText(inlines))

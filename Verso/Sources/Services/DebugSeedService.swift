@@ -8,12 +8,14 @@ enum DebugSeedService {
 
     static func seedIfNeeded(context: NSManagedObjectContext) {
         let request = NSFetchRequest<Article>(entityName: "Article")
-        guard (try? context.count(for: request)) ?? 0 < expectedCount else { return }
+        let existing = (try? context.fetch(request)) ?? []
+
+        // Re-seed if count is wrong OR if stored paths are stale (bundle UUID changed after reinstall)
+        let pathsAreStale = existing.first.map { !FileManager.default.fileExists(atPath: $0.filePath) } ?? false
+        guard existing.count < expectedCount || pathsAreStale else { return }
 
         // Wipe whatever partial seed exists so we start clean
-        if let existing = try? context.fetch(request) {
-            existing.forEach { context.delete($0) }
-        }
+        existing.forEach { context.delete($0) }
 
         let sampleDir = sampleArticlesDirectory()
         let articles: [(file: String, title: String, source: String, url: String, status: Article.Status, daysAgo: Int)] = [
