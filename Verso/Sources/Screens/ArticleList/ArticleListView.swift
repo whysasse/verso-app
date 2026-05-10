@@ -126,14 +126,12 @@ struct ArticleListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
+                VersoToolbarIconButton(
+                    systemName: "plus.circle",
+                    accent: themeManager.colors.accent
+                ) {
                     showAddArticle = true
-                } label: {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(themeManager.colors.accent)
                 }
-                .buttonStyle(.plain)
-                .tint(.clear)
             }
         }
         .navigationDestination(isPresented: $showSettings) {

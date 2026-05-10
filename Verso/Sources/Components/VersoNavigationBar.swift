@@ -1,5 +1,68 @@
 import SwiftUI
 
+/// Icon-only control matching article list toolbar styling: plain button, no system tint, accent foreground.
+struct VersoToolbarIconButton: View {
+    let systemName: String
+    let accent: Color
+    let action: () -> Void
+
+    /// Pass `nil` to use the default symbol metrics (navigation bar).
+    var iconPointSize: CGFloat? = nil
+    var labelWidth: CGFloat? = nil
+    var labelHeight: CGFloat? = nil
+    var accessibilityLabel: String? = nil
+    var accessibilityHint: String? = nil
+
+    var body: some View {
+        Button(action: action) {
+            Group {
+                if let pt = iconPointSize {
+                    Image(systemName: systemName)
+                        .font(.system(size: pt))
+                        .foregroundColor(accent)
+                } else {
+                    Image(systemName: systemName)
+                        .foregroundColor(accent)
+                }
+            }
+            .optionalFrame(width: labelWidth, height: labelHeight)
+        }
+        .buttonStyle(.plain)
+        .tint(.clear)
+        .optionalAccessibilityLabel(accessibilityLabel)
+        .optionalAccessibilityHint(accessibilityHint)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func optionalFrame(width: CGFloat?, height: CGFloat?) -> some View {
+        if let width, let height {
+            self.frame(width: width, height: height)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func optionalAccessibilityLabel(_ label: String?) -> some View {
+        if let label {
+            self.accessibilityLabel(label)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func optionalAccessibilityHint(_ hint: String?) -> some View {
+        if let hint {
+            self.accessibilityHint(hint)
+        } else {
+            self
+        }
+    }
+}
+
 struct VersoNavigationBar: ViewModifier {
     let title: String
     var trailingIcon: String = "plus.circle"
@@ -15,12 +78,11 @@ struct VersoNavigationBar: ViewModifier {
             .toolbar {
                 if let action = trailingAction {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: action) {
-                            Image(systemName: trailingIcon)
-                                .foregroundColor(themeManager.colors.accent)
-                        }
-                        .buttonStyle(.plain)
-                        .tint(.clear)
+                        VersoToolbarIconButton(
+                            systemName: trailingIcon,
+                            accent: themeManager.colors.accent,
+                            action: action
+                        )
                     }
                 }
             }

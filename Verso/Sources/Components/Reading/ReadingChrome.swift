@@ -12,7 +12,7 @@ struct TTSControlsRow: View {
             Button(action: tts.skipBack) {
                 Image(systemName: "backward.end.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(colors.textSecondary)
+                    .foregroundColor(colors.accent)
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
@@ -30,7 +30,7 @@ struct TTSControlsRow: View {
             Button(action: tts.skipForward) {
                 Image(systemName: "forward.end.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(colors.textSecondary)
+                    .foregroundColor(colors.accent)
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
@@ -41,7 +41,7 @@ struct TTSControlsRow: View {
             Button(action: tts.cycleSpeed) {
                 Text(tts.speed.label)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(colors.textSecondary)
+                    .foregroundColor(colors.accent)
                     .frame(width: 54, height: 44)
             }
             .buttonStyle(.plain)
@@ -55,6 +55,8 @@ struct TTSControlsRow: View {
 
 // MARK: - Top Bar
 
+private let readingChromeIconSize: CGFloat = 20
+
 struct ReadingTopBar: View {
     let title: String
     var onBack: () -> Void = {}
@@ -65,13 +67,16 @@ struct ReadingTopBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Button(action: onBack) {
-                Text("‹")
-                    .font(.system(size: 22))
-                    .foregroundColor(colors.accent)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
+            VersoToolbarIconButton(
+                systemName: "chevron.left",
+                accent: colors.accent,
+                action: onBack,
+                iconPointSize: readingChromeIconSize,
+                labelWidth: 44,
+                labelHeight: 44,
+                accessibilityLabel: "Back",
+                accessibilityHint: "Returns to the article list"
+            )
 
             Text(title)
                 .font(.system(size: 17, weight: .semibold))
@@ -79,13 +84,16 @@ struct ReadingTopBar: View {
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
 
-            Button(action: onOpenExternal) {
-                Text("↗")
-                    .font(.system(size: 20))
-                    .foregroundColor(colors.textSecondary)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
+            VersoToolbarIconButton(
+                systemName: "arrow.up.right",
+                accent: colors.accent,
+                action: onOpenExternal,
+                iconPointSize: readingChromeIconSize,
+                labelWidth: 44,
+                labelHeight: 44,
+                accessibilityLabel: "Open in browser",
+                accessibilityHint: "Opens the original article in your web browser"
+            )
         }
         .frame(height: 44)
         .background(colors.background)
@@ -111,6 +119,10 @@ struct ReadingBottomBar: View {
     @Binding var isVisible: Bool
     private var colors: ThemeColors { themeManager.colors }
 
+    private var ttsIconName: String {
+        isTTSActive ? "speaker.wave.2.fill" : "speaker.wave.2"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             if isTTSActive, let tts = tts {
@@ -122,13 +134,16 @@ struct ReadingBottomBar: View {
             }
 
             HStack(spacing: 0) {
-                Button(action: onControls) {
-                    Text("Aa")
-                        .font(.system(size: 16))
-                        .foregroundColor(colors.textSecondary)
-                        .frame(width: 44, height: 56)
-                }
-                .buttonStyle(.plain)
+                VersoToolbarIconButton(
+                    systemName: "textformat.size",
+                    accent: colors.accent,
+                    action: onControls,
+                    iconPointSize: readingChromeIconSize,
+                    labelWidth: 44,
+                    labelHeight: 56,
+                    accessibilityLabel: "Font and spacing",
+                    accessibilityHint: "Adjust reading font size and line spacing"
+                )
 
                 Spacer()
 
@@ -138,22 +153,27 @@ struct ReadingBottomBar: View {
 
                 Spacer()
 
-                Button(action: onToggleTTS) {
-                    Image(systemName: "speaker.wave.2")
-                        .font(.system(size: 16))
-                        .foregroundColor(isTTSActive ? colors.accent : colors.textSecondary)
-                        .frame(width: 44, height: 56)
-                }
-                .buttonStyle(.plain)
-                .tint(.clear)
+                VersoToolbarIconButton(
+                    systemName: ttsIconName,
+                    accent: colors.accent,
+                    action: onToggleTTS,
+                    iconPointSize: readingChromeIconSize,
+                    labelWidth: 44,
+                    labelHeight: 56,
+                    accessibilityLabel: isTTSActive ? "Stop listening" : "Listen to article",
+                    accessibilityHint: "Reads the article aloud"
+                )
 
-                Button(action: onTheme) {
-                    Text("◑")
-                        .font(.system(size: 20))
-                        .foregroundColor(colors.textSecondary)
-                        .frame(width: 44, height: 56)
-                }
-                .buttonStyle(.plain)
+                VersoToolbarIconButton(
+                    systemName: "circle.lefthalf.filled",
+                    accent: colors.accent,
+                    action: onTheme,
+                    iconPointSize: readingChromeIconSize,
+                    labelWidth: 44,
+                    labelHeight: 56,
+                    accessibilityLabel: "Reading theme",
+                    accessibilityHint: "Change paper, sepia, night, or ink theme"
+                )
             }
             .padding(.horizontal, VersoSpacing.md)
             .frame(height: 56)
