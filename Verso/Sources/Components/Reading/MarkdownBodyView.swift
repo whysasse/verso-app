@@ -343,7 +343,7 @@ struct MarkdownBodyView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 6))
 
             case .image(let urlString, let alt):
-                AsyncImageBlock(urlString: urlString, alt: alt, colors: colors)
+                AsyncImageBlock(urlString: urlString, alt: alt, fontSize: fontSize, colors: colors)
 
             case .horizontalRule:
                 Rectangle()
@@ -432,9 +432,29 @@ struct MarkdownBodyView: View {
 private struct AsyncImageBlock: View {
     let urlString: String
     let alt: String
+    let fontSize: CGFloat
     let colors: ThemeColors
 
+    private var captionFontSize: CGFloat {
+        max(11, fontSize - 4)
+    }
+
     var body: some View {
+        VStack(alignment: .center, spacing: 8) {
+            imageContent
+            if !trimmedCaption.isEmpty {
+                Text(trimmedCaption)
+                    .font(.system(size: captionFontSize))
+                    .foregroundColor(colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityLabel(trimmedCaption)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var imageContent: some View {
         if let url = URL(string: urlString) {
             AsyncImage(url: url) { phase in
                 switch phase {
@@ -453,9 +473,14 @@ private struct AsyncImageBlock: View {
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 6))
+            .accessibilityLabel(trimmedCaption.isEmpty ? "Image" : trimmedCaption)
         } else {
             placeholder
         }
+    }
+
+    private var trimmedCaption: String {
+        alt.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private var placeholder: some View {
@@ -464,7 +489,7 @@ private struct AsyncImageBlock: View {
             .frame(maxWidth: .infinity, minHeight: 80)
             .overlay(
                 Text(alt.isEmpty ? "Image" : alt)
-                    .font(.system(size: 13))
+                    .font(.system(size: max(12, captionFontSize)))
                     .foregroundColor(colors.textSecondary)
             )
             .clipShape(RoundedRectangle(cornerRadius: 6))

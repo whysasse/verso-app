@@ -248,7 +248,7 @@ struct AddArticleView: View {
                     author: pending.author,
                     siteName: pending.siteName
                 )
-                let fileURL = try MarkdownWriter.write(article: parsed, to: folderURL)
+                let fileURL = try await MarkdownWriter.write(article: parsed, to: folderURL)
 
                 // Insert into Core Data
                 _ = Article.create(
