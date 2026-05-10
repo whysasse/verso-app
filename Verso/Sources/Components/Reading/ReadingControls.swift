@@ -10,22 +10,38 @@ struct ReadingControls: View {
     @Binding var fontSize: CGFloat
     @Binding var lineSpacing: Int
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) private var dismiss
     private var colors: ThemeColors { themeManager.colors }
 
     var body: some View {
-        VStack(spacing: 0) {
-            dragHandle
-                .padding(.top, VersoSpacing.md)
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                dragHandle
+                    .padding(.top, VersoSpacing.md)
 
-            Group {
-                switch variant {
-                case .font:  fontControls
-                case .theme: themeControls
+                Group {
+                    switch variant {
+                    case .font:  fontControls
+                    case .theme: themeControls
+                    }
                 }
+                .padding(.horizontal, VersoSpacing.lg)
+                .padding(.top, VersoSpacing.md)
+                .padding(.bottom, VersoSpacing.md)
             }
-            .padding(.horizontal, VersoSpacing.lg)
-            .padding(.top, VersoSpacing.md)
-            .padding(.bottom, 28)
+
+            VersoToolbarIconButton(
+                systemName: "xmark",
+                accent: colors.accent,
+                action: { dismiss() },
+                iconPointSize: 15,
+                labelWidth: 44,
+                labelHeight: 44,
+                accessibilityLabel: String(localized: "Close"),
+                accessibilityHint: String(localized: "Dismiss controls")
+            )
+            .padding(.top, VersoSpacing.xs)
+            .padding(.trailing, VersoSpacing.sm)
         }
         .background(colors.surface)
         .overlay(
