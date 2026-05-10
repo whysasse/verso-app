@@ -11,11 +11,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build & Run
 
-The Xcode project is generated via [XcodeGen](https://github.com/yonaskolb/XcodeGen). To regenerate after editing `project.yml`:
+The Xcode project is generated via [XcodeGen](https://github.com/yonaskolb/XcodeGen). To regenerate after editing `project.yml`, run the helper (it creates `Secrets.xcconfig` from `Secrets.xcconfig.template` when missing — that file is gitignored):
 
 ```
-cd Verso && xcodegen generate
+cd Verso && ./generate-xcodeproj.sh
 ```
+
+If `Secrets.xcconfig` already exists, you can still run `xcodegen generate` directly.
 
 Open `Verso/Verso.xcodeproj` in Xcode to build and run. No CLI build commands are configured yet.
 

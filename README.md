@@ -28,4 +28,4 @@ Verso is a minimalist iOS article reader app focused on providing a beautiful, b
 
 ## Running Commands
 
-The Xcode project is generated via XcodeGen. Regenerate after editing `project.yml`: `cd Verso && xcodegen generate`. Open `Verso/Verso.xcodeproj` in Xcode to build and run.
+The Xcode project is generated via XcodeGen. Regenerate after editing `project.yml`: `cd Verso && ./generate-xcodeproj.sh` (creates local `Secrets.xcconfig` from the template if needed — see `Verso/Secrets.xcconfig.template`). Open `Verso/Verso.xcodeproj` in Xcode to build and run.

@@ -35,7 +35,7 @@ File: https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
 
 ## Running Commands
 
-The Xcode project is generated via XcodeGen. To regenerate: `cd Verso && xcodegen generate`.
+The Xcode project is generated via XcodeGen. To regenerate: `cd Verso && ./generate-xcodeproj.sh` (bootstraps `Secrets.xcconfig` from the template when missing). If secrets already exist, `cd Verso && xcodegen generate` is equivalent.
 
 Open `Verso/Verso.xcodeproj` in Xcode and press ⌘R. No CLI `xcodebuild` commands are configured.
 
