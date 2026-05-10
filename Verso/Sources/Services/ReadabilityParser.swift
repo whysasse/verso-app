@@ -199,7 +199,7 @@ enum HTMLToMarkdownConverter {
     /// Very lightweight conversion: strips tags and preserves block structure.
     /// For a richer conversion SwiftSoupParser handles the full traversal.
     static func convert(_ html: String) -> String {
-        var text = html
+        var text = insertMarkdownImages(from: html)
         // Block elements → newlines
         for tag in ["</p>", "</div>", "</li>", "<br>", "<br/>", "<br />", "</h1>", "</h2>", "</h3>", "</h4>", "</h5>", "</h6>"] {
             text = text.replacingOccurrences(of: tag, with: "\n", options: .caseInsensitive)
@@ -219,5 +219,47 @@ enum HTMLToMarkdownConverter {
             text = text.replacingOccurrences(of: "\n\n\n", with: "\n\n")
         }
         return text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Replaces `<img …>` tags with Markdown image syntax so FAB-140 can localize remote URLs on save.
+    private static func insertMarkdownImages(from html: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: #"<img[^>]*?>"#, options: [.caseInsensitive]) else {
+            return html
+        }
+        let ns = html as NSString
+        let mutable = NSMutableString(string: html)
+        for match in regex.matches(in: html, options: [], range: NSRange(location: 0, length: ns.length)).reversed() {
+            guard match.range.location != NSNotFound else { continue }
+            let tag = ns.substring(with: match.range)
+            guard let srcRaw = attributeValue(attribute: "src", in: tag)?
+                .trimmingCharacters(in: .whitespacesAndNewlines), !srcRaw.isEmpty else { continue }
+            guard URL(string: srcRaw)?.scheme?.lowercased().hasPrefix("http") == true else { continue }
+            let alt = attributeValue(attribute: "alt", in: tag)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let md = "\n\n![\(alt)](\(srcRaw))\n\n"
+            mutable.replaceCharacters(in: match.range, with: md)
+        }
+        return mutable as String
+    }
+
+    private static func attributeValue(attribute: String, in tag: String) -> String? {
+        guard let sepRange = tag.range(of: "\(attribute)=", options: .caseInsensitive) else { return nil }
+        var rest = tag[sepRange.upperBound...]
+        while let c = rest.first, c.isWhitespace {
+            rest = rest.dropFirst()
+        }
+        guard let delim = rest.first else { return nil }
+        switch delim {
+        case "\"":
+            rest = rest.dropFirst()
+            guard let end = rest.firstIndex(of: "\"") else { return "" }
+            return String(rest[..<end])
+        case "'":
+            rest = rest.dropFirst()
+            guard let end = rest.firstIndex(of: "'") else { return "" }
+            return String(rest[..<end])
+        default:
+            let endIdx = rest.firstIndex(where: { $0.isWhitespace || $0 == ">" }) ?? rest.endIndex
+            return String(rest[..<endIdx])
+        }
     }
 }

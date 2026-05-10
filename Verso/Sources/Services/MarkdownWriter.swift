@@ -154,7 +154,7 @@ struct MarkdownWriter {
     ///   - directoryURL: The directory URL where the file should be saved.
     /// - Returns: The URL of the written file.
     /// - Throws: MarkdownWriterError or other file-related errors.
-    static func write(article: ParsedArticle, to directoryURL: URL) throws -> URL {
+    static func write(article: ParsedArticle, to directoryURL: URL) async throws -> URL {
         guard !article.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw MarkdownWriterError.emptyTitle
         }
@@ -163,12 +163,13 @@ struct MarkdownWriter {
         let baseFilename = generateFilename(for: article)
         let filename = try uniqueFilename(baseName: baseFilename, in: directoryURL)
 
-        // Build file content
-        let frontmatter = buildFrontmatter(for: article)
-        let content = frontmatter + article.contentMarkdown
-
-        // Write file
         let fileURL = directoryURL.appendingPathComponent(filename)
+        let processedBody = try await ArticleMarkdownImageLocalizer.localizeMarkdownRemoteImages(
+            article.contentMarkdown,
+            markdownFileURL: fileURL
+        )
+        let frontmatter = buildFrontmatter(for: article)
+        let content = frontmatter + processedBody
 
         do {
             try content.write(to: fileURL, atomically: true, encoding: .utf8)

@@ -55,7 +55,7 @@ final class ImportOrchestrator: ObservableObject {
         for (index, article) in articles.enumerated() {
             state = .writing(progress: Double(index) / Double(articles.count))
             do {
-                let fileURL = try MarkdownWriter.write(article: article, to: folderURL)
+                let fileURL = try await MarkdownWriter.write(article: article, to: folderURL)
                 insertIntoCoreData(article: article, filePath: fileURL, context: context)
                 imported += 1
                 logger.info("Imported: \(article.title, privacy: .public)")

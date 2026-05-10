@@ -34,7 +34,7 @@ struct PendingArticleIngester {
             do {
                 let data = try Data(contentsOf: fileURL)
                 let pending = try JSONDecoder().decode(PendingArticle.self, from: data)
-                let writtenURL = try writeToDisk(pending: pending, folderURL: folderURL)
+                let writtenURL = try await writeToDisk(pending: pending, folderURL: folderURL)
                 try insertIntoCoreData(pending: pending, filePath: writtenURL, context: context)
                 try FileManager.default.removeItem(at: fileURL)
                 AnalyticsService.shared.track("article.saved", parameters: ["source": "share_extension"])
@@ -47,7 +47,7 @@ struct PendingArticleIngester {
 
     // MARK: - Private
 
-    private func writeToDisk(pending: PendingArticle, folderURL: URL) throws -> URL {
+    private func writeToDisk(pending: PendingArticle, folderURL: URL) async throws -> URL {
         let parsed = ParsedArticle(
             id: pending.id,
             filePath: folderURL, // placeholder; MarkdownWriter uses this for collision-checking only
@@ -60,7 +60,7 @@ struct PendingArticleIngester {
             author: pending.author,
             siteName: pending.siteName
         )
-        return try MarkdownWriter.write(article: parsed, to: folderURL)
+        return try await MarkdownWriter.write(article: parsed, to: folderURL)
     }
 
     private func insertIntoCoreData(pending: PendingArticle, filePath: URL, context: NSManagedObjectContext) throws {
