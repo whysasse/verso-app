@@ -14,6 +14,13 @@ private struct ContentHeightKey: PreferenceKey {
     }
 }
 
+private struct ViewportHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct ArticleReaderView: View {
     let article: Article
 
@@ -54,70 +61,66 @@ struct ArticleReaderView: View {
         ZStack(alignment: .top) {
             colors.background.ignoresSafeArea()
 
-            GeometryReader { geo in
-                ScrollView {
-                    ZStack(alignment: .top) {
-                        GeometryReader { inner in
-                            Color.clear.preference(
+            ScrollView {
+                VStack(alignment: .leading, spacing: 40) {
+                    ArticleHeader(
+                        title: article.title,
+                        source: article.source ?? "",
+                        date: article.dateAdded,
+                        readTime: estimatedReadTime(for: parsedContent)
+                    )
+
+                    articleBody
+
+                    if !relatedArticles.isEmpty {
+                        RelatedArticlesSection(articles: relatedArticles)
+                    }
+                }
+                .padding(.horizontal, 40)
+                .padding(.top, 44 + safeAreaTop + 24)
+                .padding(.bottom, 56 + safeAreaBottom + 24)
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(
                                 key: ScrollOffsetKey.self,
-                                value: -inner.frame(in: .named("scroll")).minY
+                                value: max(0, -proxy.frame(in: .named("scroll")).minY)
                             )
-                        }
-                        .frame(height: 0)
-
-                        VStack(alignment: .leading, spacing: 40) {
-                            ArticleHeader(
-                                title: article.title,
-                                source: article.source ?? "",
-                                date: article.dateAdded,
-                                readTime: estimatedReadTime(for: parsedContent)
-                            )
-
-                            articleBody
-
-                            if !relatedArticles.isEmpty {
-                                RelatedArticlesSection(articles: relatedArticles)
-                            }
-                        }
-                        .padding(.horizontal, 40)
-                        .padding(.top, 44 + safeAreaTop + 24)
-                        .padding(.bottom, 56 + safeAreaBottom + 24)
-                        .background(
-                            GeometryReader { content in
-                                Color.clear.preference(
-                                    key: ContentHeightKey.self,
-                                    value: content.size.height
-                                )
-                            }
-                        )
+                            .preference(key: ContentHeightKey.self, value: proxy.size.height)
                     }
+                )
+            }
+            .coordinateSpace(name: "scroll")
+            .background(
+                GeometryReader { viewport in
+                    Color.clear.preference(key: ViewportHeightKey.self, value: viewport.size.height)
                 }
-                .coordinateSpace(name: "scroll")
-                .onPreferenceChange(ScrollOffsetKey.self) { value in
-                    scrollOffset = max(0, value)
-                    if scrollProgress >= 0.95 {
-                        advanceStatus(to: .read)
-                    }
+            )
+            .onPreferenceChange(ScrollOffsetKey.self) { value in
+                scrollOffset = max(0, value)
+                if scrollProgress >= 0.95 {
+                    advanceStatus(to: .read)
                 }
-                .onPreferenceChange(ContentHeightKey.self) { value in
-                    contentHeight = value
-                }
-                .onTapGesture {
-                    let enteringImmersive = isChromeVisible
-                    if reduceMotion {
+            }
+            .onPreferenceChange(ContentHeightKey.self) { value in
+                contentHeight = value
+            }
+            .onPreferenceChange(ViewportHeightKey.self) { value in
+                guard value > 0 else { return }
+                screenHeight = value
+            }
+            .onTapGesture {
+                let enteringImmersive = isChromeVisible
+                if reduceMotion {
+                    isChromeVisible.toggle()
+                    isPillVisible = !isChromeVisible
+                } else {
+                    withAnimation(.easeOut(duration: 0.3)) {
                         isChromeVisible.toggle()
                         isPillVisible = !isChromeVisible
-                    } else {
-                        withAnimation(.easeOut(duration: 0.3)) {
-                            isChromeVisible.toggle()
-                            isPillVisible = !isChromeVisible
-                        }
                     }
-                    AnalyticsService.shared.track("reader.immersiveModeToggled", parameters: ["enabled": enteringImmersive ? "true" : "false"])
                 }
-                .onAppear {
-                    screenHeight = geo.size.height
-                }
+                AnalyticsService.shared.track("reader.immersiveModeToggled", parameters: ["enabled": enteringImmersive ? "true" : "false"])
             }
 
             VStack(spacing: 0) {
