@@ -47,10 +47,24 @@ struct ArticleListView: View {
     @State private var showAddArticle = false
     @State private var showSettings = false
     @State private var navigationArticle: Article?
-    @State private var selectedTag: String?
+    @State private var selectedTags = Set<String>()
+    @State private var showTagPanel = false
     @State private var isSelecting = false
     @State private var selectedArticleIds = Set<UUID>()
     @State private var confirmBulkDelete = false
+
+    /// Fetched independently of the list predicate so the tag panel always sees every available tag,
+    /// even when the active filter or search narrows the visible articles to zero.
+    @FetchRequest(
+        sortDescriptors: [],
+        predicate: NSPredicate(format: "status != %@", Article.Status.archived.rawValue),
+        animation: .default
+    ) private var allArticles: FetchedResults<Article>
+
+    private var allTagsSorted: [String] {
+        let unique = Set(allArticles.flatMap { $0.tagList })
+        return unique.sorted()
+    }
 
     private var listPredicate: NSPredicate {
         Self.makeListPredicate(
@@ -89,10 +103,36 @@ struct ArticleListView: View {
                 }
 
                 // Outside `.id(listFetchIdentity)` so typing doesn’t recreate this view and drop keyboard focus.
-                SearchBar(text: $searchText, placeholder: "Search titles, text, or site…")
-                    .padding(.horizontal, VersoSpacing.md)
-                    .padding(.top, VersoSpacing.md)
-                    .environmentObject(themeManager)
+                HStack(spacing: VersoSpacing.sm) {
+                    SearchBar(text: $searchText, placeholder: "Search titles, text, or site…")
+                        .environmentObject(themeManager)
+
+                    Button {
+                        withAnimation(VersoAnimation.normal) { showTagPanel = true }
+                    } label: {
+                        Image(systemName: selectedTags.isEmpty ? "tag" : "tag.fill")
+                            .font(.system(size: 17, weight: .regular))
+                            .foregroundColor(themeManager.colors.accent)
+                            .frame(width: 44, height: 44)
+                            .background(themeManager.colors.surface)
+                            .cornerRadius(VersoRadius.sm)
+                            .overlay(alignment: .topTrailing) {
+                                if !selectedTags.isEmpty {
+                                    Text("\(selectedTags.count)")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 5)
+                                        .frame(minWidth: 16, minHeight: 16)
+                                        .background(Capsule().fill(themeManager.colors.accent))
+                                        .offset(x: 4, y: -4)
+                                }
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Filter by tags")
+                }
+                .padding(.horizontal, VersoSpacing.md)
+                .padding(.top, VersoSpacing.md)
 
                 ArticleListFetchedBody(
                     listGeometry: listGeometry,
@@ -100,7 +140,7 @@ struct ArticleListView: View {
                     searchText: $searchText,
                     activeFilter: $activeFilter,
                     datePreset: $datePreset,
-                    selectedTag: $selectedTag,
+                    selectedTags: $selectedTags,
                     isSelecting: $isSelecting,
                     selectedArticleIds: $selectedArticleIds,
                     navigationArticle: $navigationArticle,
@@ -118,6 +158,38 @@ struct ArticleListView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(themeManager.colors.background)
+            .overlay {
+                if showTagPanel {
+                    ZStack(alignment: .trailing) {
+                        Color.black.opacity(0.35)
+                            .ignoresSafeArea()
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation(VersoAnimation.normal) { showTagPanel = false }
+                            }
+                            .transition(.opacity)
+
+                        TagFilterPanel(
+                            tags: allTagsSorted,
+                            selectedTags: $selectedTags,
+                            onClose: {
+                                withAnimation(VersoAnimation.normal) { showTagPanel = false }
+                            }
+                        )
+                        .environmentObject(themeManager)
+                        .gesture(
+                            DragGesture()
+                                .onEnded { value in
+                                    if value.translation.width > 60 {
+                                        withAnimation(VersoAnimation.normal) { showTagPanel = false }
+                                    }
+                                }
+                        )
+                        .transition(.move(edge: .trailing))
+                    }
+                    .animation(VersoAnimation.normal, value: showTagPanel)
+                }
+            }
         }
     }
 
@@ -169,7 +241,7 @@ private struct ArticleListFetchedBody: View {
     @Binding var searchText: String
     @Binding var activeFilter: ArticleStatus?
     @Binding var datePreset: ArticleListDatePreset
-    @Binding var selectedTag: String?
+    @Binding var selectedTags: Set<String>
     @Binding var isSelecting: Bool
     @Binding var selectedArticleIds: Set<UUID>
     @Binding var navigationArticle: Article?
@@ -194,7 +266,7 @@ private struct ArticleListFetchedBody: View {
         searchText: Binding<String>,
         activeFilter: Binding<ArticleStatus?>,
         datePreset: Binding<ArticleListDatePreset>,
-        selectedTag: Binding<String?>,
+        selectedTags: Binding<Set<String>>,
         isSelecting: Binding<Bool>,
         selectedArticleIds: Binding<Set<UUID>>,
         navigationArticle: Binding<Article?>,
@@ -209,7 +281,7 @@ private struct ArticleListFetchedBody: View {
         _searchText = searchText
         _activeFilter = activeFilter
         _datePreset = datePreset
-        _selectedTag = selectedTag
+        _selectedTags = selectedTags
         _isSelecting = isSelecting
         _selectedArticleIds = selectedArticleIds
         _navigationArticle = navigationArticle
@@ -226,14 +298,11 @@ private struct ArticleListFetchedBody: View {
         )
     }
 
-    private var allTagsSorted: [String] {
-        let unique = Set(articles.flatMap { $0.tagList })
-        return unique.sorted()
-    }
-
     private var filteredArticles: [Article] {
-        guard let tag = selectedTag else { return Array(articles) }
-        return articles.filter { $0.tagList.contains(tag) }
+        guard !selectedTags.isEmpty else { return Array(articles) }
+        return articles.filter { article in
+            !selectedTags.isDisjoint(with: Set(article.tagList))
+        }
     }
 
     private var emptyUsesArchivedVariant: Bool {
@@ -246,7 +315,7 @@ private struct ArticleListFetchedBody: View {
         let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !q.isEmpty { return true }
         if datePreset != .any { return true }
-        if selectedTag != nil { return true }
+        if !selectedTags.isEmpty { return true }
         return false
     }
 
@@ -262,22 +331,6 @@ private struct ArticleListFetchedBody: View {
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
-
-            if !allTagsSorted.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: VersoSpacing.sm) {
-                        tagFilterPill("All tags", active: selectedTag == nil) { selectedTag = nil }
-                        ForEach(allTagsSorted, id: \.self) { tag in
-                            tagFilterPill(tag, active: selectedTag == tag) { selectedTag = tag }
-                        }
-                    }
-                    .padding(.horizontal, VersoSpacing.md)
-                }
-                .padding(.top, VersoSpacing.sm)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-            }
 
             if filteredArticles.isEmpty {
                 EmptyState(variant: emptyUsesArchivedVariant ? .noArchived : (narrowedListShowsMiss ? .searchMiss : .empty))
@@ -496,21 +549,6 @@ private struct ArticleListFetchedBody: View {
         try? MarkdownWriter.updateStatus(newStatus, for: article.filePath)
     }
 
-    private func tagFilterPill(_ title: String, active: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(active ? themeManager.colors.accent : themeManager.colors.textSecondary)
-                .lineLimit(1)
-                .padding(.horizontal, VersoSpacing.sm)
-                .frame(height: 32)
-                .background(
-                    Capsule().fill(active ? themeManager.colors.accentSurface : Color.clear)
-                )
-        }
-        .buttonStyle(.plain)
-    }
-
     private func markSelectedArticlesRead() {
         guard let folderURL = folderBookmarkService.folderURL else { return }
         let accessed = folderURL.startAccessingSecurityScopedResource()
@@ -535,5 +573,118 @@ private struct ArticleListFetchedBody: View {
         try? viewContext.save()
         selectedArticleIds.removeAll()
         isSelecting = false
+    }
+}
+
+// MARK: - Tag filter panel
+
+private struct TagFilterPanel: View {
+    let tags: [String]
+    @Binding var selectedTags: Set<String>
+    let onClose: () -> Void
+
+    @EnvironmentObject var themeManager: ThemeManager
+    @State private var tagQuery: String = ""
+
+    private var filteredTags: [String] {
+        let q = tagQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else { return tags }
+        return tags.filter { $0.localizedCaseInsensitiveContains(q) }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            header
+
+            SearchBar(text: $tagQuery, placeholder: "Search tags…")
+                .padding(.horizontal, VersoSpacing.md)
+                .padding(.top, VersoSpacing.sm)
+                .padding(.bottom, VersoSpacing.sm)
+                .environmentObject(themeManager)
+
+            Divider().background(themeManager.colors.border)
+
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    tagRow(
+                        title: "All tags",
+                        isSelected: selectedTags.isEmpty
+                    ) {
+                        selectedTags.removeAll()
+                    }
+
+                    Divider()
+                        .background(themeManager.colors.border)
+                        .padding(.leading, VersoSpacing.md)
+
+                    if filteredTags.isEmpty && !tagQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text("No matching tags")
+                            .font(VersoTypography.UI.listSubtitle)
+                            .foregroundColor(themeManager.colors.textSecondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, VersoSpacing.md)
+                            .padding(.vertical, VersoSpacing.md)
+                    } else {
+                        ForEach(filteredTags, id: \.self) { tag in
+                            tagRow(
+                                title: tag,
+                                isSelected: selectedTags.contains(tag)
+                            ) {
+                                if selectedTags.contains(tag) {
+                                    selectedTags.remove(tag)
+                                } else {
+                                    selectedTags.insert(tag)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .frame(width: 320)
+        .frame(maxHeight: .infinity)
+        .background(themeManager.colors.surface.ignoresSafeArea())
+    }
+
+    private var header: some View {
+        HStack {
+            Text("Tags")
+                .font(VersoTypography.UI.screenTitle)
+                .foregroundColor(themeManager.colors.textPrimary)
+            Spacer()
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(themeManager.colors.textSecondary)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Close tag filter")
+        }
+        .padding(.leading, VersoSpacing.md)
+        .padding(.trailing, VersoSpacing.xs)
+        .padding(.top, VersoSpacing.md)
+    }
+
+    private func tagRow(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: VersoSpacing.sm) {
+                Text(title)
+                    .font(VersoTypography.UI.listTitle)
+                    .foregroundColor(themeManager.colors.textPrimary)
+                    .lineLimit(1)
+                Spacer(minLength: VersoSpacing.sm)
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(themeManager.colors.accent)
+                }
+            }
+            .padding(.horizontal, VersoSpacing.md)
+            .frame(minHeight: 44)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
