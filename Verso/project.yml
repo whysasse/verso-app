@@ -31,6 +31,8 @@ targets:
     dependencies:
       - package: SwiftSoup
       - package: TelemetryClient
+      - target: ShareExtension
+        embed: true
     attributes: {}
     info:
       path: Resources/Info.plist
@@ -81,7 +83,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fabiosasseron.verso.ShareExtension
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_IDENTITY: Apple Development
         SWIFT_VERSION: 5.0
         TARGETED_DEVICE_FAMILY: "1,2"
         INFOPLIST_FILE: ShareExtension/Resources/Info.plist
