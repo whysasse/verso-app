@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var showFolderPicker = false
     @State private var showMoveDialog = false
     @State private var pendingNewURL: URL? = nil
+    @State private var showImport = false
 
     private var colors: ThemeColors { themeManager.colors }
 
@@ -36,6 +37,12 @@ struct SettingsView: View {
         }
         .background(colors.background.ignoresSafeArea())
         .versoNavigationBar(title: "Settings")
+        .sheet(isPresented: $showImport) {
+            ImportView()
+                .environmentObject(themeManager)
+                .environmentObject(folderBookmarkService)
+                .environment(\.managedObjectContext, viewContext)
+        }
         .sheet(isPresented: $showFolderPicker) {
             DocumentPicker { urls in
                 guard let newURL = urls.first else { return }
@@ -145,6 +152,14 @@ struct SettingsView: View {
             SettingsRow(
                 type: .folder(label: "Articles folder", path: folderPath),
                 action: { showFolderPicker = true }
+            )
+            .padding(.horizontal, VersoSpacing.md)
+
+            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+
+            SettingsRow(
+                type: .default(label: "Import Articles"),
+                action: { showImport = true }
             )
             .padding(.horizontal, VersoSpacing.md)
         }
