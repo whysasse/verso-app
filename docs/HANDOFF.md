@@ -116,6 +116,7 @@ Source files for screens are not yet created — screens are to be implemented. 
 | User flows and navigation mechanics | `docs/user-flows.md`, `docs/navigation-patterns.md` |
 | Design system philosophy and reading behavior | `docs/DESIGN_SYSTEM_FOUNDATIONS.md` |
 | iCloud/Obsidian file-first decisions | `docs/OBSIDIAN_INTEGRATION.md` |
+| Analytics strategy, event catalog, TelemetryDeck integration | `docs/ANALYTICS_STRATEGY.md` |
 | Figma token naming | `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md` |
 | Full product requirements | `docs/PRD_MinimalistReaderApp.md` |
 
