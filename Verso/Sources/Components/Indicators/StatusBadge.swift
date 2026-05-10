@@ -3,21 +3,18 @@ import SwiftUI
 struct StatusBadge: View {
     let status: ArticleStatus
 
+    private let badgeDiameter: CGFloat = 28
+
     var body: some View {
-        switch status {
-        case .unread:
+        ZStack {
             Circle()
                 .fill(status.color)
-                .frame(width: 12, height: 12)
-        case .reading, .read, .archived:
-            Text(status.rawValue)
-                .font(.system(size: 11, weight: .semibold))
+                .frame(width: badgeDiameter, height: badgeDiameter)
+            Image(systemName: status.icon)
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.white)
-                .padding(.horizontal, VersoSpacing.xs)
-                .padding(.vertical, VersoSpacing.xxs)
-                .background(status.color)
-                .clipShape(Capsule())
         }
+        .accessibilityLabel(Text(status.rawValue))
     }
 }
 
