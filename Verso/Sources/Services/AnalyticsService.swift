@@ -7,7 +7,7 @@ final class AnalyticsService {
 
     private init() {}
 
-    private static let appID = "AF772698-A152-4DBF-AEAA-B49EFDC7BF8C"
+    private static let appID: String = Bundle.main.infoDictionary?["TelemetryDeckAppID"] as? String ?? ""
 
     var isOptedIn: Bool {
         get { UserDefaults.standard.bool(forKey: optInKey) }

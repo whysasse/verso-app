@@ -30,6 +30,7 @@ struct MarkdownWriter {
         // Replace path separators and colons with dashes
         var sanitized = name.replacingOccurrences(of: "/", with: "-")
         sanitized = sanitized.replacingOccurrences(of: ":", with: "-")
+        sanitized = sanitized.replacingOccurrences(of: "..", with: ".")
         // Remove any characters not allowed in filenames
         let allowedCharacters = CharacterSet.alphanumerics
             .union(CharacterSet.whitespaces)

@@ -236,7 +236,7 @@ struct AddArticleView: View {
     }
 
     private func writeToPendingQueue(_ article: PendingArticle) throws {
-        let suiteName = "group.com.fabiosasseron.verso"
+        let suiteName = AppConstants.appGroupID
         guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: suiteName) else {
             return
         }
