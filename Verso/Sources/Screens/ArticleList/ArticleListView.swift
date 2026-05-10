@@ -18,6 +18,7 @@ struct ArticleListView: View {
     @State private var showFolderPicker = false
     @State private var showAddArticle = false
     @State private var showSettings = false
+    @State private var navigationArticle: Article?
 
     private var filteredArticles: [Article] {
         articles.filter { article in
@@ -41,7 +42,8 @@ struct ArticleListView: View {
     }
 
     var body: some View {
-        List {
+        GeometryReader { listGeometry in
+            List {
             // Header rows (search + filter chips)
             if folderBookmarkService.folderURL == nil {
                 FolderPickerPrompt {
@@ -70,13 +72,17 @@ struct ArticleListView: View {
             // Article rows or empty state
             if filteredArticles.isEmpty {
                 EmptyState(variant: activeFilter == .archived && searchText.isEmpty ? .noArchived : (searchText.isEmpty ? .empty : .searchMiss))
-                    .padding(.top, VersoSpacing.xl)
+                    .environmentObject(themeManager)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: max(260, listGeometry.size.height * 0.52))
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             } else {
                 ForEach(filteredArticles) { article in
-                    NavigationLink(destination: ArticleReaderView(article: article)) {
+                    Button {
+                        navigationArticle = article
+                    } label: {
                         ArticleCard(article: article)
                     }
                     .buttonStyle(.plain)
@@ -112,43 +118,53 @@ struct ArticleListView: View {
                     }
                 }
             }
-        }
-        .listStyle(.plain)
-        .background(themeManager.colors.background)
-        .scrollContentBackground(.hidden)
-        // FAB-25: pull-to-refresh
-        .refreshable {
-            guard let url = folderBookmarkService.folderURL else { return }
-            await articleLibraryService.rebuildCache(from: url, context: viewContext)
-        }
-        .versoNavigationBar(title: "Verso", trailingIcon: "gear") {
-            showSettings = true
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                VersoToolbarIconButton(
-                    systemName: "plus.circle",
-                    accent: themeManager.colors.accent
-                ) {
-                    showAddArticle = true
+            }
+            .listStyle(.plain)
+            .frame(width: listGeometry.size.width, height: listGeometry.size.height)
+            .background(themeManager.colors.background)
+            .scrollContentBackground(.hidden)
+            // FAB-25: pull-to-refresh
+            .refreshable {
+                guard let url = folderBookmarkService.folderURL else { return }
+                await articleLibraryService.rebuildCache(from: url, context: viewContext)
+            }
+            .versoNavigationBar(title: "Verso", trailingIcon: "gear") {
+                showSettings = true
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    VersoToolbarIconButton(
+                        systemName: "plus.circle",
+                        accent: themeManager.colors.accent
+                    ) {
+                        showAddArticle = true
+                    }
                 }
             }
-        }
-        .navigationDestination(isPresented: $showSettings) {
-            SettingsView()
-        }
-        .sheet(isPresented: $showFolderPicker) {
-            DocumentPicker(onDocumentsPicked: { urls in
-                guard let url = urls.first else { return }
-                folderBookmarkService.save(url: url)
-                showFolderPicker = false
-            })
-        }
-        .sheet(isPresented: $showAddArticle) {
-            AddArticleView()
-                .environmentObject(themeManager)
-                .environmentObject(folderBookmarkService)
-                .environment(\.managedObjectContext, viewContext)
+            .navigationDestination(isPresented: $showSettings) {
+                SettingsView()
+            }
+            .sheet(isPresented: $showFolderPicker) {
+                DocumentPicker(onDocumentsPicked: { urls in
+                    guard let url = urls.first else { return }
+                    folderBookmarkService.save(url: url)
+                    showFolderPicker = false
+                })
+            }
+            .sheet(isPresented: $showAddArticle) {
+                AddArticleView()
+                    .environmentObject(themeManager)
+                    .environmentObject(folderBookmarkService)
+                    .environment(\.managedObjectContext, viewContext)
+            }
+            .navigationDestination(isPresented: Binding(
+                get: { navigationArticle != nil },
+                set: { if !$0 { navigationArticle = nil } }
+            )) {
+                if let navigationArticle {
+                    ArticleReaderView(article: navigationArticle)
+                }
+            }
         }
     }
 
