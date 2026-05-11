@@ -102,3 +102,19 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.com.fabiosasseron.verso
+
+  VersoTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: VersoTests
+    dependencies:
+      - target: Verso
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.fabiosasseron.verso.tests
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: Apple Development
+        DEVELOPMENT_TEAM: "$(DEVELOPMENT_TEAM)"
+        TARGETED_DEVICE_FAMILY: "1,2"
