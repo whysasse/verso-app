@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("/fonts/OpenDyslexic-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Fixed tokens (theme-independent) ─────────────────────────── */
+:root {
+  /* Article status */
+  --color-status-unread: #4A90D9;
+  --color-status-reading: #D4A353;
+  --color-status-read: #5AAF7A;
+
+  /* Spacing */
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* Corner radius */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 20px;
+
+  /* Typography — UI (system font) */
+  --type-ui-screen-title-size: 34px;
+  --type-ui-screen-title-weight: 700;
+  --type-ui-screen-title-line-height: 1.2;
+  --type-ui-list-title-size: 17px;
+  --type-ui-list-title-weight: 600;
+  --type-ui-list-title-line-height: 1.3;
+  --type-ui-list-subtitle-size: 15px;
+  --type-ui-list-subtitle-weight: 400;
+  --type-ui-list-subtitle-line-height: 1.4;
+  --type-ui-button-size: 17px;
+  --type-ui-button-weight: 600;
+  --type-ui-button-line-height: 1;
+  --type-ui-caption-size: 13px;
+  --type-ui-caption-weight: 400;
+  --type-ui-caption-line-height: 1.3;
+  --type-ui-input-size: 17px;
+  --type-ui-input-weight: 400;
+  --type-ui-input-line-height: 1;
+
+  /* Typography — Reading */
+  --type-reading-h1-size: 28px;
+  --type-reading-h1-weight: 700;
+  --type-reading-h1-line-height: 1.2;
+  --type-reading-h2-size: 24px;
+  --type-reading-h2-weight: 600;
+  --type-reading-h2-line-height: 1.25;
+  --type-reading-h3-size: 20px;
+  --type-reading-h3-weight: 600;
+  --type-reading-h3-line-height: 1.3;
+  --type-reading-h4-size: 18px;
+  --type-reading-h4-weight: 600;
+  --type-reading-h4-line-height: 1.35;
+  --type-reading-body-xs-size: 14px;
+  --type-reading-body-sm-size: 16px;
+  --type-reading-body-md-size: 18px;
+  --type-reading-body-lg-size: 20px;
+  --type-reading-body-xl-size: 22px;
+  --type-reading-body-xxl-size: 26px;
+  --type-reading-body-weight: 400;
+  --type-reading-body-line-height: 1.75;
+  --type-reading-body-xl-line-height: 1.6;
+  --type-reading-body-xxl-line-height: 1.5;
+}
+
+/* ── Theme tokens ─────────────────────────────────────────────── */
+
+[data-theme="paper"] {
+  --color-background: #F5F0E8;
+  --color-surface: #EDE8DF;
+  --color-text-primary: #2C2924;
+  --color-text-secondary: #6E675F;
+  --color-accent: #766655;
+  --color-accent-pressed: #584D40;
+  --color-accent-surface: rgba(118, 102, 85, 0.15);
+  --color-border: #DDD8CE;
+  --color-placeholder: #CEC8BC;
+  --color-error: #C0392B;
+  --color-warning: #B45309;
+  --color-success: #166534;
+}
+
+[data-theme="sepia"] {
+  --color-background: #F2E8D5;
+  --color-surface: #E8DEC7;
+  --color-text-primary: #2E2013;
+  --color-text-secondary: #755E40;
+  --color-accent: #825A37;
+  --color-accent-pressed: #614429;
+  --color-accent-surface: rgba(130, 90, 55, 0.15);
+  --color-border: #D9CAAC;
+  --color-placeholder: #C8BCA0;
+  --color-error: #C0392B;
+  --color-warning: #B45309;
+  --color-success: #166534;
+}
+
+[data-theme="night"] {
+  --color-background: #1C1A16;
+  --color-surface: #252320;
+  --color-text-primary: #E8E0D0;
+  --color-text-secondary: #8F897F;
+  --color-accent: #C4A97D;
+  --color-accent-pressed: #937F5E;
+  --color-accent-surface: rgba(196, 169, 125, 0.15);
+  --color-border: #2E2B26;
+  --color-placeholder: #302E2A;
+  --color-error: #F87171;
+  --color-warning: #FCD34D;
+  --color-success: #4ADE80;
+}
+
+[data-theme="ink"] {
+  --color-background: #111418;
+  --color-surface: #181C22;
+  --color-text-primary: #E4E6EB;
+  --color-text-secondary: #7E8492;
+  --color-accent: #7B9FD4;
+  --color-accent-pressed: #5C779F;
+  --color-accent-surface: rgba(123, 159, 212, 0.15);
+  --color-border: #1E2228;
+  --color-placeholder: #202630;
+  --color-error: #FC8181;
+  --color-warning: #F6E05E;
+  --color-success: #68D391;
+}
+
+/* ── Base styles ──────────────────────────────────────────────── */
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
