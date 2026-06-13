@@ -1,3 +1,5 @@
+> 🗄️ **ARCHIVED 2026-06-12.** Exploratory document; not adopted. Kept for idea archaeology; do not implement from this document. This is a speculative design exploration ("Context-Based Design System": time-of-day adaptive themes, haptic tokens, interrupting literary quotes). It **conflicts with Verso's locked decisions** — four *static* themes (Paper/Sepia/Night/Ink), a static font family, and a minimalist no-interruption philosophy — and references a `design-system.md` that does not exist. Kept for idea archaeology only. Do not implement from this document or treat it as current. Authoritative design lives in `../DESIGN_SYSTEM_FOUNDATIONS.md`, `../DESIGN_TOKENS.md`, and `../THEMES.md`.
+
 # Blueprint: Context-Based Design System (CBDS) Transition
 ## Project: Read-it-Later iPhone App (v2.0)
 ## Objective: Transition from static styles to a Temporal, Spatial, and Tactile ruleset.

@@ -45,7 +45,7 @@ All event names use dot-separated namespace convention. Parameters are passed as
 
 | Event | Parameters | Answers question |
 |-------|------------|-----------------|
-| `article.saved` | `source: "share_extension" \| "in_app"` | #2 — core loop start |
+| `article.saved` | `source: "share_extension" \| "in_app"`; `duplicate_resolution: "none" \| "update" \| "copy"` (omit or `none` when not a duplicate flow) | #2 — core loop start |
 | `article.opened` | — | #2 — intent to read |
 | `article.readCompleted` | — | #2 — core loop fulfilled |
 | `article.parseFailed` | `errorType: String` | #4 — error detection |

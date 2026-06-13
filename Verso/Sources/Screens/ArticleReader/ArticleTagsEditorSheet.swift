@@ -52,6 +52,8 @@ struct ArticleTagsEditorSheet: View {
             tagText = article.tagList.joined(separator: ", ")
             fieldFocused = true
         }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
         .alert("Couldn't save tags", isPresented: $saveFailed) {
             Button("OK", role: .cancel) {}
         } message: {

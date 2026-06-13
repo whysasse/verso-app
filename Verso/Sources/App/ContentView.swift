@@ -12,9 +12,7 @@ struct ContentView: View {
             themeManager.colors.background
                 .ignoresSafeArea()
             if hasCompletedOnboarding {
-                NavigationStack {
-                    ArticleListView()
-                }
+                VersoMainSplitView()
             } else {
                 OnboardingFlowView(onComplete: { hasCompletedOnboarding = true })
             }

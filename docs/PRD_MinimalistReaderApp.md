@@ -3,7 +3,7 @@
 **Version:** 1.7  
 **Date:** 2026-05-10  
 **Status:** Draft  
-**Owner:** [Your Name]
+**Owner:** Fabio Sasseron
 
 ---
 
@@ -41,7 +41,7 @@ A reading app that gets out of your way. Save articles. Read them beautifully. T
 
 ### Primary Use Case
 1. User reads an article on the web
-2. Taps share → selects "Save to [AppName]"
+2. Taps share → selects "Save to Verso"
 3. Article is parsed and stored locally
 4. User opens app and reads article with distraction-free UI
 5. Article is marked as read, automatically archived or kept in list
@@ -229,7 +229,7 @@ The following features are **intentionally NOT included**:
 
 ### 5.2 Share Sheet Integration
 - User taps "Share" on article
-- Selects "[AppName]"
+- Selects "Verso"
 - Article URL is sent to app
 - App shows brief "Saving..." indicator
 - Confirmation when saved
@@ -480,12 +480,12 @@ See Section 6.2 for the canonical data model. The app writes full parsed article
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | Apr 2026 | Initial draft | [Your Name] |
-| 1.1 | 2026-04-11 | Added Section 14: Obsidian Integration + glossary entry | [Your Name] |
-| 1.2 | 2026-04-19 | Section 6.1: parsing strategy locked to Readability.js via WKWebView + SwiftSoup fallback | [Your Name] |
-| 1.3 | 2026-04-19 | Major architecture pivot: file-first storage (Markdown + iCloud Drive) replaces Core Data as primary layer. Obsidian compatibility reframed as natural consequence of architecture, not a mode. Executive summary, core principles, data model, storage, sync, onboarding, out-of-scope, and Obsidian sections updated accordingly. | [Your Name] |
-| 1.4 | 2026-04-19 | App named: **Verso** | [Your Name] |
-| 1.5 | 2026-04-19 | Added three-state article status (Unread / Reading / Read), filter chips on Home screen, and folder-change dialog behavior in Settings | [Your Name] |
+| 1.0 | Apr 2026 | Initial draft | Fabio Sasseron |
+| 1.1 | 2026-04-11 | Added Section 14: Obsidian Integration + glossary entry | Fabio Sasseron |
+| 1.2 | 2026-04-19 | Section 6.1: parsing strategy locked to Readability.js via WKWebView + SwiftSoup fallback | Fabio Sasseron |
+| 1.3 | 2026-04-19 | Major architecture pivot: file-first storage (Markdown + iCloud Drive) replaces Core Data as primary layer. Obsidian compatibility reframed as natural consequence of architecture, not a mode. Executive summary, core principles, data model, storage, sync, onboarding, out-of-scope, and Obsidian sections updated accordingly. | Fabio Sasseron |
+| 1.4 | 2026-04-19 | App named: **Verso** | Fabio Sasseron |
+| 1.5 | 2026-04-19 | Added three-state article status (Unread / Reading / Read), filter chips on Home screen, and folder-change dialog behavior in Settings | Fabio Sasseron |
 | 1.6 | 2026-05-02 | Sync with current architecture: §4.1.2 Dark Mode → Theme system (Paper/Sepia/Night/Ink); §4.1.10 tab navigation → Single NavigationStack; §4.3.3 removed background color options (already MVP via theme system); §5.1 Settings dark-mode toggle → theme picker; §5.3 onboarding reduced to 4 screens (Welcome → Theme Picker → Vault Setup → Quick Tour); §10 removed iCloud sync from Phase 2 (handled natively by iCloud Drive). | Claude |
 | 1.7 | 2026-05-10 | §10 Phase 2: removed in-app data export (files are user-accessible per §4.4); moved tagging from Phase 3 into Phase 2 roadmap; §9 privacy risk mitigation wording aligned with file-first model. | Claude |
 

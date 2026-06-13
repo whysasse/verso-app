@@ -25,6 +25,9 @@ struct MarkdownReader {
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
+        // Fixed-format storage value: pin to POSIX so a non-Gregorian device calendar or
+        // localized digits can never corrupt parsing of the on-disk frontmatter. See docs/LOCALIZATION.md §3.
+        f.locale = Locale(identifier: "en_US_POSIX")
         return f
     }()
 

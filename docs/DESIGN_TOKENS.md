@@ -9,7 +9,7 @@ This file is the authoritative token registry for Verso's design system. Every t
 **Related:**
 - Design rationale and reading behavior → `DESIGN_SYSTEM_FOUNDATIONS.md`
 - Figma token naming conventions → `FIGMA_DESIGN_SYSTEM_REFERENCE.md`
-- Component-level token usage → `COMPONENTS.md` *(forthcoming)*
+- Component-level token usage and per-state color rules → `COMPONENT_SPECS.md`
 
 ---
 

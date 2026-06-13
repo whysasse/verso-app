@@ -1,5 +1,6 @@
 import AVFoundation
 import Combine
+import NaturalLanguage
 
 enum TTSSpeed: Float, CaseIterable {
     case slow = 0.75
@@ -36,6 +37,10 @@ final class TTSService: NSObject, ObservableObject, AVSpeechSynthesizerDelegate 
     private let synthesizer = AVSpeechSynthesizer()
     private var paragraphs: [String] = []
 
+    /// Language of the current article, detected from its **content** (not the UI locale)
+    /// so the synthesizer reads in the article's own language. See docs/LOCALIZATION.md §3.
+    private var detectedLanguageCode: String?
+
     override init() {
         let saved = UserDefaults.standard.float(forKey: "tts.speed")
         speed = TTSSpeed(rawValue: saved) ?? .normal
@@ -46,6 +51,7 @@ final class TTSService: NSObject, ObservableObject, AVSpeechSynthesizerDelegate 
 
     func start(paragraphs: [String], from index: Int = 0) {
         self.paragraphs = paragraphs
+        self.detectedLanguageCode = Self.detectLanguageCode(from: paragraphs)
         currentParagraphIndex = index
         speak(at: index)
     }
@@ -104,9 +110,28 @@ final class TTSService: NSObject, ObservableObject, AVSpeechSynthesizerDelegate 
         }
         let utterance = AVSpeechUtterance(string: paragraphs[index])
         utterance.rate = speed.avRate
-        utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.language.languageCode?.identifier ?? "en")
+        utterance.voice = AVSpeechSynthesisVoice(language: detectedLanguageCode ?? Self.deviceLanguageCode)
         synthesizer.speak(utterance)
         isPlaying = true
+    }
+
+    /// Detects the dominant language of the article from a sample of its text, returning a
+    /// language code (e.g. "pt", "fr", "en"). Falls back to the device language, then English.
+    /// AVSpeechSynthesisVoice resolves a bare language code to that language's default voice.
+    private static func detectLanguageCode(from paragraphs: [String]) -> String {
+        let sample = paragraphs.prefix(20).joined(separator: " ")
+        if !sample.isEmpty {
+            let recognizer = NLLanguageRecognizer()
+            recognizer.processString(sample)
+            if let lang = recognizer.dominantLanguage?.rawValue {
+                return lang
+            }
+        }
+        return deviceLanguageCode
+    }
+
+    private static var deviceLanguageCode: String {
+        Locale.current.language.languageCode?.identifier ?? "en"
     }
 
     private func advanceOrStop(from index: Int) {

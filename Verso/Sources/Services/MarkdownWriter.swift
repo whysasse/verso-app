@@ -4,6 +4,7 @@ enum MarkdownWriterError: Error, LocalizedError {
     case emptyTitle
     case fileWriteFailed(Error)
     case couldNotGenerateUniqueFilename(maxAttempts: Int)
+    case replacePathOutsideLibrary
 
     var errorDescription: String? {
         switch self {
@@ -13,6 +14,8 @@ enum MarkdownWriterError: Error, LocalizedError {
             return "Failed to write file: \(underlying.localizedDescription)"
         case .couldNotGenerateUniqueFilename(let maxAttempts):
             return "Could not generate a unique filename after \(maxAttempts) attempts."
+        case .replacePathOutsideLibrary:
+            return "Replace target is outside the Verso library folder."
         }
     }
 }
@@ -22,6 +25,9 @@ struct MarkdownWriter {
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
+        // Fixed-format storage value: pin to POSIX so a non-Gregorian device calendar or
+        // localized digits can never corrupt the on-disk frontmatter. See docs/LOCALIZATION.md §3.
+        f.locale = Locale(identifier: "en_US_POSIX")
         return f
     }()
 
@@ -242,6 +248,51 @@ struct MarkdownWriter {
             return fileURL
         } catch {
             throw MarkdownWriterError.fileWriteFailed(error)
+        }
+    }
+
+    /// Overwrites an existing `.md` file. Preserves `added`, `status`, `scroll_position`, and `tags` from disk;
+    /// refreshes title, URL, body, author, and site from `incoming`.
+    static func replaceArticle(at fileURL: URL, incoming: ParsedArticle, libraryRoot: URL) async throws {
+        try assertReplacePath(fileURL, isWithin: libraryRoot)
+        guard !incoming.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw MarkdownWriterError.emptyTitle
+        }
+
+        let existing = try MarkdownReader.read(fileURL: fileURL)
+        let merged = ParsedArticle(
+            id: existing.id,
+            filePath: fileURL,
+            title: incoming.title,
+            url: incoming.url,
+            contentMarkdown: incoming.contentMarkdown,
+            tags: existing.tags,
+            scrollPosition: existing.scrollPosition,
+            dateAdded: existing.dateAdded,
+            status: existing.status,
+            author: incoming.author,
+            siteName: incoming.siteName
+        )
+
+        let processedBody = try await ArticleMarkdownImageLocalizer.localizeMarkdownRemoteImages(
+            merged.contentMarkdown,
+            markdownFileURL: fileURL
+        )
+        let frontmatter = buildFrontmatter(for: merged)
+        let content = frontmatter + processedBody
+        do {
+            try content.write(to: fileURL, atomically: true, encoding: .utf8)
+        } catch {
+            throw MarkdownWriterError.fileWriteFailed(error)
+        }
+    }
+
+    private static func assertReplacePath(_ fileURL: URL, isWithin libraryRoot: URL) throws {
+        let f = fileURL.resolvingSymlinksInPath().standardizedFileURL.path
+        let r = libraryRoot.resolvingSymlinksInPath().standardizedFileURL.path
+        let prefix = r.hasSuffix("/") ? r : r + "/"
+        guard f.hasPrefix(prefix) else {
+            throw MarkdownWriterError.replacePathOutsideLibrary
         }
     }
 }

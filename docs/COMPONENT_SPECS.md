@@ -9,8 +9,9 @@ This document is the developer-handoff view of Verso's UI components. For each c
 
 **Source docs (authoritative):**
 - Token names, values, and usage intent → `DESIGN_TOKENS.md`
-- Token-to-element mapping with state logic → `COMPONENTS.md`
 - Behavioral specs, interaction, copy → `component-inventory.md`
+
+> **Note:** This document consolidates component specs from `COMPONENTS.md` (v1.1, archived) and `component-inventory.md` v1.4. Token-to-element mapping and per-state color rules are defined here.
 
 **Token naming:** all token names match `DESIGN_TOKENS.md` exactly. For resolved hex values per theme, refer to that file.
 

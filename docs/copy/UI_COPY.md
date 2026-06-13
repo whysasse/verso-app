@@ -1,11 +1,12 @@
 # Verso — UI Copy & Microcopy
 
-All user-visible text strings for the Verso iOS app. Developers should treat this as the source of truth when implementing screens. Each key maps to a future `Localizable.strings` entry.
+All user-visible text strings for Verso, across **both platforms (iOS and Web)**. Developers on either platform should treat this as the single source of truth when implementing screens — the same keys feed the iOS String Catalog and the Web message dictionary, so wording never drifts between platforms. The English strings below are the development base locale (`en`); translated locales are tracked in `docs/LOCALIZATION.md`.
 
 **Conventions:**
 - `{placeholder}` — dynamic value substituted at runtime
-- ⚠️ **plural** — needs singular/plural variant (`%lld article` / `%lld articles`)
+- ⚠️ **plural** — needs language-aware plural variants. Do **not** hard-code `count == 1`: use CLDR plural categories (iOS String Catalog / ICU on Web), because French treats 0 as singular and Brazilian Portuguese treats 0 as plural. See `docs/LOCALIZATION.md`.
 - Tone: sentence case, no exclamation marks, minimal and warm
+- Strings marked *invariant* (e.g. brand names) must not be translated.
 
 ---
 
@@ -96,7 +97,7 @@ All user-visible text strings for the Verso iOS app. Developers should treat thi
 |-----|----------|--------|-------|
 | `articleCard.accessibilityLabel` | VoiceOver row label | {title}, {source}, {estimated read time} | Dynamic |
 | `articleCard.accessibilityHint` | VoiceOver row hint | Double tap to open | — |
-| `articleCard.estimatedReadTime` | Read time label | {N} min read | ⚠️ plural: "1 min read" / "{N} min read" |
+| `articleCard.estimatedReadTime` | Read time label | {N} min read | ⚠️ plural: "1 min read" / "{N} min read". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. |
 
 ### Status Badges
 
@@ -197,7 +198,7 @@ All user-visible text strings for the Verso iOS app. Developers should treat thi
 
 ### Article Header
 
-> **Format note:** Display date as `MMM d, yyyy` (e.g. "Apr 28, 2025"). No key needed — format is code-level.
+> **Format note:** Display the saved date using a **locale-aware medium date style** — `DateFormatter.dateStyle = .medium` on iOS, `Intl.DateTimeFormat(locale, { dateStyle: 'medium' })` on Web. Do **not** hard-code `MMM d, yyyy`. Expected output by locale: `en` "Apr 28, 2025" · `fr-CA` "28 avr. 2025" · `pt-BR` "28 de abr. de 2025". No string key needed — formatting is code-level but must respect the active locale.
 
 ---
 
@@ -340,7 +341,7 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | Key | Location | String | Notes |
 |-----|----------|--------|-------|
 | `error.iCloudUnavailable.headline` | Inline banner headline | iCloud Drive is unavailable. | — |
-| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | — |
+| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | `[Your Name]` is **intentional** — it matches Apple's on-screen label for the device-owner row in iOS Settings. Keep the placeholder; do not insert a real name. |
 
 ### File Write Error (Scenario 6)
 
@@ -364,6 +365,22 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | `share.error.subheadline` | Share sheet error subheadline | The page couldn't be read. You can open it directly in Safari. | — |
 | `share.error.openInSafari` | Primary CTA | Open in Safari | Accent color |
 | `share.error.dismiss` | Secondary CTA | Dismiss | — |
+
+### Share Extension — Duplicate URL
+
+| Key | Location | String | Notes |
+|-----|----------|--------|-------|
+| `share.duplicate.headline` | Share sheet duplicate state | Article already saved | — |
+| `share.duplicate.subheadline` | Body copy | This link is already in your library as “{existingTitle}”. | `{existingTitle}` from existing file frontmatter |
+| `share.duplicate.updateExisting` | Primary button | Update existing | — |
+| `share.duplicate.saveCopy` | Secondary button | Save as copy | Appends ` (Copy)` to title (or ` 2` after existing ` (Copy)`) |
+| `share.duplicate.cancel` | Text button | Cancel | Completes extension without writing pending JSON |
+| `share.duplicate.success.saved` | Success headline | Saved | New file |
+| `share.duplicate.success.updated` | Success headline | Updated | Replaced existing file |
+
+### Add Article — Duplicate URL
+
+In-app **Add Article** uses the same headline, subheadline, and button labels as the share duplicate flow for consistency. Future `Localizable.strings` keys may use the `addArticle.duplicate.*` prefix.
 
 ### Generic Fallback
 

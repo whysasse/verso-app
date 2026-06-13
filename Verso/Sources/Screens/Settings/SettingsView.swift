@@ -38,6 +38,8 @@ struct SettingsView: View {
                 Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
                 privacySection
             }
+            .frame(maxWidth: 680, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
         .background(colors.background.ignoresSafeArea())
         .versoNavigationBar(title: "Settings")

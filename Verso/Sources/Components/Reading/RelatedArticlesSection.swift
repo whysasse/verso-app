@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RelatedArticlesSection: View {
     let articles: [Article]
+    /// When set (e.g. iPad split root), switches the open article without an inner `NavigationStack`.
+    var onSelectArticle: ((Article) -> Void)? = nil
 
     @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.managedObjectContext) private var viewContext
@@ -18,10 +20,19 @@ struct RelatedArticlesSection: View {
 
             VStack(spacing: VersoSpacing.xs) {
                 ForEach(articles) { article in
-                    NavigationLink(destination: ArticleReaderView(article: article)) {
-                        RelatedArticleRow(article: article, colors: colors)
+                    if let onSelectArticle {
+                        Button {
+                            onSelectArticle(article)
+                        } label: {
+                            RelatedArticleRow(article: article, colors: colors)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        NavigationLink(destination: ArticleReaderView(article: article)) {
+                            RelatedArticleRow(article: article, colors: colors)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }

@@ -1,12 +1,14 @@
 # Verso — Developer Handoff
 
-**Version:** 1.0 | **Date:** 2026-05-03 | **Status:** Ready for development
+**Version:** 1.2 | **Date:** 2026-06-12 | **Status:** Ready for development
 
 This is the AI entry point for implementation. Read this file first, then fetch the linked docs only for the specific domain you're working in.
 
+Verso now has two platforms: **iOS** (MVP shipped) and **Web** (Next.js, in active development). Most sections below apply to iOS. See the [Web Platform](#web-platform) section for web-specific architecture.
+
 ---
 
-## Architecture
+## Architecture — iOS
 
 - **Platform:** SwiftUI, iOS 16+, iCloud Drive
 - **Bundle ID:** `com.fabiosasseron.verso`
@@ -14,11 +16,51 @@ This is the AI entry point for implementation. Read this file first, then fetch 
 - **File-first:** Articles are Markdown files in a user-selected iCloud Drive folder. This is the source of truth.
 - **Core Data** (`CoreDataStack.shared`) is a read cache only — never write authoritative state to it.
 - **No tab bar.** Single `NavigationStack` throughout.
+- **Navigation:** `VersoMainSplitView.swift` orchestrates the root split/navigation structure.
 - **Share Extension** is a separate app target for saving articles from other apps.
+- **Tags:** Articles can be tagged; filtering/editing via side panel and `ArticleTagsEditorSheet`.
 
 ---
 
-## Design System — Swift Identifiers
+## Web Platform
+
+Scaffolded in `verso-web/` as a Next.js 16 + TypeScript + Tailwind app (App Router). The design system is ported to CSS custom properties so it stays in sync with the iOS token definitions in `docs/DESIGN_TOKENS.md`.
+
+### Stack
+
+- **Framework:** Next.js 16, TypeScript, Tailwind CSS, App Router
+- **Entry point:** `verso-web/app/layout.tsx` wraps the app in `ThemeProvider`
+- **Styling:** `verso-web/app/globals.css` — all tokens as CSS custom properties
+- **Theme switching:** `verso-web/app/providers/ThemeProvider.tsx` — React context, `localStorage` persistence, system dark-mode detection on first visit
+
+### CSS Token Naming
+
+Tokens in `globals.css` mirror the iOS design system:
+
+| Category | CSS variable pattern | Example |
+|---|---|---|
+| Theme colors | `--color-<role>` | `--color-background`, `--color-text-primary` |
+| Article status | `--color-status-<state>` | `--color-status-unread` (#4A90D9) |
+| Spacing | `--spacing-<scale>` | `--spacing-md` (16px) |
+| Radius | `--radius-<scale>` | `--radius-pill` (20px) |
+| UI typography | `--type-ui-<style>-<prop>` | `--type-ui-list-title-size` (17px) |
+| Reading typography | `--type-reading-<style>-<prop>` | `--type-reading-body-md-size` (18px) |
+
+Themes (`paper` · `sepia` · `night` · `ink`) are applied as `data-theme="<name>"` on `<html>`. Each theme block overrides the 9 semantic color roles: `background`, `surface`, `text-primary`, `text-secondary`, `accent`, `accent-pressed`, `accent-surface`, `border`, `placeholder`.
+
+### Fonts
+
+OpenDyslexic is bundled at `verso-web/public/fonts/OpenDyslexic-Regular.ttf` and loaded via `@font-face` in `globals.css`, matching the iOS implementation.
+
+### Web Roadmap
+
+See **`docs/BACKLOG.md`** for the authoritative issue tracker. Web platform work is tracked under FAB-166 through FAB-174 and organized in phases.
+
+Place new web screens under `verso-web/app/<screen>/page.tsx`.
+
+---
+
+## Design System — Swift Identifiers (iOS)
 
 All design enum names are exact Swift identifiers. Search the source file to find usage.
 
@@ -76,30 +118,68 @@ enum VersoAnimation { fast=easeOut(0.15)  normal=easeInOut(0.25)  slow=spring(0.
 
 ## Screens
 
-| Screen | Status | Primary components |
-|--------|--------|--------------------|
-| Article List | Design complete | NavigationBar, SearchBar, FilterChips, ArticleRow |
-| Reading View | Design complete | TopBar (auto-hide), BodyText, BottomBar (auto-hide), ReadingControls sheet |
-| Settings | Design complete | ThemePicker, FontPicker, SpacingSlider, FolderPicker |
-| Onboarding | Design complete | FolderPicker, CTA |
-| Share Extension | Design complete | ParseProgress, ArticlePreview, SaveButton |
+| Screen | Status | Source |
+|--------|--------|--------|
+| Article List | ✅ Implemented | `Verso/Sources/Screens/ArticleList/` |
+| Article Reader | ✅ Implemented | `Verso/Sources/Screens/ArticleReader/` |
+| Onboarding | ✅ Implemented | `Verso/Sources/Screens/Onboarding/` |
+| Settings | ✅ Implemented | `Verso/Sources/Screens/Settings/` |
+| Launch | ✅ Implemented | `Verso/Sources/Screens/Launch/` |
+| Share Extension | ✅ Implemented | `Verso/ShareExtension/` |
 
-Source files for screens are not yet created — screens are to be implemented. Place them under `Verso/Sources/Screens/<ScreenName>/`.
+New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 
 ---
 
 ## Services (existing)
 
+### Core Services
+
 | File | Purpose |
 |------|---------|
+| `Services/ArticleLibraryService.swift` | Central article library — list, filter, search |
 | `Services/ArticleParserService.swift` | Orchestrates parsing pipeline |
-| `Services/ArticleParsingError.swift` | Error enum for parsing failures |
-| `Services/ParsedArticle.swift` | Parsed article value type |
-| `Services/PendingArticle.swift` | In-flight article before save |
 | `Services/MarkdownReader.swift` | Reads article `.md` files from disk |
 | `Services/MarkdownWriter.swift` | Writes article `.md` files to disk |
 | `Services/ReadabilityParser.swift` | Extracts readable content from HTML |
-| `Services/SwiftSoupParser.swift` | HTML parsing via SwiftSoup |
+| `Services/FolderBookmarkService.swift` | Persists iCloud folder security-scoped bookmark |
+| `Services/ICloudFileWatcher.swift` | Watches iCloud folder for file changes |
+| `Services/ReadingPreferencesService.swift` | Persists font, size, spacing preferences |
+| `Services/RelatedArticlesService.swift` | Finds related articles by tag/domain |
+| `Services/TTSService.swift` | Text-to-speech playback |
+| `Services/AnalyticsService.swift` | TelemetryDeck event logging |
+| `Services/ArticleMarkdownImageLocalizer.swift` | Downloads and localizes remote images |
+| `Services/PendingArticleIngester.swift` | Ingests articles queued by Share Extension |
+| `Services/ArticlePlainText.swift` | Converts articles to plain text |
+| `Services/DebugSeedService.swift` | Seeds test data for debugging |
+| `Services/ParsedArticle.swift` | Data model for parsed article content |
+
+### Import Services
+
+| File | Purpose |
+|------|---------|
+| `Services/Import/ImportOrchestrator.swift` | Bulk import entry point |
+| `Services/Import/ImportFileParser.swift` | Parses generic import file formats |
+| `Services/Import/PocketParser.swift` | Parses Pocket export CSV |
+| `Services/Import/InstapaperParser.swift` | Parses Instapaper export CSV |
+| `Services/Import/GoodLinksParser.swift` | Parses GoodLinks export |
+| `Services/Import/MatterParser.swift` | Parses Matter export |
+| `Services/Import/ReadwiseParser.swift` | Parses Readwise export |
+
+### Shared Utilities (App + Share Extension)
+
+| File | Purpose |
+|------|---------|
+| `Shared/AppConstants.swift` | App-wide constants and configuration |
+| `Shared/ArticleDuplicateFinder.swift` | Deduplication logic |
+| `Shared/ArticleParsingError.swift` | Error types for parsing pipeline |
+| `Shared/DuplicateSaveResolution.swift` | Duplicate resolution strategy |
+| `Shared/LibraryBookmarkResolver.swift` | Resolves security-scoped bookmark to folder URL |
+| `Shared/PendingArticle.swift` | Data model for articles pending ingestion |
+| `Shared/ReadingEstimate.swift` | WPM-based reading time calculation |
+| `Shared/ShareDuplicateArticleTitle.swift` | Duplicate detection for Share Extension |
+| `Shared/SwiftSoupParser.swift` | HTML parsing via SwiftSoup |
+| `Shared/VersoArticleURL.swift` | Article URL parsing and validation |
 
 ---
 
@@ -112,17 +192,20 @@ Source files for screens are not yet created — screens are to be implemented. 
 | Error states (8 scenarios, copy, accessibility) | `docs/ERROR_STATES_SPEC.md` |
 | Animation implementation (SwiftUI code examples) | `docs/animation-spec.md` |
 | Accessibility (touch targets, VoiceOver, QA checklist) | `docs/accessibility-specs.md` |
-| All UI copy strings | `docs/copy/UI_COPY.md` |
+| All UI copy strings (iOS + Web base `en`) | `docs/copy/UI_COPY.md` |
+| Localization — locales, plurals, formatting, invariants (EN-CA/FR-CA/PT-BR) | `docs/LOCALIZATION.md` |
 | User flows and navigation mechanics | `docs/user-flows.md`, `docs/navigation-patterns.md` |
 | Design system philosophy and reading behavior | `docs/DESIGN_SYSTEM_FOUNDATIONS.md` |
 | iCloud/Obsidian file-first decisions | `docs/OBSIDIAN_INTEGRATION.md` |
 | Analytics strategy, event catalog, TelemetryDeck integration | `docs/ANALYTICS_STRATEGY.md` |
 | Figma token naming | `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md` |
 | Full product requirements | `docs/PRD_MinimalistReaderApp.md` |
+| Web CSS tokens (authoritative source) | `verso-web/app/globals.css` |
+| Web theme provider implementation | `verso-web/app/providers/ThemeProvider.tsx` |
 
 ---
 
-## Key Constraints
+## Key Constraints — iOS
 
 - **Minimum touch target:** 44×44pt with 8pt spacing between targets
 - **WCAG AA required:** All text on all 4 themes (4.5:1 normal, 3:1 large)
@@ -130,3 +213,11 @@ Source files for screens are not yet created — screens are to be implemented. 
 - **Reduce Motion:** Suppress auto-hide animations; replace with instant show/hide
 - **MVP search:** Title-only (no full-text body search)
 - **No proprietary database** — never store canonical article data in Core Data
+
+## Key Constraints — Web
+
+- **Token parity:** CSS custom properties in `globals.css` must stay in sync with `docs/DESIGN_TOKENS.md`. If a token value changes, update both.
+- **WCAG AA required:** Same contrast requirements as iOS apply to all 4 themes on web.
+- **Theme data attribute:** Always set theme via `data-theme` on `<html>` — never via class names — so CSS variable scoping works correctly.
+- **File-first:** The web platform reads the same Markdown files as iOS (via the filesystem or iCloud). No separate database.
+- **OpenDyslexic:** Must be bundled locally (`public/fonts/`) — do not load from an external CDN.

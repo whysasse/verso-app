@@ -2,6 +2,10 @@ import SwiftUI
 
 struct ArticleReaderView: View {
     let article: Article
+    /// When embedded in `NavigationSplitView` detail, clears selection instead of popping a nonexistent stack frame.
+    var onRequestClose: (() -> Void)?
+    /// Opens another article from “Related” while staying in the split detail column.
+    var onSelectRelatedArticle: ((Article) -> Void)?
 
     @State private var scrollOffset: CGFloat = 0
     @State private var contentHeight: CGFloat = 0
@@ -82,35 +86,40 @@ struct ArticleReaderView: View {
 
             ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: 40) {
-                    Color.clear
-                        .frame(height: restorePadHeight)
-                        .id("verscroll")
-                    ArticleHeader(
-                        title: article.title,
-                        author: article.readerDisplayAuthor,
-                        publicationFallback: article.readerPublicationFallback,
-                        date: article.dateAdded,
-                        readTime: estimatedReadTime(for: parsedContent)
-                    )
+                HStack(alignment: .top, spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(alignment: .leading, spacing: 40) {
+                        Color.clear
+                            .frame(height: restorePadHeight)
+                            .id("verscroll")
+                        ArticleHeader(
+                            title: article.title,
+                            author: article.readerDisplayAuthor,
+                            publicationFallback: article.readerPublicationFallback,
+                            date: article.dateAdded,
+                            readTime: estimatedReadTime(for: parsedContent)
+                        )
 
-                    articleBody
+                        articleBody
 
-                    if !relatedArticles.isEmpty {
-                        RelatedArticlesSection(articles: relatedArticles)
+                        if !relatedArticles.isEmpty {
+                            RelatedArticlesSection(articles: relatedArticles, onSelectArticle: onSelectRelatedArticle)
+                        }
                     }
-                }
-                .padding(.horizontal, 40)
-                .padding(.top, 44 + safeAreaTop + 24)
-                .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
-                // Critical: ScrollView proposes unbounded vertical space; intrinsic height drives backing UIScrollView contentSize.
-                .fixedSize(horizontal: false, vertical: true)
-                .overlay(alignment: .topLeading) {
-                    // Non-zero frame so the bridge view stays in the scroll content hierarchy (0×0 can skip layout / break KVO).
-                    ScrollViewScrollMetricsTracker(onScrollMetrics: applyScrollMetrics)
-                        .frame(width: 1, height: 1)
-                        .allowsHitTesting(false)
-                        .accessibilityHidden(true)
+                    .frame(maxWidth: 680, alignment: .leading)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 44 + safeAreaTop + 24)
+                    .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
+                    // Critical: ScrollView proposes unbounded vertical space; intrinsic height drives backing UIScrollView contentSize.
+                    .fixedSize(horizontal: false, vertical: true)
+                    .overlay(alignment: .topLeading) {
+                        // Non-zero frame so the bridge view stays in the scroll content hierarchy (0×0 can skip layout / break KVO).
+                        ScrollViewScrollMetricsTracker(onScrollMetrics: applyScrollMetrics)
+                            .frame(width: 1, height: 1)
+                            .allowsHitTesting(false)
+                            .accessibilityHidden(true)
+                    }
+                    Spacer(minLength: 0)
                 }
             }
             .onChange(of: contentHeight) { newHeight in
@@ -151,7 +160,13 @@ struct ArticleReaderView: View {
             VStack(spacing: 0) {
                 ReadingTopBar(
                     title: article.title,
-                    onBack: { dismiss() },
+                    onBack: {
+                        if let onRequestClose {
+                            onRequestClose()
+                        } else {
+                            dismiss()
+                        }
+                    },
                     onOpenExternal: {
                         if let url = article.url {
                             UIApplication.shared.open(url)
@@ -345,9 +360,8 @@ struct ArticleReaderView: View {
     }
 
     private func estimatedReadTime(for text: String) -> Int? {
-        guard !text.isEmpty else { return nil }
-        let wordCount = text.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.count
-        return max(1, wordCount / 200)
+        // Centralized in ReadingEstimate (WPM = 220, content-language word count). See docs/LOCALIZATION.md §3.
+        ReadingEstimate.minutes(for: text)
     }
 }
 

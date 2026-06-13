@@ -7,7 +7,7 @@
 
 **Related docs:**
 - Token names, values, and usage intent → `DESIGN_TOKENS.md`
-- Token-to-component mapping (which token goes where, per state) → `COMPONENTS.md`
+- Token-to-component mapping, anatomy, and color rules → `COMPONENT_SPECS.md`
 - Behavioral specs, reading controls, immersive mode → `DESIGN_SYSTEM_FOUNDATIONS.md`
 
 ---
@@ -16,7 +16,7 @@
 
 This document catalogs all UI components needed for Verso. Each component includes its name, variants, states, and behavioral specifications.
 
-> **Note on token references:** Component entries below reference tokens by display name (e.g., "Surface", "Text Primary") for readability. For exact Swift identifiers and per-state token mapping, see `COMPONENTS.md`. For token values across all four themes, see `DESIGN_TOKENS.md`.
+> **Note on token references:** Component entries below reference tokens by display name (e.g., "Surface", "Text Primary") for readability. For exact Swift identifiers and per-state token mapping, see `COMPONENT_SPECS.md`. For token values across all four themes, see `DESIGN_TOKENS.md`.
 
 **Navigation model:** Verso uses a Navigation-stack flow (push/pop), not a TabBar. There is no tab bar component. The three main surfaces — Article List, Article Detail, and Settings — are reached via NavigationLink and a Settings icon in the nav bar.
 

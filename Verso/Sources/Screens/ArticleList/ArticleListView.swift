@@ -35,6 +35,8 @@ private extension ArticleStatus {
 }
 
 struct ArticleListView: View {
+    @Binding var selectedArticle: Article?
+
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
     @EnvironmentObject var articleLibraryService: ArticleLibraryService
@@ -46,7 +48,6 @@ struct ArticleListView: View {
     @State private var showFolderPicker = false
     @State private var showAddArticle = false
     @State private var showSettings = false
-    @State private var navigationArticle: Article?
     @State private var selectedTags = Set<String>()
     @State private var showTagPanel = false
     @State private var isSelecting = false
@@ -143,7 +144,7 @@ struct ArticleListView: View {
                     selectedTags: $selectedTags,
                     isSelecting: $isSelecting,
                     selectedArticleIds: $selectedArticleIds,
-                    navigationArticle: $navigationArticle,
+                    selectedArticle: $selectedArticle,
                     confirmBulkDelete: $confirmBulkDelete,
                     statusCounts: statusCounts,
                     showFolderPicker: $showFolderPicker,
@@ -244,7 +245,7 @@ private struct ArticleListFetchedBody: View {
     @Binding var selectedTags: Set<String>
     @Binding var isSelecting: Bool
     @Binding var selectedArticleIds: Set<UUID>
-    @Binding var navigationArticle: Article?
+    @Binding var selectedArticle: Article?
     @Binding var confirmBulkDelete: Bool
 
     let statusCounts: [ArticleStatus: Int]
@@ -269,7 +270,7 @@ private struct ArticleListFetchedBody: View {
         selectedTags: Binding<Set<String>>,
         isSelecting: Binding<Bool>,
         selectedArticleIds: Binding<Set<UUID>>,
-        navigationArticle: Binding<Article?>,
+        selectedArticle: Binding<Article?>,
         confirmBulkDelete: Binding<Bool>,
         statusCounts: [ArticleStatus: Int],
         showFolderPicker: Binding<Bool>,
@@ -284,7 +285,7 @@ private struct ArticleListFetchedBody: View {
         _selectedTags = selectedTags
         _isSelecting = isSelecting
         _selectedArticleIds = selectedArticleIds
-        _navigationArticle = navigationArticle
+        _selectedArticle = selectedArticle
         _confirmBulkDelete = confirmBulkDelete
         self.statusCounts = statusCounts
         _showFolderPicker = showFolderPicker
@@ -350,7 +351,7 @@ private struct ArticleListFetchedBody: View {
                                 selectedArticleIds.insert(article.id)
                             }
                         } else {
-                            navigationArticle = article
+                            selectedArticle = article
                         }
                     } label: {
                         HStack(alignment: .top, spacing: VersoSpacing.sm) {
@@ -489,15 +490,6 @@ private struct ArticleListFetchedBody: View {
                 .environmentObject(themeManager)
                 .environmentObject(folderBookmarkService)
                 .environment(\.managedObjectContext, viewContext)
-        }
-        .navigationDestination(isPresented: Binding(
-            get: { navigationArticle != nil },
-            set: { if !$0 { navigationArticle = nil } }
-        )) {
-            if let navigationArticle {
-                ArticleReaderView(article: navigationArticle)
-                    .id(navigationArticle.id)
-            }
         }
     }
 

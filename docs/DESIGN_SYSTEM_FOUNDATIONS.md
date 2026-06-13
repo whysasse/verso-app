@@ -6,8 +6,8 @@
 
 **Related:**
 - Token registry (authoritative token names + values) → `DESIGN_TOKENS.md`
-- Theme intent and personality → `THEMES.md`
-- Component token mapping → `COMPONENTS.md`
+- Theme intent and personality → `DESIGN_TOKENS.md` (see §1–2)
+- Component token mapping → `COMPONENT_SPECS.md` (see per-component anatomy + color rules)
 - Figma token naming conventions → `FIGMA_DESIGN_SYSTEM_REFERENCE.md`
 
 > **Note on scope:** This document captures design rationale, philosophy, and behavioral specifications. It is not the authoritative source for token values, component token usage, or theme rationale — those have dedicated files listed above. When this document and `DESIGN_TOKENS.md` conflict on a value, `DESIGN_TOKENS.md` wins.
@@ -32,8 +32,7 @@ Four themes covering warm-light, classic-warm, warm-dark, and cool-dark. All the
 
 The default is **Paper**. Users choose their theme during onboarding and can change it anytime in Settings.
 
-> **Authoritative source for token values:** `DESIGN_TOKENS.md` §1–2. The tables below are maintained for design rationale and context. If a hex value here conflicts with `DESIGN_TOKENS.md`, the latter is correct.  
-> **Authoritative source for theme intent and personality:** `THEMES.md`.
+> **Authoritative source for token values:** `DESIGN_TOKENS.md` §1–2. The tables below are maintained for design rationale and context. If a hex value here conflicts with `DESIGN_TOKENS.md`, the latter is correct.
 
 ### 2.1 Paper *(default)*
 

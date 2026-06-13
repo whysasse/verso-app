@@ -1,3 +1,5 @@
+> 🗄️ **ARCHIVED 2026-06-12.** Superseded by `DESIGN_TOKENS.md` and `Colors.swift`. Kept for history; do not implement from this document.
+
 # Themes — Verso
 
 **Version:** 1.0  

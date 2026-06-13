@@ -1,14 +1,15 @@
-# Verso — Minimalist iOS Article Reader App
+# Verso — Minimalist Article Reader App
 
 ## Project Overview
-Verso is a minimalist iOS article reader app focused on providing a beautiful, book-like reading experience. Currently in design/discovery phase.
+Verso is a minimalist article reader app focused on providing a beautiful, book-like reading experience. It now spans two platforms — **iOS** (SwiftUI) and **Web** (Next.js) — both in active implementation. For the authoritative, up-to-date status of each platform, see `docs/PROJECT_STATUS.md`.
 
 ## Key Documentation
+- **Developer Handoff**: `docs/HANDOFF.md` (start here)
 - **Design System Foundations**: `docs/DESIGN_SYSTEM_FOUNDATIONS.md`
 - **Authoritative Design Tokens**: `docs/DESIGN_TOKENS.md`
 - **Figma Design System Reference**: `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md`
 - **Product Requirements**: `docs/PRD_MinimalistReaderApp.md`
-- **Linear Project**: https://linear.app/fabiosasseron/project/verso-095ee52ef44b/issues
+- **Issue Tracker**: `docs/BACKLOG.md` (Linear retired 2026-06-12)
 
 ## Figma Design System
 - **File**: https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI

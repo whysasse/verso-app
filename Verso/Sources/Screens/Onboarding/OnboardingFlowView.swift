@@ -40,6 +40,8 @@ struct OnboardingFlowView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(VersoAnimation.normal, value: currentPage)
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
 
             pageDots
                 .padding(.bottom, VersoSpacing.md)

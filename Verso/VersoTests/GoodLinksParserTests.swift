@@ -121,6 +121,13 @@ final class GoodLinksParserTests: XCTestCase {
         XCTAssertFalse(parser.canParse(url))
     }
 
+    func testEmptyArrayReturnsEmptyWithoutCrash() throws {
+        let url = try writeJSON("[]")
+        let parser = GoodLinksParser()
+        // canParse returns false for an empty array (no rows to inspect)
+        XCTAssertFalse(parser.canParse(url))
+    }
+
     func testImportFormatDetectorSelectsGoodLinksForNativeExport() throws {
         let url = try writeJSON(
             """

@@ -1,209 +1,261 @@
 "use client";
 
-import { useTheme, VersoTheme } from "./providers/ThemeProvider";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useArticleLibrary } from "@/hooks/useArticleLibrary";
+import type { Article } from "@/types/article";
+import { FilterChipBar, type FilterValue } from "./components/FilterChipBar";
+import { SearchBar } from "./components/SearchBar";
+import { ArticleCard } from "./components/ArticleCard";
+import { EmptyState } from "./components/EmptyState";
+import { LoadingState } from "./components/LoadingState";
+import { useTheme, type VersoTheme } from "./providers/ThemeProvider";
 
 const THEMES: VersoTheme[] = ["paper", "sepia", "night", "ink"];
 
-const COLOR_ROLES = [
-  { label: "background", var: "--color-background" },
-  { label: "surface", var: "--color-surface" },
-  { label: "text-primary", var: "--color-text-primary" },
-  { label: "text-secondary", var: "--color-text-secondary" },
-  { label: "accent", var: "--color-accent" },
-  { label: "accent-pressed", var: "--color-accent-pressed" },
-  { label: "accent-surface", var: "--color-accent-surface" },
-  { label: "border", var: "--color-border" },
-  { label: "placeholder", var: "--color-placeholder" },
-  { label: "error", var: "--color-error" },
-  { label: "warning", var: "--color-warning" },
-  { label: "success", var: "--color-success" },
-];
-
-const STATUS_ROLES = [
-  { label: "status-unread", var: "--color-status-unread" },
-  { label: "status-reading", var: "--color-status-reading" },
-  { label: "status-read", var: "--color-status-read" },
-];
-
-export default function Home() {
-  const { theme, setTheme } = useTheme();
-
+// ── Unsupported browser screen ──────────────────────────────────────
+function UnsupportedScreen() {
   return (
-    <main
+    <div
       style={{
-        minHeight: "100vh",
-        backgroundColor: "var(--color-background)",
-        color: "var(--color-text-primary)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100dvh",
         padding: "var(--spacing-xl)",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        textAlign: "center",
+        gap: "var(--spacing-sm)",
+        color: "var(--color-text-secondary)",
       }}
     >
+      <span style={{ fontSize: 48, lineHeight: 1 }}>🌐</span>
       <h1
         style={{
-          fontSize: "var(--type-ui-screen-title-size)",
-          fontWeight: "var(--type-ui-screen-title-weight)",
-          lineHeight: "var(--type-ui-screen-title-line-height)",
-          marginBottom: "var(--spacing-lg)",
+          fontSize: "var(--type-ui-list-title-size)",
+          fontWeight: "var(--type-ui-list-title-weight)",
+          color: "var(--color-text-primary)",
+          margin: 0,
         }}
       >
-        Verso Design System
+        Browser not supported
       </h1>
+      <p style={{ margin: 0, maxWidth: 320, fontSize: "var(--type-ui-list-subtitle-size)" }}>
+        Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open
+        this page in a supported browser.
+      </p>
+    </div>
+  );
+}
 
-      {/* Theme selector */}
-      <section style={{ marginBottom: "var(--spacing-xl)" }}>
-        <h2
+// ── Theme switcher (top-right) ──────────────────────────────────────
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <div style={{ display: "flex", gap: "var(--spacing-xxs)" }}>
+      {THEMES.map((t) => (
+        <button
+          key={t}
+          onClick={() => setTheme(t)}
+          title={t}
+          aria-label={`Switch to ${t} theme`}
           style={{
-            fontSize: "var(--type-ui-list-title-size)",
-            fontWeight: "var(--type-ui-list-title-weight)",
-            marginBottom: "var(--spacing-sm)",
-            color: "var(--color-text-secondary)",
+            width: 20,
+            height: 20,
+            borderRadius: "50%",
+            border: theme === t ? "2px solid var(--color-accent)" : "2px solid var(--color-border)",
+            cursor: "pointer",
+            padding: 0,
+            backgroundColor:
+              t === "paper"
+                ? "#F5F0E8"
+                : t === "sepia"
+                ? "#F2E8D5"
+                : t === "night"
+                ? "#1C1A16"
+                : "#111418",
+            transition: "border-color 0.15s ease",
           }}
-        >
-          Theme
-        </h2>
-        <div style={{ display: "flex", gap: "var(--spacing-xs)" }}>
-          {THEMES.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTheme(t)}
-              style={{
-                padding: "var(--spacing-xs) var(--spacing-sm)",
-                borderRadius: "var(--radius-lg)",
-                border: "1px solid var(--color-border)",
-                backgroundColor: theme === t ? "var(--color-accent-surface)" : "var(--color-surface)",
-                color: theme === t ? "var(--color-accent)" : "var(--color-text-primary)",
-                fontWeight: theme === t ? 600 : 400,
-                fontSize: "var(--type-ui-button-size)",
-                cursor: "pointer",
-                textTransform: "capitalize",
-                transition: "background-color 0.15s ease, color 0.15s ease",
-              }}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      </section>
+        />
+      ))}
+    </div>
+  );
+}
 
-      {/* Color swatches */}
-      <section style={{ marginBottom: "var(--spacing-xl)" }}>
-        <h2
-          style={{
-            fontSize: "var(--type-ui-list-title-size)",
-            fontWeight: "var(--type-ui-list-title-weight)",
-            marginBottom: "var(--spacing-sm)",
-            color: "var(--color-text-secondary)",
-          }}
-        >
-          Theme Colors
-        </h2>
+// ── Main page ───────────────────────────────────────────────────────
+export default function ArticleListPage() {
+  const router = useRouter();
+  const library = useArticleLibrary();
+  const [activeFilter, setActiveFilter] = useState<FilterValue>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Chip counts — always computed from full article list
+  const counts = useMemo(() => {
+    const all = library.articles.length;
+    const unread = library.articles.filter((a) => a.status === "unread").length;
+    const reading = library.articles.filter((a) => a.status === "reading").length;
+    const read = library.articles.filter((a) => a.status === "read").length;
+    return { all, unread, reading, read, archived: 0 } as Record<FilterValue, number>;
+  }, [library.articles]);
+
+  // Filter pipeline
+  const visibleArticles = useMemo(() => {
+    let result = library.articles;
+    if (activeFilter !== "all") {
+      result = result.filter((a) => a.status === activeFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter((a) => a.title.toLowerCase().includes(q));
+    }
+    return result;
+  }, [library.articles, activeFilter, searchQuery]);
+
+  function handleArticleClick(article: Article) {
+    router.push(`/article/${encodeURIComponent(article.filename)}`);
+  }
+
+  if (!library.isSupported) return <UnsupportedScreen />;
+
+  return (
+    <div
+      style={{
+        minHeight: "100dvh",
+        backgroundColor: "var(--color-background)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* ── Top bar ── */}
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "var(--color-background)",
+          borderBottom: "1px solid var(--color-border)",
+          padding: "var(--spacing-md) var(--spacing-lg)",
+        }}
+      >
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-            gap: "var(--spacing-xs)",
+            maxWidth: 680,
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "var(--spacing-md)",
           }}
         >
-          {COLOR_ROLES.map(({ label, var: cssVar }) => (
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "var(--type-ui-screen-title-size)",
+              fontWeight: "var(--type-ui-screen-title-weight)",
+              lineHeight: "var(--type-ui-screen-title-line-height)",
+              color: "var(--color-text-primary)",
+            }}
+          >
+            Verso
+          </h1>
+          <ThemeSwitcher />
+        </div>
+      </header>
+
+      {/* ── Content ── */}
+      <main
+        style={{
+          flex: 1,
+          maxWidth: 680,
+          width: "100%",
+          margin: "0 auto",
+          padding: "var(--spacing-lg)",
+          boxSizing: "border-box",
+        }}
+      >
+        {library.isLoading ? (
+          <LoadingState />
+        ) : !library.hasFolder ? (
+          <EmptyState
+            activeFilter={activeFilter}
+            hasSearch={false}
+            hasFolder={false}
+            onOpenFolder={library.openFolder}
+          />
+        ) : (
+          <>
+            {/* Search */}
+            <div style={{ marginBottom: "var(--spacing-sm)" }}>
+              <SearchBar value={searchQuery} onChange={setSearchQuery} />
+            </div>
+
+            {/* Filter chips — always visible */}
+            <div style={{ marginBottom: "var(--spacing-md)" }}>
+              <FilterChipBar
+                active={activeFilter}
+                counts={counts}
+                onChange={setActiveFilter}
+              />
+            </div>
+
+            {/* Article list or empty state */}
+            {visibleArticles.length === 0 ? (
+              <EmptyState
+                activeFilter={activeFilter}
+                hasSearch={searchQuery.trim().length > 0}
+                hasFolder={true}
+                onOpenFolder={library.openFolder}
+              />
+            ) : (
+              <div>
+                {visibleArticles.map((article) => (
+                  <ArticleCard
+                    key={article.filename}
+                    article={article}
+                    onClick={handleArticleClick}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Re-select folder link */}
             <div
-              key={label}
               style={{
-                borderRadius: "var(--radius-md)",
-                overflow: "hidden",
-                border: "1px solid var(--color-border)",
+                marginTop: "var(--spacing-xl)",
+                textAlign: "center",
               }}
             >
-              <div
+              <button
+                onClick={library.openFolder}
                 style={{
-                  height: 48,
-                  backgroundColor: `var(${cssVar})`,
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              />
-              <div
-                style={{
-                  backgroundColor: "var(--color-surface)",
-                  padding: "var(--spacing-xs)",
-                  fontSize: "var(--type-ui-caption-size)",
+                  background: "none",
+                  border: "none",
                   color: "var(--color-text-secondary)",
+                  fontSize: "var(--type-ui-caption-size)",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  textDecorationColor: "var(--color-border)",
                 }}
               >
-                {label}
-              </div>
+                Change folder
+              </button>
             </div>
-          ))}
-        </div>
-      </section>
+          </>
+        )}
 
-      {/* Status colors */}
-      <section style={{ marginBottom: "var(--spacing-xl)" }}>
-        <h2
-          style={{
-            fontSize: "var(--type-ui-list-title-size)",
-            fontWeight: "var(--type-ui-list-title-weight)",
-            marginBottom: "var(--spacing-sm)",
-            color: "var(--color-text-secondary)",
-          }}
-        >
-          Article Status Colors (fixed)
-        </h2>
-        <div style={{ display: "flex", gap: "var(--spacing-xs)" }}>
-          {STATUS_ROLES.map(({ label, var: cssVar }) => (
-            <div
-              key={label}
-              style={{
-                borderRadius: "var(--radius-md)",
-                overflow: "hidden",
-                border: "1px solid var(--color-border)",
-                flex: "1",
-              }}
-            >
-              <div
-                style={{
-                  height: 48,
-                  backgroundColor: `var(${cssVar})`,
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              />
-              <div
-                style={{
-                  backgroundColor: "var(--color-surface)",
-                  padding: "var(--spacing-xs)",
-                  fontSize: "var(--type-ui-caption-size)",
-                  color: "var(--color-text-secondary)",
-                }}
-              >
-                {label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* OpenDyslexic font sample */}
-      <section>
-        <h2
-          style={{
-            fontSize: "var(--type-ui-list-title-size)",
-            fontWeight: "var(--type-ui-list-title-weight)",
-            marginBottom: "var(--spacing-sm)",
-            color: "var(--color-text-secondary)",
-          }}
-        >
-          OpenDyslexic Font
-        </h2>
-        <p
-          style={{
-            fontFamily: "OpenDyslexic, sans-serif",
-            fontSize: "var(--type-reading-body-md-size)",
-            lineHeight: "var(--type-reading-body-line-height)",
-            color: "var(--color-text-primary)",
-            maxWidth: 600,
-          }}
-        >
-          The quick brown fox jumps over the lazy dog. Reading should feel effortless.
-        </p>
-      </section>
-    </main>
+        {library.error && (
+          <p
+            style={{
+              marginTop: "var(--spacing-md)",
+              color: "var(--color-error)",
+              fontSize: "var(--type-ui-caption-size)",
+              textAlign: "center",
+            }}
+          >
+            {library.error}
+          </p>
+        )}
+      </main>
+    </div>
   );
 }

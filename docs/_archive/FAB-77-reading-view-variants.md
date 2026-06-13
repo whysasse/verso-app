@@ -1,3 +1,5 @@
+> 🗄️ **ARCHIVED 2026-06-12.** Per-issue working document; issue complete. Kept for history; do not implement from this document.
+
 # FAB-77 — Reading View Variants
 
 **Linear:** https://linear.app/fabiosasseron/issue/FAB-77  

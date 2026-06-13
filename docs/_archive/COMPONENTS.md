@@ -1,3 +1,5 @@
+> 🗄️ **ARCHIVED 2026-06-12.** Superseded by `component-inventory.md`. Kept for history; do not implement from this document.
+
 # Components — Verso
 
 **Version:** 1.0  

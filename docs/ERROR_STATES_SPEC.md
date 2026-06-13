@@ -139,6 +139,8 @@ Icon: `folder.badge.minus`, 48pt, `textSecondary`
 | `error.iCloudUnavailable.headline` | iCloud Drive is unavailable. |
 | `error.iCloudUnavailable.subheadline` | Go to Settings → [Your Name] → iCloud to re-enable it. |
 
+> **Localization note:** `[Your Name]` here is **intentional** — it mirrors Apple's own label for the device-owner row at the top of iOS Settings. It is *not* an unfilled placeholder. Keep it as-is and do not substitute a real name; translators should match Apple's localized term for that row in each locale.
+
 **Spec:**
 - Same banner component as scenario 1, but uses `error` token instead of `warning`
 - No action button in banner — user must leave the app to resolve
