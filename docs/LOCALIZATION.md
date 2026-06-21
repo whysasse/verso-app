@@ -45,6 +45,8 @@ French and Portuguese disagree on the zero case — exactly why we delegate to t
 
 `Verso` · `Obsidian` · `iCloud Drive` · `Markdown` · `Safari` · `GitHub` · `OpenDyslexic` · theme **enum keys** (`paper`/`sepia`/`night`/`ink`).
 
+Web-only additions (added during FAB-275 step 5): `Verso Web` · `File System Access API` · `Chrome` · `Edge` (browser names) · `Georgia` (font name). See `docs/copy/UI_COPY.md` §11 ("Web-Only Strings") for the rows these appear in.
+
 Special case: the iCloud-error string `Go to Settings → [Your Name] → iCloud` keeps `[Your Name]` — it mirrors Apple's on-screen device-owner label. Translators match Apple's localized term, not a real name.
 
 ---
