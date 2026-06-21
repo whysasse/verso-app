@@ -193,7 +193,9 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | Animation implementation (SwiftUI code examples) | `docs/animation-spec.md` |
 | Accessibility (touch targets, VoiceOver, QA checklist) | `docs/accessibility-specs.md` |
 | All UI copy strings (iOS + Web base `en`) | `docs/copy/UI_COPY.md` |
-| Localization — locales, plurals, formatting, invariants (EN-CA/FR-CA/PT-BR) | `docs/LOCALIZATION.md` |
+| Codegen: generate Localizable.xcstrings / L10n.swift / Web message JSONs | `docs/copy/codegen/generate.py` |
+| Codegen: pseudo-locale for layout-flex QA (accented +30%) | `docs/copy/codegen/pseudolocalize.py` |
+| Localization — locales, plurals, formatting, invariants, pseudolocalization (EN-CA/FR-CA/PT-BR) | `docs/LOCALIZATION.md` |
 | User flows and navigation mechanics | `docs/user-flows.md`, `docs/navigation-patterns.md` |
 | Design system philosophy and reading behavior | `docs/DESIGN_SYSTEM_FOUNDATIONS.md` |
 | iCloud/Obsidian file-first decisions | `docs/OBSIDIAN_INTEGRATION.md` |

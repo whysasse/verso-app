@@ -212,6 +212,7 @@ Only fetch what you need — see `docs/HANDOFF.md` for the full doc map.
 | Accessibility (touch targets, VoiceOver) | `docs/design/accessibility-specs.md` |
 | Error states (8 scenarios, copy, a11y) | `docs/design/ERROR_STATES_SPEC.md` |
 | All UI copy strings | `docs/copy/UI_COPY.md` |
+| Localization (locales, plurals, pseudolocalization QA) | `docs/LOCALIZATION.md` |
 | User flows and navigation mechanics | `docs/product/user-flows.md`, `docs/product/navigation-patterns.md` |
 | Authoritative entry point | `docs/HANDOFF.md` |
 
