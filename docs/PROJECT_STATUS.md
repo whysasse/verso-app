@@ -78,9 +78,19 @@ Web platform issues are tracked in **`docs/BACKLOG.md`** (the issue tracker of r
 
 ---
 
-## Documentation
+## Localization — FAB-275 (EN-CA, FR-CA, PT-BR)
 
-All design specs are finalized in `docs/`:
+The localization epic is broken into phases reflecting implementation ordering:
+
+| Phase | FAB-275 step | Scope | Status |
+|-------|-------------|-------|--------|
+| **Phase A** | Steps 6–8 prep | Interim key cleanup, QuickTourView rebuild, AboutView, Obsidian tip, font-size translations, codegen plural fix | ✅ Done 2026-06-21 |
+| **Phase B** | Step 6 | Pseudolocalization + layout flex QA (Web pseudo-locale infra, ControlRow label fix) | ✅ Done 2026-06-21 |
+| **Phase C** | Step 7 | FR-CA & PT-BR translation + linguistic/diacritic QA | 🔲 Next |
+| **Phase D** | Step 8 | App Store metadata + Québec/Bill 96 compliance | 🔲 After Phase C |
+| **Phase E** | FAB-284 (post-275) | Language picker (iOS + Web) | 🔲 Future |
+
+See `docs/BACKLOG.md` for detailed step checklists and `docs/DONE.md` for completed issues.
 
 - `HANDOFF.md` — authoritative dev entry point
 - `PRD_MinimalistReaderApp.md` — full product requirements
