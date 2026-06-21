@@ -33,23 +33,17 @@
     "acknowledgements": {
       "rowLabel": "Agradecimentos de código aberto"
     },
-    "brandName": "Verso",
-    "description": "Um leitor minimalista para salvar e ler artigos, offline e sem distrações.",
     "footer": "Verso {version} · Feito com cuidado",
     "github": {
       "rowLabel": "Ver no GitHub"
     },
-    "githubLinkLabel": "GitHub",
-    "navTitle": "Sobre",
     "privacyPolicy": {
       "rowLabel": "Política de privacidade"
     },
-    "privacyPolicyLinkLabel": "Política de Privacidade",
     "title": "Sobre o Verso",
     "version": {
       "rowLabel": "Versão"
-    },
-    "versionLabel": "Versão {version}"
+    }
   },
   "addArticle": {
     "close": {
@@ -153,7 +147,7 @@
     },
     "archived": {
       "_label": "Arquivados",
-      "accessibilityLabel": "Arquivados, {count} artigos"
+      "accessibilityLabel": "{count, plural, one {Arquivados, # artigo} other {Arquivados, # artigos}}"
     },
     "chip": {
       "selected": {
@@ -306,11 +300,6 @@
     },
     "tour": {
       "headline": "Veja como funciona",
-      "illustrationBrowserLabel": "Navegador",
-      "illustrationHeadline": "Salve de qualquer lugar",
-      "illustrationShareLabel": "Compartilhar",
-      "illustrationSubheadline": "Toque em Compartilhar em qualquer navegador, escolha o Verso, e seu artigo é salvo automaticamente.",
-      "illustrationVersoLabel": "Verso",
       "skip": "Pular",
       "startReading": "Começar a ler",
       "step1": "Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente.",
@@ -328,13 +317,13 @@
   },
   "readerSettings": {
     "fontSize": {
-      "l": "L",
+      "l": "G",
       "m": "M",
-      "s": "S",
+      "s": "P",
       "sectionLabel": "Tamanho do texto",
-      "xl": "XL",
-      "xs": "XS",
-      "xxl": "XXL"
+      "xl": "GG",
+      "xs": "PP",
+      "xxl": "EEG"
     },
     "lineSpacing": {
       "airy": "Espaçado",
@@ -425,7 +414,8 @@
       "sectionLabel": "Fonte"
     },
     "fontSize": {
-      "sectionLabel": "Tamanho"
+      "sectionLabel": "Tamanho",
+      "valueLabel": "{size}pt"
     },
     "import": {
       "rowLabel": "Importar artigos"

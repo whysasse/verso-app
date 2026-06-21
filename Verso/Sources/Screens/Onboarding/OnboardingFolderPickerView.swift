@@ -59,6 +59,13 @@ struct OnboardingFolderPickerView: View {
                 }
                 .buttonStyle(.plain)
                 .tint(.clear)
+
+                Text(L10n.Onboarding.folderObsidianTip)
+                    .font(VersoTypography.UI.caption)
+                    .foregroundColor(colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, VersoSpacing.md)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, VersoSpacing.lg)
 

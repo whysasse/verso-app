@@ -33,23 +33,17 @@
     "acknowledgements": {
       "rowLabel": "Open-source acknowledgements"
     },
-    "brandName": "Verso",
-    "description": "A minimalist reader for saving and reading articles, offline and distraction-free.",
     "footer": "Verso {version} · Built with care",
     "github": {
       "rowLabel": "View on GitHub"
     },
-    "githubLinkLabel": "GitHub",
-    "navTitle": "About",
     "privacyPolicy": {
       "rowLabel": "Privacy policy"
     },
-    "privacyPolicyLinkLabel": "Privacy Policy",
     "title": "About Verso",
     "version": {
       "rowLabel": "Version"
-    },
-    "versionLabel": "Version {version}"
+    }
   },
   "addArticle": {
     "close": {
@@ -153,7 +147,7 @@
     },
     "archived": {
       "_label": "Archived",
-      "accessibilityLabel": "Archived, {count} articles"
+      "accessibilityLabel": "{count, plural, one {Archived, # article} other {Archived, # articles}}"
     },
     "chip": {
       "selected": {
@@ -306,11 +300,6 @@
     },
     "tour": {
       "headline": "Here's how it works",
-      "illustrationBrowserLabel": "Browser",
-      "illustrationHeadline": "Save from anywhere",
-      "illustrationShareLabel": "Share",
-      "illustrationSubheadline": "Tap Share in any browser, pick Verso, and your article is saved automatically.",
-      "illustrationVersoLabel": "Verso",
       "skip": "Skip",
       "startReading": "Start reading",
       "step1": "Share any article from Safari or your browser to save it instantly.",
@@ -425,7 +414,8 @@
       "sectionLabel": "Font"
     },
     "fontSize": {
-      "sectionLabel": "Size"
+      "sectionLabel": "Size",
+      "valueLabel": "{size}pt"
     },
     "import": {
       "rowLabel": "Import Articles"

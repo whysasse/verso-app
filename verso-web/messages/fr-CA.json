@@ -33,23 +33,17 @@
     "acknowledgements": {
       "rowLabel": "Remerciements open source"
     },
-    "brandName": "Verso",
-    "description": "Un lecteur minimaliste pour enregistrer et lire des articles, hors ligne et sans distraction.",
     "footer": "Verso {version} · Conçu avec soin",
     "github": {
       "rowLabel": "Voir sur GitHub"
     },
-    "githubLinkLabel": "GitHub",
-    "navTitle": "À propos",
     "privacyPolicy": {
       "rowLabel": "Politique de confidentialité"
     },
-    "privacyPolicyLinkLabel": "Politique de confidentialité",
     "title": "À propos de Verso",
     "version": {
       "rowLabel": "Version"
-    },
-    "versionLabel": "Version {version}"
+    }
   },
   "addArticle": {
     "close": {
@@ -153,7 +147,7 @@
     },
     "archived": {
       "_label": "Archivés",
-      "accessibilityLabel": "Archivés, {count} articles"
+      "accessibilityLabel": "{count, plural, one {Archivés, # article} other {Archivés, # articles}}"
     },
     "chip": {
       "selected": {
@@ -306,11 +300,6 @@
     },
     "tour": {
       "headline": "Voici comment ça fonctionne",
-      "illustrationBrowserLabel": "Navigateur",
-      "illustrationHeadline": "Enregistrez depuis n'importe où",
-      "illustrationShareLabel": "Partager",
-      "illustrationSubheadline": "Touchez Partager dans n'importe quel navigateur, choisissez Verso, et votre article est enregistré automatiquement.",
-      "illustrationVersoLabel": "Verso",
       "skip": "Ignorer",
       "startReading": "Commencer à lire",
       "step1": "Partagez n'importe quel article depuis Safari ou votre navigateur pour l'enregistrer instantanément.",
@@ -328,13 +317,13 @@
   },
   "readerSettings": {
     "fontSize": {
-      "l": "L",
+      "l": "G",
       "m": "M",
-      "s": "S",
+      "s": "P",
       "sectionLabel": "Taille du texte",
-      "xl": "XL",
-      "xs": "XS",
-      "xxl": "XXL"
+      "xl": "TG",
+      "xs": "TPS",
+      "xxl": "TTG"
     },
     "lineSpacing": {
       "airy": "Aéré",
@@ -425,7 +414,8 @@
       "sectionLabel": "Police"
     },
     "fontSize": {
-      "sectionLabel": "Taille"
+      "sectionLabel": "Taille",
+      "valueLabel": "{size}pt"
     },
     "import": {
       "rowLabel": "Importer des articles"

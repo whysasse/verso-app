@@ -120,7 +120,7 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Text("\(Int(readingPreferences.fontSize))pt")
+                    Text(L10n.Settings.fontSizeValueLabel(size: Int(readingPreferences.fontSize)))
                         .font(VersoTypography.UI.caption)
                         .foregroundColor(colors.textSecondary)
                         .frame(minWidth: 36, alignment: .center)

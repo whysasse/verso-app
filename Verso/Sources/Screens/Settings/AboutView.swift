@@ -9,45 +9,48 @@ struct AboutView: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
     }
 
+    private var appBuild: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+    }
+
     private let githubURL = URL(string: "https://github.com/whysasse/verso-app")!
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
-                links
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    rows
+                    footer
+                }
             }
+
+            Spacer()
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: L10n.About.navTitle)
+        .versoNavigationBar(title: L10n.About.title)
     }
 
-    private var header: some View {
-        VStack(alignment: .leading, spacing: VersoSpacing.xs) {
-            Text(L10n.About.brandName)
-                .font(VersoTypography.UI.screenTitle)
-                .foregroundColor(colors.textPrimary)
-
-            Text(L10n.About.versionLabel(version: appVersion))
-                .font(VersoTypography.UI.caption)
-                .foregroundColor(colors.textSecondary)
-
-            Text(L10n.About.description)
-                .font(VersoTypography.UI.listSubtitle)
-                .foregroundColor(colors.textSecondary)
-                .padding(.top, VersoSpacing.xxs)
-        }
-        .padding(.horizontal, VersoSpacing.md)
-        .padding(.top, VersoSpacing.lg)
-        .padding(.bottom, VersoSpacing.md)
-    }
-
-    private var links: some View {
+    private var rows: some View {
         VStack(spacing: 0) {
-            NavigationLink(destination: InAppWebView(url: githubURL, title: L10n.About.githubLinkLabel)) {
+            // Version
+            HStack {
+                Text(L10n.About.versionRowLabel)
+                    .font(VersoTypography.UI.input)
+                    .foregroundColor(colors.textPrimary)
+                Spacer()
+                Text("\(appVersion) (\(appBuild))")
+                    .font(VersoTypography.UI.listSubtitle)
+                    .foregroundColor(colors.textSecondary)
+            }
+            .frame(minHeight: 44)
+            .padding(.horizontal, VersoSpacing.md)
+
+            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+
+            // Acknowledgements
+            NavigationLink(destination: AcknowledgementsView()) {
                 HStack {
-                    Text(L10n.About.githubLinkLabel)
+                    Text(L10n.About.acknowledgementsRowLabel)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.textPrimary)
                     Spacer()
@@ -62,9 +65,28 @@ struct AboutView: View {
 
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
+            // GitHub
+            NavigationLink(destination: InAppWebView(url: githubURL, title: L10n.About.githubRowLabel)) {
+                HStack {
+                    Text(L10n.About.githubRowLabel)
+                        .font(VersoTypography.UI.input)
+                        .foregroundColor(colors.textPrimary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(colors.textSecondary)
+                }
+                .frame(minHeight: 44)
+                .padding(.horizontal, VersoSpacing.md)
+            }
+            .buttonStyle(.plain)
+
+            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+
+            // Privacy Policy
             NavigationLink(destination: PrivacyPolicyView()) {
                 HStack {
-                    Text(L10n.About.privacyPolicyLinkLabel)
+                    Text(L10n.About.privacyPolicyRowLabel)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.textPrimary)
                     Spacer()
@@ -77,6 +99,14 @@ struct AboutView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    private var footer: some View {
+        Text(L10n.About.footer(version: appVersion))
+            .font(VersoTypography.UI.caption)
+            .foregroundColor(colors.textSecondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, VersoSpacing.lg)
     }
 }
 

@@ -80,33 +80,13 @@ enum L10n {
         static var acknowledgementsRowLabel: String {
             String(localized: "about.acknowledgements.rowLabel", defaultValue: "Open-source acknowledgements", comment: "Row label")
         }
-        /// "Verso" -- Invariant — brand name
-        static var brandName: String {
-            String(localized: "about.brandName", defaultValue: "Verso", comment: "Invariant — brand name")
-        }
-        /// "A minimalist reader for saving and reading articles, offline and distraction-free." -- Header description
-        static var description: String {
-            String(localized: "about.description", defaultValue: "A minimalist reader for saving and reading articles, offline and distraction-free.", comment: "Header description")
-        }
         /// "Verso {version} · Built with care" -- `Verso` invariant
         static func footer(version: String) -> String {
             String(localized: "about.footer", defaultValue: "Verso \(version) · Built with care", comment: "`Verso` invariant")
         }
-        /// "GitHub" -- Invariant — brand name
-        static var githubLinkLabel: String {
-            String(localized: "about.githubLinkLabel", defaultValue: "GitHub", comment: "Invariant — brand name")
-        }
         /// "View on GitHub" -- `GitHub` invariant
         static var githubRowLabel: String {
             String(localized: "about.github.rowLabel", defaultValue: "View on GitHub", comment: "`GitHub` invariant")
-        }
-        /// "About" -- Interim — see note above. Spec value is `about.title` ('About Verso')
-        static var navTitle: String {
-            String(localized: "about.navTitle", defaultValue: "About", comment: "Interim — see note above. Spec value is `about.title` ('About Verso')")
-        }
-        /// "Privacy Policy" -- Privacy Policy row label
-        static var privacyPolicyLinkLabel: String {
-            String(localized: "about.privacyPolicyLinkLabel", defaultValue: "Privacy Policy", comment: "Privacy Policy row label")
         }
         /// "Privacy policy" -- Row label
         static var privacyPolicyRowLabel: String {
@@ -115,10 +95,6 @@ enum L10n {
         /// "About Verso" -- Page title
         static var title: String {
             String(localized: "about.title", defaultValue: "About Verso", comment: "Page title")
-        }
-        /// "Version {version}" -- digits/format unchanged across locales
-        static func versionLabel(version: String) -> String {
-            String(localized: "about.versionLabel", defaultValue: "Version \(version)", comment: "digits/format unchanged across locales")
         }
         /// "Version" -- Sub-label: `{version} ({build})` (digits/format unchanged across locales)
         static var versionRowLabel: String {
@@ -660,26 +636,6 @@ enum L10n {
         static var tourHeadline: String {
             String(localized: "onboarding.tour.headline", defaultValue: "Here's how it works", comment: "Headline")
         }
-        /// "Browser" -- Interim — see note above
-        static var tourIllustrationBrowserLabel: String {
-            String(localized: "onboarding.tour.illustrationBrowserLabel", defaultValue: "Browser", comment: "Interim — see note above")
-        }
-        /// "Save from anywhere" -- Interim — see note above
-        static var tourIllustrationHeadline: String {
-            String(localized: "onboarding.tour.illustrationHeadline", defaultValue: "Save from anywhere", comment: "Interim — see note above")
-        }
-        /// "Share" -- Interim — see note above
-        static var tourIllustrationShareLabel: String {
-            String(localized: "onboarding.tour.illustrationShareLabel", defaultValue: "Share", comment: "Interim — see note above")
-        }
-        /// "Tap Share in any browser, pick Verso, and your article is saved automatically." -- Interim — see note above
-        static var tourIllustrationSubheadline: String {
-            String(localized: "onboarding.tour.illustrationSubheadline", defaultValue: "Tap Share in any browser, pick Verso, and your article is saved automatically.", comment: "Interim — see note above")
-        }
-        /// "Verso" -- Invariant — brand name. Interim — see note above
-        static var tourIllustrationVersoLabel: String {
-            String(localized: "onboarding.tour.illustrationVersoLabel", defaultValue: "Verso", comment: "Invariant — brand name. Interim — see note above")
-        }
         /// "Skip" -- Text button
         static var tourSkip: String {
             String(localized: "onboarding.tour.skip", defaultValue: "Skip", comment: "Text button")
@@ -740,9 +696,9 @@ enum L10n {
         static var fontSizeXl: String {
             String(localized: "readerSettings.fontSize.xl", defaultValue: "XL", comment: "Accessibility label: 'Extra large, 22 points' → fr-CA 'Très grand, 22 points' / pt-BR 'Extragrande, 22 pontos'")
         }
-        /// "XS" -- **Open question for step 7:** keep universal XS/S/M/L/XL/XXL abbreviations (like clothing sizes) across all locales, rather than translating the letters. Accessibility label translates regardless: 'Extra small, 14 points' → fr-CA 'Très petit, 14 points' / pt-BR 'Extrapequeno, 14 pontos'
+        /// "XS" -- Abbreviations translated per locale (FR: Très Petit, PT: Super Pequeno). Accessibility label translates regardless: 'Extra small, 14 points' → fr-CA 'Très petit, 14 points' / pt-BR 'Extrapequeno, 14 pontos'
         static var fontSizeXs: String {
-            String(localized: "readerSettings.fontSize.xs", defaultValue: "XS", comment: "**Open question for step 7:** keep universal XS/S/M/L/XL/XXL abbreviations (like clothing sizes) across all locales, rather than translating the letters. Accessibility label translates regardless: 'Extra small, 14 points' → fr-CA 'Très petit, 14 points' / pt-BR 'Extrapequeno, 14 pontos'")
+            String(localized: "readerSettings.fontSize.xs", defaultValue: "XS", comment: "Abbreviations translated per locale (FR: Très Petit, PT: Super Pequeno). Accessibility label translates regardless: 'Extra small, 14 points' → fr-CA 'Très petit, 14 points' / pt-BR 'Extrapequeno, 14 pontos'")
         }
         /// "XXL" -- Accessibility label: 'Extra extra large, 26 points' → fr-CA 'Très très grand, 26 points' / pt-BR 'Extra extragrande, 26 pontos'
         static var fontSizeXxl: String {
@@ -915,6 +871,10 @@ enum L10n {
         /// "Size" -- Section label, stepper row
         static var fontSizeSectionLabel: String {
             String(localized: "settings.fontSize.sectionLabel", defaultValue: "Size", comment: "Section label, stepper row")
+        }
+        /// "{size}pt" -- 'pt' is a standard typographic abbreviation, invariant across locales.
+        static func fontSizeValueLabel(size: Int) -> String {
+            String(localized: "settings.fontSize.valueLabel", defaultValue: "\(size)pt", comment: "'pt' is a standard typographic abbreviation, invariant across locales.")
         }
         /// "Import Articles" -- Row label
         static var importRowLabel: String {

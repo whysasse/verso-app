@@ -9,12 +9,12 @@ struct OnboardingThemePickerView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: VersoSpacing.xs) {
-                Text("Choose your theme")
+                Text(L10n.Onboarding.themeHeadline)
                     .font(VersoTypography.UI.screenTitle)
                     .foregroundColor(colors.textPrimary)
                     .multilineTextAlignment(.center)
 
-                Text("You can always change this later in Settings.")
+                Text(L10n.Onboarding.themeSubheadline)
                     .font(VersoTypography.UI.listSubtitle)
                     .foregroundColor(colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -38,7 +38,7 @@ struct OnboardingThemePickerView: View {
 
             Spacer()
 
-            Button("Continue", action: onNext)
+            Button(L10n.Onboarding.themeContinue, action: onNext)
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
                 .padding(.horizontal, VersoSpacing.lg)
                 .padding(.bottom, VersoSpacing.xl)

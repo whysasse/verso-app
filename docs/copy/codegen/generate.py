@@ -48,6 +48,7 @@ TRUE_PLURAL_KEYS = {
     "filter.unread.accessibilityLabel",
     "filter.reading.accessibilityLabel",
     "filter.read.accessibilityLabel",
+    "filter.archived.accessibilityLabel",
     "dialog.bulkDelete.title",
     "import.done.summary",
     "import.done.skippedSuffix",
@@ -73,6 +74,11 @@ PLURAL_ONE_FORMS = {
         "fr": "Lus, %lld article",
         "pt": "Lidos, %lld artigo",
     },
+    "filter.archived.accessibilityLabel": {
+        "en": "Archived, %lld article",
+        "fr": "Archivés, %lld article",
+        "pt": "Arquivados, %lld artigo",
+    },
     "dialog.bulkDelete.title": {
         "en": "Delete %lld article?",
         "fr": "Supprimer %lld article?",
@@ -90,7 +96,7 @@ PLURAL_ONE_FORMS = {
     },
 }
 
-INTEGER_PLACEHOLDERS = {"N", "count", "points"}
+INTEGER_PLACEHOLDERS = {"N", "count", "points", "size"}
 
 def placeholder_list(s):
     return re.findall(r"\{([^}]+)\}", s)

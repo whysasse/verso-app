@@ -56,15 +56,7 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `onboarding.tour.skip` | Text button | Skip | Ignorer | Pular | — |
 | `onboarding.tour.startReading` | Primary button | Start reading | Commencer à lire | Começar a ler | — |
 
-**Interim keys — currently shipped `QuickTourView.swift`.** The rows above describe a 3-step text carousel with a Skip button. The screen as actually built is a single illustrated screen (Browser → Share → Verso icon row) with one headline/subheadline and a single CTA — no steps, no Skip. Added during step 4 view-wiring pass so the shipped screen can be wired to `L10n.*` without changing its visible content. The CTA reuses `onboarding.tour.startReading` above (case-corrected "Start Reading" → "Start reading" to match). Reconciling the two designs (build the 3-step carousel, or retire it in favor of the illustration) is tracked as **FAB-281** — see `docs/BACKLOG.md`.
-
-| Key | Location | en | fr-CA | pt-BR | Notes |
-|-----|----------|----|-------|-------|-------|
-| `onboarding.tour.illustrationHeadline` | Headline | Save from anywhere | Enregistrez depuis n'importe où | Salve de qualquer lugar | Interim — see note above |
-| `onboarding.tour.illustrationSubheadline` | Subheadline | Tap Share in any browser, pick Verso, and your article is saved automatically. | Touchez Partager dans n'importe quel navigateur, choisissez Verso, et votre article est enregistré automatiquement. | Toque em Compartilhar em qualquer navegador, escolha o Verso, e seu artigo é salvo automaticamente. | Interim — see note above |
-| `onboarding.tour.illustrationBrowserLabel` | Icon caption | Browser | Navigateur | Navegador | Interim — see note above |
-| `onboarding.tour.illustrationShareLabel` | Icon caption | Share | Partager | Compartilhar | Interim — see note above |
-| `onboarding.tour.illustrationVersoLabel` | Icon caption | Verso | Verso | Verso | Invariant — brand name. Interim — see note above |
+QuickTourView now implements the 3-step carousel (FAB-281). The interim illustration keys (`onboarding.tour.illustration*`) are retired — they were removed from the generated artifacts alongside the carousel rewrite and should not be referenced in new code.
 
 ### OB-5 · Analytics Consent
 
@@ -327,12 +319,12 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 |-----|----------|----|-------|-------|-------|
 | `readerSettings.title` | Sheet title | Reading settings | Réglages de lecture | Configurações de leitura | — |
 | `readerSettings.fontSize.sectionLabel` | Section label | Text size | Taille du texte | Tamanho do texto | — |
-| `readerSettings.fontSize.xs` | Step label | XS | XS | XS | **Open question for step 7:** keep universal XS/S/M/L/XL/XXL abbreviations (like clothing sizes) across all locales, rather than translating the letters. Accessibility label translates regardless: "Extra small, 14 points" → fr-CA "Très petit, 14 points" / pt-BR "Extrapequeno, 14 pontos" |
-| `readerSettings.fontSize.s` | Step label | S | S | S | Accessibility label: "Small, 16 points" → fr-CA "Petit, 16 points" / pt-BR "Pequeno, 16 pontos" |
+| `readerSettings.fontSize.xs` | Step label | XS | TPS | PP | Abbreviations translated per locale (FR: Très Petit, PT: Super Pequeno). Accessibility label translates regardless: "Extra small, 14 points" → fr-CA "Très petit, 14 points" / pt-BR "Extrapequeno, 14 pontos" |
+| `readerSettings.fontSize.s` | Step label | S | P | P | Accessibility label: "Small, 16 points" → fr-CA "Petit, 16 points" / pt-BR "Pequeno, 16 pontos" |
 | `readerSettings.fontSize.m` | Step label | M | M | M | Accessibility label: "Medium, 18 points, default" → fr-CA "Moyen, 18 points, par défaut" / pt-BR "Médio, 18 pontos, padrão" |
-| `readerSettings.fontSize.l` | Step label | L | L | L | Accessibility label: "Large, 20 points" → fr-CA "Grand, 20 points" / pt-BR "Grande, 20 pontos" |
-| `readerSettings.fontSize.xl` | Step label | XL | XL | XL | Accessibility label: "Extra large, 22 points" → fr-CA "Très grand, 22 points" / pt-BR "Extragrande, 22 pontos" |
-| `readerSettings.fontSize.xxl` | Step label | XXL | XXL | XXL | Accessibility label: "Extra extra large, 26 points" → fr-CA "Très très grand, 26 points" / pt-BR "Extra extragrande, 26 pontos" |
+| `readerSettings.fontSize.l` | Step label | L | G | G | Accessibility label: "Large, 20 points" → fr-CA "Grand, 20 points" / pt-BR "Grande, 20 pontos" |
+| `readerSettings.fontSize.xl` | Step label | XL | TG | GG | Accessibility label: "Extra large, 22 points" → fr-CA "Très grand, 22 points" / pt-BR "Extragrande, 22 pontos" |
+| `readerSettings.fontSize.xxl` | Step label | XXL | TTG | EEG | Accessibility label: "Extra extra large, 26 points" → fr-CA "Très très grand, 26 points" / pt-BR "Extra extragrande, 26 pontos" |
 | `readerSettings.lineSpacing.sectionLabel` | Section label | Line spacing | Interligne | Espaçamento entre linhas | — |
 | `readerSettings.lineSpacing.compact` | Option label | Compact | Compact | Compacto | — |
 | `readerSettings.lineSpacing.normal` | Option label | Normal | Normal | Normal | — |
@@ -355,6 +347,7 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `settings.font.sectionLabel` | Section label above font list | Font | Police | Fonte | — |
 | `settings.font.preview` | Sample sentence shown per font option | The quick brown fox jumps over the lazy dog | Portez ce vieux whisky au juge blond qui fume | Um pequeno jabuti xereta viu dez cegonhas felizes | Locale-appropriate pangram, not a literal translation — each locale uses its own classic pangram so every letterform is previewed. |
 | `settings.fontSize.sectionLabel` | Section label, stepper row | Size | Taille | Tamanho | — |
+| `settings.fontSize.valueLabel` | Stepper value label (appended after number) | {size}pt | {size}pt | {size}pt | "pt" is a standard typographic abbreviation, invariant across locales. |
 | `settings.section.storage` | Section header | Storage | Stockage | Armazenamento | — |
 | `settings.folder.rowLabel` | Row label | Articles folder | Dossier des articles | Pasta de artigos | Corrected from "Reading folder" to match shipped copy. |
 | `settings.folder.emptyValue` | Row sub-label (no folder set) | Not set | Non défini | Não definida | Corrected from "Not configured" to match shipped copy. |
@@ -419,16 +412,7 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `about.privacyPolicy.rowLabel` | Row label | Privacy policy | Politique de confidentialité | Política de privacidade | — |
 | `about.footer` | Copyright footer | Verso {version} · Built with care | Verso {version} · Conçu avec soin | Verso {version} · Feito com cuidado | `Verso` invariant |
 
-**Interim keys — currently shipped `AboutView.swift`.** The rows above describe the target design (version row, acknowledgements row, footer). The screen as actually built is simpler — a header (brand name, version, description) plus two link rows, no acknowledgements row or footer, nav title "About" not "About Verso". Added during step 4 view-wiring pass so the shipped screen can be wired to `L10n.*` without changing its visible text. Rebuilding the screen to match the spec rows above is tracked as **FAB-279** — see `docs/BACKLOG.md`. Once that ships, these interim keys should be deleted.
-
-| Key | Location | en | fr-CA | pt-BR | Notes |
-|-----|----------|----|-------|-------|-------|
-| `about.navTitle` | Nav bar title (current, shipped) | About | À propos | Sobre | Interim — see note above. Spec value is `about.title` ("About Verso") |
-| `about.brandName` | Header brand text | Verso | Verso | Verso | Invariant — brand name |
-| `about.versionLabel` | Header version line | Version {version} | Version {version} | Versão {version} | digits/format unchanged across locales |
-| `about.description` | Header description | A minimalist reader for saving and reading articles, offline and distraction-free. | Un lecteur minimaliste pour enregistrer et lire des articles, hors ligne et sans distraction. | Um leitor minimalista para salvar e ler artigos, offline e sem distrações. | — |
-| `about.githubLinkLabel` | GitHub row label | GitHub | GitHub | GitHub | Invariant — brand name |
-| `about.privacyPolicyLinkLabel` | Privacy Policy row label | Privacy Policy | Politique de confidentialité | Política de Privacidade | — |
+AboutView was rebuilt to match this spec (FAB-279). The interim keys (`about.navTitle`, `about.brandName`, `about.versionLabel`, `about.description`, `about.githubLinkLabel`, `about.privacyPolicyLinkLabel`) are retired — the view now uses the spec keys above.
 
 ---
 

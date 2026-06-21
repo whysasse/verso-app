@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**30 open issues** across iOS, Web, Design, and Infra.
+**26 open issues** across iOS, Web, Design, and Infra.
 
 ## iOS
 
@@ -224,55 +224,6 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   **In-app Add Article:** Same duplicate UI and write paths for parity.
 
   **Docs:** `docs/copy/UI_COPY.md` (share.duplicate.\*), `docs/ANALYTICS_STRATEGY.md`.
-
-- [ ] 🟡 **FAB-279** · Rebuild AboutView.swift to match UI_COPY.md §6 spec  `Backlog` `Medium`
-  ## Root cause
-
-  `docs/copy/UI_COPY.md` §6 documents a richer About screen (`about.title` = "About Verso", a Version row, an Open-source acknowledgements row, and a "Verso {version} · Built with care" footer). The shipped `AboutView.swift` is simpler: a header (brand name + version + description paragraph) and two link rows (GitHub, Privacy Policy), nav title "About". No acknowledgements row, no footer.
-
-  Found during the localization step-4 view-wiring pass. Rather than force the shipped screen's literal text into the mismatched spec keys, interim keys (`about.navTitle`, `about.brandName`, `about.versionLabel`, `about.description`, `about.githubLinkLabel`, `about.privacyPolicyLinkLabel`) were added to UI_COPY.md §6 so the current screen could be wired to `L10n.*` without changing its visible output.
-
-  ## Scope
-
-  - [ ] Add an "Open-source acknowledgements" row (needs a destination — list of dependencies/licenses, e.g. swift-markdown, Down, etc.)
-  - [ ] Restructure version display from header line to a row label (`about.version.rowLabel`), sub-label `{version} ({build})`
-  - [ ] Add footer "Verso {version} · Built with care" (`about.footer`)
-  - [ ] Update nav title "About" → "About Verso" (`about.title`)
-  - [ ] Re-wire screen to the original spec keys (`about.title`, `about.version.rowLabel`, `about.acknowledgements.rowLabel`, `about.github.rowLabel`, `about.privacyPolicy.rowLabel`, `about.footer`) and delete the interim keys above once done
-
-  ## Depends on
-
-  Design input on the acknowledgements row destination (new screen vs. external link).
-
-
-- [ ] 🔵 **FAB-280** · Add Obsidian tip to OnboardingFolderPickerView  `Backlog` `Low`
-  ## Root cause
-
-  `docs/copy/UI_COPY.md` §1 OB-3 documents an "Using Obsidian? Point Verso to a folder inside your vault…" tip (`onboarding.folder.obsidianTip`) for the folder-setup onboarding step. `OnboardingFolderPickerView.swift` never shows it — found during the localization step-4 view-wiring pass.
-
-  ## Scope
-
-  - [ ] Add the tip text below the folder-picker row (or wherever design prefers), conditionally or always shown
-  - [ ] Wire to the existing `onboarding.folder.obsidianTip` key (already translated, no doc changes needed)
-
-
-- [ ] 🟡 **FAB-281** · Reconcile QuickTourView.swift with UI_COPY.md §1 OB-4 spec  `Backlog` `Medium`
-  ## Root cause
-
-  `docs/copy/UI_COPY.md` §1 OB-4 documents a 3-step text carousel ("Here's how it works" / step1 / step2 / step3 / Skip / Start reading). The shipped `QuickTourView.swift` is a single illustrated screen (Browser → Share → Verso icon row, one headline/subheadline, one CTA, no Skip).
-
-  Found during the localization step-4 view-wiring pass. Interim keys (`onboarding.tour.illustrationHeadline`, `illustrationSubheadline`, `illustrationBrowserLabel`, `illustrationShareLabel`, `illustrationVersoLabel`) were added to UI_COPY.md §1 OB-4 so the current screen could be wired to `L10n.*` without changing its visible content.
-
-  ## Scope
-
-  - [ ] Decide: build the documented 3-step carousel (with Skip), or retire those rows in favor of the shipped single-illustration screen
-  - [ ] If keeping the illustration: delete `onboarding.tour.headline`/`step1`/`step2`/`step3`/`skip` from UI_COPY.md, keep `startReading` (already reused) and promote the interim keys to non-interim
-  - [ ] If building the carousel: implement steps + Skip in `QuickTourView.swift`, wire to the original spec keys, delete the interim keys
-
-  ## Depends on
-
-  Design call on which version ships.
-
 
 - [ ] 🟡 **FAB-164** · Fix GoodLinks JSON backup import (native export format)  `In Review` `Medium`
   ## Root cause
@@ -550,9 +501,11 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   - [x] **1 · Strategy & decisions doc** → [whysasse/verso-app#315](https://linear.app/fabiosasseron/issue/FAB-276/l10n-1-finalize-localization-strategy-and-decisions-doc). Ratify `docs/LOCALIZATION.md`; link from `HANDOFF.md`. *(foundation — blocks 3)* — **Done 2026-06-17**, see [DONE.md](DONE.md).
   - [ ] **2 · Locale-aware formatting** (dates, reading-time, TTS voice). Independent — can run early/parallel. iOS + Web. Replace hard-coded `MMM d, yyyy`; centralize `WPM = 220`; TTS voice follows article content language. *Done: no date/number/reading-time/TTS string locked to one locale; checked in all 3 locales.* — **iOS: done** (`WPM = 220` centralized in `ReadingEstimate.swift`; TTS voice follows content language in `TTSService.swift`; `ArticleHeader.swift` date style corrected `.long` → `.medium` 2026-06-17 to match spec). **Remaining:** Web has no date/reading-time UI yet (screens not built); full "checked in all 3 locales" verification blocked on step 7 translations.
   - [x] **3 · Shared, platform-neutral string source.** *Blocked by 1.* Extend `UI_COPY.md` keys with `en` / `fr-CA` / `pt-BR` (table columns or a generated `strings.json`); same key namespace feeds iOS + Web. Add invariant list + plural categories. *Done: one keyed source both platforms consume.* — **Done 2026-06-21.** `docs/copy/UI_COPY.md` has full `en`/`fr-CA`/`pt-BR` columns for all ~262 keys; `docs/copy/codegen/generate.py` generates `Localizable.xcstrings` + `L10n.swift` from it (verified zero drift on regeneration). Web still needs to consume this source — that's step 5.
-  - [x] **4 · iOS i18n infrastructure.** *Blocked by 3.* Adopt **String Catalog (**`.xcstrings`**)**; wire keys; encode plural variations natively. *Done: app builds localized; pseudolocale switch works.* — **Done 2026-06-21.** `Localizable.xcstrings` + `L10n.swift` generated and registered in `project.yml` for the `Verso` and `ShareExtension` targets (see [FAB-282](DONE.md)); ~20 views wired to `L10n.*` accessors; CLDR plural variants encoded for the 6 true-plural keys. **Remaining:** pseudolocale switch itself isn't built yet — that's step 6's job, not re-litigated here.
-  - [x] **5 · Web i18n infrastructure.** *Blocked by 3.* Adopt **next-intl**; `messages/<locale>.json` keyed identically to iOS; ICU plurals; locale routing/detection. *Done: web renders per-locale strings.* — **Done 2026-06-21.** `next-intl` installed (cookie-based locale, no `[locale]` routing — see `docs/plans/FAB-275-step5-web-i18n-infra.md` for why); `LocaleProvider` mirrors `ThemeProvider`; `generate.py` now also emits `verso-web/messages/{en,fr-CA,pt-BR}.json` (284 keys, confirmed idempotent); all Web components (`FilterChipBar`, `EmptyState`, `SearchBar`, `LoadingState`, `ArticleCard`, `page.tsx`, `article/[id]/page.tsx`) wired to `useTranslations`, zero hardcoded UI strings remain. **Per Fabio's call:** rather than wiring interim keys around the mismatch, Web's copy was rewritten to match the iOS-authored `UI_COPY.md` wherever an equivalent existed (search placeholder, loading label, empty states, theme/font names); ~22 new `web.*`-namespaced and empty-state keys were added for genuine Web-only surfaces (font-family picker, unsupported-browser screen, reader error states) with no iOS equivalent. Also fixed two spots where Web hardcoded `en-CA` for dates regardless of active UI locale (`ArticleCard.tsx`, `article/[id]/page.tsx`) — now locale-aware via `Intl.DateTimeFormat`. `npm run build` succeeds (verified in a clean copy outside the sandbox's FUSE-mounted folder, which has a known EPERM quirk on `.next`/`.git` cleanup — non-blocking, doesn't affect compiled output); all 192 namespace-resolved `t()` call sites checked programmatically across all 3 locales, zero missing keys. **Remaining for step 6:** `home.empty.noArticles.subheadline` ("Share an article from Safari to get started.") now also surfaces on Web's all-filter empty state even though Web has no Safari share-extension workflow — flagged here, not yet resolved; worth a look whenever step 6/7 touches empty states again.
+  - [x] **4 · iOS i18n infrastructure.** *Blocked by 3.* Adopt **String Catalog (**`.xcstrings`**)**; wire keys; encode plural variations natively. *Done: app builds localized; pseudolocale switch works.* — **Done 2026-06-21.** `Localizable.xcstrings` + `L10n.swift` generated and registered in `project.yml` for the `Verso` and `ShareExtension` targets (see [FAB-282](DONE.md)); ~20 views wired to `L10n.*` accessors; CLDR plural variants encoded for the 7 true-plural keys. **Remaining:** pseudolocale switch itself isn't built yet — that's step 6's job, not re-litigated here.
+  - [x] **5 · Web i18n infrastructure.** *Blocked by 3.* Adopt **next-intl**; `messages/<locale>.json` keyed identically to iOS; ICU plurals; locale routing/detection. *Done: web renders per-locale strings.* — **Done 2026-06-21.** `next-intl` installed (cookie-based locale, no `[locale]` routing — see `docs/plans/FAB-275-step5-web-i18n-infra.md` for why); `LocaleProvider` mirrors `ThemeProvider`; `generate.py` now also emits `verso-web/messages/{en,fr-CA,pt-BR}.json` (284 keys originally; 274 after Phase A cleanup of retired interim keys); all Web components (`FilterChipBar`, `EmptyState`, `SearchBar`, `LoadingState`, `ArticleCard`, `page.tsx`, `article/[id]/page.tsx`) wired to `useTranslations`, zero hardcoded UI strings remain. **Per Fabio's call:** rather than wiring interim keys around the mismatch, Web's copy was rewritten to match the iOS-authored `UI_COPY.md` wherever an equivalent existed (search placeholder, loading label, empty states, theme/font names); ~22 new `web.*`-namespaced and empty-state keys were added for genuine Web-only surfaces (font-family picker, unsupported-browser screen, reader error states) with no iOS equivalent. Also fixed two spots where Web hardcoded `en-CA` for dates regardless of active UI locale (`ArticleCard.tsx`, `article/[id]/page.tsx`) — now locale-aware via `Intl.DateTimeFormat`. `npm run build` succeeds (verified in a clean copy outside the sandbox's FUSE-mounted folder, which has a known EPERM quirk on `.next`/`.git` cleanup — non-blocking, doesn't affect compiled output); all 192 namespace-resolved `t()` call sites checked programmatically across all 3 locales, zero missing keys. **Remaining for step 6:** `home.empty.noArticles.subheadline` ("Share an article from Safari to get started.") now also surfaces on Web's all-filter empty state even though Web has no Safari share-extension workflow — flagged here, not yet resolved; worth a look whenever step 6/7 touches empty states again.
   - [ ] **6 · Pseudolocalization + layout flex QA.** *Blocked by 4 & 5.* Run +30% accented pseudolocale; fix truncation. Highest risk: **filter chips** (En cours / Non lus), buttons, share-sheet save states. Update `COMPONENT_SPECS.md`. *Done: no truncation/overflow in pseudolocale on either platform.*
+
+        **Phase A prep (2026-06-21):** codegen now correctly handles `filter.archived.accessibilityLabel` in TRUE_PLURAL_KEYS (was missing, producing "Archived, 1 articles"); `OnboardingThemePickerView` wired to `L10n.*` (FAB-283); `QuickTourView` rebuilt as 3-step carousel with Skip (FAB-281); Obsidian tip added to `OnboardingFolderPickerView` (FAB-280); `AboutView` rebuilt per spec + new `AcknowledgementsView` (FAB-279); font-size abbreviation labels translated per locale; `settings.fontSize.valueLabel` key added for "pt" suffix; 10 retired interim keys cleaned up. All changes verified via Web build. See DONE.md for completed issues.*
   - [ ] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** *Blocked by 6.* Québec French + Brazilian Portuguese. Verify plurals (esp. the 0-case), accents, and that **OpenDyslexic** renders ç ã õ â ê é à ü at all six reading sizes. *Done: both locales fully translated and QA'd.*
   - [ ] **8 · App Store metadata + Québec/Bill 96.** *Blocked by 7.* Localize store listing (name, subtitle, description, keywords, screenshots) for fr-CA + pt-BR; confirm Québec French-language compliance posture for distribution. *Done: localized listings ready; compliance confirmed.*
 

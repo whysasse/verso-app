@@ -529,126 +529,6 @@
         }
       }
     },
-    "onboarding.tour.illustrationHeadline": {
-      "extractionState": "manual",
-      "comment": "Interim — see note above",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save from anywhere"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Enregistrez depuis n'importe où"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Salve de qualquer lugar"
-          }
-        }
-      }
-    },
-    "onboarding.tour.illustrationSubheadline": {
-      "extractionState": "manual",
-      "comment": "Interim — see note above",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap Share in any browser, pick Verso, and your article is saved automatically."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Touchez Partager dans n'importe quel navigateur, choisissez Verso, et votre article est enregistré automatiquement."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Toque em Compartilhar em qualquer navegador, escolha o Verso, e seu artigo é salvo automaticamente."
-          }
-        }
-      }
-    },
-    "onboarding.tour.illustrationBrowserLabel": {
-      "extractionState": "manual",
-      "comment": "Interim — see note above",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browser"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Navigateur"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Navegador"
-          }
-        }
-      }
-    },
-    "onboarding.tour.illustrationShareLabel": {
-      "extractionState": "manual",
-      "comment": "Interim — see note above",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Share"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Partager"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Compartilhar"
-          }
-        }
-      }
-    },
-    "onboarding.tour.illustrationVersoLabel": {
-      "extractionState": "manual",
-      "comment": "Invariant — brand name. Interim — see note above",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verso"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verso"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verso"
-          }
-        }
-      }
-    },
     "onboarding.analyticsConsent.headline": {
       "extractionState": "manual",
       "comment": "Added during step 4 view-wiring pass — missed in the original audit.",
@@ -1578,21 +1458,57 @@
       "comment": "⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`.",
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Archived, %lld articles"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Archived, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Archived, %lld articles"
+                }
+              }
+            }
           }
         },
         "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Archivés, %lld articles"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Archivés, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Archivés, %lld articles"
+                }
+              }
+            }
           }
         },
         "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Arquivados, %lld artigos"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Arquivados, %lld artigo"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Arquivados, %lld artigos"
+                }
+              }
+            }
           }
         }
       }
@@ -3771,7 +3687,7 @@
     },
     "readerSettings.fontSize.xs": {
       "extractionState": "manual",
-      "comment": "**Open question for step 7:** keep universal XS/S/M/L/XL/XXL abbreviations (like clothing sizes) across all locales, rather than translating the letters. Accessibility label translates regardless: \"Extra small, 14 points\" → fr-CA \"Très petit, 14 points\" / pt-BR \"Extrapequeno, 14 pontos\"",
+      "comment": "Abbreviations translated per locale (FR: Très Petit, PT: Super Pequeno). Accessibility label translates regardless: \"Extra small, 14 points\" → fr-CA \"Très petit, 14 points\" / pt-BR \"Extrapequeno, 14 pontos\"",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3782,13 +3698,13 @@
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "XS"
+            "value": "TPS"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "XS"
+            "value": "PP"
           }
         }
       }
@@ -3806,13 +3722,13 @@
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "S"
+            "value": "P"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "S"
+            "value": "P"
           }
         }
       }
@@ -3854,13 +3770,13 @@
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "L"
+            "value": "G"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "L"
+            "value": "G"
           }
         }
       }
@@ -3878,13 +3794,13 @@
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "XL"
+            "value": "TG"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "XL"
+            "value": "GG"
           }
         }
       }
@@ -3902,13 +3818,13 @@
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "XXL"
+            "value": "TTG"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "XXL"
+            "value": "EEG"
           }
         }
       }
@@ -4221,6 +4137,30 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Tamanho"
+          }
+        }
+      }
+    },
+    "settings.fontSize.valueLabel": {
+      "extractionState": "manual",
+      "comment": "\"pt\" is a standard typographic abbreviation, invariant across locales.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldpt"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldpt"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldpt"
           }
         }
       }
@@ -5133,150 +5073,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verso %@ · Feito com cuidado"
-          }
-        }
-      }
-    },
-    "about.navTitle": {
-      "extractionState": "manual",
-      "comment": "Interim — see note above. Spec value is `about.title` (\"About Verso\")",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "About"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "À propos"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Sobre"
-          }
-        }
-      }
-    },
-    "about.brandName": {
-      "extractionState": "manual",
-      "comment": "Invariant — brand name",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verso"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verso"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verso"
-          }
-        }
-      }
-    },
-    "about.versionLabel": {
-      "extractionState": "manual",
-      "comment": "digits/format unchanged across locales",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Version %@"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Version %@"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Versão %@"
-          }
-        }
-      }
-    },
-    "about.description": {
-      "extractionState": "manual",
-      "comment": "Header description",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A minimalist reader for saving and reading articles, offline and distraction-free."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Un lecteur minimaliste pour enregistrer et lire des articles, hors ligne et sans distraction."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Um leitor minimalista para salvar e ler artigos, offline e sem distrações."
-          }
-        }
-      }
-    },
-    "about.githubLinkLabel": {
-      "extractionState": "manual",
-      "comment": "Invariant — brand name",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub"
-          }
-        }
-      }
-    },
-    "about.privacyPolicyLinkLabel": {
-      "extractionState": "manual",
-      "comment": "Privacy Policy row label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Privacy Policy"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Politique de confidentialité"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Política de Privacidade"
           }
         }
       }

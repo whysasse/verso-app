@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**150 completed issues.**
+**154 completed issues.**
 
 ## iOS
 
@@ -1790,4 +1790,24 @@
   ## Unblocks
 
   Step 3 of the localization epic (shared platform-neutral string source).
+
+- [x] 🟡 **FAB-279** · Rebuild AboutView.swift to match UI_COPY.md §6 spec  `Done` `Medium`
+  Restructured AboutView per spec: nav title "About Verso", Version row with `{version} ({build})` sub-label, Open-source acknowledgements row pushing to new `AcknowledgementsView`, View on GitHub row, Privacy policy row, and "Verso {version} · Built with care" footer. Retired the interim keys (`about.navTitle`, `about.brandName`, `about.versionLabel`, `about.description`, `about.githubLinkLabel`, `about.privacyPolicyLinkLabel`). New `AcknowledgementsView.swift` lists SwiftSoup, TelemetryClient, and Readability.js with their licenses.
+
+  **Completed:** 2026-06-21.
+
+- [x] 🔵 **FAB-280** · Add Obsidian tip to OnboardingFolderPickerView  `Done` `Low`
+  Added `L10n.Onboarding.folderObsidianTip` below the folder-picker row in `OnboardingFolderPickerView.swift`.
+
+  **Completed:** 2026-06-21.
+
+- [x] 🟡 **FAB-281** · Reconcile QuickTourView.swift with UI_COPY.md §1 OB-4 spec  `Done` `Medium`
+  Rebuilt `QuickTourView.swift` as a 3-step TabView carousel with Skip button, step page dots, and per-step SF Symbol illustrations. Wired to spec keys (`onboarding.tour.headline`, `step1`–`step3`, `skip`, `startReading`). Retired the interim illustration keys (`onboarding.tour.illustration*`).
+
+  **Completed:** 2026-06-21.
+
+- [x] 🟢 **FAB-283** · Wire `OnboardingThemePickerView.swift` hardcoded strings to `L10n.*`  `Done` `Low`
+  Replaced 3 hardcoded strings (`Text("Choose your theme")`, `Text("You can always change this later in Settings.")`, `Button("Continue")`) with `L10n.Onboarding.themeHeadline`, `themeSubheadline`, `themeContinue`.
+
+  **Completed:** 2026-06-21.
 
