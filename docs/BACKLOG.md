@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**28 open issues** across iOS, Web, Design, and Infra.
+**29 open issues** across iOS, Web, Design, and Infra.
 
 ## iOS
 
@@ -542,8 +542,8 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
   - [x] **1 · Strategy & decisions doc** → [whysasse/verso-app#315](https://linear.app/fabiosasseron/issue/FAB-276/l10n-1-finalize-localization-strategy-and-decisions-doc). Ratify `docs/LOCALIZATION.md`; link from `HANDOFF.md`. *(foundation — blocks 3)* — **Done 2026-06-17**, see [DONE.md](DONE.md).
   - [ ] **2 · Locale-aware formatting** (dates, reading-time, TTS voice). Independent — can run early/parallel. iOS + Web. Replace hard-coded `MMM d, yyyy`; centralize `WPM = 220`; TTS voice follows article content language. *Done: no date/number/reading-time/TTS string locked to one locale; checked in all 3 locales.* — **iOS: done** (`WPM = 220` centralized in `ReadingEstimate.swift`; TTS voice follows content language in `TTSService.swift`; `ArticleHeader.swift` date style corrected `.long` → `.medium` 2026-06-17 to match spec). **Remaining:** Web has no date/reading-time UI yet (screens not built); full "checked in all 3 locales" verification blocked on step 7 translations.
-  - [ ] **3 · Shared, platform-neutral string source.** *Blocked by 1.* Extend `UI_COPY.md` keys with `en` / `fr-CA` / `pt-BR` (table columns or a generated `strings.json`); same key namespace feeds iOS + Web. Add invariant list + plural categories. *Done: one keyed source both platforms consume.*
-  - [ ] **4 · iOS i18n infrastructure.** *Blocked by 3.* Adopt **String Catalog (**`.xcstrings`**)**; wire keys; encode plural variations natively. *Done: app builds localized; pseudolocale switch works.*
+  - [x] **3 · Shared, platform-neutral string source.** *Blocked by 1.* Extend `UI_COPY.md` keys with `en` / `fr-CA` / `pt-BR` (table columns or a generated `strings.json`); same key namespace feeds iOS + Web. Add invariant list + plural categories. *Done: one keyed source both platforms consume.* — **Done 2026-06-21.** `docs/copy/UI_COPY.md` has full `en`/`fr-CA`/`pt-BR` columns for all ~262 keys; `docs/copy/codegen/generate.py` generates `Localizable.xcstrings` + `L10n.swift` from it (verified zero drift on regeneration). Web still needs to consume this source — that's step 5.
+  - [x] **4 · iOS i18n infrastructure.** *Blocked by 3.* Adopt **String Catalog (**`.xcstrings`**)**; wire keys; encode plural variations natively. *Done: app builds localized; pseudolocale switch works.* — **Done 2026-06-21.** `Localizable.xcstrings` + `L10n.swift` generated and registered in `project.yml` for the `Verso` and `ShareExtension` targets (see [FAB-282](DONE.md)); ~20 views wired to `L10n.*` accessors; CLDR plural variants encoded for the 6 true-plural keys. **Remaining:** pseudolocale switch itself isn't built yet — that's step 6's job, not re-litigated here.
   - [ ] **5 · Web i18n infrastructure.** *Blocked by 3.* Adopt **next-intl**; `messages/<locale>.json` keyed identically to iOS; ICU plurals; locale routing/detection. *Done: web renders per-locale strings.*
   - [ ] **6 · Pseudolocalization + layout flex QA.** *Blocked by 4 & 5.* Run +30% accented pseudolocale; fix truncation. Highest risk: **filter chips** (En cours / Non lus), buttons, share-sheet save states. Update `COMPONENT_SPECS.md`. *Done: no truncation/overflow in pseudolocale on either platform.*
   - [ ] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** *Blocked by 6.* Québec French + Brazilian Portuguese. Verify plurals (esp. the 0-case), accents, and that **OpenDyslexic** renders ç ã õ â ê é à ü at all six reading sizes. *Done: both locales fully translated and QA'd.*
