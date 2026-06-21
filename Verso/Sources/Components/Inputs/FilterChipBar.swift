@@ -10,20 +10,22 @@ struct FilterChipBar: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: VersoSpacing.xs) {
                 FilterChip(
-                    label: "All",
+                    label: L10n.Filter.all,
                     count: counts.values.reduce(0, +),
                     isActive: activeFilter == nil,
-                    colors: themeManager.colors
+                    colors: themeManager.colors,
+                    accessibilityLabel: L10n.Filter.allAccessibilityLabel(count: counts.values.reduce(0, +))
                 ) {
                     activeFilter = nil
                 }
 
                 ForEach(ArticleStatus.allCases, id: \.self) { status in
                     FilterChip(
-                        label: status.rawValue,
+                        label: status.filterLabel,
                         count: counts[status, default: 0],
                         isActive: activeFilter == status,
-                        colors: themeManager.colors
+                        colors: themeManager.colors,
+                        accessibilityLabel: status.filterAccessibilityLabel(count: counts[status, default: 0])
                     ) {
                         activeFilter = status
                     }

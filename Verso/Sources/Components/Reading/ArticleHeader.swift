@@ -14,7 +14,7 @@ struct ArticleHeader: View {
 
     private var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .long
+        formatter.dateStyle = .medium
         formatter.timeStyle = .none
         return formatter.string(from: date)
     }
@@ -40,7 +40,7 @@ struct ArticleHeader: View {
             VStack(alignment: .leading, spacing: 4) {
                 if hasAttributionLine {
                     if !authorTrimmed.isEmpty {
-                        Text("By \(authorTrimmed)")
+                        Text(L10n.Reading.headerByline(author: authorTrimmed))
                             .font(.system(size: 15))
                     } else {
                         Text(publicationTrimmed)
@@ -53,7 +53,7 @@ struct ArticleHeader: View {
                     if let readTime {
                         Text("·")
                             .font(.system(size: 13))
-                        Text("\(readTime) min read")
+                        Text(L10n.ArticleCard.estimatedReadTime(count: readTime))
                             .font(.system(size: 13))
                     }
                 }

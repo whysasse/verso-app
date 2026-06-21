@@ -42,7 +42,7 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity)
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: "Settings")
+        .versoNavigationBar(title: L10n.Settings.title)
         .sheet(isPresented: $showImport) {
             ImportView()
                 .environmentObject(themeManager)
@@ -56,21 +56,21 @@ struct SettingsView: View {
             }
         }
         .confirmationDialog(
-            "Move your existing articles to the new folder?",
+            L10n.Dialog.changeFolderTitle,
             isPresented: $showMoveDialog,
             titleVisibility: .visible
         ) {
-            Button("Move Articles") {
+            Button(L10n.Dialog.changeFolderYes) {
                 guard let url = pendingNewURL else { return }
                 Task { await switchFolder(to: url, move: true) }
             }
-            Button("Keep in Old Folder") {
+            Button(L10n.Dialog.changeFolderNo) {
                 guard let url = pendingNewURL else { return }
                 Task { await switchFolder(to: url, move: false) }
             }
-            Button("Cancel", role: .cancel) { pendingNewURL = nil }
+            Button(L10n.Dialog.changeFolderCancel, role: .cancel) { pendingNewURL = nil }
         } message: {
-            Text("Your old folder won't be touched if you choose No.")
+            Text(L10n.Dialog.changeFolderMessage)
         }
     }
 
@@ -78,17 +78,17 @@ struct SettingsView: View {
 
     private var readingSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            sectionHeader("Reading")
+            sectionHeader(L10n.Settings.sectionReading)
 
             // Font picker
-            sectionLabel("Font")
+            sectionLabel(L10n.Settings.fontSectionLabel)
             VStack(spacing: 0) {
                 ForEach(availableFonts, id: \.name) { font in
                     let isSelected = readingPreferences.fontFamily == font.name
                     SettingsRow(
                         type: .font(
                             name: font.displayName,
-                            preview: "The quick brown fox jumps over the lazy dog",
+                            preview: L10n.Settings.fontPreview,
                             isSelected: isSelected
                         ),
                         action: { readingPreferences.fontFamily = font.name }
@@ -104,7 +104,7 @@ struct SettingsView: View {
 
             // Font size
             HStack {
-                Text("Size")
+                Text(L10n.Settings.fontSizeSectionLabel)
                     .font(VersoTypography.UI.input)
                     .foregroundColor(colors.textPrimary)
                 Spacer()
@@ -143,7 +143,7 @@ struct SettingsView: View {
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
             // Theme
-            sectionLabel("Theme")
+            sectionLabel(L10n.ReaderSettings.themeSectionLabel)
             SettingsRow(type: .theme)
                 .padding(.horizontal, VersoSpacing.md)
                 .padding(.bottom, VersoSpacing.sm)
@@ -152,11 +152,11 @@ struct SettingsView: View {
 
     private var storageSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            sectionHeader("Storage")
+            sectionHeader(L10n.Settings.sectionStorage)
 
-            let folderPath = folderBookmarkService.folderURL?.lastPathComponent ?? "Not set"
+            let folderPath = folderBookmarkService.folderURL?.lastPathComponent ?? L10n.Settings.folderEmptyValue
             SettingsRow(
-                type: .folder(label: "Articles folder", path: folderPath),
+                type: .folder(label: L10n.Settings.folderRowLabel, path: folderPath),
                 action: { showFolderPicker = true }
             )
             .padding(.horizontal, VersoSpacing.md)
@@ -164,7 +164,7 @@ struct SettingsView: View {
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
             SettingsRow(
-                type: .default(label: "Import Articles"),
+                type: .default(label: L10n.Settings.importRowLabel),
                 action: { showImport = true }
             )
             .padding(.horizontal, VersoSpacing.md)
@@ -173,10 +173,10 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            sectionHeader("About")
+            sectionHeader(L10n.Settings.sectionAbout)
 
             NavigationLink(destination: AboutView()) {
-                SettingsRow(type: .default(label: "Version \(appVersion)"), usesButtonChrome: false)
+                SettingsRow(type: .default(label: L10n.Settings.aboutVersionRowLabel(version: appVersion)), usesButtonChrome: false)
                     .padding(.horizontal, VersoSpacing.md)
             }
             .buttonStyle(.plain)
@@ -184,7 +184,7 @@ struct SettingsView: View {
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
             NavigationLink(destination: PrivacyPolicyView()) {
-                SettingsRow(type: .default(label: "Privacy Policy"), usesButtonChrome: false)
+                SettingsRow(type: .default(label: L10n.Settings.privacyPolicyRowLabel), usesButtonChrome: false)
                     .padding(.horizontal, VersoSpacing.md)
             }
             .buttonStyle(.plain)
@@ -193,14 +193,14 @@ struct SettingsView: View {
 
     private var privacySection: some View {
         VStack(alignment: .leading, spacing: 0) {
-            sectionHeader("Privacy")
+            sectionHeader(L10n.Settings.sectionPrivacy)
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Share anonymous data")
+                    Text(L10n.Settings.analyticsRowLabel)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.textPrimary)
-                    Text("No personal info or article content, ever.")
+                    Text(L10n.Settings.analyticsSubtitle)
                         .font(VersoTypography.UI.caption)
                         .foregroundColor(colors.textSecondary)
                 }

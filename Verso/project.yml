@@ -19,6 +19,7 @@ targets:
     platform: iOS
     sources:
       - Sources
+      - Generated
       - Shared
       - Resources
       - Model
@@ -85,6 +86,7 @@ targets:
     bundleId: com.fabiosasseron.verso.ShareExtension
     sources:
       - ShareExtension/Sources
+      - Generated
       - Shared
     dependencies:
       - package: SwiftSoup

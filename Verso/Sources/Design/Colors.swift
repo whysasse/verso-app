@@ -8,6 +8,18 @@ enum VersoTheme: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// Localized, user-facing label. `rawValue` stays a stable, English, non-localized
+    /// identifier -- used for `UserDefaults` persistence and analytics -- so this is the
+    /// only thing views should put in `Text(...)`.
+    var displayName: String {
+        switch self {
+        case .paper: return L10n.Theme.paper
+        case .sepia: return L10n.Theme.sepia
+        case .night: return L10n.Theme.night
+        case .ink:   return L10n.Theme.ink
+        }
+    }
+
     var isDark: Bool {
         switch self {
         case .paper, .sepia: return false
@@ -130,6 +142,41 @@ enum ArticleStatus: String, CaseIterable {
     case read = "Read"
     case archived = "Archived"
 
+    /// Localized filter-chip label. `rawValue` stays a stable, English, non-localized
+    /// identifier -- this is the only thing views should put in `Text(...)`.
+    var filterLabel: String {
+        switch self {
+        case .unread:   return L10n.Filter.unread
+        case .reading:  return L10n.Filter.reading
+        case .read:     return L10n.Filter.read
+        case .archived: return L10n.Filter.archived
+        }
+    }
+
+    /// Localized VoiceOver label for a filter chip, e.g. "Unread, 5 articles".
+    func filterAccessibilityLabel(count: Int) -> String {
+        switch self {
+        case .unread:   return L10n.Filter.unreadAccessibilityLabel(count: count)
+        case .reading:  return L10n.Filter.readingAccessibilityLabel(count: count)
+        case .read:     return L10n.Filter.readAccessibilityLabel(count: count)
+        case .archived: return L10n.Filter.archivedAccessibilityLabel(count: count)
+        }
+    }
+
+    /// Localized status-badge label, e.g. for `StatusBadge`'s VoiceOver text. Singular
+    /// agreement (describes one article) -- distinct from `filterLabel`'s plural chip text.
+    /// `StatusBadge` only ever receives `.unread`/`.reading`/`.read` (callers map `.archived`
+    /// to `.read` for display), so there's no `.archived` case in the doc's Status Badges
+    /// section -- falls back to `filterLabel` if that ever changes.
+    var statusLabel: String {
+        switch self {
+        case .unread:   return L10n.Status.unread
+        case .reading:  return L10n.Status.reading
+        case .read:     return L10n.Status.read
+        case .archived: return filterLabel
+        }
+    }
+
     // Badge background color.
     var color: Color {
         switch self {
@@ -144,7 +191,7 @@ enum ArticleStatus: String, CaseIterable {
     var icon: String {
         switch self {
         case .unread:   return "circle"
-        case .reading:  return "book.open"
+        case .reading:  return "book.pages"
         case .read:     return "checkmark"
         case .archived: return "archivebox"
         }

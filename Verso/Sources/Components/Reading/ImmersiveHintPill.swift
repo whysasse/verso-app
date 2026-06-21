@@ -5,7 +5,7 @@ struct ImmersiveHintPill: View {
 
     var body: some View {
         if isVisible {
-            Text("Tap anywhere to reveal")
+            Text(L10n.Reading.immersiveHint)
                 .font(.system(size: 13))
                 .foregroundColor(.white)
                 .padding(.horizontal, 14)

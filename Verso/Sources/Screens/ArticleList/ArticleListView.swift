@@ -11,6 +11,18 @@ private enum ArticleListDatePreset: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// User-facing text. `rawValue` stays a stable, English, non-localized identifier --
+    /// it doubles as this enum's Identifiable id and feeds `listFetchIdentity`'s cache-key
+    /// signature, so localizing it directly would tie cache invalidation to locale.
+    var displayLabel: String {
+        switch self {
+        case .any: return L10n.Home.dateFilterAny
+        case .week: return L10n.Home.dateFilterWeek
+        case .month: return L10n.Home.dateFilterMonth
+        case .year: return L10n.Home.dateFilterYear
+        }
+    }
+
     /// Lower bound for `dateAdded` (inclusive). `nil` means no restriction.
     var intervalStart: Date? {
         switch self {
@@ -35,6 +47,8 @@ private extension ArticleStatus {
 }
 
 struct ArticleListView: View {
+    /// Owned by `VersoMainSplitView`; binding it into this List's `selection:` is what lets
+    /// NavigationSplitView auto-collapse to the detail column on iPhone when a row is tapped.
     @Binding var selectedArticle: Article?
 
     @EnvironmentObject var themeManager: ThemeManager
@@ -105,7 +119,7 @@ struct ArticleListView: View {
 
                 // Outside `.id(listFetchIdentity)` so typing doesn’t recreate this view and drop keyboard focus.
                 HStack(spacing: VersoSpacing.sm) {
-                    SearchBar(text: $searchText, placeholder: "Search titles, text, or site…")
+                    SearchBar(text: $searchText, placeholder: L10n.Home.searchPlaceholder)
                         .environmentObject(themeManager)
 
                     Button {
@@ -130,7 +144,7 @@ struct ArticleListView: View {
                             }
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Filter by tags")
+                    .accessibilityLabel(L10n.Home.tagFilterButtonAccessibilityLabel)
                 }
                 .padding(.horizontal, VersoSpacing.md)
                 .padding(.top, VersoSpacing.md)
@@ -138,13 +152,13 @@ struct ArticleListView: View {
                 ArticleListFetchedBody(
                     listGeometry: listGeometry,
                     listPredicate: listPredicate,
+                    selectedArticle: $selectedArticle,
                     searchText: $searchText,
                     activeFilter: $activeFilter,
                     datePreset: $datePreset,
                     selectedTags: $selectedTags,
                     isSelecting: $isSelecting,
                     selectedArticleIds: $selectedArticleIds,
-                    selectedArticle: $selectedArticle,
                     confirmBulkDelete: $confirmBulkDelete,
                     statusCounts: statusCounts,
                     showFolderPicker: $showFolderPicker,
@@ -239,13 +253,13 @@ private struct ArticleListFetchedBody: View {
     let listGeometry: GeometryProxy
     let listPredicate: NSPredicate
 
+    @Binding var selectedArticle: Article?
     @Binding var searchText: String
     @Binding var activeFilter: ArticleStatus?
     @Binding var datePreset: ArticleListDatePreset
     @Binding var selectedTags: Set<String>
     @Binding var isSelecting: Bool
     @Binding var selectedArticleIds: Set<UUID>
-    @Binding var selectedArticle: Article?
     @Binding var confirmBulkDelete: Bool
 
     let statusCounts: [ArticleStatus: Int]
@@ -264,13 +278,13 @@ private struct ArticleListFetchedBody: View {
     init(
         listGeometry: GeometryProxy,
         listPredicate: NSPredicate,
+        selectedArticle: Binding<Article?>,
         searchText: Binding<String>,
         activeFilter: Binding<ArticleStatus?>,
         datePreset: Binding<ArticleListDatePreset>,
         selectedTags: Binding<Set<String>>,
         isSelecting: Binding<Bool>,
         selectedArticleIds: Binding<Set<UUID>>,
-        selectedArticle: Binding<Article?>,
         confirmBulkDelete: Binding<Bool>,
         statusCounts: [ArticleStatus: Int],
         showFolderPicker: Binding<Bool>,
@@ -279,13 +293,13 @@ private struct ArticleListFetchedBody: View {
     ) {
         self.listGeometry = listGeometry
         self.listPredicate = listPredicate
+        _selectedArticle = selectedArticle
         _searchText = searchText
         _activeFilter = activeFilter
         _datePreset = datePreset
         _selectedTags = selectedTags
         _isSelecting = isSelecting
         _selectedArticleIds = selectedArticleIds
-        _selectedArticle = selectedArticle
         _confirmBulkDelete = confirmBulkDelete
         self.statusCounts = statusCounts
         _showFolderPicker = showFolderPicker
@@ -320,8 +334,27 @@ private struct ArticleListFetchedBody: View {
         return false
     }
 
+    @ViewBuilder
+    private func rowLabel(for article: Article) -> some View {
+        HStack(alignment: .top, spacing: VersoSpacing.sm) {
+            if isSelecting {
+                Image(systemName: selectedArticleIds.contains(article.id) ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22))
+                    .foregroundColor(themeManager.colors.accent)
+                    .padding(.top, 4)
+            }
+            ArticleCard(article: article)
+        }
+    }
+
     var body: some View {
-        List {
+        // `selection:` (not a plain List) is what makes NavigationSplitView auto-collapse to the
+        // detail column on iPhone when a row is tapped — see the comment on `selectedArticle` in
+        // VersoMainSplitView for why a NavigationLink/navigationDestination pair across columns
+        // doesn't work here. While bulk-select mode is active, taps should toggle checkboxes
+        // instead of opening an article, so the binding writes nowhere (`.constant(nil)`) and the
+        // checkbox Button below handles the tap itself.
+        List(selection: isSelecting ? .constant(nil) : $selectedArticle) {
             dateFilterRow
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
@@ -343,28 +376,29 @@ private struct ArticleListFetchedBody: View {
                     .listRowSeparator(.hidden)
             } else {
                 ForEach(filteredArticles) { article in
-                    Button {
+                    Group {
                         if isSelecting {
-                            if selectedArticleIds.contains(article.id) {
-                                selectedArticleIds.remove(article.id)
-                            } else {
-                                selectedArticleIds.insert(article.id)
+                            // Bulk-select mode: tap toggles a checkbox, no navigation involved.
+                            // The List's selection binding is `.constant(nil)` while this is active,
+                            // so this Button's own tap handling is what fires here, not row selection.
+                            Button {
+                                if selectedArticleIds.contains(article.id) {
+                                    selectedArticleIds.remove(article.id)
+                                } else {
+                                    selectedArticleIds.insert(article.id)
+                                }
+                            } label: {
+                                rowLabel(for: article)
                             }
+                            .buttonStyle(.plain)
                         } else {
-                            selectedArticle = article
-                        }
-                    } label: {
-                        HStack(alignment: .top, spacing: VersoSpacing.sm) {
-                            if isSelecting {
-                                Image(systemName: selectedArticleIds.contains(article.id) ? "checkmark.circle.fill" : "circle")
-                                    .font(.system(size: 22))
-                                    .foregroundColor(themeManager.colors.accent)
-                                    .padding(.top, 4)
-                            }
-                            ArticleCard(article: article)
+                            // No Button/NavigationLink wrapper needed: this row's tap is handled by
+                            // the List's `selection:` binding above (`.tag` is what associates the
+                            // tap with this article).
+                            rowLabel(for: article)
                         }
                     }
-                    .buttonStyle(.plain)
+                    .tag(article)
                     .listRowInsets(EdgeInsets(
                         top: 4.5, leading: VersoSpacing.md,
                         bottom: 4.5, trailing: VersoSpacing.md
@@ -376,7 +410,7 @@ private struct ArticleListFetchedBody: View {
                             Button {
                                 archiveArticle(article)
                             } label: {
-                                Label("Archive", systemImage: "archivebox")
+                                Label(L10n.Swipe.archive, systemImage: "archivebox")
                             }
                             .tint(Color(hex: "766655"))
                         }
@@ -387,7 +421,7 @@ private struct ArticleListFetchedBody: View {
                             toggleReadStatus(article)
                         } label: {
                             Label(
-                                isRead ? "Mark Unread" : "Mark Read",
+                                isRead ? L10n.Swipe.markUnread : L10n.Swipe.markRead,
                                 systemImage: isRead ? "circle" : "checkmark.circle"
                             )
                         }
@@ -404,12 +438,12 @@ private struct ArticleListFetchedBody: View {
             guard let url = folderBookmarkService.folderURL else { return }
             await articleLibraryService.rebuildCache(from: url, context: viewContext)
         }
-        .versoNavigationBar(title: "Verso", trailingIcon: "gear") {
+        .versoNavigationBar(title: L10n.Home.navTitle, trailingIcon: "gear") {
             showSettings = true
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(isSelecting ? "Cancel" : "Select") {
+                Button(isSelecting ? L10n.Home.bulkSelectCancel : L10n.Home.bulkSelectSelect) {
                     if isSelecting {
                         isSelecting = false
                         selectedArticleIds.removeAll()
@@ -435,7 +469,7 @@ private struct ArticleListFetchedBody: View {
                     Button {
                         markSelectedArticlesRead()
                     } label: {
-                        Text("Mark read")
+                        Text(L10n.Home.bulkSelectMarkRead)
                             .font(VersoTypography.UI.button)
                     }
                     .buttonStyle(.plain)
@@ -446,7 +480,7 @@ private struct ArticleListFetchedBody: View {
                     Button(role: .destructive) {
                         confirmBulkDelete = true
                     } label: {
-                        Text("Delete")
+                        Text(L10n.Home.bulkSelectDelete)
                             .font(VersoTypography.UI.button)
                     }
                     .buttonStyle(.plain)
@@ -466,14 +500,14 @@ private struct ArticleListFetchedBody: View {
             }
         }
         .confirmationDialog(
-            "Delete \(selectedArticleIds.count) article\(selectedArticleIds.count == 1 ? "" : "s")?",
+            L10n.Dialog.bulkDeleteTitle(count: selectedArticleIds.count),
             isPresented: $confirmBulkDelete,
             titleVisibility: .visible
         ) {
-            Button("Delete", role: .destructive) {
+            Button(L10n.Dialog.deleteArticleConfirm, role: .destructive) {
                 deleteSelectedArticles()
             }
-            Button("Cancel", role: .cancel) {}
+            Button(L10n.Dialog.deleteArticleCancel, role: .cancel) {}
         }
         .navigationDestination(isPresented: $showSettings) {
             SettingsView()
@@ -495,19 +529,19 @@ private struct ArticleListFetchedBody: View {
 
     private var dateFilterRow: some View {
         HStack {
-            Text("Added")
+            Text(L10n.Home.dateFilterLabel)
                 .font(VersoTypography.UI.caption)
                 .foregroundColor(themeManager.colors.textSecondary)
             Spacer()
             Menu {
                 ForEach(ArticleListDatePreset.allCases) { preset in
-                    Button(preset.rawValue) {
+                    Button(preset.displayLabel) {
                         datePreset = preset
                     }
                 }
             } label: {
                 HStack(spacing: VersoSpacing.xs) {
-                    Text(datePreset.rawValue)
+                    Text(datePreset.displayLabel)
                         .font(VersoTypography.UI.listSubtitle)
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.system(size: 12, weight: .semibold))
@@ -588,7 +622,7 @@ private struct TagFilterPanel: View {
         VStack(spacing: 0) {
             header
 
-            SearchBar(text: $tagQuery, placeholder: "Search tags…")
+            SearchBar(text: $tagQuery, placeholder: L10n.Home.tagFilterSearchPlaceholder)
                 .padding(.horizontal, VersoSpacing.md)
                 .padding(.top, VersoSpacing.sm)
                 .padding(.bottom, VersoSpacing.sm)
@@ -599,7 +633,7 @@ private struct TagFilterPanel: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     tagRow(
-                        title: "All tags",
+                        title: L10n.Home.tagFilterAllTags,
                         isSelected: selectedTags.isEmpty
                     ) {
                         selectedTags.removeAll()
@@ -610,7 +644,7 @@ private struct TagFilterPanel: View {
                         .padding(.leading, VersoSpacing.md)
 
                     if filteredTags.isEmpty && !tagQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text("No matching tags")
+                        Text(L10n.Home.tagFilterNoMatches)
                             .font(VersoTypography.UI.listSubtitle)
                             .foregroundColor(themeManager.colors.textSecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -640,7 +674,7 @@ private struct TagFilterPanel: View {
 
     private var header: some View {
         HStack {
-            Text("Tags")
+            Text(L10n.Home.tagFilterTitle)
                 .font(VersoTypography.UI.screenTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
             Spacer()
@@ -651,7 +685,7 @@ private struct TagFilterPanel: View {
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Close tag filter")
+            .accessibilityLabel(L10n.Home.tagFilterCloseAccessibilityLabel)
         }
         .padding(.leading, VersoSpacing.md)
         .padding(.trailing, VersoSpacing.xs)

@@ -35,7 +35,7 @@ Articles are saved as plain Markdown files to a user-selected iCloud Drive folde
 - **Platform:** SwiftUI, iOS 16+
 - **Bundle ID:** `com.fabiosasseron.verso`
 - **Entry point:** `Verso/Sources/App/VersoApp.swift` → `ContentView.swift`
-- **Navigation:** Single `NavigationStack` (no tab bar); orchestrated by `VersoMainSplitView.swift`
+- **Navigation:** `NavigationSplitView` (hybrid: collapses to a single stack on iPhone/compact, sidebar + detail side-by-side on iPad/regular); no tab bar; orchestrated by `VersoMainSplitView.swift`
 - **Share Extension:** Separate app target at `Verso/ShareExtension/` for saving articles from other apps.
 - **Design system code:** 7 Swift files in `Verso/Sources/Design/` (Colors, Typography, Spacing, Radius, ThemeManager, Animation, DesignSystemPreview).
 
@@ -133,7 +133,7 @@ enum ArticleStatus: String { case unread, reading, read }
 ```
 
 Badge colors: unread `#4A90D9` · reading `#D4A353` · read `#5AAF7A`
-SF Symbols: `circle` · `book.open` · `checkmark` (16pt, white, 28×28 badge).
+SF Symbols: `circle` · `book.pages` · `checkmark` (16pt, white, 28×28 badge). (`book.open` is not a real SF Symbol — don't reintroduce it.)
 
 ### Spacing, Radius, Typography, Animation
 
@@ -159,6 +159,7 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 - **Background + safe area:** Use `.background(color)` on content, not root view.
 - **Toolbar button style:** `.buttonStyle(.plain)` + `.tint(.clear)` needed to remove bubble background on iOS 16+.
 - **iCloud security-scoped access:** Always call `startAccessingSecurityScopedResource()` / `stopAccessingSecurityScopedResource()` when reading from iCloud Drive bookmarks.
+- **`NavigationSplitView` sidebar → detail navigation:** `NavigationLink(value:)` placed in the sidebar column cannot be opened by a `.navigationDestination(for:)` registered in the detail column — confirmed via a runtime warning ("no matching navigationDestination declaration visible from the location of the link"). SwiftUI only resolves a link's destination within the link's own column, or an enclosing `NavigationStack` — never across sidebar/detail. **Fix:** bind the sidebar's `List` with `selection:` (e.g. `List(selection: $selectedArticle)`) instead — that's the mechanism `NavigationSplitView` actually uses to auto-collapse/push to the detail column on iPhone. Reserve `NavigationLink`/`.navigationDestination(for:)` for pushes that stay *within* one column (e.g. opening a "related article" inside the reader's own `NavigationStack`). See `VersoMainSplitView.swift` (`selectedArticle` vs `detailPath`) and `ArticleListView.swift`.
 
 ---
 

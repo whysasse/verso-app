@@ -26,8 +26,8 @@ struct ScrollProgress: View {
                     .frame(width: fillWidth, height: trackHeight)
             }
             .clipShape(Capsule())
-            .accessibilityLabel("Reading progress")
-            .accessibilityValue("\(Int((p * 100).rounded())) percent")
+            .accessibilityLabel(L10n.A11y.progressLabel)
+            .accessibilityValue(L10n.A11y.progressValue(count: Int((p * 100).rounded())))
         }
         .frame(height: 4)
     }

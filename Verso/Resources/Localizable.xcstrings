@@ -1,0 +1,6510 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "onboarding.welcome.headline": {
+      "extractionState": "manual",
+      "comment": "Headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your articles. Your files."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vos articles. Vos fichiers."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Seus artigos. Seus arquivos."
+          }
+        }
+      }
+    },
+    "onboarding.welcome.subheadline": {
+      "extractionState": "manual",
+      "comment": "Subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans votre iCloud Drive."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Um lugar tranquilo para ler. Sem contas, sem algoritmos — apenas arquivos Markdown no seu iCloud Drive."
+          }
+        }
+      }
+    },
+    "onboarding.welcome.cta": {
+      "extractionState": "manual",
+      "comment": "Primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get started"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Commencer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Começar"
+          }
+        }
+      }
+    },
+    "onboarding.theme.headline": {
+      "extractionState": "manual",
+      "comment": "Headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your reading theme"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisissez votre thème de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolha seu tema de leitura"
+          }
+        }
+      }
+    },
+    "onboarding.theme.subheadline": {
+      "extractionState": "manual",
+      "comment": "Subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can change this any time from settings."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vous pouvez le modifier à tout moment dans les réglages."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Você pode alterar isso a qualquer momento nas configurações."
+          }
+        }
+      }
+    },
+    "onboarding.theme.continue": {
+      "extractionState": "manual",
+      "comment": "Primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Continuer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Continuar"
+          }
+        }
+      }
+    },
+    "theme.paper": {
+      "extractionState": "manual",
+      "comment": "Shared with Settings / Reader Settings",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paper"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Papier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Papel"
+          }
+        }
+      }
+    },
+    "theme.sepia": {
+      "extractionState": "manual",
+      "comment": "Shared",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sepia"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sépia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sépia"
+          }
+        }
+      }
+    },
+    "theme.night": {
+      "extractionState": "manual",
+      "comment": "Shared",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Night"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nuit"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Noite"
+          }
+        }
+      }
+    },
+    "theme.ink": {
+      "extractionState": "manual",
+      "comment": "Shared",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ink"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Encre"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tinta"
+          }
+        }
+      }
+    },
+    "onboarding.folder.headline": {
+      "extractionState": "manual",
+      "comment": "Corrected \"store\" → \"save\" during step 4 view-wiring pass to match shipped code — fr-CA/pt-BR already said \"save\" (enregistrer/guardar), so en was the stale one.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where should Verso save your articles?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Où Verso doit-il enregistrer vos articles?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Onde o Verso deve guardar seus artigos?"
+          }
+        }
+      }
+    },
+    "onboarding.folder.subheadline": {
+      "extractionState": "manual",
+      "comment": "Code previously had different wording (\"Articles are saved as Markdown files — yours to keep.\"); switched to this canonical copy during step 4 view-wiring pass since fr-CA/pt-BR were already translated against it.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisissez un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que vous pouvez ouvrir n'importe où."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolha uma pasta no iCloud Drive. O Verso salva cada artigo como um arquivo Markdown que você pode abrir em qualquer lugar."
+          }
+        }
+      }
+    },
+    "onboarding.folder.chooseCta": {
+      "extractionState": "manual",
+      "comment": "Added ellipsis during step 4 view-wiring pass to match the row-placeholder treatment shipped in code (not a standalone button as the original \"Primary button\" location implied).",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose folder…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisir un dossier…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolher pasta…"
+          }
+        }
+      }
+    },
+    "onboarding.folder.continueCta": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Continuer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Continuar"
+          }
+        }
+      }
+    },
+    "onboarding.folder.privacyNote": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso never uploads your files. They live in your iCloud Drive."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Verso ne téléverse jamais vos fichiers. Ils restent dans votre iCloud Drive."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive."
+          }
+        }
+      }
+    },
+    "onboarding.folder.obsidianTip": {
+      "extractionState": "manual",
+      "comment": "Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vous utilisez Obsidian? Pointez Verso vers un dossier dans votre coffre et les articles y apparaîtront automatiquement."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente."
+          }
+        }
+      }
+    },
+    "onboarding.tour.headline": {
+      "extractionState": "manual",
+      "comment": "Headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Here's how it works"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Voici comment ça fonctionne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Veja como funciona"
+          }
+        }
+      }
+    },
+    "onboarding.tour.step1": {
+      "extractionState": "manual",
+      "comment": "Step 1 label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share any article from Safari or your browser to save it instantly."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Partagez n'importe quel article depuis Safari ou votre navigateur pour l'enregistrer instantanément."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente."
+          }
+        }
+      }
+    },
+    "onboarding.tour.step2": {
+      "extractionState": "manual",
+      "comment": "Step 2 label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Verso to read. Your list is always in sync with your files."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ouvrez Verso pour lire. Votre liste est toujours synchronisée avec vos fichiers."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos."
+          }
+        }
+      }
+    },
+    "onboarding.tour.step3": {
+      "extractionState": "manual",
+      "comment": "Step 3 label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark articles as read when you're done. They stay in your folder forever."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquez les articles comme lus une fois terminés. Ils restent dans votre dossier pour toujours."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre."
+          }
+        }
+      }
+    },
+    "onboarding.tour.skip": {
+      "extractionState": "manual",
+      "comment": "Text button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ignorer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pular"
+          }
+        }
+      }
+    },
+    "onboarding.tour.startReading": {
+      "extractionState": "manual",
+      "comment": "Primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start reading"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Commencer à lire"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Começar a ler"
+          }
+        }
+      }
+    },
+    "onboarding.tour.illustrationHeadline": {
+      "extractionState": "manual",
+      "comment": "Interim — see note above",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save from anywhere"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrez depuis n'importe où"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salve de qualquer lugar"
+          }
+        }
+      }
+    },
+    "onboarding.tour.illustrationSubheadline": {
+      "extractionState": "manual",
+      "comment": "Interim — see note above",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap Share in any browser, pick Verso, and your article is saved automatically."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Touchez Partager dans n'importe quel navigateur, choisissez Verso, et votre article est enregistré automatiquement."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque em Compartilhar em qualquer navegador, escolha o Verso, e seu artigo é salvo automaticamente."
+          }
+        }
+      }
+    },
+    "onboarding.tour.illustrationBrowserLabel": {
+      "extractionState": "manual",
+      "comment": "Interim — see note above",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browser"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Navigateur"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Navegador"
+          }
+        }
+      }
+    },
+    "onboarding.tour.illustrationShareLabel": {
+      "extractionState": "manual",
+      "comment": "Interim — see note above",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Partager"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compartilhar"
+          }
+        }
+      }
+    },
+    "onboarding.tour.illustrationVersoLabel": {
+      "extractionState": "manual",
+      "comment": "Invariant — brand name. Interim — see note above",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        }
+      }
+    },
+    "onboarding.analyticsConsent.headline": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help make Verso better"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aidez à améliorer Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajude a melhorar o Verso"
+          }
+        }
+      }
+    },
+    "onboarding.analyticsConsent.subheadline": {
+      "extractionState": "manual",
+      "comment": "Subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share anonymous usage data — no personal info, no article content, ever."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Partagez des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca."
+          }
+        }
+      }
+    },
+    "onboarding.analyticsConsent.acceptCta": {
+      "extractionState": "manual",
+      "comment": "Primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sure, why not"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Bien sûr, pourquoi pas"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Claro, por que não"
+          }
+        }
+      }
+    },
+    "onboarding.analyticsConsent.declineCta": {
+      "extractionState": "manual",
+      "comment": "Secondary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No thanks"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Non merci"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não, obrigado"
+          }
+        }
+      }
+    },
+    "home.navTitle": {
+      "extractionState": "manual",
+      "comment": "Invariant — brand name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        }
+      }
+    },
+    "home.settings.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Settings icon button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réglages"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Configurações"
+          }
+        }
+      }
+    },
+    "home.archiveToggle.showArchive": {
+      "extractionState": "manual",
+      "comment": "Archive toggle accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show archived articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Afficher les articles archivés"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mostrar artigos arquivados"
+          }
+        }
+      }
+    },
+    "home.archiveToggle.showLibrary": {
+      "extractionState": "manual",
+      "comment": "Archive toggle accessibility label (active)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show reading list"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Afficher la liste de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mostrar lista de leitura"
+          }
+        }
+      }
+    },
+    "home.sort.newestFirst": {
+      "extractionState": "manual",
+      "comment": "Sort toggle accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort newest first"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Trier du plus récent"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ordenar do mais recente"
+          }
+        }
+      }
+    },
+    "home.sort.oldestFirst": {
+      "extractionState": "manual",
+      "comment": "Sort toggle accessibility label (active)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort oldest first"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Trier du plus ancien"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ordenar do mais antigo"
+          }
+        }
+      }
+    },
+    "home.pullToRefresh.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Pull-to-refresh",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh article list"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Actualiser la liste d'articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Atualizar lista de artigos"
+          }
+        }
+      }
+    },
+    "home.search.placeholder": {
+      "extractionState": "manual",
+      "comment": "Updated during step 4 view-wiring pass — code's placeholder is more specific than the doc's original \"Search titles…\" (search now also matches body text and site name), value corrected to match shipped behaviour.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search titles, text, or site…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rechercher titres, texte ou site…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Buscar títulos, texto ou site…"
+          }
+        }
+      }
+    },
+    "home.search.clear.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Clear search button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear search"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Effacer la recherche"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Limpar busca"
+          }
+        }
+      }
+    },
+    "home.search.cancel": {
+      "extractionState": "manual",
+      "comment": "Cancel button (keyboard visible)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "home.dateFilter.label": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit (date-range filter postdates it).",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajouté"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Adicionado"
+          }
+        }
+      }
+    },
+    "home.dateFilter.any": {
+      "extractionState": "manual",
+      "comment": "Date-range menu option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Any time"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "N'importe quand"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Qualquer período"
+          }
+        }
+      }
+    },
+    "home.dateFilter.week": {
+      "extractionState": "manual",
+      "comment": "Date-range menu option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past week"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Semaine dernière"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Última semana"
+          }
+        }
+      }
+    },
+    "home.dateFilter.month": {
+      "extractionState": "manual",
+      "comment": "Date-range menu option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past month"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mois dernier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Último mês"
+          }
+        }
+      }
+    },
+    "home.dateFilter.year": {
+      "extractionState": "manual",
+      "comment": "Date-range menu option",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past year"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Année dernière"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Último ano"
+          }
+        }
+      }
+    },
+    "home.tagFilter.button.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — tag filtering postdates the original audit. \"Tag\" rendered as étiquette/etiqueta (standard software term), not a literal \"mot-clé\"/\"marcador\".",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter by tags"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Filtrer par étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Filtrar por etiquetas"
+          }
+        }
+      }
+    },
+    "home.tagFilter.title": {
+      "extractionState": "manual",
+      "comment": "Side panel header",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tags"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Etiquetas"
+          }
+        }
+      }
+    },
+    "home.tagFilter.searchPlaceholder": {
+      "extractionState": "manual",
+      "comment": "Side panel search field",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search tags…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rechercher des étiquettes…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Buscar etiquetas…"
+          }
+        }
+      }
+    },
+    "home.tagFilter.allTags": {
+      "extractionState": "manual",
+      "comment": "Row that clears the tag selection",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All tags"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toutes les étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Todas as etiquetas"
+          }
+        }
+      }
+    },
+    "home.tagFilter.noMatches": {
+      "extractionState": "manual",
+      "comment": "Empty state inside the panel",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching tags"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucune étiquette correspondante"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhuma etiqueta correspondente"
+          }
+        }
+      }
+    },
+    "home.tagFilter.close.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Close (X) button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close tag filter"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer le filtre d'étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fechar filtro de etiquetas"
+          }
+        }
+      }
+    },
+    "filter.all": {
+      "extractionState": "manual",
+      "comment": "Filter chip label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tous"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Todos"
+          }
+        }
+      }
+    },
+    "filter.unread": {
+      "extractionState": "manual",
+      "comment": "Filter chip label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Non lus"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não lidos"
+          }
+        }
+      }
+    },
+    "filter.reading": {
+      "extractionState": "manual",
+      "comment": "Filter chip label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "En cours"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lendo"
+          }
+        }
+      }
+    },
+    "filter.read": {
+      "extractionState": "manual",
+      "comment": "Filter chip label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lus"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lidos"
+          }
+        }
+      }
+    },
+    "filter.archived": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — `FilterChipBar.swift` renders a chip for every `ArticleStatus` case, including `.archived`, which the original audit missed.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archived"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Archivés"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arquivados"
+          }
+        }
+      }
+    },
+    "filter.all.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All articles, %lld total"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tous les articles, %lld au total"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Todos os artigos, %lld no total"
+          }
+        }
+      }
+    },
+    "filter.unread.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Unread, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Unread, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Non lus, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Non lus, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Não lidos, %lld artigo"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Não lidos, %lld artigos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "filter.reading.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Reading, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Reading, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "En cours, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "En cours, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Lendo, %lld artigo"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Lendo, %lld artigos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "filter.read.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Read, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Read, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Lus, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Lus, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Lidos, %lld artigo"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Lidos, %lld artigos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "filter.archived.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archived, %lld articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Archivés, %lld articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arquivados, %lld artigos"
+          }
+        }
+      }
+    },
+    "filter.chip.selected.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint (any chip)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently selected"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Actuellement sélectionné"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Selecionado atualmente"
+          }
+        }
+      }
+    },
+    "filter.chip.unselected.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint (any chip)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to filter"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Appuyez deux fois pour filtrer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para filtrar"
+          }
+        }
+      }
+    },
+    "articleCard.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Dynamic — template only, no literal text to translate",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, %@, %@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %@, %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %@, %@"
+          }
+        }
+      }
+    },
+    "articleCard.accessibilityHint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver row hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to open"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Appuyez deux fois pour ouvrir"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para abrir"
+          }
+        }
+      }
+    },
+    "articleCard.estimatedReadTime": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural: \"1 min read\" / \"{N} min read\". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: \"min\" is already an invariant abbreviation in both languages, no plural variant needed.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min de leitura"
+          }
+        }
+      }
+    },
+    "status.unread": {
+      "extractionState": "manual",
+      "comment": "Singular agreement (describes one article); also used in filter chips and Reading View",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Non lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não lido"
+          }
+        }
+      }
+    },
+    "status.reading": {
+      "extractionState": "manual",
+      "comment": "Badge / accessibility",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "En cours"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lendo"
+          }
+        }
+      }
+    },
+    "status.read": {
+      "extractionState": "manual",
+      "comment": "Badge / accessibility",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lido"
+          }
+        }
+      }
+    },
+    "home.empty.noArticles.headline": {
+      "extractionState": "manual",
+      "comment": "Empty state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No articles yet"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun article pour l'instant"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhum artigo ainda"
+          }
+        }
+      }
+    },
+    "home.empty.noArticles.subheadline": {
+      "extractionState": "manual",
+      "comment": "Empty state subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share an article from Safari to get started."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Partagez un article depuis Safari pour commencer."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compartilhe um artigo do Safari para começar."
+          }
+        }
+      }
+    },
+    "home.empty.noResults.headline": {
+      "extractionState": "manual",
+      "comment": "Search empty state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No results"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun résultat"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhum resultado"
+          }
+        }
+      }
+    },
+    "home.empty.noResults.subheadline": {
+      "extractionState": "manual",
+      "comment": "Search empty state subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try a different search term."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Essayez un autre terme de recherche."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tente outro termo de busca."
+          }
+        }
+      }
+    },
+    "home.empty.archive.headline": {
+      "extractionState": "manual",
+      "comment": "Archive empty state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing archived"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rien d'archivé"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nada arquivado"
+          }
+        }
+      }
+    },
+    "home.empty.archive.subheadline": {
+      "extractionState": "manual",
+      "comment": "Archive empty state subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles you archive will appear here."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Les articles que vous archivez apparaîtront ici."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Os artigos que você arquivar vão aparecer aqui."
+          }
+        }
+      }
+    },
+    "home.loading.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Skeleton loading state",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Chargement des articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Carregando artigos"
+          }
+        }
+      }
+    },
+    "swipe.delete": {
+      "extractionState": "manual",
+      "comment": "Red",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Excluir"
+          }
+        }
+      }
+    },
+    "swipe.archive": {
+      "extractionState": "manual",
+      "comment": "Swipe-left action label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archive"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Archiver"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arquivar"
+          }
+        }
+      }
+    },
+    "swipe.unarchive": {
+      "extractionState": "manual",
+      "comment": "Swipe-left action label (archive view)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unarchive"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Désarchiver"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Desarquivar"
+          }
+        }
+      }
+    },
+    "swipe.markRead": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass. Distinct copy/casing from `contextMenu.markAsRead` (\"Mark as read\") — same action, different control, intentionally not deduplicated since the two surfaces were authored with different wording independently.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark Read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como lido"
+          }
+        }
+      }
+    },
+    "swipe.markUnread": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass. See note on `swipe.markRead`.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark Unread"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme non lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como não lido"
+          }
+        }
+      }
+    },
+    "home.bulkSelect.select": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — bulk select postdates the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sélectionner"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Selecionar"
+          }
+        }
+      }
+    },
+    "home.bulkSelect.cancel": {
+      "extractionState": "manual",
+      "comment": "Toolbar button — exits bulk-select mode",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "home.bulkSelect.markRead": {
+      "extractionState": "manual",
+      "comment": "Bottom bar action (selection non-empty)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como lido"
+          }
+        }
+      }
+    },
+    "home.bulkSelect.delete": {
+      "extractionState": "manual",
+      "comment": "Destructive",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Excluir"
+          }
+        }
+      }
+    },
+    "dialog.bulkDelete.title": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural (this row shows the \"other\"/plural form; singular \"one\" form authored directly in codegen, same pattern as the other ⚠️-flagged keys). Confirm/Cancel buttons reuse `dialog.deleteArticle.confirm` / `dialog.deleteArticle.cancel` (identical wording, no new key needed).",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld article?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld articles?"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Supprimer %lld article?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Supprimer %lld articles?"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Excluir %lld artigo?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Excluir %lld artigos?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "contextMenu.open": {
+      "extractionState": "manual",
+      "comment": "Context menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ouvrir"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Abrir"
+          }
+        }
+      }
+    },
+    "contextMenu.archive": {
+      "extractionState": "manual",
+      "comment": "Context menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archive"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Archiver"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arquivar"
+          }
+        }
+      }
+    },
+    "contextMenu.unarchive": {
+      "extractionState": "manual",
+      "comment": "Context menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unarchive"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Désarchiver"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Desarquivar"
+          }
+        }
+      }
+    },
+    "contextMenu.markAsRead": {
+      "extractionState": "manual",
+      "comment": "Context menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como lido"
+          }
+        }
+      }
+    },
+    "contextMenu.markAsUnread": {
+      "extractionState": "manual",
+      "comment": "Context menu item",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as unread"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme non lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como não lido"
+          }
+        }
+      }
+    },
+    "contextMenu.delete": {
+      "extractionState": "manual",
+      "comment": "Destructive",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Excluir"
+          }
+        }
+      }
+    },
+    "dialog.deleteArticle.title": {
+      "extractionState": "manual",
+      "comment": "Dialog title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete article?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer l'article?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Excluir artigo?"
+          }
+        }
+      }
+    },
+    "dialog.deleteArticle.message": {
+      "extractionState": "manual",
+      "comment": "Dialog message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This cannot be undone. The file will be permanently removed from your iCloud Drive."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cette action est irréversible. Le fichier sera définitivement supprimé de votre iCloud Drive."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive."
+          }
+        }
+      }
+    },
+    "dialog.deleteArticle.confirm": {
+      "extractionState": "manual",
+      "comment": "Destructive button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Excluir"
+          }
+        }
+      }
+    },
+    "dialog.deleteArticle.cancel": {
+      "extractionState": "manual",
+      "comment": "Cancel button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "addArticle.navTitle": {
+      "extractionState": "manual",
+      "comment": "Sheet nav bar title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajouter un article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Adicionar artigo"
+          }
+        }
+      }
+    },
+    "addArticle.close.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Close (X) toolbar button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fechar"
+          }
+        }
+      }
+    },
+    "addArticle.close.accessibilityHint": {
+      "extractionState": "manual",
+      "comment": "Close button VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss add article sheet"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer la feuille d'ajout d'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fechar a tela de adicionar artigo"
+          }
+        }
+      }
+    },
+    "addArticle.idle.instructions": {
+      "extractionState": "manual",
+      "comment": "Idle state body copy",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste a link to save an article to your library."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Collez un lien pour enregistrer un article dans votre bibliothèque."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cole um link para salvar um artigo na sua biblioteca."
+          }
+        }
+      }
+    },
+    "addArticle.idle.placeholder": {
+      "extractionState": "manual",
+      "comment": "URL text field placeholder",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste a link…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Collez un lien…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cole um link…"
+          }
+        }
+      }
+    },
+    "addArticle.idle.save": {
+      "extractionState": "manual",
+      "comment": "Primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvar"
+          }
+        }
+      }
+    },
+    "addArticle.saving.message": {
+      "extractionState": "manual",
+      "comment": "In-progress state",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving article…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrement de l'article…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvando artigo…"
+          }
+        }
+      }
+    },
+    "addArticle.success.headline": {
+      "extractionState": "manual",
+      "comment": "Success state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article saved!"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Article enregistré!"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Artigo salvo!"
+          }
+        }
+      }
+    },
+    "addArticle.success.subheadline": {
+      "extractionState": "manual",
+      "comment": "Success state subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It will appear in your library shortly."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Il apparaîtra bientôt dans votre bibliothèque."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ele aparecerá em breve na sua biblioteca."
+          }
+        }
+      }
+    },
+    "addArticle.failure.headline": {
+      "extractionState": "manual",
+      "comment": "Failure state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not save article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Impossible d'enregistrer l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não foi possível salvar o artigo"
+          }
+        }
+      }
+    },
+    "addArticle.failure.tryAgain": {
+      "extractionState": "manual",
+      "comment": "Failure state primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try Again"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réessayer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tentar novamente"
+          }
+        }
+      }
+    },
+    "addArticle.error.noLibraryFolder": {
+      "extractionState": "manual",
+      "comment": "Edge case — folder bookmark missing mid-flow",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No library folder selected."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun dossier de bibliothèque sélectionné."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhuma pasta de biblioteca selecionada."
+          }
+        }
+      }
+    },
+    "reading.splitView.placeholder.headline": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — iPad split view postdates the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select an article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sélectionnez un article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Selecione um artigo"
+          }
+        }
+      }
+    },
+    "reading.splitView.placeholder.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Same placeholder, combined accessibility element",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No article selected"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun article sélectionné"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhum artigo selecionado"
+          }
+        }
+      }
+    },
+    "reading.back.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Back button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to reading list"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Retour à la liste de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Voltar para a lista de leitura"
+          }
+        }
+      }
+    },
+    "reading.openExternal.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Open-externally button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open original article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ouvrir l'article original"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Abrir artigo original"
+          }
+        }
+      }
+    },
+    "tagsEditor.instructions": {
+      "extractionState": "manual",
+      "comment": "`Obsidian` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comma-separated tags. Stored in the article's YAML so they work with Obsidian."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Étiquettes séparées par des virgules. Stockées dans le YAML de l'article pour fonctionner avec Obsidian."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etiquetas separadas por vírgula. Armazenadas no YAML do artigo para funcionar com o Obsidian."
+          }
+        }
+      }
+    },
+    "tagsEditor.placeholder": {
+      "extractionState": "manual",
+      "comment": "Text field placeholder",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. research, design"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "p. ex. recherche, design"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "ex.: pesquisa, design"
+          }
+        }
+      }
+    },
+    "tagsEditor.cancel": {
+      "extractionState": "manual",
+      "comment": "Toolbar button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "tagsEditor.save": {
+      "extractionState": "manual",
+      "comment": "Toolbar button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvar"
+          }
+        }
+      }
+    },
+    "tagsEditor.saveFailed.title": {
+      "extractionState": "manual",
+      "comment": "Alert title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't save tags"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Impossible d'enregistrer les étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não foi possível salvar as etiquetas"
+          }
+        }
+      }
+    },
+    "tagsEditor.saveFailed.message": {
+      "extractionState": "manual",
+      "comment": "Alert message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check folder access or disk space, then try again."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vérifiez l'accès au dossier ou l'espace disque, puis réessayez."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Verifique o acesso à pasta ou o espaço em disco e tente novamente."
+          }
+        }
+      }
+    },
+    "tagsEditor.saveFailed.ok": {
+      "extractionState": "manual",
+      "comment": "Invariant — standard alert acknowledgement across all three locales",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "reading.immersiveHint": {
+      "extractionState": "manual",
+      "comment": "Never shown when VoiceOver is active",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap anywhere to reveal controls"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Touchez n'importe où pour afficher les commandes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque em qualquer lugar para mostrar os controles"
+          }
+        }
+      }
+    },
+    "reading.controls.decreaseFontSize": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decrease font size"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réduire la taille du texte"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Diminuir tamanho da fonte"
+          }
+        }
+      }
+    },
+    "reading.controls.increaseFontSize": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Increase font size"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Augmenter la taille du texte"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aumentar tamanho da fonte"
+          }
+        }
+      }
+    },
+    "reading.controls.lineSpacing": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line spacing"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Interligne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Espaçamento entre linhas"
+          }
+        }
+      }
+    },
+    "reading.controls.lineSpacing.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to open spacing options"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Appuyez deux fois pour ouvrir les options d'interligne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para abrir as opções de espaçamento"
+          }
+        }
+      }
+    },
+    "reading.controls.margins": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Margins"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marges"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Margens"
+          }
+        }
+      }
+    },
+    "reading.controls.margins.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to open margin options"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Appuyez deux fois pour ouvrir les options de marges"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para abrir as opções de margem"
+          }
+        }
+      }
+    },
+    "reading.controls.theme": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theme"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Thème"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tema"
+          }
+        }
+      }
+    },
+    "reading.controls.theme.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to open theme options"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Appuyez deux fois pour ouvrir les options de thème"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para abrir as opções de tema"
+          }
+        }
+      }
+    },
+    "reading.controls.markAsRead": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as read"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como lido"
+          }
+        }
+      }
+    },
+    "reading.controls.markAsUnread": {
+      "extractionState": "manual",
+      "comment": "Icon button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as unread"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marquer comme non lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marcar como não lido"
+          }
+        }
+      }
+    },
+    "reading.controls.tts.play": {
+      "extractionState": "manual",
+      "comment": "TTS button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play text-to-speech"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lire la synthèse vocale"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Reproduzir texto em voz"
+          }
+        }
+      }
+    },
+    "reading.controls.tts.pause": {
+      "extractionState": "manual",
+      "comment": "TTS button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause text-to-speech"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mettre en pause la synthèse vocale"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pausar texto em voz"
+          }
+        }
+      }
+    },
+    "reading.controlsSheet.closeAccessibilityHint": {
+      "extractionState": "manual",
+      "comment": "Close (X) button itself reuses `addArticle.close.accessibilityLabel` (\"Close\") — identical wording/affordance across sheets.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss controls"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer les commandes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fechar os controles"
+          }
+        }
+      }
+    },
+    "reading.controlsSheet.fontSizeLabel": {
+      "extractionState": "manual",
+      "comment": "Font-size row label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Font size"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Taille du texte"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tamanho da fonte"
+          }
+        }
+      }
+    },
+    "reading.controlsSheet.lineSpacingLabel": {
+      "extractionState": "manual",
+      "comment": "Line-spacing row label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line spacing"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Interligne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Espaçamento entre linhas"
+          }
+        }
+      }
+    },
+    "tts.nowPlaying.play": {
+      "extractionState": "manual",
+      "comment": "Lock screen control",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lire"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Reproduzir"
+          }
+        }
+      }
+    },
+    "tts.nowPlaying.pause": {
+      "extractionState": "manual",
+      "comment": "Lock screen control",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pause"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pausar"
+          }
+        }
+      }
+    },
+    "tts.nowPlaying.skipForward": {
+      "extractionState": "manual",
+      "comment": "Lock screen control",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip forward"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Avancer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Avançar"
+          }
+        }
+      }
+    },
+    "reading.body.loading": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Chargement…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Carregando…"
+          }
+        }
+      }
+    },
+    "reading.body.image.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — generic fallback when an article image has no alt text.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Image"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Imagem"
+          }
+        }
+      }
+    },
+    "reading.relatedArticles.sectionHeader": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Related"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Articles connexes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Relacionados"
+          }
+        }
+      }
+    },
+    "reading.header.byline": {
+      "extractionState": "manual",
+      "comment": "Added during step 4 view-wiring pass — missed in the original audit. `{author}` is the article's author name as-is (not translated); falls back to `publicationFallback` (source name, also not translated) when author is unavailable, with no \"By\"/\"Par\"/\"Por\" prefix in that case.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By %@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Par %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Por %@"
+          }
+        }
+      }
+    },
+    "readerSettings.title": {
+      "extractionState": "manual",
+      "comment": "Sheet title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading settings"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réglages de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Configurações de leitura"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text size"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Taille du texte"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tamanho do texto"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.xs": {
+      "extractionState": "manual",
+      "comment": "**Open question for step 7:** keep universal XS/S/M/L/XL/XXL abbreviations (like clothing sizes) across all locales, rather than translating the letters. Accessibility label translates regardless: \"Extra small, 14 points\" → fr-CA \"Très petit, 14 points\" / pt-BR \"Extrapequeno, 14 pontos\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XS"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XS"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XS"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.s": {
+      "extractionState": "manual",
+      "comment": "Accessibility label: \"Small, 16 points\" → fr-CA \"Petit, 16 points\" / pt-BR \"Pequeno, 16 pontos\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "S"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "S"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "S"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.m": {
+      "extractionState": "manual",
+      "comment": "Accessibility label: \"Medium, 18 points, default\" → fr-CA \"Moyen, 18 points, par défaut\" / pt-BR \"Médio, 18 pontos, padrão\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "M"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "M"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.l": {
+      "extractionState": "manual",
+      "comment": "Accessibility label: \"Large, 20 points\" → fr-CA \"Grand, 20 points\" / pt-BR \"Grande, 20 pontos\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "L"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "L"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.xl": {
+      "extractionState": "manual",
+      "comment": "Accessibility label: \"Extra large, 22 points\" → fr-CA \"Très grand, 22 points\" / pt-BR \"Extragrande, 22 pontos\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XL"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XL"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XL"
+          }
+        }
+      }
+    },
+    "readerSettings.fontSize.xxl": {
+      "extractionState": "manual",
+      "comment": "Accessibility label: \"Extra extra large, 26 points\" → fr-CA \"Très très grand, 26 points\" / pt-BR \"Extra extragrande, 26 pontos\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "XXL"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XXL"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "XXL"
+          }
+        }
+      }
+    },
+    "readerSettings.lineSpacing.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line spacing"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Interligne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Espaçamento entre linhas"
+          }
+        }
+      }
+    },
+    "readerSettings.lineSpacing.compact": {
+      "extractionState": "manual",
+      "comment": "Option label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compact"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compact"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compacto"
+          }
+        }
+      }
+    },
+    "readerSettings.lineSpacing.normal": {
+      "extractionState": "manual",
+      "comment": "Option label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Normal"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Normal"
+          }
+        }
+      }
+    },
+    "readerSettings.lineSpacing.relaxed": {
+      "extractionState": "manual",
+      "comment": "Default",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relaxed"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Détendu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Relaxado"
+          }
+        }
+      }
+    },
+    "readerSettings.lineSpacing.airy": {
+      "extractionState": "manual",
+      "comment": "Option label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Airy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aéré"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Espaçado"
+          }
+        }
+      }
+    },
+    "readerSettings.theme.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theme"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Thème"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tema"
+          }
+        }
+      }
+    },
+    "readerSettings.theme.selected.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently selected"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Actuellement sélectionné"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Selecionado atualmente"
+          }
+        }
+      }
+    },
+    "readerSettings.margins.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Margins"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marges"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Margens"
+          }
+        }
+      }
+    },
+    "settings.title": {
+      "extractionState": "manual",
+      "comment": "Navigation title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réglages"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Configurações"
+          }
+        }
+      }
+    },
+    "settings.section.reading": {
+      "extractionState": "manual",
+      "comment": "Corrected — net-new section, didn't exist in original audit.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Leitura"
+          }
+        }
+      }
+    },
+    "settings.font.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label above font list",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Font"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Police"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fonte"
+          }
+        }
+      }
+    },
+    "settings.font.preview": {
+      "extractionState": "manual",
+      "comment": "Locale-appropriate pangram, not a literal translation — each locale uses its own classic pangram so every letterform is previewed.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The quick brown fox jumps over the lazy dog"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Portez ce vieux whisky au juge blond qui fume"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Um pequeno jabuti xereta viu dez cegonhas felizes"
+          }
+        }
+      }
+    },
+    "settings.fontSize.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label, stepper row",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Size"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Taille"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tamanho"
+          }
+        }
+      }
+    },
+    "settings.section.storage": {
+      "extractionState": "manual",
+      "comment": "Section header",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Stockage"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Armazenamento"
+          }
+        }
+      }
+    },
+    "settings.folder.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Corrected from \"Reading folder\" to match shipped copy.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles folder"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Dossier des articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pasta de artigos"
+          }
+        }
+      }
+    },
+    "settings.folder.emptyValue": {
+      "extractionState": "manual",
+      "comment": "Corrected from \"Not configured\" to match shipped copy.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not set"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Non défini"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não definida"
+          }
+        }
+      }
+    },
+    "settings.import.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Row label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importer des articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importar artigos"
+          }
+        }
+      }
+    },
+    "settings.section.about": {
+      "extractionState": "manual",
+      "comment": "Section header",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "À propos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sobre"
+          }
+        }
+      }
+    },
+    "settings.about.versionRowLabel": {
+      "extractionState": "manual",
+      "comment": "Row label (links to About page)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Version %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Versão %@"
+          }
+        }
+      }
+    },
+    "settings.privacyPolicy.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Distinct row/casing from `about.privacyPolicy.rowLabel` (\"Privacy policy\") — same destination, surfaced directly in Settings as well as inside the About sub-page; not deduplicated since they're different controls authored independently.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Politique de confidentialité"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Política de Privacidade"
+          }
+        }
+      }
+    },
+    "settings.section.privacy": {
+      "extractionState": "manual",
+      "comment": "Section header",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Confidentialité"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Privacidade"
+          }
+        }
+      }
+    },
+    "settings.analytics.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Row label, analytics toggle",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share anonymous data"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Partager des données anonymes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compartilhar dados anônimos"
+          }
+        }
+      }
+    },
+    "settings.analytics.subtitle": {
+      "extractionState": "manual",
+      "comment": "Row sub-label, analytics toggle",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No personal info or article content, ever."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucune information personnelle ni contenu d'article, jamais."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhuma informação pessoal ou conteúdo de artigo, nunca."
+          }
+        }
+      }
+    },
+    "privacyPolicy.navTitle": {
+      "extractionState": "manual",
+      "comment": "Same text as `settings.privacyPolicy.rowLabel`, kept as a separate key since a nav title and a row label are different copy slots.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Politique de confidentialité"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Política de Privacidade"
+          }
+        }
+      }
+    },
+    "dialog.changeFolder.title": {
+      "extractionState": "manual",
+      "comment": "Corrected to match shipped copy.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move your existing articles to the new folder?"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Déplacer vos articles existants vers le nouveau dossier?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mover seus artigos existentes para a nova pasta?"
+          }
+        }
+      }
+    },
+    "dialog.changeFolder.message": {
+      "extractionState": "manual",
+      "comment": "Corrected to match shipped copy.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your old folder won't be touched if you choose No."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Votre ancien dossier ne sera pas touché si vous choisissez Non."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sua pasta antiga não será alterada se você escolher Não."
+          }
+        }
+      }
+    },
+    "dialog.changeFolder.yes": {
+      "extractionState": "manual",
+      "comment": "Corrected to match shipped copy (Title Case).",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Déplacer les articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mover Artigos"
+          }
+        }
+      }
+    },
+    "dialog.changeFolder.no": {
+      "extractionState": "manual",
+      "comment": "Corrected to match shipped copy.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep in Old Folder"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Garder dans l'ancien dossier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Manter na pasta antiga"
+          }
+        }
+      }
+    },
+    "dialog.changeFolder.cancel": {
+      "extractionState": "manual",
+      "comment": "Cancel button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "import.close.accessibilityHint": {
+      "extractionState": "manual",
+      "comment": "Close (X) button itself reuses `addArticle.close.accessibilityLabel` (\"Close\") — identical wording/affordance across sheets.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss import sheet"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer la feuille d'importation"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fechar a tela de importação"
+          }
+        }
+      }
+    },
+    "import.idle.headline": {
+      "extractionState": "manual",
+      "comment": "Coincidentally matches `settings.import.rowLabel`'s wording today, but kept as a separate key — a settings row label and a screen headline are different copy slots that could diverge independently.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importer des articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importar artigos"
+          }
+        }
+      }
+    },
+    "import.idle.subtitle": {
+      "extractionState": "manual",
+      "comment": "Third-party product names invariant.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import your reading list from GoodLinks, Instapaper, Pocket, Readwise Reader, or Matter."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importez votre liste de lecture depuis GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importe sua lista de leitura do GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter."
+          }
+        }
+      }
+    },
+    "import.idle.noFolderWarning": {
+      "extractionState": "manual",
+      "comment": "Idle state warning, shown only when no articles folder is set",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set your articles folder in Storage settings before importing."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Définissez votre dossier d'articles dans les réglages Stockage avant d'importer."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Defina sua pasta de artigos nas configurações de Armazenamento antes de importar."
+          }
+        }
+      }
+    },
+    "import.idle.selectFileButton": {
+      "extractionState": "manual",
+      "comment": "Idle state primary CTA",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select Export File"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sélectionner le fichier d'exportation"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Selecionar arquivo de exportação"
+          }
+        }
+      }
+    },
+    "import.parsing.message": {
+      "extractionState": "manual",
+      "comment": "Parsing state message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading file…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lecture du fichier…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lendo arquivo…"
+          }
+        }
+      }
+    },
+    "import.writing.message": {
+      "extractionState": "manual",
+      "comment": "Writing state message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importing articles…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importation des articles…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importando artigos…"
+          }
+        }
+      }
+    },
+    "import.done.headline": {
+      "extractionState": "manual",
+      "comment": "Done state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Complete"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importation terminée"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importação concluída"
+          }
+        }
+      }
+    },
+    "import.done.summary": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural (this row shows the \"other\"/plural form; singular \"one\" form authored directly in codegen, same pattern as the other ⚠️-flagged keys). Shipped code composes this with an optional `import.done.skippedSuffix` clause, then a literal \".\" — both pieces need independent plural handling since \"imported\" and \"skipped\" each agree with their own count.",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld article imported"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld articles imported"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld article importé"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld articles importés"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld artigo importado"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "%lld artigos importados"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "import.done.skippedSuffix": {
+      "extractionState": "manual",
+      "comment": "⚠️ plural; see `import.done.summary`.",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": ", %lld skipped"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": ", %lld skipped"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": ", %lld ignoré"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": ", %lld ignorés"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": ", %lld ignorado"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": ", %lld ignorados"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "import.done.doneButton": {
+      "extractionState": "manual",
+      "comment": "Done state primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "OK"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "import.done.importAnotherButton": {
+      "extractionState": "manual",
+      "comment": "Done state secondary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Another File"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importer un autre fichier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importar outro arquivo"
+          }
+        }
+      }
+    },
+    "import.failed.headline": {
+      "extractionState": "manual",
+      "comment": "Failed state headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import Failed"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Importation échouée"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Falha na importação"
+          }
+        }
+      }
+    },
+    "about.title": {
+      "extractionState": "manual",
+      "comment": "Page title",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "À propos de Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sobre o Verso"
+          }
+        }
+      }
+    },
+    "about.version.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Sub-label: `{version} ({build})` (digits/format unchanged across locales)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Version"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Versão"
+          }
+        }
+      }
+    },
+    "about.acknowledgements.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Row label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open-source acknowledgements"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Remerciements open source"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Agradecimentos de código aberto"
+          }
+        }
+      }
+    },
+    "about.github.rowLabel": {
+      "extractionState": "manual",
+      "comment": "`GitHub` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View on GitHub"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voir sur GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver no GitHub"
+          }
+        }
+      }
+    },
+    "about.privacyPolicy.rowLabel": {
+      "extractionState": "manual",
+      "comment": "Row label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy policy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Politique de confidentialité"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Política de privacidade"
+          }
+        }
+      }
+    },
+    "about.footer": {
+      "extractionState": "manual",
+      "comment": "`Verso` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso %@ · Built with care"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso %@ · Conçu avec soin"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso %@ · Feito com cuidado"
+          }
+        }
+      }
+    },
+    "about.navTitle": {
+      "extractionState": "manual",
+      "comment": "Interim — see note above. Spec value is `about.title` (\"About Verso\")",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "À propos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sobre"
+          }
+        }
+      }
+    },
+    "about.brandName": {
+      "extractionState": "manual",
+      "comment": "Invariant — brand name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        }
+      }
+    },
+    "about.versionLabel": {
+      "extractionState": "manual",
+      "comment": "digits/format unchanged across locales",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Version %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Versão %@"
+          }
+        }
+      }
+    },
+    "about.description": {
+      "extractionState": "manual",
+      "comment": "Header description",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A minimalist reader for saving and reading articles, offline and distraction-free."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Un lecteur minimaliste pour enregistrer et lire des articles, hors ligne et sans distraction."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Um leitor minimalista para salvar e ler artigos, offline e sem distrações."
+          }
+        }
+      }
+    },
+    "about.githubLinkLabel": {
+      "extractionState": "manual",
+      "comment": "Invariant — brand name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub"
+          }
+        }
+      }
+    },
+    "about.privacyPolicyLinkLabel": {
+      "extractionState": "manual",
+      "comment": "Privacy Policy row label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Politique de confidentialité"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Política de Privacidade"
+          }
+        }
+      }
+    },
+    "share.title": {
+      "extractionState": "manual",
+      "comment": "`Verso` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save to Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer dans Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvar no Verso"
+          }
+        }
+      }
+    },
+    "share.preview.loading.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Loading shimmer",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading article preview"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Chargement de l'aperçu de l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Carregando pré-visualização do artigo"
+          }
+        }
+      }
+    },
+    "share.save.default": {
+      "extractionState": "manual",
+      "comment": "Save button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvar"
+          }
+        }
+      }
+    },
+    "share.save.loading": {
+      "extractionState": "manual",
+      "comment": "Save button (in progress)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving…"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrement…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvando…"
+          }
+        }
+      }
+    },
+    "share.save.success": {
+      "extractionState": "manual",
+      "comment": "Save button (done)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistré"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvo"
+          }
+        }
+      }
+    },
+    "share.save.error": {
+      "extractionState": "manual",
+      "comment": "Save button (failed)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réessayer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tentar novamente"
+          }
+        }
+      }
+    },
+    "share.cancel": {
+      "extractionState": "manual",
+      "comment": "Cancel button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "share.error.noFolder.message": {
+      "extractionState": "manual",
+      "comment": "No-folder-configured message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folder not configured."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Dossier non configuré."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pasta não configurada."
+          }
+        }
+      }
+    },
+    "share.error.noFolder.cta": {
+      "extractionState": "manual",
+      "comment": "`Verso` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Verso to finish setup"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Verso pour terminer la configuration"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir o Verso para concluir a configuração"
+          }
+        }
+      }
+    },
+    "error.offline.banner.headline": {
+      "extractionState": "manual",
+      "comment": "Inline banner headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You're offline."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vous êtes hors ligne."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Você está off-line."
+          }
+        }
+      }
+    },
+    "error.offline.banner.subheadline": {
+      "extractionState": "manual",
+      "comment": "Inline banner subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved articles are still available."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Les articles enregistrés restent disponibles."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Os artigos salvos continuam disponíveis."
+          }
+        }
+      }
+    },
+    "error.offline.articleUnavailable": {
+      "extractionState": "manual",
+      "comment": "Greyed-out row only",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not available offline."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Non disponible hors ligne."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não disponível off-line."
+          }
+        }
+      }
+    },
+    "error.parsing.headline": {
+      "extractionState": "manual",
+      "comment": "Bottom sheet headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't read this article."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Impossible de lire cet article."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não foi possível ler este artigo."
+          }
+        }
+      }
+    },
+    "error.parsing.subheadline": {
+      "extractionState": "manual",
+      "comment": "Bottom sheet subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The page may be behind a paywall or require a login."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "La page est peut-être derrière un mur payant ou exige une connexion."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "A página pode estar atrás de um paywall ou exigir login."
+          }
+        }
+      }
+    },
+    "error.parsing.openInSafari": {
+      "extractionState": "manual",
+      "comment": "Accent fill; `Safari` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in Safari"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir dans Safari"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir no Safari"
+          }
+        }
+      }
+    },
+    "error.parsing.dismiss": {
+      "extractionState": "manual",
+      "comment": "Secondary CTA",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Descartar"
+          }
+        }
+      }
+    },
+    "error.noFolder.headline": {
+      "extractionState": "manual",
+      "comment": "Full-screen error headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No folder selected."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun dossier sélectionné."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhuma pasta selecionada."
+          }
+        }
+      }
+    },
+    "error.noFolder.subheadline": {
+      "extractionState": "manual",
+      "comment": "Full-screen error subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a folder in iCloud Drive to start saving articles."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisissez un dossier dans iCloud Drive pour commencer à enregistrer des articles."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolha uma pasta no iCloud Drive para começar a salvar artigos."
+          }
+        }
+      }
+    },
+    "error.noFolder.cta": {
+      "extractionState": "manual",
+      "comment": "CTA button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose folder"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisir un dossier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolher pasta"
+          }
+        }
+      }
+    },
+    "error.folderMissing.headline": {
+      "extractionState": "manual",
+      "comment": "Full-screen error headline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folder not found."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Dossier introuvable."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Pasta não encontrada."
+          }
+        }
+      }
+    },
+    "error.folderMissing.subheadline": {
+      "extractionState": "manual",
+      "comment": "Full-screen error subheadline",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The folder may have been moved or deleted. Choose a new one to continue."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Le dossier a peut-être été déplacé ou supprimé. Choisissez-en un nouveau pour continuer."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "A pasta pode ter sido movida ou excluída. Escolha uma nova para continuar."
+          }
+        }
+      }
+    },
+    "error.folderMissing.cta": {
+      "extractionState": "manual",
+      "comment": "CTA button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose new folder"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisir un nouveau dossier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolher nova pasta"
+          }
+        }
+      }
+    },
+    "error.iCloudUnavailable.headline": {
+      "extractionState": "manual",
+      "comment": "`iCloud Drive` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Drive is unavailable."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Drive est indisponible."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O iCloud Drive está indisponível."
+          }
+        }
+      }
+    },
+    "error.iCloudUnavailable.subheadline": {
+      "extractionState": "manual",
+      "comment": "`[Your Name]` is **intentional** in all locales — it matches Apple's on-screen label for the device-owner row in iOS Settings. Keep the placeholder; do not insert a real name. Translators should match Apple's localized Settings path wording for \"Réglages\"/\"Configurações\" once confirmed against an fr-CA/pt-BR device — flag for step 7 QA.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to Settings → [Your Name] → iCloud to re-enable it."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Allez dans Réglages → [Your Name] → iCloud pour le réactiver."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vá em Configurações → [Your Name] → iCloud para reativá-lo."
+          }
+        }
+      }
+    },
+    "error.fileWrite.message": {
+      "extractionState": "manual",
+      "comment": "3s auto-dismiss",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't save article."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Impossible d'enregistrer l'article."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não foi possível salvar o artigo."
+          }
+        }
+      }
+    },
+    "error.fileWrite.subtext": {
+      "extractionState": "manual",
+      "comment": "Toast subtext",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check that your folder is accessible and try again."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Vérifiez que votre dossier est accessible et réessayez."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Verifique se sua pasta está acessível e tente novamente."
+          }
+        }
+      }
+    },
+    "error.fileRead.headline": {
+      "extractionState": "manual",
+      "comment": "Inline reading view",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This article couldn't be loaded."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cet article n'a pas pu être chargé."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não foi possível carregar este artigo."
+          }
+        }
+      }
+    },
+    "error.fileRead.cta": {
+      "extractionState": "manual",
+      "comment": "Opens sourceURL in Safari",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open original"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ouvrir l'original"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Abrir original"
+          }
+        }
+      }
+    },
+    "share.error.headline": {
+      "extractionState": "manual",
+      "comment": "Replaces §8 `share.error.couldNotParse`",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't save this article."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Impossible d'enregistrer cet article."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Não foi possível salvar este artigo."
+          }
+        }
+      }
+    },
+    "share.error.subheadline": {
+      "extractionState": "manual",
+      "comment": "`Safari` invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The page couldn't be read. You can open it directly in Safari."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La page n'a pas pu être lue. Vous pouvez l'ouvrir directement dans Safari."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A página não pôde ser lida. Você pode abri-la diretamente no Safari."
+          }
+        }
+      }
+    },
+    "share.error.openInSafari": {
+      "extractionState": "manual",
+      "comment": "Accent color",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in Safari"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ouvrir dans Safari"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Abrir no Safari"
+          }
+        }
+      }
+    },
+    "share.error.dismiss": {
+      "extractionState": "manual",
+      "comment": "Secondary CTA",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Fermer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Descartar"
+          }
+        }
+      }
+    },
+    "share.duplicate.headline": {
+      "extractionState": "manual",
+      "comment": "Share sheet duplicate state",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article already saved"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Article déjà enregistré"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Artigo já salvo"
+          }
+        }
+      }
+    },
+    "share.duplicate.subheadline": {
+      "extractionState": "manual",
+      "comment": "`{existingTitle}` from existing file frontmatter; fr-CA uses guillemets « » per Québec French convention",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This link is already in your library as \"%@\"."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ce lien est déjà dans votre bibliothèque sous le nom « %@ »."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Este link já está na sua biblioteca como \"%@\"."
+          }
+        }
+      }
+    },
+    "share.duplicate.updateExisting": {
+      "extractionState": "manual",
+      "comment": "Primary button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update existing"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mettre à jour l'existant"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Atualizar existente"
+          }
+        }
+      }
+    },
+    "share.duplicate.saveCopy": {
+      "extractionState": "manual",
+      "comment": "Appends ` (Copy)` to title (or ` 2` after existing ` (Copy)`) — fr-CA/pt-BR suffix wording TBD in step 7 (e.g. ` (Copie)` / ` (Cópia)`)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save as copy"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistrer une copie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvar como cópia"
+          }
+        }
+      }
+    },
+    "share.duplicate.cancel": {
+      "extractionState": "manual",
+      "comment": "Completes extension without writing pending JSON",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Annuler"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Cancelar"
+          }
+        }
+      }
+    },
+    "share.duplicate.success.saved": {
+      "extractionState": "manual",
+      "comment": "New file",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Enregistré"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Salvo"
+          }
+        }
+      }
+    },
+    "share.duplicate.success.updated": {
+      "extractionState": "manual",
+      "comment": "Replaced existing file",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updated"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mis à jour"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Atualizado"
+          }
+        }
+      }
+    },
+    "error.generic": {
+      "extractionState": "manual",
+      "comment": "Last-resort fallback",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Something went wrong. Please try again."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Une erreur s'est produite. Veuillez réessayer."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Algo deu errado. Tente novamente."
+          }
+        }
+      }
+    },
+    "a11y.articleRow.hint": {
+      "extractionState": "manual",
+      "comment": "Article list row hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to open"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Touchez deux fois pour ouvrir"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para abrir"
+          }
+        }
+      }
+    },
+    "a11y.articleRow.label": {
+      "extractionState": "manual",
+      "comment": "Dynamic — composed from already-translated fragments, no literal text to translate",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, %@, %@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %@, %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %@, %@"
+          }
+        }
+      }
+    },
+    "a11y.filterChip.selected": {
+      "extractionState": "manual",
+      "comment": "Selected filter chip hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently selected"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Actuellement sélectionné"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Atualmente selecionado"
+          }
+        }
+      }
+    },
+    "a11y.filterChip.unselected": {
+      "extractionState": "manual",
+      "comment": "Unselected filter chip hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to filter"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Touchez deux fois pour filtrer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para filtrar"
+          }
+        }
+      }
+    },
+    "a11y.themeChip.selected": {
+      "extractionState": "manual",
+      "comment": "Selected theme chip hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently selected"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Actuellement sélectionné"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Atualmente selecionado"
+          }
+        }
+      }
+    },
+    "a11y.themeChip.unselected": {
+      "extractionState": "manual",
+      "comment": "Unselected theme chip hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to select"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Touchez deux fois pour sélectionner"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para selecionar"
+          }
+        }
+      }
+    },
+    "a11y.fontOption.selected": {
+      "extractionState": "manual",
+      "comment": "Selected font option announcement",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, selected"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, sélectionné"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, selecionado"
+          }
+        }
+      }
+    },
+    "a11y.fontOption.unselected": {
+      "extractionState": "manual",
+      "comment": "Font names are invariant",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
+    "a11y.fontSize.label": {
+      "extractionState": "manual",
+      "comment": "e.g. \"Medium, 18 points\" → \"Moyen, 18 points\" → \"Médio, 18 pontos\". `{label}` is the full-word size name (Extra small/Small/Medium/…), not the XS/S/M abbreviation — see §4 Reader Settings open question",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, %lld points"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %lld points"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %lld pontos"
+          }
+        }
+      }
+    },
+    "a11y.fontSize.default": {
+      "extractionState": "manual",
+      "comment": "e.g. \"Medium, 18 points, default\"",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, %lld points, default"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %lld points, par défaut"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%@, %lld pontos, padrão"
+          }
+        }
+      }
+    },
+    "a11y.progress.label": {
+      "extractionState": "manual",
+      "comment": "Scroll progress bar",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading progress"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Progression de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Progresso de leitura"
+          }
+        }
+      }
+    },
+    "a11y.progress.value": {
+      "extractionState": "manual",
+      "comment": "Corrected during step 4 view-wiring pass: doc previously specified \"{N} minutes remaining\" with full plural handling, but shipped code reads out scroll percentage, not estimated time remaining. \"Percent\" doesn't inflect by count in en/fr-CA/pt-BR, so no plural variant needed. Wiring ScrollProgress.swift to a real time-remaining announcement is a possible future enhancement — see docs/BACKLOG.md.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld percent"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld pour cent"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld por cento"
+          }
+        }
+      }
+    },
+    "a11y.skeletonLoading": {
+      "extractionState": "manual",
+      "comment": "Skeleton list",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading articles"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Chargement des articles"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Carregando artigos"
+          }
+        }
+      }
+    },
+    "a11y.deleteAction": {
+      "extractionState": "manual",
+      "comment": "Swipe-delete action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Excluir artigo"
+          }
+        }
+      }
+    },
+    "a11y.archiveAction": {
+      "extractionState": "manual",
+      "comment": "Swipe-archive action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archive article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Archiver l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arquivar artigo"
+          }
+        }
+      }
+    },
+    "a11y.unarchiveAction": {
+      "extractionState": "manual",
+      "comment": "Swipe-unarchive action",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unarchive article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Désarchiver l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Desarquivar artigo"
+          }
+        }
+      }
+    },
+    "launch.brandName": {
+      "extractionState": "manual",
+      "comment": "Invariant — brand name. Added during step 4 view-wiring pass — `LaunchView.swift` had no UI_COPY entry yet.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

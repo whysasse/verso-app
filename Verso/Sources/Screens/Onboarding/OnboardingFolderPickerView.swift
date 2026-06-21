@@ -27,12 +27,12 @@ struct OnboardingFolderPickerView: View {
                 }
 
                 VStack(spacing: VersoSpacing.sm) {
-                    Text("Where should Verso save your articles?")
+                    Text(L10n.Onboarding.folderHeadline)
                         .font(VersoTypography.UI.screenTitle)
                         .foregroundColor(colors.textPrimary)
                         .multilineTextAlignment(.center)
 
-                    Text("Pick a folder in iCloud Drive. Articles are saved as Markdown files — yours to keep.")
+                    Text(L10n.Onboarding.folderSubheadline)
                         .font(VersoTypography.UI.listSubtitle)
                         .foregroundColor(colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -43,7 +43,7 @@ struct OnboardingFolderPickerView: View {
                     showDocumentPicker = true
                 } label: {
                     HStack {
-                        Text(folderSelected ? folderBookmarkService.folderURL!.lastPathComponent : "Choose folder…")
+                        Text(folderSelected ? folderBookmarkService.folderURL!.lastPathComponent : L10n.Onboarding.folderChooseCta)
                             .font(VersoTypography.UI.listSubtitle)
                             .foregroundColor(folderSelected ? colors.textPrimary : colors.textSecondary)
                         Spacer()
@@ -65,7 +65,7 @@ struct OnboardingFolderPickerView: View {
             Spacer()
 
             VStack(spacing: VersoSpacing.sm) {
-                Button("Continue") {
+                Button(L10n.Onboarding.folderContinueCta) {
                     AnalyticsService.shared.track("onboarding.stepCompleted", parameters: ["step": "folder_picker"])
                     onNext()
                 }
@@ -73,7 +73,7 @@ struct OnboardingFolderPickerView: View {
                 .disabled(!folderSelected)
                 .opacity(folderSelected ? 1 : 0.5)
 
-                Text("Verso never uploads your files. They live in your iCloud Drive.")
+                Text(L10n.Onboarding.folderPrivacyNote)
                     .font(VersoTypography.UI.caption)
                     .foregroundColor(colors.textSecondary)
                     .multilineTextAlignment(.center)

@@ -72,13 +72,13 @@ struct AddArticleView: View {
                             iconPointSize: 17,
                             labelWidth: 44,
                             labelHeight: 44,
-                            accessibilityLabel: String(localized: "Close"),
-                            accessibilityHint: String(localized: "Dismiss add article sheet")
+                            accessibilityLabel: L10n.AddArticle.closeAccessibilityLabel,
+                            accessibilityHint: L10n.AddArticle.closeAccessibilityHint
                         )
                     }
                 }
                 ToolbarItem(placement: .principal) {
-                    Text("Add Article")
+                    Text(L10n.AddArticle.navTitle)
                         .font(VersoTypography.UI.listTitle)
                         .foregroundColor(themeManager.colors.textPrimary)
                 }
@@ -96,19 +96,19 @@ struct AddArticleView: View {
 
     private var idleContent: some View {
         VStack(alignment: .leading, spacing: VersoSpacing.lg) {
-            Text("Paste a link to save an article to your library.")
+            Text(L10n.AddArticle.idleInstructions)
                 .font(VersoTypography.UI.listSubtitle)
                 .foregroundColor(themeManager.colors.textSecondary)
 
             VersoTextField(
-                placeholder: "Paste a link…",
+                placeholder: L10n.AddArticle.idlePlaceholder,
                 text: $urlText,
                 keyboardType: .URL,
                 autocapitalization: .never,
                 autocorrectionDisabled: true
             )
 
-            Button("Save") {
+            Button(L10n.AddArticle.idleSave) {
                 Task { await save() }
             }
             .buttonStyle(VersoButtonStyle(variant: .primary, theme: themeManager.colors))
@@ -125,27 +125,27 @@ struct AddArticleView: View {
 
     private func duplicatePromptContent(pending: PendingArticle, existingPath: String, existingTitle: String) -> some View {
         VStack(alignment: .leading, spacing: VersoSpacing.lg) {
-            Text("Article already saved")
+            Text(L10n.Share.duplicateHeadline)
                 .font(VersoTypography.UI.listTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
 
-            Text("This link is already in your library as “\(existingTitle)”.")
+            Text(L10n.Share.duplicateSubheadline(existingTitle: existingTitle))
                 .font(VersoTypography.UI.listSubtitle)
                 .foregroundColor(themeManager.colors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(spacing: VersoSpacing.sm) {
-                Button("Update existing") {
+                Button(L10n.Share.duplicateUpdateExisting) {
                     Task { await applyDuplicateReplace(pending: pending, existingPath: existingPath) }
                 }
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: themeManager.colors))
 
-                Button("Save as copy") {
+                Button(L10n.Share.duplicateSaveCopy) {
                     Task { await applyDuplicateCopy(pending: pending) }
                 }
                 .buttonStyle(VersoButtonStyle(variant: .secondary, theme: themeManager.colors))
 
-                Button("Cancel") {
+                Button(L10n.Share.duplicateCancel) {
                     viewState = .idle
                 }
                 .font(VersoTypography.UI.button)
@@ -167,7 +167,7 @@ struct AddArticleView: View {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: themeManager.colors.accent))
                 .scaleEffect(1.5)
-            Text("Saving article…")
+            Text(L10n.AddArticle.savingMessage)
                 .font(VersoTypography.UI.caption)
                 .foregroundColor(themeManager.colors.textSecondary)
             Spacer()
@@ -183,10 +183,10 @@ struct AddArticleView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 56))
                 .foregroundColor(themeManager.colors.accent)
-            Text("Article saved!")
+            Text(L10n.AddArticle.successHeadline)
                 .font(VersoTypography.UI.listTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
-            Text("It will appear in your library shortly.")
+            Text(L10n.AddArticle.successSubheadline)
                 .font(VersoTypography.UI.listSubtitle)
                 .foregroundColor(themeManager.colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -208,7 +208,7 @@ struct AddArticleView: View {
             Image(systemName: "xmark.circle.fill")
                 .font(.system(size: 56))
                 .foregroundColor(.red.opacity(0.8))
-            Text("Could not save article")
+            Text(L10n.AddArticle.failureHeadline)
                 .font(VersoTypography.UI.listTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
             if let message = errorMessage {
@@ -220,14 +220,14 @@ struct AddArticleView: View {
             }
 
             VStack(spacing: VersoSpacing.sm) {
-                Button("Try Again") {
+                Button(L10n.AddArticle.failureTryAgain) {
                     viewState = .idle
                 }
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: themeManager.colors))
 
                 if let url = failedURL {
                     Link(destination: url) {
-                        Text("Open in Safari")
+                        Text(L10n.Error.parsingOpenInSafari)
                             .font(VersoTypography.UI.button)
                             .foregroundColor(themeManager.colors.accent)
                             .frame(maxWidth: .infinity)
@@ -250,13 +250,12 @@ struct AddArticleView: View {
         guard urlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
         Task {
-            let detected = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
-                UIPasteboard.general.detectPatterns(for: [.probableWebURL]) { result in
-                    continuation.resume(returning: (try? result.get())?.contains(.probableWebURL) == true)
-                }
-            }
-            guard detected,
-                  let raw = UIPasteboard.general.string else { return }
+            // `hasURLs` is a quiet check — no "Pasted from…" banner, no permission prompt.
+            // Replaces the deprecated `detectPatterns(for: [.probableWebURL])`.
+            // `.string` covers plain-text pastes; `.url?.absoluteString` covers URL-type pastes
+            // (e.g. from Safari's address bar) where `.string` may return nil.
+            guard UIPasteboard.general.hasURLs else { return }
+            guard let raw = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString else { return }
             let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
             guard let urlString = Self.firstHTTPURLString(in: trimmed) else { return }
             await MainActor.run {
@@ -326,7 +325,7 @@ struct AddArticleView: View {
         viewState = .saving
         errorMessage = nil
         guard let folderURL = folderBookmarkService.folderURL else {
-            errorMessage = "No library folder selected."
+            errorMessage = L10n.AddArticle.errorNoLibraryFolder
             viewState = .failure
             return
         }
@@ -350,7 +349,7 @@ struct AddArticleView: View {
         viewState = .saving
         errorMessage = nil
         guard let folderURL = folderBookmarkService.folderURL else {
-            errorMessage = "No library folder selected."
+            errorMessage = L10n.AddArticle.errorNoLibraryFolder
             viewState = .failure
             return
         }

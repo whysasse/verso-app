@@ -12,7 +12,7 @@ struct RelatedArticlesSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VersoSpacing.md) {
-            Text("Related")
+            Text(L10n.Reading.relatedArticlesSectionHeader)
                 .font(VersoTypography.UI.caption)
                 .foregroundColor(colors.textSecondary)
                 .textCase(.uppercase)

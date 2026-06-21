@@ -37,8 +37,8 @@ struct ReadingControls: View {
                 iconPointSize: 15,
                 labelWidth: 44,
                 labelHeight: 44,
-                accessibilityLabel: String(localized: "Close"),
-                accessibilityHint: String(localized: "Dismiss controls")
+                accessibilityLabel: L10n.AddArticle.closeAccessibilityLabel,
+                accessibilityHint: L10n.Reading.controlsSheetCloseAccessibilityHint
             )
             .padding(.top, VersoSpacing.xs)
             .padding(.trailing, VersoSpacing.sm)
@@ -62,7 +62,7 @@ struct ReadingControls: View {
     private var fontControls: some View {
         VStack(spacing: VersoSpacing.lg) {
             HStack {
-                Text("Font size")
+                Text(L10n.Reading.controlsSheetFontSizeLabel)
                     .font(VersoTypography.UI.listSubtitle)
                     .foregroundColor(colors.textSecondary)
                 Spacer()
@@ -93,7 +93,7 @@ struct ReadingControls: View {
             }
 
             HStack {
-                Text("Line spacing")
+                Text(L10n.Reading.controlsSheetLineSpacingLabel)
                     .font(VersoTypography.UI.listSubtitle)
                     .foregroundColor(colors.textSecondary)
                 Spacer()
@@ -161,7 +161,7 @@ private struct ThemeChipView: View {
                         .stroke(isSelected ? colors.accent : colors.border, lineWidth: isSelected ? 2 : 1)
                 )
 
-            Text(theme.rawValue)
+            Text(theme.displayName)
                 .font(.system(size: 11))
                 .foregroundColor(colors.textSecondary)
         }

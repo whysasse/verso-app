@@ -42,7 +42,7 @@ struct ThemeChip: View {
                         .stroke(isSelected ? accentColor : borderColor, lineWidth: isSelected ? 2 : 1)
                 )
 
-            Text(theme.rawValue)
+            Text(theme.displayName)
                 .font(.system(size: 11))
                 .foregroundColor(textColor)
         }

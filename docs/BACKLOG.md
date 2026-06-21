@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**25 open issues** across iOS, Web, Design, and Infra.
+**28 open issues** across iOS, Web, Design, and Infra.
 
 ## iOS
 
@@ -25,19 +25,6 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 - [ ] 🔵 **FAB-54** · [PHASE 3] Implement highlighting  `Backlog` `Low`
   Allow users to select text in the reading view and highlight it. Store highlights in the article's .md file as custom frontmatter or inline Markdown annotations.
-
-- [ ] 🟡 **FAB-135** · Detect clipboard URL when tapping the add article button  `In Review` `Medium`
-  When the user taps the "+" button to manually add an article, the app should check if a URL is present in the clipboard and pre-fill the URL field with it if so.
-
-  This speeds up the manual-add flow significantly since users often copy a URL before switching to Verso.
-
-  **Implementation complete** (2026-06-12). Uses `detectPatterns(for: [.probableWebURL])` to avoid the iOS system banner.
-
-  **⚠️ Needs device testing before closing:**
-  - Copy a URL in Safari → switch to Verso → tap + → field pre-fills, no system banner shown
-  - No URL in clipboard → field stays empty
-  - Non-URL text in clipboard → field stays empty
-  - Field already has content → no overwrite
 
 - [ ] 🟡 **FAB-150** · [Phase 2] App Store release checklist  `Backlog` `Medium`
   Parent checklist for shipping Verso to the App Store after Phase 2 feature work ([FAB-51](https://linear.app/fabiosasseron/issue/FAB-51/phase-2-implement-scroll-position-saving) → [FAB-52](https://linear.app/fabiosasseron/issue/FAB-52/phase-2-implement-tagging-system) → [FAB-50](https://linear.app/fabiosasseron/issue/FAB-50/phase-2-implement-full-text-body-search) → [FAB-53](https://linear.app/fabiosasseron/issue/FAB-53/phase-2-implement-bulk-actions)).
@@ -238,6 +225,55 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
   **Docs:** `docs/copy/UI_COPY.md` (share.duplicate.\*), `docs/ANALYTICS_STRATEGY.md`.
 
+- [ ] 🟡 **FAB-279** · Rebuild AboutView.swift to match UI_COPY.md §6 spec  `Backlog` `Medium`
+  ## Root cause
+
+  `docs/copy/UI_COPY.md` §6 documents a richer About screen (`about.title` = "About Verso", a Version row, an Open-source acknowledgements row, and a "Verso {version} · Built with care" footer). The shipped `AboutView.swift` is simpler: a header (brand name + version + description paragraph) and two link rows (GitHub, Privacy Policy), nav title "About". No acknowledgements row, no footer.
+
+  Found during the localization step-4 view-wiring pass. Rather than force the shipped screen's literal text into the mismatched spec keys, interim keys (`about.navTitle`, `about.brandName`, `about.versionLabel`, `about.description`, `about.githubLinkLabel`, `about.privacyPolicyLinkLabel`) were added to UI_COPY.md §6 so the current screen could be wired to `L10n.*` without changing its visible output.
+
+  ## Scope
+
+  - [ ] Add an "Open-source acknowledgements" row (needs a destination — list of dependencies/licenses, e.g. swift-markdown, Down, etc.)
+  - [ ] Restructure version display from header line to a row label (`about.version.rowLabel`), sub-label `{version} ({build})`
+  - [ ] Add footer "Verso {version} · Built with care" (`about.footer`)
+  - [ ] Update nav title "About" → "About Verso" (`about.title`)
+  - [ ] Re-wire screen to the original spec keys (`about.title`, `about.version.rowLabel`, `about.acknowledgements.rowLabel`, `about.github.rowLabel`, `about.privacyPolicy.rowLabel`, `about.footer`) and delete the interim keys above once done
+
+  ## Depends on
+
+  Design input on the acknowledgements row destination (new screen vs. external link).
+
+
+- [ ] 🔵 **FAB-280** · Add Obsidian tip to OnboardingFolderPickerView  `Backlog` `Low`
+  ## Root cause
+
+  `docs/copy/UI_COPY.md` §1 OB-3 documents an "Using Obsidian? Point Verso to a folder inside your vault…" tip (`onboarding.folder.obsidianTip`) for the folder-setup onboarding step. `OnboardingFolderPickerView.swift` never shows it — found during the localization step-4 view-wiring pass.
+
+  ## Scope
+
+  - [ ] Add the tip text below the folder-picker row (or wherever design prefers), conditionally or always shown
+  - [ ] Wire to the existing `onboarding.folder.obsidianTip` key (already translated, no doc changes needed)
+
+
+- [ ] 🟡 **FAB-281** · Reconcile QuickTourView.swift with UI_COPY.md §1 OB-4 spec  `Backlog` `Medium`
+  ## Root cause
+
+  `docs/copy/UI_COPY.md` §1 OB-4 documents a 3-step text carousel ("Here's how it works" / step1 / step2 / step3 / Skip / Start reading). The shipped `QuickTourView.swift` is a single illustrated screen (Browser → Share → Verso icon row, one headline/subheadline, one CTA, no Skip).
+
+  Found during the localization step-4 view-wiring pass. Interim keys (`onboarding.tour.illustrationHeadline`, `illustrationSubheadline`, `illustrationBrowserLabel`, `illustrationShareLabel`, `illustrationVersoLabel`) were added to UI_COPY.md §1 OB-4 so the current screen could be wired to `L10n.*` without changing its visible content.
+
+  ## Scope
+
+  - [ ] Decide: build the documented 3-step carousel (with Skip), or retire those rows in favor of the shipped single-illustration screen
+  - [ ] If keeping the illustration: delete `onboarding.tour.headline`/`step1`/`step2`/`step3`/`skip` from UI_COPY.md, keep `startReading` (already reused) and promote the interim keys to non-interim
+  - [ ] If building the carousel: implement steps + Skip in `QuickTourView.swift`, wire to the original spec keys, delete the interim keys
+
+  ## Depends on
+
+  Design call on which version ships.
+
+
 - [ ] 🟡 **FAB-164** · Fix GoodLinks JSON backup import (native export format)  `In Review` `Medium`
   ## Root cause
 
@@ -259,6 +295,48 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 
 ## Web
+
+### Phase 1 — Foundation
+
+- [x] 🟡 **FAB-165** · [WEB] Phase 1: Scaffold Next.js app + port design system tokens  `Completed` `Medium`
+  Initialize verso-web/ as a Next.js 15+ project with TypeScript strict mode, Tailwind CSS, and port design system tokens from iOS.
+
+  ## Completed Tasks
+
+  * [x] Created verso-web/ directory at repo root
+  * [x] Initialized Next.js 16.2.6 with TypeScript v5
+  * [x] Configured TypeScript with strict mode (`strict: true`, `isolatedModules`, `noEmit`)
+  * [x] Set up Tailwind CSS 4 with PostCSS integration
+  * [x] Created app directory structure:
+    - `app/` — Next.js App Router
+    - `app/components/` — UI components (ArticleCard, SearchBar, FilterChipBar, MarkdownRenderer, etc.)
+    - `app/providers/` — Context providers (ThemeProvider)
+    - `hooks/` — Custom React hooks (useArticleLibrary)
+    - `services/` — Utility services
+    - `types/` — TypeScript definitions
+    - `public/fonts/` — Custom fonts (OpenDyslexic)
+  * [x] Ported design system tokens to `app/globals.css`:
+    - Fixed tokens: spacing, corner radius, typography (UI + reading)
+    - Theme tokens for all 4 themes (Paper, Sepia, Night, Ink)
+    - Color roles: primary/secondary text, background, surface, accent, border, placeholder, error, warning, success
+  * [x] Created root layout (`app/layout.tsx`) with ThemeProvider
+  * [x] Created home page (`app/page.tsx`) with article listing, search, filtering, and theme switcher
+  * [x] Configured package.json with core dependencies: `next`, `react`, `react-dom`, `react-markdown`, `gray-matter`, `idb`
+  * [x] Added scripts: `npm run dev`, `npm run build`, `npm start`
+  * [x] Verified dev server starts cleanly: `npm run dev` → http://localhost:3000 (startup time: 747ms)
+
+  ## Verification
+
+  - [x] TypeScript strict mode enabled and checked
+  - [x] Tailwind CSS rendering correctly
+  - [x] Design tokens applied across all 4 themes
+  - [x] Dev server runs without errors
+  - [x] All required directories created
+  - [x] File System Access API integration ready
+
+  ## Completion Date
+
+  **2026-06-15** — Ready for Phase 2 implementation.
 
 ### Phase 3 — Expansion
 
@@ -406,6 +484,49 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 ### Uncategorized
 
+- [ ] 🔵 **FAB-277** · [Phase 3] RSVP reading mode  `Backlog` `Low`
+  Rapid Serial Visual Presentation — displays article words one at a time in the center of the screen, eliminating eye movement and increasing potential reading speed.
+
+  ## Concept
+
+  The reader taps a button in the reading view to enter RSVP mode. Words flash at a configurable WPM rate. The reader can pause, rewind a sentence, and exit back to the normal scroll position. A visual rhythm cue (e.g. a brief color flash on the focal letter) helps the eye lock on.
+
+  ## Scope
+
+  * **Trigger:** RSVP button in the reading view toolbar (alongside TTS)
+  * **Speed presets:** 150, 250, 350, 500 WPM — adjustable in Settings
+  * **Controls:** Play/Pause · Rewind sentence · Exit (returns to scroll position)
+  * **Typography:** Single word centered, large size, using the current reading font + theme
+  * **Chunking:** 1 word per flash (default); consider 2-word chunks for fluent readers
+  * **Pause on punctuation:** Slightly longer pause after `.`, `,`, `!`, `?` for natural rhythm
+  * **Reduce Motion:** Disable auto-play; show one word at a time with manual tap-to-advance
+  * **Accessibility:** VoiceOver should announce current word and expose play/pause controls
+
+  ## Open questions
+
+  * Should WPM be a free slider or locked to presets?
+  * Persist last-used WPM across sessions?
+  * iOS only first, or Web simultaneously?
+
+  ## Notes
+
+  No new data model needed — tokenize the same `ArticlePlainText` already used for TTS. Can reuse `TTSService` word boundaries for pause timing.
+
+
+
+- [ ] 🔵 **FAB-278** · Reading-progress VoiceOver value: percent → time remaining  `Backlog` `Low`
+  `ScrollProgress.swift`'s accessibility value currently announces scroll percentage ("73 percent"). Found during the localization step-4 view-wiring pass: `UI_COPY.md` had documented this exact spot as "{N} minutes remaining" — including real CLDR plural handling in the codegen script — but no code ever consumed it, so the doc was stale and has been corrected to match shipped behavior (percent).
+
+  Time-remaining is the more useful announcement for VoiceOver users (a raw percentage doesn't tell you how much reading is left), but it requires the progress bar to compute elapsed/remaining estimated time at the current scroll offset, which `ScrollProgress` doesn't currently have access to. Worth a deliberate UX call rather than a default.
+
+  No app implementation yet — tracking only.
+
+
+- [ ] 🟢 **FAB-283** · Wire `OnboardingThemePickerView.swift` hardcoded strings to `L10n.*`  `Backlog` `Low`
+  Found during the FAB-282 final sweep. `OnboardingThemePickerView.swift` has three hardcoded user-facing strings: `Text("Choose your theme")`, `Text("You can always change this later in Settings.")`, and `Button("Continue")`. Existing L10n keys differ slightly (`onboarding.theme.headline` = "Choose your reading theme", `onboarding.theme.subheadline` = "You can change this any time from settings."), so wiring them would change visible copy.
+
+  **Fix:** follow the FAB-281 pattern — add interim keys matching the shipped copy, wire the view, file a copy-reconciliation decision. `L10n.Onboarding.themeContinue` ("Continue") can be wired directly — it matches.
+
 - [ ] 🟠 **FAB-275** · Localization: EN-CA, FR-CA, PT-BR (epic)  `Backlog` `High`
   Ship Verso in **EN-CA, FR-CA, and PT-BR** across iOS and Web.
 
@@ -419,8 +540,8 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
   ### Ordered backlog
 
-  - [ ] **1 · Strategy & decisions doc** → [whysasse/verso-app#315](https://linear.app/fabiosasseron/issue/FAB-276/l10n-1-finalize-localization-strategy-and-decisions-doc). Ratify `docs/LOCALIZATION.md`; link from `HANDOFF.md`. *(foundation — blocks 3)*
-  - [ ] **2 · Locale-aware formatting** (dates, reading-time, TTS voice). Independent — can run early/parallel. iOS + Web. Replace hard-coded `MMM d, yyyy`; centralize `WPM = 220`; TTS voice follows article content language. *Done: no date/number/reading-time/TTS string locked to one locale; checked in all 3 locales.*
+  - [x] **1 · Strategy & decisions doc** → [whysasse/verso-app#315](https://linear.app/fabiosasseron/issue/FAB-276/l10n-1-finalize-localization-strategy-and-decisions-doc). Ratify `docs/LOCALIZATION.md`; link from `HANDOFF.md`. *(foundation — blocks 3)* — **Done 2026-06-17**, see [DONE.md](DONE.md).
+  - [ ] **2 · Locale-aware formatting** (dates, reading-time, TTS voice). Independent — can run early/parallel. iOS + Web. Replace hard-coded `MMM d, yyyy`; centralize `WPM = 220`; TTS voice follows article content language. *Done: no date/number/reading-time/TTS string locked to one locale; checked in all 3 locales.* — **iOS: done** (`WPM = 220` centralized in `ReadingEstimate.swift`; TTS voice follows content language in `TTSService.swift`; `ArticleHeader.swift` date style corrected `.long` → `.medium` 2026-06-17 to match spec). **Remaining:** Web has no date/reading-time UI yet (screens not built); full "checked in all 3 locales" verification blocked on step 7 translations.
   - [ ] **3 · Shared, platform-neutral string source.** *Blocked by 1.* Extend `UI_COPY.md` keys with `en` / `fr-CA` / `pt-BR` (table columns or a generated `strings.json`); same key namespace feeds iOS + Web. Add invariant list + plural categories. *Done: one keyed source both platforms consume.*
   - [ ] **4 · iOS i18n infrastructure.** *Blocked by 3.* Adopt **String Catalog (**`.xcstrings`**)**; wire keys; encode plural variations natively. *Done: app builds localized; pseudolocale switch works.*
   - [ ] **5 · Web i18n infrastructure.** *Blocked by 3.* Adopt **next-intl**; `messages/<locale>.json` keyed identically to iOS; ICU plurals; locale routing/detection. *Done: web renders per-locale strings.*
@@ -428,16 +549,4 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   - [ ] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** *Blocked by 6.* Québec French + Brazilian Portuguese. Verify plurals (esp. the 0-case), accents, and that **OpenDyslexic** renders ç ã õ â ê é à ü at all six reading sizes. *Done: both locales fully translated and QA'd.*
   - [ ] **8 · App Store metadata + Québec/Bill 96.** *Blocked by 7.* Localize store listing (name, subtitle, description, keywords, screenshots) for fr-CA + pt-BR; confirm Québec French-language compliance posture for distribution. *Done: localized listings ready; compliance confirmed.*
 
-- [ ] 🟠 **FAB-276** · L10n 1 · Finalize localization strategy & decisions doc  `Backlog` `High`
-  **Foundation — blocks the string/infra work.**
-
-  `docs/LOCALIZATION.md` exists (v1.0) with the locked decisions. This issue is to review/ratify it and fill any gaps before implementation:
-
-  * Confirm locale set: `en` base, `en-CA` aliases `en`, `fr-CA` + `pt-BR` full. No RTL.
-  * Confirm CLDR plural categories (FR: 0 = singular; PT-BR: 0 = plural).
-  * Lock the invariant-terms list and the `[Your Name]` iCloud exception.
-  * Confirm theme-label translations and per-locale font-preview strings.
-  * Confirm `WPM = 220` and locale-aware date policy.
-
-  **Done when:** `docs/LOCALIZATION.md` is signed off and linked from `docs/HANDOFF.md`.
 

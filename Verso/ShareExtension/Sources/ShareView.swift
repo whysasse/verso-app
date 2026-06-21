@@ -53,7 +53,7 @@ struct ShareView: View {
             ProgressView()
                 .tint(PaperTheme.accent)
                 .scaleEffect(1.2)
-            Text("Saving…")
+            Text(L10n.AddArticle.savingMessage)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(PaperTheme.textSecondary)
         }
@@ -62,11 +62,11 @@ struct ShareView: View {
 
     private func duplicatePromptView(pending: PendingArticle, existingTitle: String, existingPath: String) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Article already saved")
+            Text(L10n.Share.duplicateHeadline)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(PaperTheme.textPrimary)
 
-            Text("This link is already in your library as “\(existingTitle)”.")
+            Text(L10n.Share.duplicateSubheadline(existingTitle: existingTitle))
                 .font(.system(size: 15))
                 .foregroundStyle(PaperTheme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -75,7 +75,7 @@ struct ShareView: View {
                 Button {
                     viewModel.chooseUpdateExisting(pending: pending, existingPath: existingPath)
                 } label: {
-                    Text("Update existing")
+                    Text(L10n.Share.duplicateUpdateExisting)
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -88,7 +88,7 @@ struct ShareView: View {
                 Button {
                     viewModel.chooseSaveCopy(pending: pending)
                 } label: {
-                    Text("Save as copy")
+                    Text(L10n.Share.duplicateSaveCopy)
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -102,7 +102,7 @@ struct ShareView: View {
                 }
                 .buttonStyle(.plain)
 
-                Button("Cancel") {
+                Button(L10n.Share.cancel) {
                     extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
                 }
                 .font(.system(size: 15))
@@ -119,7 +119,7 @@ struct ShareView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 36))
                 .foregroundStyle(Color(red: 0.353, green: 0.686, blue: 0.478)) // Read green
-            Text(isUpdate ? "Updated" : "Saved")
+            Text(isUpdate ? L10n.Share.duplicateSuccessUpdated : L10n.Share.duplicateSuccessSaved)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(PaperTheme.textPrimary)
             Text(title)
@@ -137,17 +137,17 @@ struct ShareView: View {
             Image(systemName: "exclamationmark.circle")
                 .font(.system(size: 36))
                 .foregroundStyle(PaperTheme.textSecondary)
-            Text("Couldn't save article")
+            Text(L10n.Share.errorHeadline)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(PaperTheme.textPrimary)
             HStack(spacing: 16) {
-                Button("Dismiss") {
+                Button(L10n.Share.errorDismiss) {
                     extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
                 }
                 .font(.system(size: 15))
                 .foregroundStyle(PaperTheme.textSecondary)
 
-                Link("Open in Safari", destination: url)
+                Link(L10n.Share.errorOpenInSafari, destination: url)
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(PaperTheme.accent)
             }

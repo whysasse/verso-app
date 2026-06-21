@@ -1,8 +1,8 @@
 # Verso — Localization (i18n) Strategy
 
-**Version:** 1.0 · **Date:** 2026-06-09 · **Status:** Decisions locked; implementation tracked in Linear
+**Version:** 1.1 · **Date:** 2026-06-09 · **Ratified:** 2026-06-17 (FAB-276) · **Status:** Signed off; implementation tracked in `docs/BACKLOG.md`
 
-Verso ships in three locales: **EN-CA, FR-CA, PT-BR**. This doc records the decisions so iOS and Web implement i18n the same way. All user-facing strings live in `copy/UI_COPY.md` (the `en` base); this doc covers locale policy, plurals, formatting, and invariants. Implementation work is in the Linear backlog under the **Localization** epic.
+Verso ships in three locales: **EN-CA, FR-CA, PT-BR**. This doc records the decisions so iOS and Web implement i18n the same way. All user-facing strings live in `copy/UI_COPY.md` (the `en` base); this doc covers locale policy, plurals, formatting, and invariants. Implementation work is tracked under the **Localization** epic ([FAB-275](BACKLOG.md)) in `docs/BACKLOG.md` (issue tracker of record since Linear retired 2026-06-12).
 
 ---
 

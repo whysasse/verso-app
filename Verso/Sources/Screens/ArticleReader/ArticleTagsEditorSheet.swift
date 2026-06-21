@@ -17,11 +17,11 @@ struct ArticleTagsEditorSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: VersoSpacing.md) {
-                Text("Comma-separated tags. Stored in the article’s YAML so they work with Obsidian.")
+                Text(L10n.TagsEditor.instructions)
                     .font(VersoTypography.UI.caption)
                     .foregroundColor(colors.textSecondary)
 
-                TextField("e.g. research, design", text: $tagText)
+                TextField(L10n.TagsEditor.placeholder, text: $tagText)
                     .textFieldStyle(.plain)
                     .font(VersoTypography.UI.input)
                     .foregroundColor(colors.textPrimary)
@@ -36,14 +36,14 @@ struct ArticleTagsEditorSheet: View {
             }
             .padding(VersoSpacing.md)
             .background(colors.background)
-            .navigationTitle("Tags")
+            .navigationTitle(L10n.Home.tagFilterTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(L10n.TagsEditor.cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
+                    Button(L10n.TagsEditor.save) { save() }
                         .fontWeight(.semibold)
                 }
             }
@@ -54,10 +54,10 @@ struct ArticleTagsEditorSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .alert("Couldn't save tags", isPresented: $saveFailed) {
-            Button("OK", role: .cancel) {}
+        .alert(L10n.TagsEditor.saveFailedTitle, isPresented: $saveFailed) {
+            Button(L10n.TagsEditor.saveFailedOk, role: .cancel) {}
         } message: {
-            Text("Check folder access or disk space, then try again.")
+            Text(L10n.TagsEditor.saveFailedMessage)
         }
     }
 

@@ -85,7 +85,7 @@ private struct ThemePreviewCard: View {
                         .stroke(isSelected ? themeColors.accent : themeColors.border, lineWidth: isSelected ? 2 : 1)
                 )
 
-                Text(theme.rawValue.capitalized)
+                Text(theme.displayName)
                     .font(VersoTypography.UI.caption)
                     .foregroundColor(isSelected ? themeColors.accent : themeColors.textSecondary)
                     .padding(.top, VersoSpacing.xs)

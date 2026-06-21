@@ -45,17 +45,17 @@ struct EmptyState: View {
 
     private var headline: String {
         switch variant {
-        case .empty:      return "No articles yet"
-        case .searchMiss: return "No articles match your search"
-        case .noArchived: return "Nothing archived"
+        case .empty:      return L10n.Home.emptyNoArticlesHeadline
+        case .searchMiss: return L10n.Home.emptyNoResultsHeadline
+        case .noArchived: return L10n.Home.emptyArchiveHeadline
         }
     }
 
     private var subheadline: String {
         switch variant {
-        case .empty:      return "Save your first article to get started"
-        case .searchMiss: return "Try a different search term"
-        case .noArchived: return "Articles you archive will appear here"
+        case .empty:      return L10n.Home.emptyNoArticlesSubheadline
+        case .searchMiss: return L10n.Home.emptyNoResultsSubheadline
+        case .noArchived: return L10n.Home.emptyArchiveSubheadline
         }
     }
 }

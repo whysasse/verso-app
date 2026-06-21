@@ -4,9 +4,11 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 
 **Conventions:**
 - `{placeholder}` — dynamic value substituted at runtime
-- ⚠️ **plural** — needs language-aware plural variants. Do **not** hard-code `count == 1`: use CLDR plural categories (iOS String Catalog / ICU on Web), because French treats 0 as singular and Brazilian Portuguese treats 0 as plural. See `docs/LOCALIZATION.md`.
+- ⚠️ **plural** — needs language-aware plural variants. Do **not** hard-code `count == 1`: use CLDR plural categories (iOS String Catalog / ICU on Web), because French treats 0 as singular and Brazilian Portuguese treats 0 as plural. See `docs/LOCALIZATION.md` §2. The `fr-CA` / `pt-BR` cells below show the representative ("other") form only — the actual `.xcstrings` / ICU plural variants are produced during FAB-275 steps 4–5.
 - Tone: sentence case, no exclamation marks, minimal and warm
-- Strings marked *invariant* (e.g. brand names) must not be translated.
+- Strings marked *invariant* (e.g. brand names) must not be translated — see `docs/LOCALIZATION.md` §4 for the full list (`Verso`, `Obsidian`, `iCloud Drive`, `Markdown`, `Safari`, `GitHub`, `OpenDyslexic`, theme enum keys). Invariant cells repeat the `en` string unchanged.
+- `en-CA` is an alias of `en` (no separate column — see `docs/LOCALIZATION.md` §1).
+- `fr-CA` / `pt-BR` strings below are a **first draft** (FAB-275 step 3, shared string source). Final linguistic/diacritic QA happens in step 7.
 
 ---
 
@@ -14,43 +16,64 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 
 ### OB-1 · Welcome
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `onboarding.welcome.headline` | Headline | Your articles. Your files. | — |
-| `onboarding.welcome.subheadline` | Subheadline | A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive. | — |
-| `onboarding.welcome.cta` | Primary button | Get started | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `onboarding.welcome.headline` | Headline | Your articles. Your files. | Vos articles. Vos fichiers. | Seus artigos. Seus arquivos. | — |
+| `onboarding.welcome.subheadline` | Subheadline | A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive. | Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans votre iCloud Drive. | Um lugar tranquilo para ler. Sem contas, sem algoritmos — apenas arquivos Markdown no seu iCloud Drive. | — |
+| `onboarding.welcome.cta` | Primary button | Get started | Commencer | Começar | — |
 
 ### OB-2 · Theme Picker
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `onboarding.theme.headline` | Headline | Choose your reading theme | — |
-| `onboarding.theme.subheadline` | Subheadline | You can change this any time from settings. | — |
-| `onboarding.theme.continue` | Primary button | Continue | — |
-| `theme.paper` | Theme label | Paper | Shared with Settings / Reader Settings |
-| `theme.sepia` | Theme label | Sepia | Shared |
-| `theme.night` | Theme label | Night | Shared |
-| `theme.ink` | Theme label | Ink | Shared |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `onboarding.theme.headline` | Headline | Choose your reading theme | Choisissez votre thème de lecture | Escolha seu tema de leitura | — |
+| `onboarding.theme.subheadline` | Subheadline | You can change this any time from settings. | Vous pouvez le modifier à tout moment dans les réglages. | Você pode alterar isso a qualquer momento nas configurações. | — |
+| `onboarding.theme.continue` | Primary button | Continue | Continuer | Continuar | — |
+| `theme.paper` | Theme label | Paper | Papier | Papel | Shared with Settings / Reader Settings |
+| `theme.sepia` | Theme label | Sepia | Sépia | Sépia | Shared |
+| `theme.night` | Theme label | Night | Nuit | Noite | Shared |
+| `theme.ink` | Theme label | Ink | Encre | Tinta | Shared |
 
 ### OB-3 · Folder Setup
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `onboarding.folder.headline` | Headline | Where should Verso store your articles? | — |
-| `onboarding.folder.subheadline` | Subheadline | Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere. | — |
-| `onboarding.folder.chooseCta` | Primary button | Choose folder | — |
-| `onboarding.folder.obsidianTip` | Tip text | Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically. | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `onboarding.folder.headline` | Headline | Where should Verso save your articles? | Où Verso doit-il enregistrer vos articles? | Onde o Verso deve guardar seus artigos? | Corrected "store" → "save" during step 4 view-wiring pass to match shipped code — fr-CA/pt-BR already said "save" (enregistrer/guardar), so en was the stale one. |
+| `onboarding.folder.subheadline` | Subheadline | Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere. | Choisissez un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que vous pouvez ouvrir n'importe où. | Escolha uma pasta no iCloud Drive. O Verso salva cada artigo como um arquivo Markdown que você pode abrir em qualquer lugar. | Code previously had different wording ("Articles are saved as Markdown files — yours to keep."); switched to this canonical copy during step 4 view-wiring pass since fr-CA/pt-BR were already translated against it. |
+| `onboarding.folder.chooseCta` | Folder-picker row placeholder (shown before a folder is selected; replaced by the folder name once one is) | Choose folder… | Choisir un dossier… | Escolher pasta… | Added ellipsis during step 4 view-wiring pass to match the row-placeholder treatment shipped in code (not a standalone button as the original "Primary button" location implied). |
+| `onboarding.folder.continueCta` | Primary button | Continue | Continuer | Continuar | Added during step 4 view-wiring pass — missed in the original audit. |
+| `onboarding.folder.privacyNote` | Caption below Continue button | Verso never uploads your files. They live in your iCloud Drive. | Verso ne téléverse jamais vos fichiers. Ils restent dans votre iCloud Drive. | O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive. | Added during step 4 view-wiring pass — missed in the original audit. |
+| `onboarding.folder.obsidianTip` | Tip text | Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically. | Vous utilisez Obsidian? Pointez Verso vers un dossier dans votre coffre et les articles y apparaîtront automatiquement. | Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente. | Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md. |
 
 ### OB-4 · Quick Tour
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `onboarding.tour.headline` | Headline | Here's how it works | — |
-| `onboarding.tour.step1` | Step 1 label | Share any article from Safari or your browser to save it instantly. | — |
-| `onboarding.tour.step2` | Step 2 label | Open Verso to read. Your list is always in sync with your files. | — |
-| `onboarding.tour.step3` | Step 3 label | Mark articles as read when you're done. They stay in your folder forever. | — |
-| `onboarding.tour.skip` | Text button | Skip | — |
-| `onboarding.tour.startReading` | Primary button | Start reading | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `onboarding.tour.headline` | Headline | Here's how it works | Voici comment ça fonctionne | Veja como funciona | — |
+| `onboarding.tour.step1` | Step 1 label | Share any article from Safari or your browser to save it instantly. | Partagez n'importe quel article depuis Safari ou votre navigateur pour l'enregistrer instantanément. | Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente. | — |
+| `onboarding.tour.step2` | Step 2 label | Open Verso to read. Your list is always in sync with your files. | Ouvrez Verso pour lire. Votre liste est toujours synchronisée avec vos fichiers. | Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos. | — |
+| `onboarding.tour.step3` | Step 3 label | Mark articles as read when you're done. They stay in your folder forever. | Marquez les articles comme lus une fois terminés. Ils restent dans votre dossier pour toujours. | Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre. | — |
+| `onboarding.tour.skip` | Text button | Skip | Ignorer | Pular | — |
+| `onboarding.tour.startReading` | Primary button | Start reading | Commencer à lire | Começar a ler | — |
+
+**Interim keys — currently shipped `QuickTourView.swift`.** The rows above describe a 3-step text carousel with a Skip button. The screen as actually built is a single illustrated screen (Browser → Share → Verso icon row) with one headline/subheadline and a single CTA — no steps, no Skip. Added during step 4 view-wiring pass so the shipped screen can be wired to `L10n.*` without changing its visible content. The CTA reuses `onboarding.tour.startReading` above (case-corrected "Start Reading" → "Start reading" to match). Reconciling the two designs (build the 3-step carousel, or retire it in favor of the illustration) is tracked as **FAB-281** — see `docs/BACKLOG.md`.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `onboarding.tour.illustrationHeadline` | Headline | Save from anywhere | Enregistrez depuis n'importe où | Salve de qualquer lugar | Interim — see note above |
+| `onboarding.tour.illustrationSubheadline` | Subheadline | Tap Share in any browser, pick Verso, and your article is saved automatically. | Touchez Partager dans n'importe quel navigateur, choisissez Verso, et votre article est enregistré automatiquement. | Toque em Compartilhar em qualquer navegador, escolha o Verso, e seu artigo é salvo automaticamente. | Interim — see note above |
+| `onboarding.tour.illustrationBrowserLabel` | Icon caption | Browser | Navigateur | Navegador | Interim — see note above |
+| `onboarding.tour.illustrationShareLabel` | Icon caption | Share | Partager | Compartilhar | Interim — see note above |
+| `onboarding.tour.illustrationVersoLabel` | Icon caption | Verso | Verso | Verso | Invariant — brand name. Interim — see note above |
+
+### OB-5 · Analytics Consent
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `onboarding.analyticsConsent.headline` | Headline | Help make Verso better | Aidez à améliorer Verso | Ajude a melhorar o Verso | Added during step 4 view-wiring pass — missed in the original audit. |
+| `onboarding.analyticsConsent.subheadline` | Subheadline | Share anonymous usage data — no personal info, no article content, ever. | Partagez des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais. | Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca. | — |
+| `onboarding.analyticsConsent.acceptCta` | Primary button | Sure, why not | Bien sûr, pourquoi pas | Claro, por que não | — |
+| `onboarding.analyticsConsent.declineCta` | Secondary button | No thanks | Non merci | Não, obrigado | — |
 
 ---
 
@@ -58,325 +81,447 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 
 ### Navigation
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `home.navTitle` | Navigation bar large title | Verso | — |
-| `home.settings.accessibilityLabel` | Settings icon button | Settings | — |
-| `home.archiveToggle.showArchive` | Archive toggle accessibility label | Show archived articles | — |
-| `home.archiveToggle.showLibrary` | Archive toggle accessibility label (active) | Show reading list | — |
-| `home.sort.newestFirst` | Sort toggle accessibility label | Sort newest first | — |
-| `home.sort.oldestFirst` | Sort toggle accessibility label (active) | Sort oldest first | — |
-| `home.pullToRefresh.accessibilityLabel` | Pull-to-refresh | Refresh article list | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.navTitle` | Navigation bar large title | Verso | Verso | Verso | Invariant — brand name |
+| `home.settings.accessibilityLabel` | Settings icon button | Settings | Réglages | Configurações | — |
+| `home.archiveToggle.showArchive` | Archive toggle accessibility label | Show archived articles | Afficher les articles archivés | Mostrar artigos arquivados | — |
+| `home.archiveToggle.showLibrary` | Archive toggle accessibility label (active) | Show reading list | Afficher la liste de lecture | Mostrar lista de leitura | — |
+| `home.sort.newestFirst` | Sort toggle accessibility label | Sort newest first | Trier du plus récent | Ordenar do mais recente | — |
+| `home.sort.oldestFirst` | Sort toggle accessibility label (active) | Sort oldest first | Trier du plus ancien | Ordenar do mais antigo | — |
+| `home.pullToRefresh.accessibilityLabel` | Pull-to-refresh | Refresh article list | Actualiser la liste d'articles | Atualizar lista de artigos | — |
 
 ### Search
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `home.search.placeholder` | Search bar placeholder | Search titles… | — |
-| `home.search.clear.accessibilityLabel` | Clear search button | Clear search | — |
-| `home.search.cancel` | Cancel button (keyboard visible) | Cancel | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.search.placeholder` | Search bar placeholder | Search titles, text, or site… | Rechercher titres, texte ou site… | Buscar títulos, texto ou site… | Updated during step 4 view-wiring pass — code's placeholder is more specific than the doc's original "Search titles…" (search now also matches body text and site name), value corrected to match shipped behaviour. |
+| `home.search.clear.accessibilityLabel` | Clear search button | Clear search | Effacer la recherche | Limpar busca | — |
+| `home.search.cancel` | Cancel button (keyboard visible) | Cancel | Annuler | Cancelar | — |
+
+### Date Filter
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.dateFilter.label` | Row label, left of the date-range menu | Added | Ajouté | Adicionado | Added during step 4 view-wiring pass — missed in the original audit (date-range filter postdates it). |
+| `home.dateFilter.any` | Date-range menu option | Any time | N'importe quand | Qualquer período | — |
+| `home.dateFilter.week` | Date-range menu option | Past week | Semaine dernière | Última semana | — |
+| `home.dateFilter.month` | Date-range menu option | Past month | Mois dernier | Último mês | — |
+| `home.dateFilter.year` | Date-range menu option | Past year | Année dernière | Último ano | — |
+
+### Tag Filter
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.tagFilter.button.accessibilityLabel` | Tag-filter icon button (top of list) | Filter by tags | Filtrer par étiquettes | Filtrar por etiquetas | Added during step 4 view-wiring pass — tag filtering postdates the original audit. "Tag" rendered as étiquette/etiqueta (standard software term), not a literal "mot-clé"/"marcador". |
+| `home.tagFilter.title` | Side panel header | Tags | Étiquettes | Etiquetas | — |
+| `home.tagFilter.searchPlaceholder` | Side panel search field | Search tags… | Rechercher des étiquettes… | Buscar etiquetas… | — |
+| `home.tagFilter.allTags` | Row that clears the tag selection | All tags | Toutes les étiquettes | Todas as etiquetas | — |
+| `home.tagFilter.noMatches` | Empty state inside the panel | No matching tags | Aucune étiquette correspondante | Nenhuma etiqueta correspondente | — |
+| `home.tagFilter.close.accessibilityLabel` | Close (X) button | Close tag filter | Fermer le filtre d'étiquettes | Fechar filtro de etiquetas | — |
 
 ### Filter Chips
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `filter.all` | Filter chip label | All | — |
-| `filter.unread` | Filter chip label | Unread | — |
-| `filter.reading` | Filter chip label | Reading | — |
-| `filter.read` | Filter chip label | Read | — |
-| `filter.all.accessibilityLabel` | VoiceOver label | All articles, {count} total | ⚠️ plural |
-| `filter.unread.accessibilityLabel` | VoiceOver label | Unread, {count} articles | ⚠️ plural |
-| `filter.reading.accessibilityLabel` | VoiceOver label | Reading, {count} articles | ⚠️ plural |
-| `filter.read.accessibilityLabel` | VoiceOver label | Read, {count} articles | ⚠️ plural |
-| `filter.chip.selected.hint` | VoiceOver hint (any chip) | Currently selected | — |
-| `filter.chip.unselected.hint` | VoiceOver hint (any chip) | Double tap to filter | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `filter.all` | Filter chip label | All | Tous | Todos | — |
+| `filter.unread` | Filter chip label | Unread | Non lus | Não lidos | — |
+| `filter.reading` | Filter chip label | Reading | En cours | Lendo | — |
+| `filter.read` | Filter chip label | Read | Lus | Lidos | — |
+| `filter.archived` | Filter chip label | Archived | Archivés | Arquivados | Added during step 4 view-wiring pass — `FilterChipBar.swift` renders a chip for every `ArticleStatus` case, including `.archived`, which the original audit missed. |
+| `filter.all.accessibilityLabel` | VoiceOver label | All articles, {count} total | Tous les articles, {count} au total | Todos os artigos, {count} no total | ⚠️ plural |
+| `filter.unread.accessibilityLabel` | VoiceOver label | Unread, {count} articles | Non lus, {count} articles | Não lidos, {count} artigos | ⚠️ plural |
+| `filter.reading.accessibilityLabel` | VoiceOver label | Reading, {count} articles | En cours, {count} articles | Lendo, {count} artigos | ⚠️ plural |
+| `filter.read.accessibilityLabel` | VoiceOver label | Read, {count} articles | Lus, {count} articles | Lidos, {count} artigos | ⚠️ plural |
+| `filter.archived.accessibilityLabel` | VoiceOver label | Archived, {count} articles | Archivés, {count} articles | Arquivados, {count} artigos | ⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`. |
+| `filter.chip.selected.hint` | VoiceOver hint (any chip) | Currently selected | Actuellement sélectionné | Selecionado atualmente | — |
+| `filter.chip.unselected.hint` | VoiceOver hint (any chip) | Double tap to filter | Appuyez deux fois pour filtrer | Toque duas vezes para filtrar | — |
 
 ### Article Card
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `articleCard.accessibilityLabel` | VoiceOver row label | {title}, {source}, {estimated read time} | Dynamic |
-| `articleCard.accessibilityHint` | VoiceOver row hint | Double tap to open | — |
-| `articleCard.estimatedReadTime` | Read time label | {N} min read | ⚠️ plural: "1 min read" / "{N} min read". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `articleCard.accessibilityLabel` | VoiceOver row label | {title}, {source}, {estimated read time} | {title}, {source}, {estimated read time} | {title}, {source}, {estimated read time} | Dynamic — template only, no literal text to translate |
+| `articleCard.accessibilityHint` | VoiceOver row hint | Double tap to open | Appuyez deux fois pour ouvrir | Toque duas vezes para abrir | — |
+| `articleCard.estimatedReadTime` | Read time label | {N} min read | {N} min de lecture | {N} min de leitura | ⚠️ plural: "1 min read" / "{N} min read". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: "min" is already an invariant abbreviation in both languages, no plural variant needed. |
 
 ### Status Badges
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `status.unread` | Badge / accessibility | Unread | Also used in filter chips and Reading View |
-| `status.reading` | Badge / accessibility | Reading | — |
-| `status.read` | Badge / accessibility | Read | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `status.unread` | Badge / accessibility | Unread | Non lu | Não lido | Singular agreement (describes one article); also used in filter chips and Reading View |
+| `status.reading` | Badge / accessibility | Reading | En cours | Lendo | — |
+| `status.read` | Badge / accessibility | Read | Lu | Lido | — |
 
 ### Empty States
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `home.empty.noArticles.headline` | Empty state headline | No articles yet | — |
-| `home.empty.noArticles.subheadline` | Empty state subheadline | Share an article from Safari to get started. | — |
-| `home.empty.noResults.headline` | Search empty state headline | No results | — |
-| `home.empty.noResults.subheadline` | Search empty state subheadline | Try a different search term. | — |
-| `home.empty.archive.headline` | Archive empty state headline | Nothing archived | — |
-| `home.empty.archive.subheadline` | Archive empty state subheadline | Articles you archive will appear here. | — |
-| `home.loading.accessibilityLabel` | Skeleton loading state | Loading articles | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.empty.noArticles.headline` | Empty state headline | No articles yet | Aucun article pour l'instant | Nenhum artigo ainda | — |
+| `home.empty.noArticles.subheadline` | Empty state subheadline | Share an article from Safari to get started. | Partagez un article depuis Safari pour commencer. | Compartilhe um artigo do Safari para começar. | — |
+| `home.empty.noResults.headline` | Search empty state headline | No results | Aucun résultat | Nenhum resultado | — |
+| `home.empty.noResults.subheadline` | Search empty state subheadline | Try a different search term. | Essayez un autre terme de recherche. | Tente outro termo de busca. | — |
+| `home.empty.archive.headline` | Archive empty state headline | Nothing archived | Rien d'archivé | Nada arquivado | — |
+| `home.empty.archive.subheadline` | Archive empty state subheadline | Articles you archive will appear here. | Les articles que vous archivez apparaîtront ici. | Os artigos que você arquivar vão aparecer aqui. | — |
+| `home.loading.accessibilityLabel` | Skeleton loading state | Loading articles | Chargement des articles | Carregando artigos | — |
 
 ### Swipe Actions
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `swipe.delete` | Swipe-left action label | Delete | Red |
-| `swipe.archive` | Swipe-left action label | Archive | — |
-| `swipe.unarchive` | Swipe-left action label (archive view) | Unarchive | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `swipe.delete` | Swipe-left action label | Delete | Supprimer | Excluir | Red |
+| `swipe.archive` | Swipe-left action label | Archive | Archiver | Arquivar | — |
+| `swipe.unarchive` | Swipe-left action label (archive view) | Unarchive | Désarchiver | Desarquivar | — |
+| `swipe.markRead` | Swipe-right action label | Mark Read | Marquer comme lu | Marcar como lido | Added during step 4 view-wiring pass. Distinct copy/casing from `contextMenu.markAsRead` ("Mark as read") — same action, different control, intentionally not deduplicated since the two surfaces were authored with different wording independently. |
+| `swipe.markUnread` | Swipe-right action label | Mark Unread | Marquer comme non lu | Marcar como não lido | Added during step 4 view-wiring pass. See note on `swipe.markRead`. |
+
+### Bulk Select
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.bulkSelect.select` | Toolbar button — enters bulk-select mode | Select | Sélectionner | Selecionar | Added during step 4 view-wiring pass — bulk select postdates the original audit. |
+| `home.bulkSelect.cancel` | Toolbar button — exits bulk-select mode | Cancel | Annuler | Cancelar | — |
+| `home.bulkSelect.markRead` | Bottom bar action (selection non-empty) | Mark read | Marquer comme lu | Marcar como lido | — |
+| `home.bulkSelect.delete` | Bottom bar action (selection non-empty) | Delete | Supprimer | Excluir | Destructive |
+| `dialog.bulkDelete.title` | Confirmation dialog title | Delete {count} articles? | Supprimer {count} articles? | Excluir {count} artigos? | ⚠️ plural (this row shows the "other"/plural form; singular "one" form authored directly in codegen, same pattern as the other ⚠️-flagged keys). Confirm/Cancel buttons reuse `dialog.deleteArticle.confirm` / `dialog.deleteArticle.cancel` (identical wording, no new key needed). |
 
 ### Context Menu
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `contextMenu.open` | Context menu item | Open | — |
-| `contextMenu.archive` | Context menu item | Archive | — |
-| `contextMenu.unarchive` | Context menu item | Unarchive | — |
-| `contextMenu.markAsRead` | Context menu item | Mark as read | — |
-| `contextMenu.markAsUnread` | Context menu item | Mark as unread | — |
-| `contextMenu.delete` | Context menu item | Delete | Destructive |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `contextMenu.open` | Context menu item | Open | Ouvrir | Abrir | — |
+| `contextMenu.archive` | Context menu item | Archive | Archiver | Arquivar | — |
+| `contextMenu.unarchive` | Context menu item | Unarchive | Désarchiver | Desarquivar | — |
+| `contextMenu.markAsRead` | Context menu item | Mark as read | Marquer comme lu | Marcar como lido | — |
+| `contextMenu.markAsUnread` | Context menu item | Mark as unread | Marquer comme non lu | Marcar como não lido | — |
+| `contextMenu.delete` | Context menu item | Delete | Supprimer | Excluir | Destructive |
 
 ### Delete Confirmation Dialog
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `dialog.deleteArticle.title` | Dialog title | Delete article? | — |
-| `dialog.deleteArticle.message` | Dialog message | This cannot be undone. The file will be permanently removed from your iCloud Drive. | — |
-| `dialog.deleteArticle.confirm` | Destructive button | Delete | — |
-| `dialog.deleteArticle.cancel` | Cancel button | Cancel | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `dialog.deleteArticle.title` | Dialog title | Delete article? | Supprimer l'article? | Excluir artigo? | — |
+| `dialog.deleteArticle.message` | Dialog message | This cannot be undone. The file will be permanently removed from your iCloud Drive. | Cette action est irréversible. Le fichier sera définitivement supprimé de votre iCloud Drive. | Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive. | — |
+| `dialog.deleteArticle.confirm` | Destructive button | Delete | Supprimer | Excluir | — |
+| `dialog.deleteArticle.cancel` | Cancel button | Cancel | Annuler | Cancelar | — |
+
+### Add Article (In-App)
+
+> Added during step 4 view-wiring pass — this entire in-app sheet (Home's "+" entry point) was missed in the original audit. Its duplicate-prompt state reuses `share.duplicate.*` from §8 per the existing note above; the rest of the screen (idle/saving/success/failure) needed new keys under the `addArticle.*` namespace. "Open in Safari" reuses `error.parsing.openInSafari` (identical wording, already-established generic CTA).
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `addArticle.navTitle` | Sheet nav bar title | Add Article | Ajouter un article | Adicionar artigo | — |
+| `addArticle.close.accessibilityLabel` | Close (X) toolbar button | Close | Fermer | Fechar | — |
+| `addArticle.close.accessibilityHint` | Close button VoiceOver hint | Dismiss add article sheet | Fermer la feuille d'ajout d'article | Fechar a tela de adicionar artigo | — |
+| `addArticle.idle.instructions` | Idle state body copy | Paste a link to save an article to your library. | Collez un lien pour enregistrer un article dans votre bibliothèque. | Cole um link para salvar um artigo na sua biblioteca. | — |
+| `addArticle.idle.placeholder` | URL text field placeholder | Paste a link… | Collez un lien… | Cole um link… | — |
+| `addArticle.idle.save` | Primary button | Save | Enregistrer | Salvar | — |
+| `addArticle.saving.message` | In-progress state | Saving article… | Enregistrement de l'article… | Salvando artigo… | — |
+| `addArticle.success.headline` | Success state headline | Article saved! | Article enregistré! | Artigo salvo! | — |
+| `addArticle.success.subheadline` | Success state subheadline | It will appear in your library shortly. | Il apparaîtra bientôt dans votre bibliothèque. | Ele aparecerá em breve na sua biblioteca. | — |
+| `addArticle.failure.headline` | Failure state headline | Could not save article | Impossible d'enregistrer l'article | Não foi possível salvar o artigo | — |
+| `addArticle.failure.tryAgain` | Failure state primary button | Try Again | Réessayer | Tentar novamente | — |
+| `addArticle.error.noLibraryFolder` | Error message when no folder is bookmarked yet | No library folder selected. | Aucun dossier de bibliothèque sélectionné. | Nenhuma pasta de biblioteca selecionada. | Edge case — folder bookmark missing mid-flow |
 
 ---
 
 ## 3. Reading View
 
+### Split View Placeholder (iPad)
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.splitView.placeholder.headline` | Detail column, no article selected (regular-width iPad) | Select an article | Sélectionnez un article | Selecione um artigo | Added during step 4 view-wiring pass — iPad split view postdates the original audit. |
+| `reading.splitView.placeholder.accessibilityLabel` | Same placeholder, combined accessibility element | No article selected | Aucun article sélectionné | Nenhum artigo selecionado | — |
+
 ### Top Bar
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `reading.back.accessibilityLabel` | Back button | Back to reading list | — |
-| `reading.openExternal.accessibilityLabel` | Open-externally button | Open original article | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.back.accessibilityLabel` | Back button | Back to reading list | Retour à la liste de lecture | Voltar para a lista de leitura | — |
+| `reading.openExternal.accessibilityLabel` | Open-externally button | Open original article | Ouvrir l'article original | Abrir artigo original | — |
+
+### Tags Editor
+
+> Added during step 4 view-wiring pass — this sheet (opened from the reading view's tag icon) was missed in the original audit. Nav title reuses `home.tagFilter.title` (identical wording, "Tags"). `Obsidian` is a third-party product name and stays invariant.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `tagsEditor.instructions` | Body copy above the text field | Comma-separated tags. Stored in the article's YAML so they work with Obsidian. | Étiquettes séparées par des virgules. Stockées dans le YAML de l'article pour fonctionner avec Obsidian. | Etiquetas separadas por vírgula. Armazenadas no YAML do artigo para funcionar com o Obsidian. | `Obsidian` invariant |
+| `tagsEditor.placeholder` | Text field placeholder | e.g. research, design | p. ex. recherche, design | ex.: pesquisa, design | — |
+| `tagsEditor.cancel` | Toolbar button | Cancel | Annuler | Cancelar | — |
+| `tagsEditor.save` | Toolbar button | Save | Enregistrer | Salvar | — |
+| `tagsEditor.saveFailed.title` | Alert title | Couldn't save tags | Impossible d'enregistrer les étiquettes | Não foi possível salvar as etiquetas | — |
+| `tagsEditor.saveFailed.message` | Alert message | Check folder access or disk space, then try again. | Vérifiez l'accès au dossier ou l'espace disque, puis réessayez. | Verifique o acesso à pasta ou o espaço em disco e tente novamente. | — |
+| `tagsEditor.saveFailed.ok` | Alert button | OK | OK | OK | Invariant — standard alert acknowledgement across all three locales |
 
 ### Immersive Hint
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `reading.immersiveHint` | Hint pill (first launch only) | Tap anywhere to reveal controls | Never shown when VoiceOver is active |
-
-### Scroll Progress
-
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `reading.progress.accessibilityLabel` | Progress bar | {N} minutes remaining | ⚠️ plural; "Less than a minute remaining" when < 1 min |
-| `reading.progress.almostDone` | Progress bar (< 1 min) | Less than a minute remaining | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.immersiveHint` | Hint pill (first launch only) | Tap anywhere to reveal controls | Touchez n'importe où pour afficher les commandes | Toque em qualquer lugar para mostrar os controles | Never shown when VoiceOver is active |
 
 ### Bottom Bar (Reading Controls)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `reading.controls.decreaseFontSize` | Icon button accessibility label | Decrease font size | — |
-| `reading.controls.increaseFontSize` | Icon button accessibility label | Increase font size | — |
-| `reading.controls.lineSpacing` | Icon button accessibility label | Line spacing | — |
-| `reading.controls.lineSpacing.hint` | VoiceOver hint | Double tap to open spacing options | — |
-| `reading.controls.margins` | Icon button accessibility label | Margins | — |
-| `reading.controls.margins.hint` | VoiceOver hint | Double tap to open margin options | — |
-| `reading.controls.theme` | Icon button accessibility label | Theme | — |
-| `reading.controls.theme.hint` | VoiceOver hint | Double tap to open theme options | — |
-| `reading.controls.markAsRead` | Icon button accessibility label | Mark as read | — |
-| `reading.controls.markAsUnread` | Icon button accessibility label | Mark as unread | — |
-| `reading.controls.tts.play` | TTS button accessibility label | Play text-to-speech | — |
-| `reading.controls.tts.pause` | TTS button accessibility label | Pause text-to-speech | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.controls.decreaseFontSize` | Icon button accessibility label | Decrease font size | Réduire la taille du texte | Diminuir tamanho da fonte | — |
+| `reading.controls.increaseFontSize` | Icon button accessibility label | Increase font size | Augmenter la taille du texte | Aumentar tamanho da fonte | — |
+| `reading.controls.lineSpacing` | Icon button accessibility label | Line spacing | Interligne | Espaçamento entre linhas | — |
+| `reading.controls.lineSpacing.hint` | VoiceOver hint | Double tap to open spacing options | Appuyez deux fois pour ouvrir les options d'interligne | Toque duas vezes para abrir as opções de espaçamento | — |
+| `reading.controls.margins` | Icon button accessibility label | Margins | Marges | Margens | — |
+| `reading.controls.margins.hint` | VoiceOver hint | Double tap to open margin options | Appuyez deux fois pour ouvrir les options de marges | Toque duas vezes para abrir as opções de margem | — |
+| `reading.controls.theme` | Icon button accessibility label | Theme | Thème | Tema | — |
+| `reading.controls.theme.hint` | VoiceOver hint | Double tap to open theme options | Appuyez deux fois pour ouvrir les options de thème | Toque duas vezes para abrir as opções de tema | — |
+| `reading.controls.markAsRead` | Icon button accessibility label | Mark as read | Marquer comme lu | Marcar como lido | — |
+| `reading.controls.markAsUnread` | Icon button accessibility label | Mark as unread | Marquer comme non lu | Marcar como não lido | — |
+| `reading.controls.tts.play` | TTS button accessibility label | Play text-to-speech | Lire la synthèse vocale | Reproduzir texto em voz | — |
+| `reading.controls.tts.pause` | TTS button accessibility label | Pause text-to-speech | Mettre en pause la synthèse vocale | Pausar texto em voz | — |
+
+### Font/Theme Adjustment Sheet
+
+> Added during step 4 view-wiring pass — `ReadingControls.swift` (the bottom sheet opened by the Font/Theme buttons in the bar above) was undocumented. Named `controlsSheet.*` rather than reusing `reading.controls.*` to avoid colliding with the bottom bar's icon-button labels above, which are a different component.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.controlsSheet.closeAccessibilityHint` | Close (X) button VoiceOver hint | Dismiss controls | Fermer les commandes | Fechar os controles | Close (X) button itself reuses `addArticle.close.accessibilityLabel` ("Close") — identical wording/affordance across sheets. |
+| `reading.controlsSheet.fontSizeLabel` | Font-size row label | Font size | Taille du texte | Tamanho da fonte | — |
+| `reading.controlsSheet.lineSpacingLabel` | Line-spacing row label | Line spacing | Interligne | Espaçamento entre linhas | — |
 
 ### Text-to-Speech (Lock Screen / Now Playing)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `tts.nowPlaying.play` | Lock screen control | Play | — |
-| `tts.nowPlaying.pause` | Lock screen control | Pause | — |
-| `tts.nowPlaying.skipForward` | Lock screen control | Skip forward | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `tts.nowPlaying.play` | Lock screen control | Play | Lire | Reproduzir | — |
+| `tts.nowPlaying.pause` | Lock screen control | Pause | Pause | Pausar | — |
+| `tts.nowPlaying.skipForward` | Lock screen control | Skip forward | Avancer | Avançar | — |
+
+### Article Body
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.body.loading` | Placeholder shown while the markdown file is being parsed | Loading… | Chargement… | Carregando… | Added during step 4 view-wiring pass — missed in the original audit. |
+| `reading.body.image.accessibilityLabel` | Inline image with no caption/alt text | Image | Image | Imagem | Added during step 4 view-wiring pass — generic fallback when an article image has no alt text. |
+| `reading.relatedArticles.sectionHeader` | Section header below article body | Related | Articles connexes | Relacionados | Added during step 4 view-wiring pass — missed in the original audit. |
 
 ### Article Header
 
 > **Format note:** Display the saved date using a **locale-aware medium date style** — `DateFormatter.dateStyle = .medium` on iOS, `Intl.DateTimeFormat(locale, { dateStyle: 'medium' })` on Web. Do **not** hard-code `MMM d, yyyy`. Expected output by locale: `en` "Apr 28, 2025" · `fr-CA` "28 avr. 2025" · `pt-BR` "28 de abr. de 2025". No string key needed — formatting is code-level but must respect the active locale.
 
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.header.byline` | Author attribution line | By {author} | Par {author} | Por {author} | Added during step 4 view-wiring pass — missed in the original audit. `{author}` is the article's author name as-is (not translated); falls back to `publicationFallback` (source name, also not translated) when author is unavailable, with no "By"/"Par"/"Por" prefix in that case. |
+
 ---
 
 ## 4. Reader Settings (Bottom Sheet)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `readerSettings.title` | Sheet title | Reading settings | — |
-| `readerSettings.fontSize.sectionLabel` | Section label | Text size | — |
-| `readerSettings.fontSize.xs` | Step label | XS | Accessibility label: "Extra small, 14 points" |
-| `readerSettings.fontSize.s` | Step label | S | Accessibility label: "Small, 16 points" |
-| `readerSettings.fontSize.m` | Step label | M | Accessibility label: "Medium, 18 points, default" |
-| `readerSettings.fontSize.l` | Step label | L | Accessibility label: "Large, 20 points" |
-| `readerSettings.fontSize.xl` | Step label | XL | Accessibility label: "Extra large, 22 points" |
-| `readerSettings.fontSize.xxl` | Step label | XXL | Accessibility label: "Extra extra large, 26 points" |
-| `readerSettings.lineSpacing.sectionLabel` | Section label | Line spacing | — |
-| `readerSettings.lineSpacing.compact` | Option label | Compact | — |
-| `readerSettings.lineSpacing.normal` | Option label | Normal | — |
-| `readerSettings.lineSpacing.relaxed` | Option label | Relaxed | Default |
-| `readerSettings.lineSpacing.airy` | Option label | Airy | — |
-| `readerSettings.theme.sectionLabel` | Section label | Theme | — |
-| `readerSettings.theme.selected.hint` | VoiceOver hint | Currently selected | — |
-| `readerSettings.margins.sectionLabel` | Section label | Margins | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `readerSettings.title` | Sheet title | Reading settings | Réglages de lecture | Configurações de leitura | — |
+| `readerSettings.fontSize.sectionLabel` | Section label | Text size | Taille du texte | Tamanho do texto | — |
+| `readerSettings.fontSize.xs` | Step label | XS | XS | XS | **Open question for step 7:** keep universal XS/S/M/L/XL/XXL abbreviations (like clothing sizes) across all locales, rather than translating the letters. Accessibility label translates regardless: "Extra small, 14 points" → fr-CA "Très petit, 14 points" / pt-BR "Extrapequeno, 14 pontos" |
+| `readerSettings.fontSize.s` | Step label | S | S | S | Accessibility label: "Small, 16 points" → fr-CA "Petit, 16 points" / pt-BR "Pequeno, 16 pontos" |
+| `readerSettings.fontSize.m` | Step label | M | M | M | Accessibility label: "Medium, 18 points, default" → fr-CA "Moyen, 18 points, par défaut" / pt-BR "Médio, 18 pontos, padrão" |
+| `readerSettings.fontSize.l` | Step label | L | L | L | Accessibility label: "Large, 20 points" → fr-CA "Grand, 20 points" / pt-BR "Grande, 20 pontos" |
+| `readerSettings.fontSize.xl` | Step label | XL | XL | XL | Accessibility label: "Extra large, 22 points" → fr-CA "Très grand, 22 points" / pt-BR "Extragrande, 22 pontos" |
+| `readerSettings.fontSize.xxl` | Step label | XXL | XXL | XXL | Accessibility label: "Extra extra large, 26 points" → fr-CA "Très très grand, 26 points" / pt-BR "Extra extragrande, 26 pontos" |
+| `readerSettings.lineSpacing.sectionLabel` | Section label | Line spacing | Interligne | Espaçamento entre linhas | — |
+| `readerSettings.lineSpacing.compact` | Option label | Compact | Compact | Compacto | — |
+| `readerSettings.lineSpacing.normal` | Option label | Normal | Normal | Normal | — |
+| `readerSettings.lineSpacing.relaxed` | Option label | Relaxed | Détendu | Relaxado | Default |
+| `readerSettings.lineSpacing.airy` | Option label | Airy | Aéré | Espaçado | — |
+| `readerSettings.theme.sectionLabel` | Section label | Theme | Thème | Tema | — |
+| `readerSettings.theme.selected.hint` | VoiceOver hint | Currently selected | Actuellement sélectionné | Selecionado atualmente | — |
+| `readerSettings.margins.sectionLabel` | Section label | Margins | Marges | Margens | — |
 
 ---
 
 ## 5. Settings (Modal)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `settings.title` | Navigation title | Settings | — |
-| `settings.done` | Done button | Done | — |
-| `settings.section.folder` | Section header | Folder | — |
-| `settings.folder.rowLabel` | Row label | Reading folder | — |
-| `settings.folder.emptyValue` | Row sub-label (no folder set) | Not configured | — |
-| `settings.folder.currentValue` | Row sub-label (folder set) | {folderName} | Dynamic |
-| `settings.section.appearance` | Section header | Appearance | — |
-| `settings.appearance.rowLabel` | Row label | Appearance | — |
-| `settings.section.about` | Section header | About | — |
-| `settings.about.rowLabel` | Row label | About Verso | — |
+> **Corrected during step 4 view-wiring pass:** the original rows below described an earlier Folder/Appearance/About structure that no longer matches the shipped `SettingsView` (which has Reading/Storage/About/Privacy sections). Rows are corrected to the actual shipped copy; net-new rows are flagged in Notes.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `settings.title` | Navigation title | Settings | Réglages | Configurações | — |
+| `settings.section.reading` | Section header | Reading | Lecture | Leitura | Corrected — net-new section, didn't exist in original audit. |
+| `settings.font.sectionLabel` | Section label above font list | Font | Police | Fonte | — |
+| `settings.font.preview` | Sample sentence shown per font option | The quick brown fox jumps over the lazy dog | Portez ce vieux whisky au juge blond qui fume | Um pequeno jabuti xereta viu dez cegonhas felizes | Locale-appropriate pangram, not a literal translation — each locale uses its own classic pangram so every letterform is previewed. |
+| `settings.fontSize.sectionLabel` | Section label, stepper row | Size | Taille | Tamanho | — |
+| `settings.section.storage` | Section header | Storage | Stockage | Armazenamento | — |
+| `settings.folder.rowLabel` | Row label | Articles folder | Dossier des articles | Pasta de artigos | Corrected from "Reading folder" to match shipped copy. |
+| `settings.folder.emptyValue` | Row sub-label (no folder set) | Not set | Non défini | Não definida | Corrected from "Not configured" to match shipped copy. |
+| `settings.import.rowLabel` | Row label | Import Articles | Importer des articles | Importar artigos | — |
+| `settings.section.about` | Section header | About | À propos | Sobre | — |
+| `settings.about.versionRowLabel` | Row label (links to About page) | Version {version} | Version {version} | Versão {version} | — |
+| `settings.privacyPolicy.rowLabel` | Row label (links to Privacy Policy page) | Privacy Policy | Politique de confidentialité | Política de Privacidade | Distinct row/casing from `about.privacyPolicy.rowLabel` ("Privacy policy") — same destination, surfaced directly in Settings as well as inside the About sub-page; not deduplicated since they're different controls authored independently. |
+| `settings.section.privacy` | Section header | Privacy | Confidentialité | Privacidade | — |
+| `settings.analytics.rowLabel` | Row label, analytics toggle | Share anonymous data | Partager des données anonymes | Compartilhar dados anônimos | — |
+| `settings.analytics.subtitle` | Row sub-label, analytics toggle | No personal info or article content, ever. | Aucune information personnelle ni contenu d'article, jamais. | Nenhuma informação pessoal ou conteúdo de artigo, nunca. | — |
+
+### Privacy Policy Screen
+
+> Added during step 4 view-wiring pass — the destination screen opened by `settings.privacyPolicy.rowLabel` / `about.privacyPolicyLinkLabel` had no key of its own for its nav bar title.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `privacyPolicy.navTitle` | Nav bar title | Privacy Policy | Politique de confidentialité | Política de Privacidade | Same text as `settings.privacyPolicy.rowLabel`, kept as a separate key since a nav title and a row label are different copy slots. |
 
 ### Change Folder Dialog
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `dialog.changeFolder.title` | Dialog title | Move existing articles? | — |
-| `dialog.changeFolder.message` | Dialog message | Do you want to move your saved articles to the new folder? Your current folder won't be changed if you choose No. | — |
-| `dialog.changeFolder.yes` | Confirm button | Move articles | — |
-| `dialog.changeFolder.no` | Secondary button | Don't move | — |
-| `dialog.changeFolder.cancel` | Cancel button | Cancel | — |
+> **Corrected during step 4 view-wiring pass:** the shipped confirmation dialog splits the question (title) from the reassurance copy (message) differently than originally drafted, and uses different button wording. Rows below match the shipped copy.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `dialog.changeFolder.title` | Dialog title | Move your existing articles to the new folder? | Déplacer vos articles existants vers le nouveau dossier? | Mover seus artigos existentes para a nova pasta? | Corrected to match shipped copy. |
+| `dialog.changeFolder.message` | Dialog message | Your old folder won't be touched if you choose No. | Votre ancien dossier ne sera pas touché si vous choisissez Non. | Sua pasta antiga não será alterada se você escolher Não. | Corrected to match shipped copy. |
+| `dialog.changeFolder.yes` | Confirm button | Move Articles | Déplacer les articles | Mover Artigos | Corrected to match shipped copy (Title Case). |
+| `dialog.changeFolder.no` | Secondary button | Keep in Old Folder | Garder dans l'ancien dossier | Manter na pasta antiga | Corrected to match shipped copy. |
+| `dialog.changeFolder.cancel` | Cancel button | Cancel | Annuler | Cancelar | — |
+
+### Import (In-App)
+
+> Added during step 4 view-wiring pass — `ImportView.swift`'s entire idle/parsing/writing/done/failed flow was missing from this doc; only the Settings row label (`settings.import.rowLabel`) that opens it had been documented.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `import.close.accessibilityHint` | Close (X) toolbar button VoiceOver hint | Dismiss import sheet | Fermer la feuille d'importation | Fechar a tela de importação | Close (X) button itself reuses `addArticle.close.accessibilityLabel` ("Close") — identical wording/affordance across sheets. |
+| `import.idle.headline` | Idle state headline | Import Articles | Importer des articles | Importar artigos | Coincidentally matches `settings.import.rowLabel`'s wording today, but kept as a separate key — a settings row label and a screen headline are different copy slots that could diverge independently. |
+| `import.idle.subtitle` | Idle state subtitle | Import your reading list from GoodLinks, Instapaper, Pocket, Readwise Reader, or Matter. | Importez votre liste de lecture depuis GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter. | Importe sua lista de leitura do GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter. | Third-party product names invariant. |
+| `import.idle.noFolderWarning` | Idle state warning, shown only when no articles folder is set | Set your articles folder in Storage settings before importing. | Définissez votre dossier d'articles dans les réglages Stockage avant d'importer. | Defina sua pasta de artigos nas configurações de Armazenamento antes de importar. | — |
+| `import.idle.selectFileButton` | Idle state primary CTA | Select Export File | Sélectionner le fichier d'exportation | Selecionar arquivo de exportação | — |
+| `import.parsing.message` | Parsing state message | Reading file… | Lecture du fichier… | Lendo arquivo… | — |
+| `import.writing.message` | Writing state message | Importing articles… | Importation des articles… | Importando artigos… | — |
+| `import.done.headline` | Done state headline | Import Complete | Importation terminée | Importação concluída | — |
+| `import.done.summary` | Done state summary, imported count | {count} articles imported | {count} articles importés | {count} artigos importados | ⚠️ plural (this row shows the "other"/plural form; singular "one" form authored directly in codegen, same pattern as the other ⚠️-flagged keys). Shipped code composes this with an optional `import.done.skippedSuffix` clause, then a literal "." — both pieces need independent plural handling since "imported" and "skipped" each agree with their own count. |
+| `import.done.skippedSuffix` | Done state, optional skipped clause appended after the summary (only when skipped > 0) | , {count} skipped | , {count} ignorés | , {count} ignorados | ⚠️ plural; see `import.done.summary`. |
+| `import.done.doneButton` | Done state primary button | Done | OK | OK | — |
+| `import.done.importAnotherButton` | Done state secondary button | Import Another File | Importer un autre fichier | Importar outro arquivo | — |
+| `import.failed.headline` | Failed state headline | Import Failed | Importation échouée | Falha na importação | — |
 
 ---
 
-## 6. Appearance (Settings Sub-page)
+## 6. About (Settings Sub-page)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `appearance.title` | Page title | Appearance | — |
-| `appearance.section.theme` | Section label | Default theme | — |
-| `appearance.section.font` | Section label | Default font | — |
-| `appearance.font.newYork` | Font option label | New York | — |
-| `appearance.font.georgia` | Font option label | Georgia | — |
-| `appearance.font.sfPro` | Font option label | SF Pro | — |
-| `appearance.font.openDyslexic` | Font option label | OpenDyslexic | — |
-| `appearance.font.preview` | Font preview sample text | The verso is the left-hand page. | Invariant — do not localise |
-| `appearance.section.textSize` | Section label | Default text size | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `about.title` | Page title | About Verso | À propos de Verso | Sobre o Verso | — |
+| `about.version.rowLabel` | Row label | Version | Version | Versão | Sub-label: `{version} ({build})` (digits/format unchanged across locales) |
+| `about.acknowledgements.rowLabel` | Row label | Open-source acknowledgements | Remerciements open source | Agradecimentos de código aberto | — |
+| `about.github.rowLabel` | Row label | View on GitHub | Voir sur GitHub | Ver no GitHub | `GitHub` invariant |
+| `about.privacyPolicy.rowLabel` | Row label | Privacy policy | Politique de confidentialité | Política de privacidade | — |
+| `about.footer` | Copyright footer | Verso {version} · Built with care | Verso {version} · Conçu avec soin | Verso {version} · Feito com cuidado | `Verso` invariant |
 
----
+**Interim keys — currently shipped `AboutView.swift`.** The rows above describe the target design (version row, acknowledgements row, footer). The screen as actually built is simpler — a header (brand name, version, description) plus two link rows, no acknowledgements row or footer, nav title "About" not "About Verso". Added during step 4 view-wiring pass so the shipped screen can be wired to `L10n.*` without changing its visible text. Rebuilding the screen to match the spec rows above is tracked as **FAB-279** — see `docs/BACKLOG.md`. Once that ships, these interim keys should be deleted.
 
-## 7. About (Settings Sub-page)
-
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `about.title` | Page title | About Verso | — |
-| `about.version.rowLabel` | Row label | Version | Sub-label: `{version} ({build})` |
-| `about.acknowledgements.rowLabel` | Row label | Open-source acknowledgements | — |
-| `about.github.rowLabel` | Row label | View on GitHub | — |
-| `about.privacyPolicy.rowLabel` | Row label | Privacy policy | — |
-| `about.footer` | Copyright footer | Verso {version} · Built with care | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `about.navTitle` | Nav bar title (current, shipped) | About | À propos | Sobre | Interim — see note above. Spec value is `about.title` ("About Verso") |
+| `about.brandName` | Header brand text | Verso | Verso | Verso | Invariant — brand name |
+| `about.versionLabel` | Header version line | Version {version} | Version {version} | Versão {version} | digits/format unchanged across locales |
+| `about.description` | Header description | A minimalist reader for saving and reading articles, offline and distraction-free. | Un lecteur minimaliste pour enregistrer et lire des articles, hors ligne et sans distraction. | Um leitor minimalista para salvar e ler artigos, offline e sem distrações. | — |
+| `about.githubLinkLabel` | GitHub row label | GitHub | GitHub | GitHub | Invariant — brand name |
+| `about.privacyPolicyLinkLabel` | Privacy Policy row label | Privacy Policy | Politique de confidentialité | Política de Privacidade | — |
 
 ---
 
-## 8. Share Extension
+## 7. Share Extension
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `share.title` | Sheet title | Save to Verso | — |
-| `share.preview.loading.accessibilityLabel` | Loading shimmer | Loading article preview | — |
-| `share.save.default` | Save button | Save | — |
-| `share.save.loading` | Save button (in progress) | Saving… | — |
-| `share.save.success` | Save button (done) | Saved | — |
-| `share.save.error` | Save button (failed) | Try again | — |
-| `share.cancel` | Cancel button | Cancel | — |
-| `share.error.noFolder.message` | No-folder-configured message | Folder not configured. | — |
-| `share.error.noFolder.cta` | No-folder-configured link | Open Verso to finish setup | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `share.title` | Sheet title | Save to Verso | Enregistrer dans Verso | Salvar no Verso | `Verso` invariant |
+| `share.preview.loading.accessibilityLabel` | Loading shimmer | Loading article preview | Chargement de l'aperçu de l'article | Carregando pré-visualização do artigo | — |
+| `share.save.default` | Save button | Save | Enregistrer | Salvar | — |
+| `share.save.loading` | Save button (in progress) | Saving… | Enregistrement… | Salvando… | — |
+| `share.save.success` | Save button (done) | Saved | Enregistré | Salvo | — |
+| `share.save.error` | Save button (failed) | Try again | Réessayer | Tentar novamente | — |
+| `share.cancel` | Cancel button | Cancel | Annuler | Cancelar | — |
+| `share.error.noFolder.message` | No-folder-configured message | Folder not configured. | Dossier non configuré. | Pasta não configurada. | — |
+| `share.error.noFolder.cta` | No-folder-configured link | Open Verso to finish setup | Ouvrir Verso pour terminer la configuration | Abrir o Verso para concluir a configuração | `Verso` invariant |
 
 > **Note:** `share.error.couldNotParse` and `share.error.openInSafari` are superseded by `share.error.*` keys in §9 (Scenario 8).
 
 ---
 
-## 9. Error & System Messages
+## 8. Error & System Messages
 
 Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 
 ### Offline / Network (Scenario 1)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.offline.banner.headline` | Inline banner headline | You're offline. | — |
-| `error.offline.banner.subheadline` | Inline banner subheadline | Saved articles are still available. | — |
-| `error.offline.articleUnavailable` | Article row (unavailable article) | Not available offline. | Greyed-out row only |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.offline.banner.headline` | Inline banner headline | You're offline. | Vous êtes hors ligne. | Você está off-line. | — |
+| `error.offline.banner.subheadline` | Inline banner subheadline | Saved articles are still available. | Les articles enregistrés restent disponibles. | Os artigos salvos continuam disponíveis. | — |
+| `error.offline.articleUnavailable` | Article row (unavailable article) | Not available offline. | Non disponible hors ligne. | Não disponível off-line. | Greyed-out row only |
 
 ### Parsing Failed (Scenario 2)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.parsing.headline` | Bottom sheet headline | Couldn't read this article. | — |
-| `error.parsing.subheadline` | Bottom sheet subheadline | The page may be behind a paywall or require a login. | — |
-| `error.parsing.openInSafari` | Primary CTA | Open in Safari | Accent fill |
-| `error.parsing.dismiss` | Secondary CTA | Dismiss | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.parsing.headline` | Bottom sheet headline | Couldn't read this article. | Impossible de lire cet article. | Não foi possível ler este artigo. | — |
+| `error.parsing.subheadline` | Bottom sheet subheadline | The page may be behind a paywall or require a login. | La page est peut-être derrière un mur payant ou exige une connexion. | A página pode estar atrás de um paywall ou exigir login. | — |
+| `error.parsing.openInSafari` | Primary CTA | Open in Safari | Ouvrir dans Safari | Abrir no Safari | Accent fill; `Safari` invariant |
+| `error.parsing.dismiss` | Secondary CTA | Dismiss | Fermer | Descartar | — |
 
 ### Folder Not Configured (Scenario 3)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.noFolder.headline` | Full-screen error headline | No folder selected. | — |
-| `error.noFolder.subheadline` | Full-screen error subheadline | Choose a folder in iCloud Drive to start saving articles. | — |
-| `error.noFolder.cta` | CTA button | Choose folder | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.noFolder.headline` | Full-screen error headline | No folder selected. | Aucun dossier sélectionné. | Nenhuma pasta selecionada. | — |
+| `error.noFolder.subheadline` | Full-screen error subheadline | Choose a folder in iCloud Drive to start saving articles. | Choisissez un dossier dans iCloud Drive pour commencer à enregistrer des articles. | Escolha uma pasta no iCloud Drive para começar a salvar artigos. | — |
+| `error.noFolder.cta` | CTA button | Choose folder | Choisir un dossier | Escolher pasta | — |
 
 ### Folder Not Found (Scenario 4)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.folderMissing.headline` | Full-screen error headline | Folder not found. | — |
-| `error.folderMissing.subheadline` | Full-screen error subheadline | The folder may have been moved or deleted. Choose a new one to continue. | — |
-| `error.folderMissing.cta` | CTA button | Choose new folder | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.folderMissing.headline` | Full-screen error headline | Folder not found. | Dossier introuvable. | Pasta não encontrada. | — |
+| `error.folderMissing.subheadline` | Full-screen error subheadline | The folder may have been moved or deleted. Choose a new one to continue. | Le dossier a peut-être été déplacé ou supprimé. Choisissez-en un nouveau pour continuer. | A pasta pode ter sido movida ou excluída. Escolha uma nova para continuar. | — |
+| `error.folderMissing.cta` | CTA button | Choose new folder | Choisir un nouveau dossier | Escolher nova pasta | — |
 
 ### iCloud Unavailable (Scenario 5)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.iCloudUnavailable.headline` | Inline banner headline | iCloud Drive is unavailable. | — |
-| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | `[Your Name]` is **intentional** — it matches Apple's on-screen label for the device-owner row in iOS Settings. Keep the placeholder; do not insert a real name. |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.iCloudUnavailable.headline` | Inline banner headline | iCloud Drive is unavailable. | iCloud Drive est indisponible. | O iCloud Drive está indisponível. | `iCloud Drive` invariant |
+| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | Allez dans Réglages → [Your Name] → iCloud pour le réactiver. | Vá em Configurações → [Your Name] → iCloud para reativá-lo. | `[Your Name]` is **intentional** in all locales — it matches Apple's on-screen label for the device-owner row in iOS Settings. Keep the placeholder; do not insert a real name. Translators should match Apple's localized Settings path wording for "Réglages"/"Configurações" once confirmed against an fr-CA/pt-BR device — flag for step 7 QA. |
 
 ### File Write Error (Scenario 6)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.fileWrite.message` | Toast message | Couldn't save article. | 3s auto-dismiss |
-| `error.fileWrite.subtext` | Toast subtext | Check that your folder is accessible and try again. | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.fileWrite.message` | Toast message | Couldn't save article. | Impossible d'enregistrer l'article. | Não foi possível salvar o artigo. | 3s auto-dismiss |
+| `error.fileWrite.subtext` | Toast subtext | Check that your folder is accessible and try again. | Vérifiez que votre dossier est accessible et réessayez. | Verifique se sua pasta está acessível e tente novamente. | — |
 
 ### File Read Error (Scenario 7)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.fileRead.headline` | Inline reading view | This article couldn't be loaded. | — |
-| `error.fileRead.cta` | Text button | Open original | Opens sourceURL in Safari |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.fileRead.headline` | Inline reading view | This article couldn't be loaded. | Cet article n'a pas pu être chargé. | Não foi possível carregar este artigo. | — |
+| `error.fileRead.cta` | Text button | Open original | Ouvrir l'original | Abrir original | Opens sourceURL in Safari |
 
 ### Share Extension — Parse Failure (Scenario 8)
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `share.error.headline` | Share sheet error state | Couldn't save this article. | Replaces §8 `share.error.couldNotParse` |
-| `share.error.subheadline` | Share sheet error subheadline | The page couldn't be read. You can open it directly in Safari. | — |
-| `share.error.openInSafari` | Primary CTA | Open in Safari | Accent color |
-| `share.error.dismiss` | Secondary CTA | Dismiss | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `share.error.headline` | Share sheet error state | Couldn't save this article. | Impossible d'enregistrer cet article. | Não foi possível salvar este artigo. | Replaces §8 `share.error.couldNotParse` |
+| `share.error.subheadline` | Share sheet error subheadline | The page couldn't be read. You can open it directly in Safari. | La page n'a pas pu être lue. Vous pouvez l'ouvrir directement dans Safari. | A página não pôde ser lida. Você pode abri-la diretamente no Safari. | `Safari` invariant |
+| `share.error.openInSafari` | Primary CTA | Open in Safari | Ouvrir dans Safari | Abrir no Safari | Accent color |
+| `share.error.dismiss` | Secondary CTA | Dismiss | Fermer | Descartar | — |
 
 ### Share Extension — Duplicate URL
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `share.duplicate.headline` | Share sheet duplicate state | Article already saved | — |
-| `share.duplicate.subheadline` | Body copy | This link is already in your library as “{existingTitle}”. | `{existingTitle}` from existing file frontmatter |
-| `share.duplicate.updateExisting` | Primary button | Update existing | — |
-| `share.duplicate.saveCopy` | Secondary button | Save as copy | Appends ` (Copy)` to title (or ` 2` after existing ` (Copy)`) |
-| `share.duplicate.cancel` | Text button | Cancel | Completes extension without writing pending JSON |
-| `share.duplicate.success.saved` | Success headline | Saved | New file |
-| `share.duplicate.success.updated` | Success headline | Updated | Replaced existing file |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `share.duplicate.headline` | Share sheet duplicate state | Article already saved | Article déjà enregistré | Artigo já salvo | — |
+| `share.duplicate.subheadline` | Body copy | This link is already in your library as "{existingTitle}". | Ce lien est déjà dans votre bibliothèque sous le nom « {existingTitle} ». | Este link já está na sua biblioteca como "{existingTitle}". | `{existingTitle}` from existing file frontmatter; fr-CA uses guillemets « » per Québec French convention |
+| `share.duplicate.updateExisting` | Primary button | Update existing | Mettre à jour l'existant | Atualizar existente | — |
+| `share.duplicate.saveCopy` | Secondary button | Save as copy | Enregistrer une copie | Salvar como cópia | Appends ` (Copy)` to title (or ` 2` after existing ` (Copy)`) — fr-CA/pt-BR suffix wording TBD in step 7 (e.g. ` (Copie)` / ` (Cópia)`) |
+| `share.duplicate.cancel` | Text button | Cancel | Annuler | Cancelar | Completes extension without writing pending JSON |
+| `share.duplicate.success.saved` | Success headline | Saved | Enregistré | Salvo | New file |
+| `share.duplicate.success.updated` | Success headline | Updated | Mis à jour | Atualizado | Replaced existing file |
 
 ### Add Article — Duplicate URL
 
@@ -384,31 +529,39 @@ In-app **Add Article** uses the same headline, subheadline, and button labels as
 
 ### Generic Fallback
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `error.generic` | Last-resort fallback | Something went wrong. Please try again. | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `error.generic` | Last-resort fallback | Something went wrong. Please try again. | Une erreur s'est produite. Veuillez réessayer. | Algo deu errado. Tente novamente. | — |
 
 ---
 
-## 10. Accessibility-Only Labels (VoiceOver)
+## 9. Accessibility-Only Labels (VoiceOver)
 
 These strings are never visible on screen. They are set via `.accessibilityLabel` / `.accessibilityHint` in code.
 
-| Key | Location | String | Notes |
-|-----|----------|--------|-------|
-| `a11y.articleRow.hint` | Article list row hint | Double tap to open | — |
-| `a11y.articleRow.label` | Article list row label | {title}, {source}, {estimatedReadTime} | Dynamic |
-| `a11y.filterChip.selected` | Selected filter chip hint | Currently selected | — |
-| `a11y.filterChip.unselected` | Unselected filter chip hint | Double tap to filter | — |
-| `a11y.themeChip.selected` | Selected theme chip hint | Currently selected | — |
-| `a11y.themeChip.unselected` | Unselected theme chip hint | Double tap to select | — |
-| `a11y.fontOption.selected` | Selected font option announcement | {fontName}, selected | — |
-| `a11y.fontOption.unselected` | Unselected font option | {fontName} | — |
-| `a11y.fontSize.label` | Font size step label | {label}, {points} points | e.g. "Medium, 18 points" |
-| `a11y.fontSize.default` | Default size annotation | {label}, {points} points, default | e.g. "Medium, 18 points, default" |
-| `a11y.progress.label` | Scroll progress bar | Reading progress | — |
-| `a11y.progress.value` | Scroll progress bar value | {N} minutes remaining | ⚠️ plural; use `reading.progress.almostDone` < 1 min |
-| `a11y.skeletonLoading` | Skeleton list | Loading articles | — |
-| `a11y.deleteAction` | Swipe-delete action | Delete article | — |
-| `a11y.archiveAction` | Swipe-archive action | Archive article | — |
-| `a11y.unarchiveAction` | Swipe-unarchive action | Unarchive article | — |
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `a11y.articleRow.hint` | Article list row hint | Double tap to open | Touchez deux fois pour ouvrir | Toque duas vezes para abrir | — |
+| `a11y.articleRow.label` | Article list row label | {title}, {source}, {estimatedReadTime} | {title}, {source}, {estimatedReadTime} | {title}, {source}, {estimatedReadTime} | Dynamic — composed from already-translated fragments, no literal text to translate |
+| `a11y.filterChip.selected` | Selected filter chip hint | Currently selected | Actuellement sélectionné | Atualmente selecionado | — |
+| `a11y.filterChip.unselected` | Unselected filter chip hint | Double tap to filter | Touchez deux fois pour filtrer | Toque duas vezes para filtrar | — |
+| `a11y.themeChip.selected` | Selected theme chip hint | Currently selected | Actuellement sélectionné | Atualmente selecionado | — |
+| `a11y.themeChip.unselected` | Unselected theme chip hint | Double tap to select | Touchez deux fois pour sélectionner | Toque duas vezes para selecionar | — |
+| `a11y.fontOption.selected` | Selected font option announcement | {fontName}, selected | {fontName}, sélectionné | {fontName}, selecionado | — |
+| `a11y.fontOption.unselected` | Unselected font option | {fontName} | {fontName} | {fontName} | Font names are invariant |
+| `a11y.fontSize.label` | Font size step label | {label}, {points} points | {label}, {points} points | {label}, {points} pontos | e.g. "Medium, 18 points" → "Moyen, 18 points" → "Médio, 18 pontos". `{label}` is the full-word size name (Extra small/Small/Medium/…), not the XS/S/M abbreviation — see §4 Reader Settings open question |
+| `a11y.fontSize.default` | Default size annotation | {label}, {points} points, default | {label}, {points} points, par défaut | {label}, {points} pontos, padrão | e.g. "Medium, 18 points, default" |
+| `a11y.progress.label` | Scroll progress bar | Reading progress | Progression de lecture | Progresso de leitura | — |
+| `a11y.progress.value` | Scroll progress bar value | {N} percent | {N} pour cent | {N} por cento | Corrected during step 4 view-wiring pass: doc previously specified "{N} minutes remaining" with full plural handling, but shipped code reads out scroll percentage, not estimated time remaining. "Percent" doesn't inflect by count in en/fr-CA/pt-BR, so no plural variant needed. Wiring ScrollProgress.swift to a real time-remaining announcement is a possible future enhancement — see docs/BACKLOG.md. |
+| `a11y.skeletonLoading` | Skeleton list | Loading articles | Chargement des articles | Carregando artigos | — |
+| `a11y.deleteAction` | Swipe-delete action | Delete article | Supprimer l'article | Excluir artigo | — |
+| `a11y.archiveAction` | Swipe-archive action | Archive article | Archiver l'article | Arquivar artigo | — |
+| `a11y.unarchiveAction` | Swipe-unarchive action | Unarchive article | Désarchiver l'article | Desarquivar artigo | — |
+
+---
+
+## 10. Launch Screen
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `launch.brandName` | Splash screen brand text (under app icon) | Verso | Verso | Verso | Invariant — brand name. Added during step 4 view-wiring pass — `LaunchView.swift` had no UI_COPY entry yet. |

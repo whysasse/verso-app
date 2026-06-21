@@ -16,12 +16,12 @@ struct AnalyticsConsentView: View {
                     .foregroundColor(colors.accent)
 
                 VStack(spacing: VersoSpacing.sm) {
-                    Text("Help make Verso better")
+                    Text(L10n.Onboarding.analyticsConsentHeadline)
                         .font(VersoTypography.UI.screenTitle)
                         .foregroundColor(colors.textPrimary)
                         .multilineTextAlignment(.center)
 
-                    Text("Share anonymous usage data — no personal info, no article content, ever.")
+                    Text(L10n.Onboarding.analyticsConsentSubheadline)
                         .font(VersoTypography.UI.listSubtitle)
                         .foregroundColor(colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -32,13 +32,13 @@ struct AnalyticsConsentView: View {
             Spacer()
 
             VStack(spacing: VersoSpacing.sm) {
-                Button("Sure, why not") {
+                Button(L10n.Onboarding.analyticsConsentAcceptCta) {
                     AnalyticsService.shared.optIn()
                     onNext()
                 }
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
 
-                Button("No thanks", action: onNext)
+                Button(L10n.Onboarding.analyticsConsentDeclineCta, action: onNext)
                     .buttonStyle(VersoButtonStyle(variant: .secondary, theme: colors))
             }
             .padding(.horizontal, VersoSpacing.lg)

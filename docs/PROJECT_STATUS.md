@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-06-12 | **PRD Version:** 1.7
+**Date:** 2026-06-15 | **PRD Version:** 1.7
 
 ---
 
@@ -17,7 +17,7 @@ Verso is a minimalist, open-source article reader with iOS and web platforms. Ar
 | Platform | Status |
 |----------|--------|
 | **iOS** (SwiftUI, iOS 16+) | Implementation underway |
-| **Web** (Next.js 16 + TypeScript + Tailwind) | Scaffolded, Phase 1 in progress |
+| **Web** (Next.js 16 + TypeScript + Tailwind) | Phase 1 complete ✅; Phase 3+ in backlog |
 
 ---
 
@@ -57,18 +57,24 @@ The design system and all screen designs are **complete**. Implementation is act
 
 ## Web — Current State
 
-Scaffolded as a Next.js 16 app. Phase 1 (data layer) is underway.
+**Phase 1 (Foundation) ✅ Complete** (2026-06-15, FAB-165). Scaffolded as a Next.js 16 app with design system ported and running. Phases 3+ queued in backlog.
 
-### ✅ Done
+### ✅ Done (Phase 1)
 
-- Project scaffold (`verso-web/`)
-- Design tokens as CSS custom properties in `globals.css` (mirroring iOS tokens)
-- Theme system (`ThemeProvider.tsx`) — context, `localStorage` persistence, system dark-mode detection
-- Data layer foundation: `FileSystemService.ts`, `article.ts` types, `useArticleLibrary` hook
+- Project scaffold (`verso-web/`) initialized
+- Next.js 16.2.6 + TypeScript 5 with strict mode
+- Tailwind CSS 4 configured with PostCSS
+- Design tokens ported to `globals.css` — all 4 themes (Paper, Sepia, Night, Ink) + fixed tokens (spacing, typography, radius)
+- Theme system (`ThemeProvider.tsx`) — React context, localStorage persistence, system dark-mode detection
+- Directory structure: `app/`, `components/`, `hooks/`, `services/`, `types/`, `public/fonts/`
+- Root layout (`app/layout.tsx`) with ThemeProvider
+- Home page (`app/page.tsx`) with article listing, search, filtering, theme switcher
+- Data layer foundation: `useArticleLibrary` hook, article types, File System Access API integration
+- Dev server verified: `npm run dev` runs cleanly at http://localhost:3000
 
 ### 🔲 Remaining (Web)
 
-Web platform issues are tracked in **`docs/BACKLOG.md`** (the issue tracker of record). Current work spans phases 1–5, from data layer through to PWA support and advanced features (FAB-166 → FAB-174).
+Web platform issues are tracked in **`docs/BACKLOG.md`** (the issue tracker of record). **Phase 2 not yet scoped.** Future phases 3–5 span URL ingestion, bulk import, PWA support, and advanced features (FAB-171 → FAB-175).
 
 ---
 

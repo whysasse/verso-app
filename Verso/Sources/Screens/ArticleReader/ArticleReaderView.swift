@@ -269,7 +269,7 @@ struct ArticleReaderView: View {
     @ViewBuilder
     private var articleBody: some View {
         if parsedContent.isEmpty {
-            Text("Loading…")
+            Text(L10n.Reading.bodyLoading)
                 .font(.custom(readingPreferences.fontFamily, size: readingPreferences.fontSize))
                 .foregroundColor(colors.textSecondary)
         } else {
@@ -279,7 +279,8 @@ struct ArticleReaderView: View {
                 fontSize: readingPreferences.fontSize,
                 lineSpacingValue: lineSpacingValue,
                 colors: colors,
-                highlightedParagraphIndex: isTTSActive ? ttsParagraphs[safe: ttsService.currentParagraphIndex]?.index : nil
+                highlightedParagraphIndex: isTTSActive ? ttsParagraphs[safe: ttsService.currentParagraphIndex]?.index : nil,
+                baseDirectoryURL: article.filePath.isEmpty ? nil : URL(fileURLWithPath: article.filePath).deletingLastPathComponent()
             )
         }
     }

@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**147 completed issues.**
+**150 completed issues.**
 
 ## iOS
 
@@ -619,6 +619,25 @@
   When saving an article, images should be downloaded and stored in a `media/` subfolder inside the article's folder (rather than being referenced by remote URL). This keeps articles fully offline and self-contained.
 
   Additionally, image captions (subtitles) should be rendered with a distinct style — smaller, muted text — to visually differentiate them from the article body.
+
+- [x] 🟡 **FAB-135** · Detect clipboard URL when tapping the add article button  `Done` `Medium`
+  When the user taps the "+" button to manually add an article, the app checks the clipboard for a plausible HTTP(S) URL and pre-fills the URL field if found. Uses `UIPasteboard.general.hasURLs` (quiet check, no "Pasted from…" system banner).
+
+  ## Bug found during device testing (2026-06-16)
+
+  Initial implementation read `UIPasteboard.general.string` to get the clipboard contents after confirming `hasURLs == true`. On-device this silently failed: `hasURLs` is true whenever the pasteboard holds a URL-*type* item (e.g. copied from Safari's address bar), but `.string` reads the plain-text representation — which is `nil` when the source app stored the URL as a URL type without an accompanying plain-text type. The guard hit `nil`, the function returned early, and the field never pre-filled, with no visible error.
+
+  **Fix:** `AddArticleView.prefillURLFromClipboardIfNeeded()` now falls back to `UIPasteboard.general.url?.absoluteString` when `.string` is nil:
+  ```swift
+  guard let raw = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString else { return }
+  ```
+
+  ## Verification (device, 2026-06-16)
+
+  - [x] Copy a URL in Safari → switch to Verso → tap + → field pre-fills, no system banner shown
+  - [x] No URL in clipboard → field stays empty
+  - [x] Non-URL text in clipboard → field stays empty
+  - [x] Field already has content → no overwrite
 
 
 ### Phase 3 — Expansion
@@ -1747,4 +1766,28 @@
   ## Reference
 
   See `docs/ANALYTICS_STRATEGY.md` → Event Catalog.
+
+- [x] 🔴 **FAB-282** · `L10n.swift` not registered in any Xcode target — localization epic doesn't compile  `Done` `Urgent`
+  `Verso/Generated/L10n.swift` was missing from `project.yml` (XcodeGen config) — had zero entries in the generated `.xcodeproj`. Added `- Generated` to both `Verso` and `ShareExtension` target source lists, regenerated with XcodeGen, and verified both targets build clean. Also wired `ShareView.swift` to `L10n.*`, replacing all hardcoded strings.
+
+  **Fix:** `project.yml` → added `Generated` dir to both targets; `ShareView.swift` → replaced 10 hardcoded strings with `L10n.Share.*` and `L10n.AddArticle.savingMessage` accessors.
+
+  **Completed:** 2026-06-20.
+
+- [x] 🟠 **FAB-276** · L10n 1 · Finalize localization strategy & decisions doc  `Done` `High`
+  **Foundation — blocks the string/infra work** ([FAB-275](https://linear.app/fabiosasseron/issue/FAB-275/localization-en-ca-fr-ca-pt-br-epic) epic, step 1).
+
+  `docs/LOCALIZATION.md` reviewed and ratified against the acceptance checklist:
+
+  - [x] Locale set confirmed: `en` base, `en-CA` aliases `en`, `fr-CA` + `pt-BR` full. No RTL.
+  - [x] CLDR plural categories confirmed (FR: 0 = singular; PT-BR: 0 = plural).
+  - [x] Invariant-terms list and the `[Your Name]` iCloud exception locked.
+  - [x] Theme-label translations and per-locale font-preview strings confirmed.
+  - [x] `WPM = 220` and locale-aware (medium) date policy confirmed — cross-checked against code: `ReadingEstimate.swift` already centralizes `WPM = 220`; `TTSService.swift` already selects voice by content language. One drift found and fixed in the same pass: `ArticleHeader.swift` used `DateFormatter.dateStyle = .long` instead of the spec's `.medium` — corrected.
+
+  **Completed:** 2026-06-17. `docs/LOCALIZATION.md` bumped to v1.1, marked ratified, and its stale "Linear backlog" reference updated to point at `docs/BACKLOG.md` (Linear retired 2026-06-12). Already linked from `docs/HANDOFF.md`.
+
+  ## Unblocks
+
+  Step 3 of the localization epic (shared platform-neutral string source).
 

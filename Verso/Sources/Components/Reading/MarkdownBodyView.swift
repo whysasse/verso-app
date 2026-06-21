@@ -251,6 +251,8 @@ struct MarkdownBodyView: View {
     let lineSpacingValue: CGFloat
     let colors: ThemeColors
     var highlightedParagraphIndex: Int? = nil
+    /// Directory of the article file — used to resolve relative image paths (e.g. `./Article.media/img.jpg`).
+    var baseDirectoryURL: URL? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -343,7 +345,7 @@ struct MarkdownBodyView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 6))
 
             case .image(let urlString, let alt):
-                AsyncImageBlock(urlString: urlString, alt: alt, fontSize: fontSize, colors: colors)
+                AsyncImageBlock(urlString: urlString, baseDirectoryURL: baseDirectoryURL, alt: alt, fontSize: fontSize, colors: colors)
 
             case .horizontalRule:
                 Rectangle()
@@ -431,6 +433,7 @@ struct MarkdownBodyView: View {
 
 private struct AsyncImageBlock: View {
     let urlString: String
+    var baseDirectoryURL: URL? = nil
     let alt: String
     let fontSize: CGFloat
     let colors: ThemeColors
@@ -453,9 +456,22 @@ private struct AsyncImageBlock: View {
         }
     }
 
+    /// Resolves `urlString` to an absolute URL.
+    /// Relative paths (starting with `./` or no scheme) are resolved against `baseDirectoryURL`
+    /// so locally-saved images work as `file://` URLs.
+    private var resolvedURL: URL? {
+        if let base = baseDirectoryURL,
+           !urlString.contains("://") {
+            // Strip leading "./" if present before appending.
+            let relative = urlString.hasPrefix("./") ? String(urlString.dropFirst(2)) : urlString
+            return base.appendingPathComponent(relative)
+        }
+        return URL(string: urlString)
+    }
+
     @ViewBuilder
     private var imageContent: some View {
-        if let url = URL(string: urlString) {
+        if let url = resolvedURL {
             AsyncImage(url: url) { phase in
                 switch phase {
                 case .success(let image):
@@ -473,7 +489,7 @@ private struct AsyncImageBlock: View {
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 6))
-            .accessibilityLabel(trimmedCaption.isEmpty ? "Image" : trimmedCaption)
+            .accessibilityLabel(trimmedCaption.isEmpty ? L10n.Reading.bodyImageAccessibilityLabel : trimmedCaption)
         } else {
             placeholder
         }
@@ -488,7 +504,7 @@ private struct AsyncImageBlock: View {
             .fill(colors.surface)
             .frame(maxWidth: .infinity, minHeight: 80)
             .overlay(
-                Text(alt.isEmpty ? "Image" : alt)
+                Text(alt.isEmpty ? L10n.Reading.bodyImageAccessibilityLabel : alt)
                     .font(.system(size: max(12, captionFontSize)))
                     .foregroundColor(colors.textSecondary)
             )

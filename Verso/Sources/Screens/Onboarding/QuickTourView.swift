@@ -14,12 +14,12 @@ struct QuickTourView: View {
                 shareFlowIllustration
 
                 VStack(spacing: VersoSpacing.sm) {
-                    Text("Save from anywhere")
+                    Text(L10n.Onboarding.tourIllustrationHeadline)
                         .font(VersoTypography.UI.screenTitle)
                         .foregroundColor(colors.textPrimary)
                         .multilineTextAlignment(.center)
 
-                    Text("Tap Share in any browser, pick Verso, and your article is saved automatically.")
+                    Text(L10n.Onboarding.tourIllustrationSubheadline)
                         .font(VersoTypography.UI.listSubtitle)
                         .foregroundColor(colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -29,7 +29,7 @@ struct QuickTourView: View {
 
             Spacer()
 
-            Button("Start Reading", action: onComplete)
+            Button(L10n.Onboarding.tourStartReading, action: onComplete)
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
                 .padding(.horizontal, VersoSpacing.lg)
                 .padding(.bottom, VersoSpacing.xl)
@@ -38,19 +38,19 @@ struct QuickTourView: View {
 
     private var shareFlowIllustration: some View {
         HStack(spacing: VersoSpacing.sm) {
-            IllustrationStep(symbol: "safari", label: "Browser", colors: colors)
+            IllustrationStep(symbol: "safari", label: L10n.Onboarding.tourIllustrationBrowserLabel, colors: colors)
 
             Image(systemName: "chevron.right")
                 .foregroundColor(colors.textSecondary)
                 .font(.system(size: 14, weight: .semibold))
 
-            IllustrationStep(symbol: "square.and.arrow.up", label: "Share", colors: colors)
+            IllustrationStep(symbol: "square.and.arrow.up", label: L10n.Onboarding.tourIllustrationShareLabel, colors: colors)
 
             Image(systemName: "chevron.right")
                 .foregroundColor(colors.textSecondary)
                 .font(.system(size: 14, weight: .semibold))
 
-            IllustrationStep(symbol: "book.closed.fill", label: "Verso", colors: colors)
+            IllustrationStep(symbol: "book.closed.fill", label: L10n.Onboarding.tourIllustrationVersoLabel, colors: colors)
         }
         .padding(.horizontal, VersoSpacing.lg)
     }

@@ -20,20 +20,20 @@ struct AboutView: View {
             }
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: "About")
+        .versoNavigationBar(title: L10n.About.navTitle)
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: VersoSpacing.xs) {
-            Text("Verso")
+            Text(L10n.About.brandName)
                 .font(VersoTypography.UI.screenTitle)
                 .foregroundColor(colors.textPrimary)
 
-            Text("Version \(appVersion)")
+            Text(L10n.About.versionLabel(version: appVersion))
                 .font(VersoTypography.UI.caption)
                 .foregroundColor(colors.textSecondary)
 
-            Text("A minimalist reader for saving and reading articles, offline and distraction-free.")
+            Text(L10n.About.description)
                 .font(VersoTypography.UI.listSubtitle)
                 .foregroundColor(colors.textSecondary)
                 .padding(.top, VersoSpacing.xxs)
@@ -45,9 +45,9 @@ struct AboutView: View {
 
     private var links: some View {
         VStack(spacing: 0) {
-            NavigationLink(destination: InAppWebView(url: githubURL, title: "GitHub")) {
+            NavigationLink(destination: InAppWebView(url: githubURL, title: L10n.About.githubLinkLabel)) {
                 HStack {
-                    Text("GitHub")
+                    Text(L10n.About.githubLinkLabel)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.textPrimary)
                     Spacer()
@@ -64,7 +64,7 @@ struct AboutView: View {
 
             NavigationLink(destination: PrivacyPolicyView()) {
                 HStack {
-                    Text("Privacy Policy")
+                    Text(L10n.About.privacyPolicyLinkLabel)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.textPrimary)
                     Spacer()

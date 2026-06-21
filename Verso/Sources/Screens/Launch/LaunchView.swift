@@ -14,7 +14,7 @@ struct LaunchView: View {
                         .foregroundColor(themeManager.colors.accent)
                         .frame(width: 64, height: 64)
 
-                    Text("Verso")
+                    Text(L10n.Launch.brandName)
                         .font(.system(size: 28, weight: .bold, design: .serif))
                         .foregroundColor(themeManager.colors.accent)
                 }

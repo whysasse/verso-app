@@ -29,8 +29,8 @@ struct ImportView: View {
                         iconPointSize: 17,
                         labelWidth: 44,
                         labelHeight: 44,
-                        accessibilityLabel: String(localized: "Close"),
-                        accessibilityHint: String(localized: "Dismiss import sheet")
+                        accessibilityLabel: L10n.AddArticle.closeAccessibilityLabel,
+                        accessibilityHint: L10n.Import.closeAccessibilityHint
                     )
                 }
             }
@@ -51,9 +51,9 @@ struct ImportView: View {
         case .idle:
             idleContent
         case .parsing:
-            progressContent(message: "Reading file…", progress: nil)
+            progressContent(message: L10n.Import.parsingMessage, progress: nil)
         case .writing(let progress):
-            progressContent(message: "Importing articles…", progress: progress)
+            progressContent(message: L10n.Import.writingMessage, progress: progress)
         case .done(let imported, let skipped):
             doneContent(imported: imported, skipped: skipped)
         case .failed(let message):
@@ -70,11 +70,11 @@ struct ImportView: View {
                 .foregroundColor(colors.textSecondary)
 
             VStack(spacing: VersoSpacing.xs) {
-                Text("Import Articles")
+                Text(L10n.Import.idleHeadline)
                     .font(VersoTypography.UI.listTitle)
                     .foregroundColor(colors.textPrimary)
 
-                Text("Import your reading list from GoodLinks, Instapaper, Pocket, Readwise Reader, or Matter.")
+                Text(L10n.Import.idleSubtitle)
                     .font(VersoTypography.UI.listSubtitle)
                     .foregroundColor(colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -82,7 +82,7 @@ struct ImportView: View {
             }
 
             if folderBookmarkService.folderURL == nil {
-                Text("Set your articles folder in Storage settings before importing.")
+                Text(L10n.Import.idleNoFolderWarning)
                     .font(VersoTypography.UI.caption)
                     .foregroundColor(colors.accent)
                     .multilineTextAlignment(.center)
@@ -92,7 +92,7 @@ struct ImportView: View {
             Button {
                 showFilePicker = true
             } label: {
-                Text("Select Export File")
+                Text(L10n.Import.idleSelectFileButton)
                     .font(VersoTypography.UI.button)
                     .foregroundColor(colors.background)
                     .frame(maxWidth: .infinity)
@@ -136,11 +136,11 @@ struct ImportView: View {
                 .foregroundColor(colors.accent)
 
             VStack(spacing: VersoSpacing.xs) {
-                Text("Import Complete")
+                Text(L10n.Import.doneHeadline)
                     .font(VersoTypography.UI.listTitle)
                     .foregroundColor(colors.textPrimary)
 
-                Text("\(imported) article\(imported == 1 ? "" : "s") imported\(skipped > 0 ? ", \(skipped) skipped" : "").")
+                Text(L10n.Import.doneSummary(count: imported) + (skipped > 0 ? L10n.Import.doneSkippedSuffix(count: skipped) : "") + ".")
                     .font(VersoTypography.UI.listSubtitle)
                     .foregroundColor(colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -150,7 +150,7 @@ struct ImportView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text("Done")
+                    Text(L10n.Import.doneDoneButton)
                         .font(VersoTypography.UI.button)
                         .foregroundColor(colors.background)
                         .frame(maxWidth: .infinity)
@@ -164,7 +164,7 @@ struct ImportView: View {
                 Button {
                     orchestrator.reset()
                 } label: {
-                    Text("Import Another File")
+                    Text(L10n.Import.doneImportAnotherButton)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.accent)
                 }
@@ -183,7 +183,7 @@ struct ImportView: View {
                 .foregroundColor(colors.textSecondary)
 
             VStack(spacing: VersoSpacing.xs) {
-                Text("Import Failed")
+                Text(L10n.Import.failedHeadline)
                     .font(VersoTypography.UI.listTitle)
                     .foregroundColor(colors.textPrimary)
 
@@ -197,7 +197,7 @@ struct ImportView: View {
             Button {
                 orchestrator.reset()
             } label: {
-                Text("Try Again")
+                Text(L10n.AddArticle.failureTryAgain)
                     .font(VersoTypography.UI.button)
                     .foregroundColor(colors.background)
                     .frame(maxWidth: .infinity)

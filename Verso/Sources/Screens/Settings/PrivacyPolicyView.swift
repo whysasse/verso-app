@@ -30,7 +30,7 @@ struct PrivacyPolicyView: View {
             .padding(VersoSpacing.md)
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: "Privacy Policy")
+        .versoNavigationBar(title: L10n.PrivacyPolicy.navTitle)
     }
 }
 

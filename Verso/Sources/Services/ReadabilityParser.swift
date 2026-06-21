@@ -294,7 +294,7 @@ enum HTMLToMarkdownConverter {
         guard let re = try? NSRegularExpression(pattern: #"<picture\b[^>]*>([\s\S]*?)</picture>"#, options: [.caseInsensitive]) else {
             return html
         }
-        var work = NSMutableString(string: html)
+        let work = NSMutableString(string: html)
         while true {
             let full = NSString(string: work as String)
             let search = NSRange(location: 0, length: full.length)

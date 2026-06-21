@@ -16,12 +16,12 @@ struct WelcomeView: View {
                     .foregroundColor(colors.accent)
 
                 VStack(spacing: VersoSpacing.sm) {
-                    Text("Your articles.\nYour files.")
+                    Text(L10n.Onboarding.welcomeHeadline)
                         .font(VersoTypography.UI.screenTitle)
                         .foregroundColor(colors.textPrimary)
                         .multilineTextAlignment(.center)
 
-                    Text("Save any article, read on your terms.")
+                    Text(L10n.Onboarding.welcomeSubheadline)
                         .font(VersoTypography.UI.listSubtitle)
                         .foregroundColor(colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -30,7 +30,7 @@ struct WelcomeView: View {
 
             Spacer()
 
-            Button("Get Started", action: onNext)
+            Button(L10n.Onboarding.welcomeCta, action: onNext)
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
                 .padding(.horizontal, VersoSpacing.lg)
                 .padding(.bottom, VersoSpacing.xl)

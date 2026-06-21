@@ -14,7 +14,7 @@ struct StatusBadge: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.white)
         }
-        .accessibilityLabel(Text(status.rawValue))
+        .accessibilityLabel(Text(status.statusLabel))
     }
 }
 

@@ -10,17 +10,17 @@ struct FolderPickerPrompt: View {
                 .font(.system(size: 32))
                 .foregroundColor(themeManager.colors.accent)
 
-            Text("No folder selected")
+            Text(L10n.Error.noFolderHeadline)
                 .font(VersoTypography.UI.listTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
 
-            Text("Choose an iCloud Drive folder where your articles will be stored.")
+            Text(L10n.Error.noFolderSubheadline)
                 .font(VersoTypography.UI.caption)
                 .foregroundColor(themeManager.colors.textSecondary)
                 .multilineTextAlignment(.center)
 
             Button(action: onChoose) {
-                Text("Choose a folder to get started")
+                Text(L10n.Error.noFolderCta)
                     .font(VersoTypography.UI.button)
                     .foregroundColor(themeManager.colors.background)
                     .padding(.horizontal, VersoSpacing.md)
