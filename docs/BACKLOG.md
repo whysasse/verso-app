@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**29 open issues** across iOS, Web, Design, and Infra.
+**30 open issues** across iOS, Web, Design, and Infra.
 
 ## iOS
 
@@ -526,6 +526,13 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   Found during the FAB-282 final sweep. `OnboardingThemePickerView.swift` has three hardcoded user-facing strings: `Text("Choose your theme")`, `Text("You can always change this later in Settings.")`, and `Button("Continue")`. Existing L10n keys differ slightly (`onboarding.theme.headline` = "Choose your reading theme", `onboarding.theme.subheadline` = "You can change this any time from settings."), so wiring them would change visible copy.
 
   **Fix:** follow the FAB-281 pattern — add interim keys matching the shipped copy, wire the view, file a copy-reconciliation decision. `L10n.Onboarding.themeContinue` ("Continue") can be wired directly — it matches.
+
+- [ ] 🟢 **FAB-284** · Language picker (iOS + Web)  `Backlog` `Low`
+  Both platforms currently resolve their locale automatically (iOS: device system language; Web, once step 5 lands: browser language via a cookie) with no in-app override. Add an explicit picker so a user can choose `en` / `fr-CA` / `pt-BR` regardless of device/browser language.
+
+  **iOS:** likely lives in Settings, alongside the existing theme picker. **Web:** `LocaleProvider` (see `docs/plans/FAB-275-step5-web-i18n-infra.md`, step 3) is deliberately shaped the same way as `ThemeProvider` so adding a `setLocale` + a switcher (mirroring the existing `ThemeSwitcher`) is a small diff, not a rewrite, once this is picked up.
+
+  Filed as a deliberate follow-up — both platforms localize correctly via auto-detection without this. Where it lives in the UI is a UX call for Fabio, not a technical one.
 
 - [ ] 🟠 **FAB-275** · Localization: EN-CA, FR-CA, PT-BR (epic)  `Backlog` `High`
   Ship Verso in **EN-CA, FR-CA, and PT-BR** across iOS and Web.
