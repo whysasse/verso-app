@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { ThemeProvider } from "./providers/ThemeProvider";
+import { LocaleProvider, type VersoLocale } from "./providers/LocaleProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,15 +10,21 @@ export const metadata: Metadata = {
   description: "A minimalist article reader",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = (await getLocale()) as VersoLocale;
+
   return (
-    <html lang="en" data-theme="paper" className="h-full antialiased">
+    <html lang={locale} data-theme="paper" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <NextIntlClientProvider>
+          <LocaleProvider initialLocale={locale}>
+            <ThemeProvider>{children}</ThemeProvider>
+          </LocaleProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

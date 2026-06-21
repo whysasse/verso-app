@@ -1,4 +1,8 @@
+import { useTranslations } from "next-intl";
+
 export function LoadingState() {
+  const t = useTranslations("home.loading");
+
   return (
     <div
       style={{
@@ -21,7 +25,7 @@ export function LoadingState() {
           animation: "verso-spin 0.7s linear infinite",
         }}
       />
-      <span style={{ fontSize: "var(--type-ui-caption-size)" }}>Loading articles…</span>
+      <span style={{ fontSize: "var(--type-ui-caption-size)" }}>{t("accessibilityLabel")}</span>
       <style>{`
         @keyframes verso-spin {
           to { transform: rotate(360deg); }

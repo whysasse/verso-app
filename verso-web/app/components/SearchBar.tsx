@@ -1,9 +1,13 @@
+import { useTranslations } from "next-intl";
+
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
 }
 
 export function SearchBar({ value, onChange }: SearchBarProps) {
+  const t = useTranslations("home.search");
+
   return (
     <div style={{ position: "relative" }}>
       {/* Search icon */}
@@ -24,7 +28,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       </span>
       <input
         type="search"
-        placeholder="Search articles"
+        placeholder={t("placeholder")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
@@ -51,7 +55,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       {value && (
         <button
           onClick={() => onChange("")}
-          aria-label="Clear search"
+          aria-label={t("clear.accessibilityLabel")}
           style={{
             position: "absolute",
             right: "var(--spacing-sm)",

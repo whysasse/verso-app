@@ -75,3 +75,7 @@ Verso.xcodeproj/
 
 # Local build secrets (see Verso/Secrets.xcconfig.template)
 Verso/Secrets.xcconfig
+
+# Stray scratch files left in sandboxed sessions (filesystem quirk prevents deletion;
+# renamed with a leading dot instead so they stop showing up as untracked)
+docs/copy/.ignore_*

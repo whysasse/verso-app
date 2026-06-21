@@ -163,6 +163,12 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `home.empty.noResults.subheadline` | Search empty state subheadline | Try a different search term. | Essayez un autre terme de recherche. | Tente outro termo de busca. | — |
 | `home.empty.archive.headline` | Archive empty state headline | Nothing archived | Rien d'archivé | Nada arquivado | — |
 | `home.empty.archive.subheadline` | Archive empty state subheadline | Articles you archive will appear here. | Les articles que vous archivez apparaîtront ici. | Os artigos que você arquivar vão aparecer aqui. | — |
+| `home.empty.noUnread.headline` | Unread-filter empty state headline | Nothing unread | Aucun article non lu | Nenhum artigo não lido | Added during step 5 web-wiring pass — Web has a per-filter empty state with no iOS equivalent (iOS doesn't filter the list by read status the same way). needs_review. |
+| `home.empty.noUnread.subheadline` | Unread-filter empty state subheadline | Articles you haven't read yet will appear here. | Les articles que vous n'avez pas encore lus apparaîtront ici. | Os artigos que você ainda não leu vão aparecer aqui. | needs_review. |
+| `home.empty.noReading.headline` | Reading-filter empty state headline | Nothing in progress | Rien en cours | Nada em andamento | Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review. |
+| `home.empty.noReading.subheadline` | Reading-filter empty state subheadline | Articles you're currently reading will appear here. | Les articles que vous lisez actuellement apparaîtront ici. | Os artigos que você está lendo no momento vão aparecer aqui. | needs_review. |
+| `home.empty.noRead.headline` | Read-filter empty state headline | Nothing read yet | Rien de lu pour l'instant | Nada lido ainda | Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review. |
+| `home.empty.noRead.subheadline` | Read-filter empty state subheadline | Articles you finish reading will appear here. | Les articles que vous terminez de lire apparaîtront ici. | Os artigos que você terminar de ler vão aparecer aqui. | needs_review. |
 | `home.loading.accessibilityLabel` | Skeleton loading state | Loading articles | Chargement des articles | Carregando artigos | — |
 
 ### Swipe Actions
@@ -565,3 +571,34 @@ These strings are never visible on screen. They are set via `.accessibilityLabel
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `launch.brandName` | Splash screen brand text (under app icon) | Verso | Verso | Verso | Invariant — brand name. Added during step 4 view-wiring pass — `LaunchView.swift` had no UI_COPY entry yet. |
+
+---
+
+## 11. Web-Only Strings
+
+> Added during step 5 web-wiring pass. Verso Web has a handful of surfaces with no iOS
+> counterpart at all (a desktop font-family picker, a "this browser isn't supported"
+> screen, single-string error states on the reader page where iOS uses a structured
+> headline/subheadline/cta error view instead). Per the step-5 plan, everywhere a real
+> iOS equivalent existed, Web's copy was changed to match it instead of adding a new key
+> here — these rows are only the genuinely Web-specific remainder. All fr-CA/pt-BR here
+> are first-pass translations, needs_review.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `web.unsupportedBrowser.headline` | Full-screen notice when File System Access API is unavailable | Browser not supported | Navigateur non pris en charge | Navegador não compatível | — |
+| `web.unsupportedBrowser.subheadline` | Same screen, body copy | Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser. | Verso Web utilise l'API File System Access, qui nécessite Chrome ou Edge 86+. Veuillez ouvrir cette page dans un navigateur pris en charge. | O Verso Web usa a File System Access API, que requer Chrome ou Edge 86+. Abra esta página em um navegador compatível. | `Verso Web`, `File System Access API`, `Chrome`, `Edge` invariant. |
+| `web.changeFolder.label` | Link below the article list to re-pick the library folder | Change folder | Changer de dossier | Alterar pasta | — |
+| `web.fontFamily.system` | Font-family option label | System | Système | Sistema | — |
+| `web.fontFamily.mono` | Font-family option label | Mono | Mono | Mono | — |
+| `web.fontFamily.georgia` | Font-family option label | Georgia | Georgia | Georgia | Invariant — font name. |
+| `web.fontFamily.dyslexic` | Font-family option label | OpenDyslexic | OpenDyslexic | OpenDyslexic | Invariant — brand name (see `docs/LOCALIZATION.md` §4). Renamed from the shipped "Dyslexic" to the actual font name. |
+| `web.reader.toggleControls.show` | Reader-screen "Aa" button tooltip when controls are hidden | Show controls | Afficher les commandes | Mostrar controles | — |
+| `web.reader.toggleControls.hide` | Reader-screen "Aa" button tooltip when controls are visible | Hide controls | Masquer les commandes | Ocultar controles | — |
+| `web.reader.backButton.label` | Reader-screen back link (visible text, the "←" glyph is decorative and not part of the translated string) | Library | Bibliothèque | Biblioteca | — |
+| `web.reader.error.noFolder` | Reader-screen error when no folder is bookmarked | No folder selected. Go back and choose your library folder. | Aucun dossier sélectionné. Revenez en arrière et choisissez votre dossier de bibliothèque. | Nenhuma pasta selecionada. Volte e escolha a pasta da sua biblioteca. | Distinct from `error.noFolder.*` (home-screen full error view, headline/subheadline/cta) — this is a single inline string on the reader page. |
+| `web.reader.error.permissionDenied` | Reader-screen error when folder permission was revoked | Folder permission denied. Go back and re-select your library. | Autorisation du dossier refusée. Revenez en arrière et resélectionnez votre bibliothèque. | Permissão da pasta negada. Volte e selecione novamente sua biblioteca. | — |
+| `web.reader.error.articleNotFound` | Reader-screen error when the file isn't found in the folder | Article not found: {filename} | Article introuvable : {filename} | Artigo não encontrado: {filename} | `{filename}` not translated. |
+| `web.reader.error.loadFailed` | Reader-screen generic load failure (caught exception, no specific message) | Failed to load article | Échec du chargement de l'article | Falha ao carregar o artigo | — |
+| `web.reader.error.fallback` | Reader-screen fallback when article is missing with no specific error | Article not found. | Article introuvable. | Artigo não encontrado. | — |
+| `web.reader.backToLibrary.label` | Link shown alongside the reader-screen error state (the "←" glyph is decorative) | Back to library | Retour à la bibliothèque | Voltar para a biblioteca | — |

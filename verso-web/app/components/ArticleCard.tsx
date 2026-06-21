@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from "next-intl";
 import type { Article, ArticleStatus } from "@/types/article";
 
 const STATUS_COLORS: Record<ArticleStatus, string> = {
@@ -7,20 +8,12 @@ const STATUS_COLORS: Record<ArticleStatus, string> = {
   archived: "#8F897F",
 };
 
-const STATUS_LABELS: Record<ArticleStatus, string> = {
-  unread: "Unread",
-  reading: "Reading",
-  read: "Read",
-  archived: "Archived",
-};
-
-function formatDate(iso: string): string {
+// docs/copy/UI_COPY.md §3 requires a locale-aware *medium* date style here (not a
+// hard-coded "en-CA" / "MMM d, yyyy" format) -- this card's date previously ignored the
+// active UI locale entirely.
+function formatDate(iso: string, locale: string): string {
   const d = new Date(iso + "T00:00:00"); // treat as local date
-  return d.toLocaleDateString("en-CA", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(d);
 }
 
 function extractHostname(url?: string): string | null {
@@ -38,6 +31,8 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, onClick }: ArticleCardProps) {
+  const locale = useLocale();
+  const t = useTranslations("filter");
   const statusColor = STATUS_COLORS[article.status];
   const source = article.site_name ?? extractHostname(article.url);
 
@@ -58,7 +53,7 @@ export function ArticleCard({ article, onClick }: ArticleCardProps) {
       <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--spacing-sm)" }}>
         {/* Status dot */}
         <span
-          aria-label={STATUS_LABELS[article.status]}
+          aria-label={t(`${article.status}._label`)}
           style={{
             flexShrink: 0,
             width: 8,
@@ -95,7 +90,7 @@ export function ArticleCard({ article, onClick }: ArticleCardProps) {
               whiteSpace: "nowrap",
             }}
           >
-            {[source, formatDate(article.added)].filter(Boolean).join(" · ")}
+            {[source, formatDate(article.added, locale)].filter(Boolean).join(" · ")}
           </p>
         </div>
       </div>

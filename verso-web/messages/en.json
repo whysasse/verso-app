@@ -1,0 +1,550 @@
+{
+  "a11y": {
+    "archiveAction": "Archive article",
+    "articleRow": {
+      "hint": "Double tap to open",
+      "label": "{title}, {source}, {estimatedReadTime}"
+    },
+    "deleteAction": "Delete article",
+    "filterChip": {
+      "selected": "Currently selected",
+      "unselected": "Double tap to filter"
+    },
+    "fontOption": {
+      "selected": "{fontName}, selected",
+      "unselected": "{fontName}"
+    },
+    "fontSize": {
+      "default": "{label}, {points} points, default",
+      "label": "{label}, {points} points"
+    },
+    "progress": {
+      "label": "Reading progress",
+      "value": "{count} percent"
+    },
+    "skeletonLoading": "Loading articles",
+    "themeChip": {
+      "selected": "Currently selected",
+      "unselected": "Double tap to select"
+    },
+    "unarchiveAction": "Unarchive article"
+  },
+  "about": {
+    "acknowledgements": {
+      "rowLabel": "Open-source acknowledgements"
+    },
+    "brandName": "Verso",
+    "description": "A minimalist reader for saving and reading articles, offline and distraction-free.",
+    "footer": "Verso {version} · Built with care",
+    "github": {
+      "rowLabel": "View on GitHub"
+    },
+    "githubLinkLabel": "GitHub",
+    "navTitle": "About",
+    "privacyPolicy": {
+      "rowLabel": "Privacy policy"
+    },
+    "privacyPolicyLinkLabel": "Privacy Policy",
+    "title": "About Verso",
+    "version": {
+      "rowLabel": "Version"
+    },
+    "versionLabel": "Version {version}"
+  },
+  "addArticle": {
+    "close": {
+      "accessibilityHint": "Dismiss add article sheet",
+      "accessibilityLabel": "Close"
+    },
+    "error": {
+      "noLibraryFolder": "No library folder selected."
+    },
+    "failure": {
+      "headline": "Could not save article",
+      "tryAgain": "Try Again"
+    },
+    "idle": {
+      "instructions": "Paste a link to save an article to your library.",
+      "placeholder": "Paste a link…",
+      "save": "Save"
+    },
+    "navTitle": "Add Article",
+    "saving": {
+      "message": "Saving article…"
+    },
+    "success": {
+      "headline": "Article saved!",
+      "subheadline": "It will appear in your library shortly."
+    }
+  },
+  "articleCard": {
+    "accessibilityHint": "Double tap to open",
+    "accessibilityLabel": "{title}, {source}, {estimatedReadTime}",
+    "estimatedReadTime": "{count} min read"
+  },
+  "contextMenu": {
+    "archive": "Archive",
+    "delete": "Delete",
+    "markAsRead": "Mark as read",
+    "markAsUnread": "Mark as unread",
+    "open": "Open",
+    "unarchive": "Unarchive"
+  },
+  "dialog": {
+    "bulkDelete": {
+      "title": "{count, plural, one {Delete # article?} other {Delete # articles?}}"
+    },
+    "changeFolder": {
+      "cancel": "Cancel",
+      "message": "Your old folder won't be touched if you choose No.",
+      "no": "Keep in Old Folder",
+      "title": "Move your existing articles to the new folder?",
+      "yes": "Move Articles"
+    },
+    "deleteArticle": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "message": "This cannot be undone. The file will be permanently removed from your iCloud Drive.",
+      "title": "Delete article?"
+    }
+  },
+  "error": {
+    "fileRead": {
+      "cta": "Open original",
+      "headline": "This article couldn't be loaded."
+    },
+    "fileWrite": {
+      "message": "Couldn't save article.",
+      "subtext": "Check that your folder is accessible and try again."
+    },
+    "folderMissing": {
+      "cta": "Choose new folder",
+      "headline": "Folder not found.",
+      "subheadline": "The folder may have been moved or deleted. Choose a new one to continue."
+    },
+    "generic": "Something went wrong. Please try again.",
+    "iCloudUnavailable": {
+      "headline": "iCloud Drive is unavailable.",
+      "subheadline": "Go to Settings → [Your Name] → iCloud to re-enable it."
+    },
+    "noFolder": {
+      "cta": "Choose folder",
+      "headline": "No folder selected.",
+      "subheadline": "Choose a folder in iCloud Drive to start saving articles."
+    },
+    "offline": {
+      "articleUnavailable": "Not available offline.",
+      "banner": {
+        "headline": "You're offline.",
+        "subheadline": "Saved articles are still available."
+      }
+    },
+    "parsing": {
+      "dismiss": "Dismiss",
+      "headline": "Couldn't read this article.",
+      "openInSafari": "Open in Safari",
+      "subheadline": "The page may be behind a paywall or require a login."
+    }
+  },
+  "filter": {
+    "all": {
+      "_label": "All",
+      "accessibilityLabel": "All articles, {count} total"
+    },
+    "archived": {
+      "_label": "Archived",
+      "accessibilityLabel": "Archived, {count} articles"
+    },
+    "chip": {
+      "selected": {
+        "hint": "Currently selected"
+      },
+      "unselected": {
+        "hint": "Double tap to filter"
+      }
+    },
+    "read": {
+      "_label": "Read",
+      "accessibilityLabel": "{count, plural, one {Read, # article} other {Read, # articles}}"
+    },
+    "reading": {
+      "_label": "Reading",
+      "accessibilityLabel": "{count, plural, one {Reading, # article} other {Reading, # articles}}"
+    },
+    "unread": {
+      "_label": "Unread",
+      "accessibilityLabel": "{count, plural, one {Unread, # article} other {Unread, # articles}}"
+    }
+  },
+  "home": {
+    "archiveToggle": {
+      "showArchive": "Show archived articles",
+      "showLibrary": "Show reading list"
+    },
+    "bulkSelect": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "markRead": "Mark read",
+      "select": "Select"
+    },
+    "dateFilter": {
+      "any": "Any time",
+      "label": "Added",
+      "month": "Past month",
+      "week": "Past week",
+      "year": "Past year"
+    },
+    "empty": {
+      "archive": {
+        "headline": "Nothing archived",
+        "subheadline": "Articles you archive will appear here."
+      },
+      "noArticles": {
+        "headline": "No articles yet",
+        "subheadline": "Share an article from Safari to get started."
+      },
+      "noRead": {
+        "headline": "Nothing read yet",
+        "subheadline": "Articles you finish reading will appear here."
+      },
+      "noReading": {
+        "headline": "Nothing in progress",
+        "subheadline": "Articles you're currently reading will appear here."
+      },
+      "noResults": {
+        "headline": "No results",
+        "subheadline": "Try a different search term."
+      },
+      "noUnread": {
+        "headline": "Nothing unread",
+        "subheadline": "Articles you haven't read yet will appear here."
+      }
+    },
+    "loading": {
+      "accessibilityLabel": "Loading articles"
+    },
+    "navTitle": "Verso",
+    "pullToRefresh": {
+      "accessibilityLabel": "Refresh article list"
+    },
+    "search": {
+      "cancel": "Cancel",
+      "clear": {
+        "accessibilityLabel": "Clear search"
+      },
+      "placeholder": "Search titles, text, or site…"
+    },
+    "settings": {
+      "accessibilityLabel": "Settings"
+    },
+    "sort": {
+      "newestFirst": "Sort newest first",
+      "oldestFirst": "Sort oldest first"
+    },
+    "tagFilter": {
+      "allTags": "All tags",
+      "button": {
+        "accessibilityLabel": "Filter by tags"
+      },
+      "close": {
+        "accessibilityLabel": "Close tag filter"
+      },
+      "noMatches": "No matching tags",
+      "searchPlaceholder": "Search tags…",
+      "title": "Tags"
+    }
+  },
+  "import": {
+    "close": {
+      "accessibilityHint": "Dismiss import sheet"
+    },
+    "done": {
+      "doneButton": "Done",
+      "headline": "Import Complete",
+      "importAnotherButton": "Import Another File",
+      "skippedSuffix": "{count, plural, one {, # skipped} other {, # skipped}}",
+      "summary": "{count, plural, one {# article imported} other {# articles imported}}"
+    },
+    "failed": {
+      "headline": "Import Failed"
+    },
+    "idle": {
+      "headline": "Import Articles",
+      "noFolderWarning": "Set your articles folder in Storage settings before importing.",
+      "selectFileButton": "Select Export File",
+      "subtitle": "Import your reading list from GoodLinks, Instapaper, Pocket, Readwise Reader, or Matter."
+    },
+    "parsing": {
+      "message": "Reading file…"
+    },
+    "writing": {
+      "message": "Importing articles…"
+    }
+  },
+  "launch": {
+    "brandName": "Verso"
+  },
+  "onboarding": {
+    "analyticsConsent": {
+      "acceptCta": "Sure, why not",
+      "declineCta": "No thanks",
+      "headline": "Help make Verso better",
+      "subheadline": "Share anonymous usage data — no personal info, no article content, ever."
+    },
+    "folder": {
+      "chooseCta": "Choose folder…",
+      "continueCta": "Continue",
+      "headline": "Where should Verso save your articles?",
+      "obsidianTip": "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically.",
+      "privacyNote": "Verso never uploads your files. They live in your iCloud Drive.",
+      "subheadline": "Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere."
+    },
+    "theme": {
+      "continue": "Continue",
+      "headline": "Choose your reading theme",
+      "subheadline": "You can change this any time from settings."
+    },
+    "tour": {
+      "headline": "Here's how it works",
+      "illustrationBrowserLabel": "Browser",
+      "illustrationHeadline": "Save from anywhere",
+      "illustrationShareLabel": "Share",
+      "illustrationSubheadline": "Tap Share in any browser, pick Verso, and your article is saved automatically.",
+      "illustrationVersoLabel": "Verso",
+      "skip": "Skip",
+      "startReading": "Start reading",
+      "step1": "Share any article from Safari or your browser to save it instantly.",
+      "step2": "Open Verso to read. Your list is always in sync with your files.",
+      "step3": "Mark articles as read when you're done. They stay in your folder forever."
+    },
+    "welcome": {
+      "cta": "Get started",
+      "headline": "Your articles. Your files.",
+      "subheadline": "A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive."
+    }
+  },
+  "privacyPolicy": {
+    "navTitle": "Privacy Policy"
+  },
+  "readerSettings": {
+    "fontSize": {
+      "l": "L",
+      "m": "M",
+      "s": "S",
+      "sectionLabel": "Text size",
+      "xl": "XL",
+      "xs": "XS",
+      "xxl": "XXL"
+    },
+    "lineSpacing": {
+      "airy": "Airy",
+      "compact": "Compact",
+      "normal": "Normal",
+      "relaxed": "Relaxed",
+      "sectionLabel": "Line spacing"
+    },
+    "margins": {
+      "sectionLabel": "Margins"
+    },
+    "theme": {
+      "sectionLabel": "Theme",
+      "selected": {
+        "hint": "Currently selected"
+      }
+    },
+    "title": "Reading settings"
+  },
+  "reading": {
+    "back": {
+      "accessibilityLabel": "Back to reading list"
+    },
+    "body": {
+      "image": {
+        "accessibilityLabel": "Image"
+      },
+      "loading": "Loading…"
+    },
+    "controls": {
+      "decreaseFontSize": "Decrease font size",
+      "increaseFontSize": "Increase font size",
+      "lineSpacing": {
+        "_label": "Line spacing",
+        "hint": "Double tap to open spacing options"
+      },
+      "margins": {
+        "_label": "Margins",
+        "hint": "Double tap to open margin options"
+      },
+      "markAsRead": "Mark as read",
+      "markAsUnread": "Mark as unread",
+      "theme": {
+        "_label": "Theme",
+        "hint": "Double tap to open theme options"
+      },
+      "tts": {
+        "pause": "Pause text-to-speech",
+        "play": "Play text-to-speech"
+      }
+    },
+    "controlsSheet": {
+      "closeAccessibilityHint": "Dismiss controls",
+      "fontSizeLabel": "Font size",
+      "lineSpacingLabel": "Line spacing"
+    },
+    "header": {
+      "byline": "By {author}"
+    },
+    "immersiveHint": "Tap anywhere to reveal controls",
+    "openExternal": {
+      "accessibilityLabel": "Open original article"
+    },
+    "relatedArticles": {
+      "sectionHeader": "Related"
+    },
+    "splitView": {
+      "placeholder": {
+        "accessibilityLabel": "No article selected",
+        "headline": "Select an article"
+      }
+    }
+  },
+  "settings": {
+    "about": {
+      "versionRowLabel": "Version {version}"
+    },
+    "analytics": {
+      "rowLabel": "Share anonymous data",
+      "subtitle": "No personal info or article content, ever."
+    },
+    "folder": {
+      "emptyValue": "Not set",
+      "rowLabel": "Articles folder"
+    },
+    "font": {
+      "preview": "The quick brown fox jumps over the lazy dog",
+      "sectionLabel": "Font"
+    },
+    "fontSize": {
+      "sectionLabel": "Size"
+    },
+    "import": {
+      "rowLabel": "Import Articles"
+    },
+    "privacyPolicy": {
+      "rowLabel": "Privacy Policy"
+    },
+    "section": {
+      "about": "About",
+      "privacy": "Privacy",
+      "reading": "Reading",
+      "storage": "Storage"
+    },
+    "title": "Settings"
+  },
+  "share": {
+    "cancel": "Cancel",
+    "duplicate": {
+      "cancel": "Cancel",
+      "headline": "Article already saved",
+      "saveCopy": "Save as copy",
+      "subheadline": "This link is already in your library as \"{existingTitle}\".",
+      "success": {
+        "saved": "Saved",
+        "updated": "Updated"
+      },
+      "updateExisting": "Update existing"
+    },
+    "error": {
+      "dismiss": "Dismiss",
+      "headline": "Couldn't save this article.",
+      "noFolder": {
+        "cta": "Open Verso to finish setup",
+        "message": "Folder not configured."
+      },
+      "openInSafari": "Open in Safari",
+      "subheadline": "The page couldn't be read. You can open it directly in Safari."
+    },
+    "preview": {
+      "loading": {
+        "accessibilityLabel": "Loading article preview"
+      }
+    },
+    "save": {
+      "default": "Save",
+      "error": "Try again",
+      "loading": "Saving…",
+      "success": "Saved"
+    },
+    "title": "Save to Verso"
+  },
+  "status": {
+    "read": "Read",
+    "reading": "Reading",
+    "unread": "Unread"
+  },
+  "swipe": {
+    "archive": "Archive",
+    "delete": "Delete",
+    "markRead": "Mark Read",
+    "markUnread": "Mark Unread",
+    "unarchive": "Unarchive"
+  },
+  "tagsEditor": {
+    "cancel": "Cancel",
+    "instructions": "Comma-separated tags. Stored in the article's YAML so they work with Obsidian.",
+    "placeholder": "e.g. research, design",
+    "save": "Save",
+    "saveFailed": {
+      "message": "Check folder access or disk space, then try again.",
+      "ok": "OK",
+      "title": "Couldn't save tags"
+    }
+  },
+  "theme": {
+    "ink": "Ink",
+    "night": "Night",
+    "paper": "Paper",
+    "sepia": "Sepia"
+  },
+  "tts": {
+    "nowPlaying": {
+      "pause": "Pause",
+      "play": "Play",
+      "skipForward": "Skip forward"
+    }
+  },
+  "web": {
+    "changeFolder": {
+      "label": "Change folder"
+    },
+    "fontFamily": {
+      "dyslexic": "OpenDyslexic",
+      "georgia": "Georgia",
+      "mono": "Mono",
+      "system": "System"
+    },
+    "reader": {
+      "backButton": {
+        "label": "Library"
+      },
+      "backToLibrary": {
+        "label": "Back to library"
+      },
+      "error": {
+        "articleNotFound": "Article not found: {filename}",
+        "fallback": "Article not found.",
+        "loadFailed": "Failed to load article",
+        "noFolder": "No folder selected. Go back and choose your library folder.",
+        "permissionDenied": "Folder permission denied. Go back and re-select your library."
+      },
+      "toggleControls": {
+        "hide": "Hide controls",
+        "show": "Show controls"
+      }
+    },
+    "unsupportedBrowser": {
+      "headline": "Browser not supported",
+      "subheadline": "Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser."
+    }
+  }
+}

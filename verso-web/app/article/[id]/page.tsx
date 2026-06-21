@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import * as FS from "@/services/FileSystemService";
 import type { Article } from "@/types/article";
@@ -14,21 +15,23 @@ import { useTheme, type VersoTheme } from "@/app/providers/ThemeProvider";
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const FONT_FAMILIES: { value: FontFamily; label: string }[] = [
-  { value: "georgia", label: "Georgia" },
-  { value: "system", label: "System" },
-  { value: "mono", label: "Mono" },
-  { value: "dyslexic", label: "Dyslexic" },
-];
+const FONT_FAMILIES: FontFamily[] = ["georgia", "system", "mono", "dyslexic"];
 
 const FONT_SIZES: FontSize[] = [14, 16, 18, 20, 22, 26];
 
-const LINE_HEIGHTS: { value: LineHeight; label: string }[] = [
-  { value: "compact", label: "Compact" },
-  { value: "normal", label: "Normal" },
-  { value: "relaxed", label: "Relaxed" },
-  { value: "airy", label: "Airy" },
-];
+// docs/copy/UI_COPY.md's readerSettings.fontSize.{xs..xxl} are point-based step labels
+// (XS=14pt .. XXL=26pt) that line up exactly with this array -- reusing them as the chip
+// labels here instead of raw pixel numbers keeps Web's stepper in sync with iOS's wording.
+const FONT_SIZE_LABEL_KEYS: Record<FontSize, string> = {
+  14: "xs",
+  16: "s",
+  18: "m",
+  20: "l",
+  22: "xl",
+  26: "xxl",
+};
+
+const LINE_HEIGHTS: LineHeight[] = ["compact", "normal", "relaxed", "airy"];
 
 const THEMES: VersoTheme[] = ["paper", "sepia", "night", "ink"];
 
@@ -56,10 +59,12 @@ function savePrefs(prefs: ReaderPrefs) {
   try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch {}
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso + "T00:00:00").toLocaleDateString("en-CA", {
-    year: "numeric", month: "long", day: "numeric",
-  });
+// docs/copy/UI_COPY.md §3 requires a locale-aware *medium* date style (see the same
+// fix in ArticleCard.tsx) -- this previously hard-coded "en-CA" regardless of UI locale.
+function formatDate(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+    new Date(iso + "T00:00:00"),
+  );
 }
 
 // ── useIdleChrome ─────────────────────────────────────────────────────
@@ -154,6 +159,7 @@ function ScrollProgressBar({ progress }: { progress: number }) {
 // ── FirstUseHint ──────────────────────────────────────────────────────
 
 function FirstUseHint({ onDismiss }: { onDismiss: () => void }) {
+  const t = useTranslations("reading");
   const [fading, setFading] = useState(false);
 
   function dismiss() {
@@ -189,7 +195,7 @@ function FirstUseHint({ onDismiss }: { onDismiss: () => void }) {
           pointerEvents: "none",
         }}
       >
-        Tap anywhere to show or hide controls
+        {t("immersiveHint")}
       </div>
     </div>
   );
@@ -217,6 +223,7 @@ function Chrome({
   onMarkAsRead,
 }: ChromeProps) {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations();
 
   const chromeStyle: React.CSSProperties = {
     opacity: visible ? 1 : 0,
@@ -247,7 +254,11 @@ function Chrome({
         <div style={{ flex: 1 }} />
         <button
           onClick={onToggleControls}
-          title={showControls ? "Hide controls" : "Show controls"}
+          title={
+            showControls
+              ? t("web.reader.toggleControls.hide")
+              : t("web.reader.toggleControls.show")
+          }
           style={{
             ...iconButtonStyle,
             backgroundColor: showControls ? "var(--color-accent-surface)" : undefined,
@@ -287,65 +298,65 @@ function Chrome({
           }}
         >
           {/* Font family */}
-          <ControlRow label="Font">
-            {FONT_FAMILIES.map(({ value, label }) => (
+          <ControlRow label={t("settings.font.sectionLabel")}>
+            {FONT_FAMILIES.map((value) => (
               <ChipButton
                 key={value}
                 active={prefs.fontFamily === value}
                 onClick={() => onPrefsChange({ ...prefs, fontFamily: value })}
               >
-                {label}
+                {t(`web.fontFamily.${value}`)}
               </ChipButton>
             ))}
           </ControlRow>
 
           {/* Font size */}
-          <ControlRow label="Size">
+          <ControlRow label={t("readerSettings.fontSize.sectionLabel")}>
             {FONT_SIZES.map((size) => (
               <ChipButton
                 key={size}
                 active={prefs.fontSize === size}
                 onClick={() => onPrefsChange({ ...prefs, fontSize: size })}
               >
-                {size}
+                {t(`readerSettings.fontSize.${FONT_SIZE_LABEL_KEYS[size]}`)}
               </ChipButton>
             ))}
           </ControlRow>
 
           {/* Line height */}
-          <ControlRow label="Spacing">
-            {LINE_HEIGHTS.map(({ value, label }) => (
+          <ControlRow label={t("readerSettings.lineSpacing.sectionLabel")}>
+            {LINE_HEIGHTS.map((value) => (
               <ChipButton
                 key={value}
                 active={prefs.lineHeight === value}
                 onClick={() => onPrefsChange({ ...prefs, lineHeight: value })}
               >
-                {label}
+                {t(`readerSettings.lineSpacing.${value}`)}
               </ChipButton>
             ))}
           </ControlRow>
 
           {/* Theme */}
-          <ControlRow label="Theme">
-            {THEMES.map((t) => (
+          <ControlRow label={t("readerSettings.theme.sectionLabel")}>
+            {THEMES.map((themeValue) => (
               <button
-                key={t}
-                onClick={() => setTheme(t)}
-                title={t}
-                aria-label={`Switch to ${t} theme`}
+                key={themeValue}
+                onClick={() => setTheme(themeValue)}
+                title={t(`theme.${themeValue}`)}
+                aria-label={t(`theme.${themeValue}`)}
                 style={{
                   width: 24,
                   height: 24,
                   borderRadius: "50%",
-                  border: theme === t
+                  border: theme === themeValue
                     ? "2px solid var(--color-accent)"
                     : "2px solid var(--color-border)",
                   cursor: "pointer",
                   padding: 0,
                   backgroundColor:
-                    t === "paper" ? "#F5F0E8"
-                    : t === "sepia" ? "#F2E8D5"
-                    : t === "night" ? "#1C1A16"
+                    themeValue === "paper" ? "#F5F0E8"
+                    : themeValue === "sepia" ? "#F2E8D5"
+                    : themeValue === "night" ? "#1C1A16"
                     : "#111418",
                 }}
               />
@@ -368,7 +379,7 @@ function Chrome({
                   cursor: "pointer",
                 }}
               >
-                Mark as read
+                {t("reading.controls.markAsRead")}
               </button>
             </div>
           )}
@@ -382,6 +393,7 @@ function Chrome({
 
 function BackButton() {
   const router = useRouter();
+  const t = useTranslations("web.reader.backButton");
   return (
     <button
       onClick={() => router.back()}
@@ -398,7 +410,7 @@ function BackButton() {
         gap: "var(--spacing-xxs)",
       }}
     >
-      ← Library
+      ← {t("label")}
     </button>
   );
 }
@@ -464,6 +476,9 @@ const iconButtonStyle: React.CSSProperties = {
 export default function ArticleReaderPage() {
   const params = useParams();
   const filename = decodeURIComponent(params.id as string);
+  const locale = useLocale();
+  const t = useTranslations("web.reader.error");
+  const tBackToLibrary = useTranslations("web.reader.backToLibrary");
 
   const [article, setArticle] = useState<Article | null>(null);
   const [fsHandle, setFsHandle] = useState<FileSystemDirectoryHandle | null>(null);
@@ -503,14 +518,14 @@ export default function ArticleReaderPage() {
       try {
         let handle = await FS.getSavedFolder();
         if (!handle) {
-          setError("No folder selected. Go back and choose your library folder.");
+          setError(t("noFolder"));
           return;
         }
         const perm = await handle.queryPermission({ mode: "readwrite" });
         if (perm !== "granted") {
           const granted = await FS.requestFolderPermission(handle);
           if (!granted) {
-            setError("Folder permission denied. Go back and re-select your library.");
+            setError(t("permissionDenied"));
             return;
           }
           handle = (await FS.getSavedFolder())!;
@@ -518,18 +533,18 @@ export default function ArticleReaderPage() {
         setFsHandle(handle);
         const loaded = await FS.readArticle(handle, filename);
         if (!loaded) {
-          setError(`Article not found: ${filename}`);
+          setError(t("articleNotFound", { filename }));
         } else {
           setArticle(loaded);
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load article");
+        setError(e instanceof Error ? e.message : t("loadFailed"));
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, [filename]);
+  }, [filename, t]);
 
   const handlePrefsChange = useCallback((next: ReaderPrefs) => {
     setPrefs(next);
@@ -639,10 +654,10 @@ export default function ArticleReaderPage() {
           textAlign: "center",
           maxWidth: 320,
         }}>
-          {error ?? "Article not found."}
+          {error ?? t("fallback")}
         </p>
         <a href="/" style={{ color: "var(--color-accent)", fontSize: "var(--type-ui-caption-size)" }}>
-          ← Back to library
+          ← {tBackToLibrary("label")}
         </a>
       </div>
     );
@@ -702,7 +717,7 @@ export default function ArticleReaderPage() {
           }}>
             {article.site_name && <span>{article.site_name}</span>}
             {article.site_name && article.added && <span>·</span>}
-            {article.added && <span>{formatDate(article.added)}</span>}
+            {article.added && <span>{formatDate(article.added, locale)}</span>}
             {article.author && <><span>·</span><span>{article.author}</span></>}
           </p>
           {article.url && (

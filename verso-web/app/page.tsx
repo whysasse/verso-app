@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useArticleLibrary } from "@/hooks/useArticleLibrary";
 import type { Article } from "@/types/article";
@@ -15,6 +16,8 @@ const THEMES: VersoTheme[] = ["paper", "sepia", "night", "ink"];
 
 // ── Unsupported browser screen ──────────────────────────────────────
 function UnsupportedScreen() {
+  const t = useTranslations("web.unsupportedBrowser");
+
   return (
     <div
       style={{
@@ -38,11 +41,10 @@ function UnsupportedScreen() {
           margin: 0,
         }}
       >
-        Browser not supported
+        {t("headline")}
       </h1>
       <p style={{ margin: 0, maxWidth: 320, fontSize: "var(--type-ui-list-subtitle-size)" }}>
-        Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open
-        this page in a supported browser.
+        {t("subheadline")}
       </p>
     </div>
   );
@@ -51,27 +53,31 @@ function UnsupportedScreen() {
 // ── Theme switcher (top-right) ──────────────────────────────────────
 function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("theme");
   return (
     <div style={{ display: "flex", gap: "var(--spacing-xxs)" }}>
-      {THEMES.map((t) => (
+      {THEMES.map((themeValue) => (
         <button
-          key={t}
-          onClick={() => setTheme(t)}
-          title={t}
-          aria-label={`Switch to ${t} theme`}
+          key={themeValue}
+          onClick={() => setTheme(themeValue)}
+          title={t(themeValue)}
+          aria-label={t(themeValue)}
           style={{
             width: 20,
             height: 20,
             borderRadius: "50%",
-            border: theme === t ? "2px solid var(--color-accent)" : "2px solid var(--color-border)",
+            border:
+              theme === themeValue
+                ? "2px solid var(--color-accent)"
+                : "2px solid var(--color-border)",
             cursor: "pointer",
             padding: 0,
             backgroundColor:
-              t === "paper"
+              themeValue === "paper"
                 ? "#F5F0E8"
-                : t === "sepia"
+                : themeValue === "sepia"
                 ? "#F2E8D5"
-                : t === "night"
+                : themeValue === "night"
                 ? "#1C1A16"
                 : "#111418",
             transition: "border-color 0.15s ease",
@@ -85,6 +91,7 @@ function ThemeSwitcher() {
 // ── Main page ───────────────────────────────────────────────────────
 export default function ArticleListPage() {
   const router = useRouter();
+  const t = useTranslations("web");
   const library = useArticleLibrary();
   const [activeFilter, setActiveFilter] = useState<FilterValue>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -237,7 +244,7 @@ export default function ArticleListPage() {
                   textDecorationColor: "var(--color-border)",
                 }}
               >
-                Change folder
+                {t("changeFolder.label")}
               </button>
             </div>
           </>

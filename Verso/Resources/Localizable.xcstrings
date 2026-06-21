@@ -1933,6 +1933,150 @@
         }
       }
     },
+    "home.empty.noUnread.headline": {
+      "extractionState": "manual",
+      "comment": "Added during step 5 web-wiring pass — Web has a per-filter empty state with no iOS equivalent (iOS doesn't filter the list by read status the same way). needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing unread"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun article non lu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhum artigo não lido"
+          }
+        }
+      }
+    },
+    "home.empty.noUnread.subheadline": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles you haven't read yet will appear here."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Les articles que vous n'avez pas encore lus apparaîtront ici."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Os artigos que você ainda não leu vão aparecer aqui."
+          }
+        }
+      }
+    },
+    "home.empty.noReading.headline": {
+      "extractionState": "manual",
+      "comment": "Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing in progress"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rien en cours"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nada em andamento"
+          }
+        }
+      }
+    },
+    "home.empty.noReading.subheadline": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles you're currently reading will appear here."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Les articles que vous lisez actuellement apparaîtront ici."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Os artigos que você está lendo no momento vão aparecer aqui."
+          }
+        }
+      }
+    },
+    "home.empty.noRead.headline": {
+      "extractionState": "manual",
+      "comment": "Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing read yet"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rien de lu pour l'instant"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nada lido ainda"
+          }
+        }
+      }
+    },
+    "home.empty.noRead.subheadline": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles you finish reading will appear here."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Les articles que vous terminez de lire apparaîtront ici."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Os artigos que você terminar de ler vão aparecer aqui."
+          }
+        }
+      }
+    },
     "home.loading.accessibilityLabel": {
       "extractionState": "manual",
       "comment": "Skeleton loading state",
@@ -6501,6 +6645,390 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verso"
+          }
+        }
+      }
+    },
+    "web.unsupportedBrowser.headline": {
+      "extractionState": "manual",
+      "comment": "Full-screen notice when File System Access API is unavailable",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browser not supported"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Navigateur non pris en charge"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Navegador não compatível"
+          }
+        }
+      }
+    },
+    "web.unsupportedBrowser.subheadline": {
+      "extractionState": "manual",
+      "comment": "`Verso Web`, `File System Access API`, `Chrome`, `Edge` invariant.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verso Web utilise l'API File System Access, qui nécessite Chrome ou Edge 86+. Veuillez ouvrir cette page dans un navigateur pris en charge."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Verso Web usa a File System Access API, que requer Chrome ou Edge 86+. Abra esta página em um navegador compatível."
+          }
+        }
+      }
+    },
+    "web.changeFolder.label": {
+      "extractionState": "manual",
+      "comment": "Link below the article list to re-pick the library folder",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change folder"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Changer de dossier"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Alterar pasta"
+          }
+        }
+      }
+    },
+    "web.fontFamily.system": {
+      "extractionState": "manual",
+      "comment": "Font-family option label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Système"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Sistema"
+          }
+        }
+      }
+    },
+    "web.fontFamily.mono": {
+      "extractionState": "manual",
+      "comment": "Font-family option label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mono"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mono"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mono"
+          }
+        }
+      }
+    },
+    "web.fontFamily.georgia": {
+      "extractionState": "manual",
+      "comment": "Invariant — font name.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Georgia"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Georgia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Georgia"
+          }
+        }
+      }
+    },
+    "web.fontFamily.dyslexic": {
+      "extractionState": "manual",
+      "comment": "Invariant — brand name (see `docs/LOCALIZATION.md` §4). Renamed from the shipped \"Dyslexic\" to the actual font name.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpenDyslexic"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpenDyslexic"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpenDyslexic"
+          }
+        }
+      }
+    },
+    "web.reader.toggleControls.show": {
+      "extractionState": "manual",
+      "comment": "Reader-screen \"Aa\" button tooltip when controls are hidden",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show controls"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Afficher les commandes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mostrar controles"
+          }
+        }
+      }
+    },
+    "web.reader.toggleControls.hide": {
+      "extractionState": "manual",
+      "comment": "Reader-screen \"Aa\" button tooltip when controls are visible",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide controls"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Masquer les commandes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ocultar controles"
+          }
+        }
+      }
+    },
+    "web.reader.backButton.label": {
+      "extractionState": "manual",
+      "comment": "Reader-screen back link (visible text, the \"←\" glyph is decorative and not part of the translated string)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Library"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Bibliothèque"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Biblioteca"
+          }
+        }
+      }
+    },
+    "web.reader.error.noFolder": {
+      "extractionState": "manual",
+      "comment": "Distinct from `error.noFolder.*` (home-screen full error view, headline/subheadline/cta) — this is a single inline string on the reader page.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No folder selected. Go back and choose your library folder."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Aucun dossier sélectionné. Revenez en arrière et choisissez votre dossier de bibliothèque."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Nenhuma pasta selecionada. Volte e escolha a pasta da sua biblioteca."
+          }
+        }
+      }
+    },
+    "web.reader.error.permissionDenied": {
+      "extractionState": "manual",
+      "comment": "Reader-screen error when folder permission was revoked",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folder permission denied. Go back and re-select your library."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Autorisation du dossier refusée. Revenez en arrière et resélectionnez votre bibliothèque."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Permissão da pasta negada. Volte e selecione novamente sua biblioteca."
+          }
+        }
+      }
+    },
+    "web.reader.error.articleNotFound": {
+      "extractionState": "manual",
+      "comment": "`{filename}` not translated.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article not found: %@"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Article introuvable : %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Artigo não encontrado: %@"
+          }
+        }
+      }
+    },
+    "web.reader.error.loadFailed": {
+      "extractionState": "manual",
+      "comment": "Reader-screen generic load failure (caught exception, no specific message)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to load article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Échec du chargement de l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Falha ao carregar o artigo"
+          }
+        }
+      }
+    },
+    "web.reader.error.fallback": {
+      "extractionState": "manual",
+      "comment": "Reader-screen fallback when article is missing with no specific error",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article not found."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Article introuvable."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Artigo não encontrado."
+          }
+        }
+      }
+    },
+    "web.reader.backToLibrary.label": {
+      "extractionState": "manual",
+      "comment": "Link shown alongside the reader-screen error state (the \"←\" glyph is decorative)",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to library"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Retour à la bibliothèque"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Voltar para a biblioteca"
           }
         }
       }

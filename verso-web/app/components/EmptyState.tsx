@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { ArticleStatus } from "@/types/article";
 
 interface EmptyStateProps {
@@ -7,15 +8,20 @@ interface EmptyStateProps {
   onOpenFolder: () => void;
 }
 
-function messageFor(
+// Web filters the list by status (all/unread/reading/read) and shows one empty state
+// per filter, plus a search variant. iOS doesn't have a per-status-filter empty state,
+// so only `noArticles` ("all", no search) and `noResults` (search) reuse a documented
+// iOS key; `noUnread`/`noReading`/`noRead` are net-new rows added to UI_COPY.md
+// alongside this wiring pass (see docs/copy/UI_COPY.md "Empty States" section).
+function scenarioFor(
   activeFilter: ArticleStatus | "all",
   hasSearch: boolean,
-): string {
-  if (hasSearch) return "No articles match your search.";
-  if (activeFilter === "unread") return "No unread articles.";
-  if (activeFilter === "reading") return "Nothing in progress.";
-  if (activeFilter === "read") return "No read articles yet.";
-  return "No articles in your library.";
+): "noResults" | "noUnread" | "noReading" | "noRead" | "noArticles" {
+  if (hasSearch) return "noResults";
+  if (activeFilter === "unread") return "noUnread";
+  if (activeFilter === "reading") return "noReading";
+  if (activeFilter === "read") return "noRead";
+  return "noArticles";
 }
 
 export function EmptyState({
@@ -24,6 +30,9 @@ export function EmptyState({
   hasFolder,
   onOpenFolder,
 }: EmptyStateProps) {
+  const t = useTranslations();
+  const scenario = scenarioFor(activeFilter, hasSearch);
+
   return (
     <div
       style={{
@@ -46,35 +55,33 @@ export function EmptyState({
           margin: 0,
         }}
       >
-        {hasFolder ? messageFor(activeFilter, hasSearch) : "No folder selected"}
+        {hasFolder ? t(`home.empty.${scenario}.headline`) : t("error.noFolder.headline")}
+      </p>
+      <p
+        style={{
+          fontSize: "var(--type-ui-list-subtitle-size)",
+          margin: "0 0 var(--spacing-xs)",
+          maxWidth: 300,
+        }}
+      >
+        {hasFolder ? t(`home.empty.${scenario}.subheadline`) : t("error.noFolder.subheadline")}
       </p>
       {!hasFolder && (
-        <>
-          <p
-            style={{
-              fontSize: "var(--type-ui-list-subtitle-size)",
-              margin: "0 0 var(--spacing-xs)",
-              maxWidth: 300,
-            }}
-          >
-            Select the iCloud Drive folder where your Verso articles are stored.
-          </p>
-          <button
-            onClick={onOpenFolder}
-            style={{
-              padding: "var(--spacing-xs) var(--spacing-lg)",
-              borderRadius: "var(--radius-pill)",
-              border: "none",
-              backgroundColor: "var(--color-accent)",
-              color: "var(--color-background)",
-              fontSize: "var(--type-ui-button-size)",
-              fontWeight: "var(--type-ui-button-weight)",
-              cursor: "pointer",
-            }}
-          >
-            Choose Folder
-          </button>
-        </>
+        <button
+          onClick={onOpenFolder}
+          style={{
+            padding: "var(--spacing-xs) var(--spacing-lg)",
+            borderRadius: "var(--radius-pill)",
+            border: "none",
+            backgroundColor: "var(--color-accent)",
+            color: "var(--color-background)",
+            fontSize: "var(--type-ui-button-size)",
+            fontWeight: "var(--type-ui-button-weight)",
+            cursor: "pointer",
+          }}
+        >
+          {t("error.noFolder.cta")}
+        </button>
       )}
     </div>
   );

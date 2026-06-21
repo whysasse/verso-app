@@ -1,0 +1,550 @@
+{
+  "a11y": {
+    "archiveAction": "Arquivar artigo",
+    "articleRow": {
+      "hint": "Toque duas vezes para abrir",
+      "label": "{title}, {source}, {estimatedReadTime}"
+    },
+    "deleteAction": "Excluir artigo",
+    "filterChip": {
+      "selected": "Atualmente selecionado",
+      "unselected": "Toque duas vezes para filtrar"
+    },
+    "fontOption": {
+      "selected": "{fontName}, selecionado",
+      "unselected": "{fontName}"
+    },
+    "fontSize": {
+      "default": "{label}, {points} pontos, padrão",
+      "label": "{label}, {points} pontos"
+    },
+    "progress": {
+      "label": "Progresso de leitura",
+      "value": "{count} por cento"
+    },
+    "skeletonLoading": "Carregando artigos",
+    "themeChip": {
+      "selected": "Atualmente selecionado",
+      "unselected": "Toque duas vezes para selecionar"
+    },
+    "unarchiveAction": "Desarquivar artigo"
+  },
+  "about": {
+    "acknowledgements": {
+      "rowLabel": "Agradecimentos de código aberto"
+    },
+    "brandName": "Verso",
+    "description": "Um leitor minimalista para salvar e ler artigos, offline e sem distrações.",
+    "footer": "Verso {version} · Feito com cuidado",
+    "github": {
+      "rowLabel": "Ver no GitHub"
+    },
+    "githubLinkLabel": "GitHub",
+    "navTitle": "Sobre",
+    "privacyPolicy": {
+      "rowLabel": "Política de privacidade"
+    },
+    "privacyPolicyLinkLabel": "Política de Privacidade",
+    "title": "Sobre o Verso",
+    "version": {
+      "rowLabel": "Versão"
+    },
+    "versionLabel": "Versão {version}"
+  },
+  "addArticle": {
+    "close": {
+      "accessibilityHint": "Fechar a tela de adicionar artigo",
+      "accessibilityLabel": "Fechar"
+    },
+    "error": {
+      "noLibraryFolder": "Nenhuma pasta de biblioteca selecionada."
+    },
+    "failure": {
+      "headline": "Não foi possível salvar o artigo",
+      "tryAgain": "Tentar novamente"
+    },
+    "idle": {
+      "instructions": "Cole um link para salvar um artigo na sua biblioteca.",
+      "placeholder": "Cole um link…",
+      "save": "Salvar"
+    },
+    "navTitle": "Adicionar artigo",
+    "saving": {
+      "message": "Salvando artigo…"
+    },
+    "success": {
+      "headline": "Artigo salvo!",
+      "subheadline": "Ele aparecerá em breve na sua biblioteca."
+    }
+  },
+  "articleCard": {
+    "accessibilityHint": "Toque duas vezes para abrir",
+    "accessibilityLabel": "{title}, {source}, {estimatedReadTime}",
+    "estimatedReadTime": "{count} min de leitura"
+  },
+  "contextMenu": {
+    "archive": "Arquivar",
+    "delete": "Excluir",
+    "markAsRead": "Marcar como lido",
+    "markAsUnread": "Marcar como não lido",
+    "open": "Abrir",
+    "unarchive": "Desarquivar"
+  },
+  "dialog": {
+    "bulkDelete": {
+      "title": "{count, plural, one {Excluir # artigo?} other {Excluir # artigos?}}"
+    },
+    "changeFolder": {
+      "cancel": "Cancelar",
+      "message": "Sua pasta antiga não será alterada se você escolher Não.",
+      "no": "Manter na pasta antiga",
+      "title": "Mover seus artigos existentes para a nova pasta?",
+      "yes": "Mover Artigos"
+    },
+    "deleteArticle": {
+      "cancel": "Cancelar",
+      "confirm": "Excluir",
+      "message": "Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive.",
+      "title": "Excluir artigo?"
+    }
+  },
+  "error": {
+    "fileRead": {
+      "cta": "Abrir original",
+      "headline": "Não foi possível carregar este artigo."
+    },
+    "fileWrite": {
+      "message": "Não foi possível salvar o artigo.",
+      "subtext": "Verifique se sua pasta está acessível e tente novamente."
+    },
+    "folderMissing": {
+      "cta": "Escolher nova pasta",
+      "headline": "Pasta não encontrada.",
+      "subheadline": "A pasta pode ter sido movida ou excluída. Escolha uma nova para continuar."
+    },
+    "generic": "Algo deu errado. Tente novamente.",
+    "iCloudUnavailable": {
+      "headline": "O iCloud Drive está indisponível.",
+      "subheadline": "Vá em Configurações → [Your Name] → iCloud para reativá-lo."
+    },
+    "noFolder": {
+      "cta": "Escolher pasta",
+      "headline": "Nenhuma pasta selecionada.",
+      "subheadline": "Escolha uma pasta no iCloud Drive para começar a salvar artigos."
+    },
+    "offline": {
+      "articleUnavailable": "Não disponível off-line.",
+      "banner": {
+        "headline": "Você está off-line.",
+        "subheadline": "Os artigos salvos continuam disponíveis."
+      }
+    },
+    "parsing": {
+      "dismiss": "Descartar",
+      "headline": "Não foi possível ler este artigo.",
+      "openInSafari": "Abrir no Safari",
+      "subheadline": "A página pode estar atrás de um paywall ou exigir login."
+    }
+  },
+  "filter": {
+    "all": {
+      "_label": "Todos",
+      "accessibilityLabel": "Todos os artigos, {count} no total"
+    },
+    "archived": {
+      "_label": "Arquivados",
+      "accessibilityLabel": "Arquivados, {count} artigos"
+    },
+    "chip": {
+      "selected": {
+        "hint": "Selecionado atualmente"
+      },
+      "unselected": {
+        "hint": "Toque duas vezes para filtrar"
+      }
+    },
+    "read": {
+      "_label": "Lidos",
+      "accessibilityLabel": "{count, plural, one {Lidos, # artigo} other {Lidos, # artigos}}"
+    },
+    "reading": {
+      "_label": "Lendo",
+      "accessibilityLabel": "{count, plural, one {Lendo, # artigo} other {Lendo, # artigos}}"
+    },
+    "unread": {
+      "_label": "Não lidos",
+      "accessibilityLabel": "{count, plural, one {Não lidos, # artigo} other {Não lidos, # artigos}}"
+    }
+  },
+  "home": {
+    "archiveToggle": {
+      "showArchive": "Mostrar artigos arquivados",
+      "showLibrary": "Mostrar lista de leitura"
+    },
+    "bulkSelect": {
+      "cancel": "Cancelar",
+      "delete": "Excluir",
+      "markRead": "Marcar como lido",
+      "select": "Selecionar"
+    },
+    "dateFilter": {
+      "any": "Qualquer período",
+      "label": "Adicionado",
+      "month": "Último mês",
+      "week": "Última semana",
+      "year": "Último ano"
+    },
+    "empty": {
+      "archive": {
+        "headline": "Nada arquivado",
+        "subheadline": "Os artigos que você arquivar vão aparecer aqui."
+      },
+      "noArticles": {
+        "headline": "Nenhum artigo ainda",
+        "subheadline": "Compartilhe um artigo do Safari para começar."
+      },
+      "noRead": {
+        "headline": "Nada lido ainda",
+        "subheadline": "Os artigos que você terminar de ler vão aparecer aqui."
+      },
+      "noReading": {
+        "headline": "Nada em andamento",
+        "subheadline": "Os artigos que você está lendo no momento vão aparecer aqui."
+      },
+      "noResults": {
+        "headline": "Nenhum resultado",
+        "subheadline": "Tente outro termo de busca."
+      },
+      "noUnread": {
+        "headline": "Nenhum artigo não lido",
+        "subheadline": "Os artigos que você ainda não leu vão aparecer aqui."
+      }
+    },
+    "loading": {
+      "accessibilityLabel": "Carregando artigos"
+    },
+    "navTitle": "Verso",
+    "pullToRefresh": {
+      "accessibilityLabel": "Atualizar lista de artigos"
+    },
+    "search": {
+      "cancel": "Cancelar",
+      "clear": {
+        "accessibilityLabel": "Limpar busca"
+      },
+      "placeholder": "Buscar títulos, texto ou site…"
+    },
+    "settings": {
+      "accessibilityLabel": "Configurações"
+    },
+    "sort": {
+      "newestFirst": "Ordenar do mais recente",
+      "oldestFirst": "Ordenar do mais antigo"
+    },
+    "tagFilter": {
+      "allTags": "Todas as etiquetas",
+      "button": {
+        "accessibilityLabel": "Filtrar por etiquetas"
+      },
+      "close": {
+        "accessibilityLabel": "Fechar filtro de etiquetas"
+      },
+      "noMatches": "Nenhuma etiqueta correspondente",
+      "searchPlaceholder": "Buscar etiquetas…",
+      "title": "Etiquetas"
+    }
+  },
+  "import": {
+    "close": {
+      "accessibilityHint": "Fechar a tela de importação"
+    },
+    "done": {
+      "doneButton": "OK",
+      "headline": "Importação concluída",
+      "importAnotherButton": "Importar outro arquivo",
+      "skippedSuffix": "{count, plural, one {, # ignorado} other {, # ignorados}}",
+      "summary": "{count, plural, one {# artigo importado} other {# artigos importados}}"
+    },
+    "failed": {
+      "headline": "Falha na importação"
+    },
+    "idle": {
+      "headline": "Importar artigos",
+      "noFolderWarning": "Defina sua pasta de artigos nas configurações de Armazenamento antes de importar.",
+      "selectFileButton": "Selecionar arquivo de exportação",
+      "subtitle": "Importe sua lista de leitura do GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter."
+    },
+    "parsing": {
+      "message": "Lendo arquivo…"
+    },
+    "writing": {
+      "message": "Importando artigos…"
+    }
+  },
+  "launch": {
+    "brandName": "Verso"
+  },
+  "onboarding": {
+    "analyticsConsent": {
+      "acceptCta": "Claro, por que não",
+      "declineCta": "Não, obrigado",
+      "headline": "Ajude a melhorar o Verso",
+      "subheadline": "Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca."
+    },
+    "folder": {
+      "chooseCta": "Escolher pasta…",
+      "continueCta": "Continuar",
+      "headline": "Onde o Verso deve guardar seus artigos?",
+      "obsidianTip": "Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente.",
+      "privacyNote": "O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive.",
+      "subheadline": "Escolha uma pasta no iCloud Drive. O Verso salva cada artigo como um arquivo Markdown que você pode abrir em qualquer lugar."
+    },
+    "theme": {
+      "continue": "Continuar",
+      "headline": "Escolha seu tema de leitura",
+      "subheadline": "Você pode alterar isso a qualquer momento nas configurações."
+    },
+    "tour": {
+      "headline": "Veja como funciona",
+      "illustrationBrowserLabel": "Navegador",
+      "illustrationHeadline": "Salve de qualquer lugar",
+      "illustrationShareLabel": "Compartilhar",
+      "illustrationSubheadline": "Toque em Compartilhar em qualquer navegador, escolha o Verso, e seu artigo é salvo automaticamente.",
+      "illustrationVersoLabel": "Verso",
+      "skip": "Pular",
+      "startReading": "Começar a ler",
+      "step1": "Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente.",
+      "step2": "Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos.",
+      "step3": "Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre."
+    },
+    "welcome": {
+      "cta": "Começar",
+      "headline": "Seus artigos. Seus arquivos.",
+      "subheadline": "Um lugar tranquilo para ler. Sem contas, sem algoritmos — apenas arquivos Markdown no seu iCloud Drive."
+    }
+  },
+  "privacyPolicy": {
+    "navTitle": "Política de Privacidade"
+  },
+  "readerSettings": {
+    "fontSize": {
+      "l": "L",
+      "m": "M",
+      "s": "S",
+      "sectionLabel": "Tamanho do texto",
+      "xl": "XL",
+      "xs": "XS",
+      "xxl": "XXL"
+    },
+    "lineSpacing": {
+      "airy": "Espaçado",
+      "compact": "Compacto",
+      "normal": "Normal",
+      "relaxed": "Relaxado",
+      "sectionLabel": "Espaçamento entre linhas"
+    },
+    "margins": {
+      "sectionLabel": "Margens"
+    },
+    "theme": {
+      "sectionLabel": "Tema",
+      "selected": {
+        "hint": "Selecionado atualmente"
+      }
+    },
+    "title": "Configurações de leitura"
+  },
+  "reading": {
+    "back": {
+      "accessibilityLabel": "Voltar para a lista de leitura"
+    },
+    "body": {
+      "image": {
+        "accessibilityLabel": "Imagem"
+      },
+      "loading": "Carregando…"
+    },
+    "controls": {
+      "decreaseFontSize": "Diminuir tamanho da fonte",
+      "increaseFontSize": "Aumentar tamanho da fonte",
+      "lineSpacing": {
+        "_label": "Espaçamento entre linhas",
+        "hint": "Toque duas vezes para abrir as opções de espaçamento"
+      },
+      "margins": {
+        "_label": "Margens",
+        "hint": "Toque duas vezes para abrir as opções de margem"
+      },
+      "markAsRead": "Marcar como lido",
+      "markAsUnread": "Marcar como não lido",
+      "theme": {
+        "_label": "Tema",
+        "hint": "Toque duas vezes para abrir as opções de tema"
+      },
+      "tts": {
+        "pause": "Pausar texto em voz",
+        "play": "Reproduzir texto em voz"
+      }
+    },
+    "controlsSheet": {
+      "closeAccessibilityHint": "Fechar os controles",
+      "fontSizeLabel": "Tamanho da fonte",
+      "lineSpacingLabel": "Espaçamento entre linhas"
+    },
+    "header": {
+      "byline": "Por {author}"
+    },
+    "immersiveHint": "Toque em qualquer lugar para mostrar os controles",
+    "openExternal": {
+      "accessibilityLabel": "Abrir artigo original"
+    },
+    "relatedArticles": {
+      "sectionHeader": "Relacionados"
+    },
+    "splitView": {
+      "placeholder": {
+        "accessibilityLabel": "Nenhum artigo selecionado",
+        "headline": "Selecione um artigo"
+      }
+    }
+  },
+  "settings": {
+    "about": {
+      "versionRowLabel": "Versão {version}"
+    },
+    "analytics": {
+      "rowLabel": "Compartilhar dados anônimos",
+      "subtitle": "Nenhuma informação pessoal ou conteúdo de artigo, nunca."
+    },
+    "folder": {
+      "emptyValue": "Não definida",
+      "rowLabel": "Pasta de artigos"
+    },
+    "font": {
+      "preview": "Um pequeno jabuti xereta viu dez cegonhas felizes",
+      "sectionLabel": "Fonte"
+    },
+    "fontSize": {
+      "sectionLabel": "Tamanho"
+    },
+    "import": {
+      "rowLabel": "Importar artigos"
+    },
+    "privacyPolicy": {
+      "rowLabel": "Política de Privacidade"
+    },
+    "section": {
+      "about": "Sobre",
+      "privacy": "Privacidade",
+      "reading": "Leitura",
+      "storage": "Armazenamento"
+    },
+    "title": "Configurações"
+  },
+  "share": {
+    "cancel": "Cancelar",
+    "duplicate": {
+      "cancel": "Cancelar",
+      "headline": "Artigo já salvo",
+      "saveCopy": "Salvar como cópia",
+      "subheadline": "Este link já está na sua biblioteca como \"{existingTitle}\".",
+      "success": {
+        "saved": "Salvo",
+        "updated": "Atualizado"
+      },
+      "updateExisting": "Atualizar existente"
+    },
+    "error": {
+      "dismiss": "Descartar",
+      "headline": "Não foi possível salvar este artigo.",
+      "noFolder": {
+        "cta": "Abrir o Verso para concluir a configuração",
+        "message": "Pasta não configurada."
+      },
+      "openInSafari": "Abrir no Safari",
+      "subheadline": "A página não pôde ser lida. Você pode abri-la diretamente no Safari."
+    },
+    "preview": {
+      "loading": {
+        "accessibilityLabel": "Carregando pré-visualização do artigo"
+      }
+    },
+    "save": {
+      "default": "Salvar",
+      "error": "Tentar novamente",
+      "loading": "Salvando…",
+      "success": "Salvo"
+    },
+    "title": "Salvar no Verso"
+  },
+  "status": {
+    "read": "Lido",
+    "reading": "Lendo",
+    "unread": "Não lido"
+  },
+  "swipe": {
+    "archive": "Arquivar",
+    "delete": "Excluir",
+    "markRead": "Marcar como lido",
+    "markUnread": "Marcar como não lido",
+    "unarchive": "Desarquivar"
+  },
+  "tagsEditor": {
+    "cancel": "Cancelar",
+    "instructions": "Etiquetas separadas por vírgula. Armazenadas no YAML do artigo para funcionar com o Obsidian.",
+    "placeholder": "ex.: pesquisa, design",
+    "save": "Salvar",
+    "saveFailed": {
+      "message": "Verifique o acesso à pasta ou o espaço em disco e tente novamente.",
+      "ok": "OK",
+      "title": "Não foi possível salvar as etiquetas"
+    }
+  },
+  "theme": {
+    "ink": "Tinta",
+    "night": "Noite",
+    "paper": "Papel",
+    "sepia": "Sépia"
+  },
+  "tts": {
+    "nowPlaying": {
+      "pause": "Pausar",
+      "play": "Reproduzir",
+      "skipForward": "Avançar"
+    }
+  },
+  "web": {
+    "changeFolder": {
+      "label": "Alterar pasta"
+    },
+    "fontFamily": {
+      "dyslexic": "OpenDyslexic",
+      "georgia": "Georgia",
+      "mono": "Mono",
+      "system": "Sistema"
+    },
+    "reader": {
+      "backButton": {
+        "label": "Biblioteca"
+      },
+      "backToLibrary": {
+        "label": "Voltar para a biblioteca"
+      },
+      "error": {
+        "articleNotFound": "Artigo não encontrado: {filename}",
+        "fallback": "Artigo não encontrado.",
+        "loadFailed": "Falha ao carregar o artigo",
+        "noFolder": "Nenhuma pasta selecionada. Volte e escolha a pasta da sua biblioteca.",
+        "permissionDenied": "Permissão da pasta negada. Volte e selecione novamente sua biblioteca."
+      },
+      "toggleControls": {
+        "hide": "Ocultar controles",
+        "show": "Mostrar controles"
+      }
+    },
+    "unsupportedBrowser": {
+      "headline": "Navegador não compatível",
+      "subheadline": "O Verso Web usa a File System Access API, que requer Chrome ou Edge 86+. Abra esta página em um navegador compatível."
+    }
+  }
+}

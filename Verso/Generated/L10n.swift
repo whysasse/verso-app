@@ -450,6 +450,22 @@ enum L10n {
         static var emptyNoArticlesSubheadline: String {
             String(localized: "home.empty.noArticles.subheadline", defaultValue: "Share an article from Safari to get started.", comment: "Empty state subheadline")
         }
+        /// "Nothing read yet" -- Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.
+        static var emptyNoReadHeadline: String {
+            String(localized: "home.empty.noRead.headline", defaultValue: "Nothing read yet", comment: "Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.")
+        }
+        /// "Articles you finish reading will appear here." -- needs_review.
+        static var emptyNoReadSubheadline: String {
+            String(localized: "home.empty.noRead.subheadline", defaultValue: "Articles you finish reading will appear here.", comment: "needs_review.")
+        }
+        /// "Nothing in progress" -- Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.
+        static var emptyNoReadingHeadline: String {
+            String(localized: "home.empty.noReading.headline", defaultValue: "Nothing in progress", comment: "Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.")
+        }
+        /// "Articles you're currently reading will appear here." -- needs_review.
+        static var emptyNoReadingSubheadline: String {
+            String(localized: "home.empty.noReading.subheadline", defaultValue: "Articles you're currently reading will appear here.", comment: "needs_review.")
+        }
         /// "No results" -- Search empty state headline
         static var emptyNoResultsHeadline: String {
             String(localized: "home.empty.noResults.headline", defaultValue: "No results", comment: "Search empty state headline")
@@ -457,6 +473,14 @@ enum L10n {
         /// "Try a different search term." -- Search empty state subheadline
         static var emptyNoResultsSubheadline: String {
             String(localized: "home.empty.noResults.subheadline", defaultValue: "Try a different search term.", comment: "Search empty state subheadline")
+        }
+        /// "Nothing unread" -- Added during step 5 web-wiring pass — Web has a per-filter empty state with no iOS equivalent (iOS doesn't filter the list by read status the same way). needs_review.
+        static var emptyNoUnreadHeadline: String {
+            String(localized: "home.empty.noUnread.headline", defaultValue: "Nothing unread", comment: "Added during step 5 web-wiring pass — Web has a per-filter empty state with no iOS equivalent (iOS doesn't filter the list by read status the same way). needs_review.")
+        }
+        /// "Articles you haven't read yet will appear here." -- needs_review.
+        static var emptyNoUnreadSubheadline: String {
+            String(localized: "home.empty.noUnread.subheadline", defaultValue: "Articles you haven't read yet will appear here.", comment: "needs_review.")
         }
         /// "Loading articles" -- Skeleton loading state
         static var loadingAccessibilityLabel: String {
@@ -1099,6 +1123,72 @@ enum L10n {
         /// "Skip forward" -- Lock screen control
         static var nowPlayingSkipForward: String {
             String(localized: "tts.nowPlaying.skipForward", defaultValue: "Skip forward", comment: "Lock screen control")
+        }
+    }
+    enum Web {
+        /// "Change folder" -- Link below the article list to re-pick the library folder
+        static var changeFolderLabel: String {
+            String(localized: "web.changeFolder.label", defaultValue: "Change folder", comment: "Link below the article list to re-pick the library folder")
+        }
+        /// "OpenDyslexic" -- Invariant — brand name (see `docs/LOCALIZATION.md` §4). Renamed from the shipped 'Dyslexic' to the actual font name.
+        static var fontFamilyDyslexic: String {
+            String(localized: "web.fontFamily.dyslexic", defaultValue: "OpenDyslexic", comment: "Invariant — brand name (see `docs/LOCALIZATION.md` §4). Renamed from the shipped 'Dyslexic' to the actual font name.")
+        }
+        /// "Georgia" -- Invariant — font name.
+        static var fontFamilyGeorgia: String {
+            String(localized: "web.fontFamily.georgia", defaultValue: "Georgia", comment: "Invariant — font name.")
+        }
+        /// "Mono" -- Font-family option label
+        static var fontFamilyMono: String {
+            String(localized: "web.fontFamily.mono", defaultValue: "Mono", comment: "Font-family option label")
+        }
+        /// "System" -- Font-family option label
+        static var fontFamilySystem: String {
+            String(localized: "web.fontFamily.system", defaultValue: "System", comment: "Font-family option label")
+        }
+        /// "Library" -- Reader-screen back link (visible text, the '←' glyph is decorative and not part of the translated string)
+        static var readerBackButtonLabel: String {
+            String(localized: "web.reader.backButton.label", defaultValue: "Library", comment: "Reader-screen back link (visible text, the '←' glyph is decorative and not part of the translated string)")
+        }
+        /// "Back to library" -- Link shown alongside the reader-screen error state (the '←' glyph is decorative)
+        static var readerBackToLibraryLabel: String {
+            String(localized: "web.reader.backToLibrary.label", defaultValue: "Back to library", comment: "Link shown alongside the reader-screen error state (the '←' glyph is decorative)")
+        }
+        /// "Article not found: {filename}" -- `{filename}` not translated.
+        static func readerErrorArticleNotFound(filename: String) -> String {
+            String(localized: "web.reader.error.articleNotFound", defaultValue: "Article not found: \(filename)", comment: "`{filename}` not translated.")
+        }
+        /// "Article not found." -- Reader-screen fallback when article is missing with no specific error
+        static var readerErrorFallback: String {
+            String(localized: "web.reader.error.fallback", defaultValue: "Article not found.", comment: "Reader-screen fallback when article is missing with no specific error")
+        }
+        /// "Failed to load article" -- Reader-screen generic load failure (caught exception, no specific message)
+        static var readerErrorLoadFailed: String {
+            String(localized: "web.reader.error.loadFailed", defaultValue: "Failed to load article", comment: "Reader-screen generic load failure (caught exception, no specific message)")
+        }
+        /// "No folder selected. Go back and choose your library folder." -- Distinct from `error.noFolder.*` (home-screen full error view, headline/subheadline/cta) — this is a single inline string on the reader page.
+        static var readerErrorNoFolder: String {
+            String(localized: "web.reader.error.noFolder", defaultValue: "No folder selected. Go back and choose your library folder.", comment: "Distinct from `error.noFolder.*` (home-screen full error view, headline/subheadline/cta) — this is a single inline string on the reader page.")
+        }
+        /// "Folder permission denied. Go back and re-select your library." -- Reader-screen error when folder permission was revoked
+        static var readerErrorPermissionDenied: String {
+            String(localized: "web.reader.error.permissionDenied", defaultValue: "Folder permission denied. Go back and re-select your library.", comment: "Reader-screen error when folder permission was revoked")
+        }
+        /// "Hide controls" -- Reader-screen 'Aa' button tooltip when controls are visible
+        static var readerToggleControlsHide: String {
+            String(localized: "web.reader.toggleControls.hide", defaultValue: "Hide controls", comment: "Reader-screen 'Aa' button tooltip when controls are visible")
+        }
+        /// "Show controls" -- Reader-screen 'Aa' button tooltip when controls are hidden
+        static var readerToggleControlsShow: String {
+            String(localized: "web.reader.toggleControls.show", defaultValue: "Show controls", comment: "Reader-screen 'Aa' button tooltip when controls are hidden")
+        }
+        /// "Browser not supported" -- Full-screen notice when File System Access API is unavailable
+        static var unsupportedBrowserHeadline: String {
+            String(localized: "web.unsupportedBrowser.headline", defaultValue: "Browser not supported", comment: "Full-screen notice when File System Access API is unavailable")
+        }
+        /// "Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser." -- `Verso Web`, `File System Access API`, `Chrome`, `Edge` invariant.
+        static var unsupportedBrowserSubheadline: String {
+            String(localized: "web.unsupportedBrowser.subheadline", defaultValue: "Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser.", comment: "`Verso Web`, `File System Access API`, `Chrome`, `Edge` invariant.")
         }
     }
 }
