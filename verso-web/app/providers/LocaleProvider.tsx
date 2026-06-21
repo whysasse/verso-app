@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 
 /** Keep in sync with verso-web/i18n/request.ts -- these are the only locales with a
  * shipped message bundle. `en-CA` is an alias of `en` (see docs/LOCALIZATION.md §1),
- * resolved server-side, so it never appears here. */
-export type VersoLocale = "en" | "fr-CA" | "pt-BR";
+ * resolved server-side, so it never appears here. `pseudo` is a developer-only
+ * pseudo-locale for layout-flex QA, opted in by setting the cookie directly. */
+export type VersoLocale = "en" | "fr-CA" | "pt-BR" | "pseudo";
 
 const COOKIE_NAME = "verso-locale";
 const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;

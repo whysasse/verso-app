@@ -1811,3 +1811,20 @@
 
   **Completed:** 2026-06-21.
 
+## Phase B — Pseudolocalization & layout flex QA (FAB-275 step 6)
+
+- [x] 🟢 **FAB-275 step 6** · Web pseudo-locale generation script & infrastructure  `Done` `Low`
+  Created `docs/copy/codegen/pseudolocalize.py` that transforms `en.json` into `verso-web/messages/pseudo.json` with accented characters, ~30% vowel lengthening, and bracket wrapping for visual truncation detection. ICU MessageFormat plurals are preserved verbatim. Added `"pseudo"` to `SUPPORTED_LOCALES` in `verso-web/i18n/request.ts` and `VersoLocale` type in `LocaleProvider.tsx`. Pseudo-locale is opt-in via setting the `verso-locale=pseudo` cookie — never returned from `navigator.language`. Build verified clean.
+
+  **Completed:** 2026-06-21.
+
+- [x] 🟢 **FAB-275 step 6** · Fix ControlRow label clipping in Web reader controls  `Done` `Low`
+  The `ControlRow` component in `verso-web/app/article/[id]/page.tsx` had a hard-coded `width: 52px` on its label span, which clipped pseudo-localized text (e.g. `[Tëëxt sïïzë]` at ~82px). Changed to `minWidth: 52` with `whiteSpace: "nowrap"` so labels expand naturally while preserving minimum alignment for short English labels.
+
+  **Completed:** 2026-06-21.
+
+- [x] 🟢 **FAB-275 step 6** · Document iOS pseudolocalization testing workflow  `Done` `Low`
+  Added detailed instructions to `docs/LOCALIZATION.md` §7 covering both Web (cookie-based `pseudo.json`) and iOS (Xcode scheme → Run → Options → Double-Length Pseudolanguage) pseudolocalization workflows. Documents the ControlRow label fix as reference for future truncation audits.
+
+  **Completed:** 2026-06-21.
+

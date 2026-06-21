@@ -78,9 +78,29 @@ QA: confirm **OpenDyslexic** renders ç ã õ â ê é à ü cleanly at all six 
 
 ---
 
-## 7. String expansion
+## 7. String expansion & pseudolocalization
 
 FR/PT run ~15–30% longer than EN. Highest-risk components: **filter chips** ("En cours / Non lus" ≫ "Reading / Unread"), primary buttons, and share-sheet save states. Layouts must flex (scroll/wrap, no truncation). Run **pseudolocalization** (+30% length, accented) in QA before real strings land. See `COMPONENT_SPECS.md`.
+
+### Pseudolocalization infrastructure
+
+**Web** — opt-in pseudo-locale via `verso-locale=pseudo` cookie. The pseudo-locale is built from `en.json` by `docs/copy/codegen/pseudolocalize.py`:
+
+1. Run `python3 docs/copy/codegen/pseudolocalize.py` to regenerate `verso-web/messages/pseudo.json`
+2. Open the web app, set the cookie: `document.cookie = "verso-locale=pseudo; path=/"; location.reload();`
+3. Inspect every screen for text clipping and overflow. Pseudo text is wrapped in `[...]` to make truncation visually obvious.
+4. Revert by deleting the cookie or setting it to `en`.
+
+**iOS** — use Xcode's built-in pseudolanguage (no code changes needed):
+
+1. In Xcode, select the active scheme at the top toolbar.
+2. **Edit Scheme…** → **Run** → **Options** tab.
+3. Under **Application Language**, choose **Double-Length Pseudolanguage**.
+4. Press ⌘R to build and run.
+5. Inspect every screen for truncation. Xcode auto-doubles all strings from `Localizable.xcstrings` and adds accent marks.
+6. Revert by setting **Application Language** back to **System Language**.
+
+Known layout fix applied (Phase B, `docs/BACKLOG.md` FAB-275 step 6): `ControlRow` label in the Web reader's inline controls panel was clipped by a hard-coded `width: 52px`. Changed to `minWidth: 52` with `whiteSpace: "nowrap"` so labels expand naturally for longer translations.
 
 ---
 

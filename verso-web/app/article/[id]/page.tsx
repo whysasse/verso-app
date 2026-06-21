@@ -421,7 +421,8 @@ function ControlRow({ label, children }: { label: string; children: React.ReactN
       <span style={{
         fontSize: "var(--type-ui-caption-size)",
         color: "var(--color-text-secondary)",
-        width: 52,
+        minWidth: 52,
+        whiteSpace: "nowrap",
         flexShrink: 0,
       }}>
         {label}

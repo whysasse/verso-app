@@ -1,0 +1,540 @@
+{
+  "a11y": {
+    "archiveAction": "[Äärççhïïvë äärtïïççlë]",
+    "articleRow": {
+      "hint": "[Dööüüblë tääp tö ööpëëñ]",
+      "label": "[{title}, {source}, {estimatedReadTime}]"
+    },
+    "deleteAction": "[Dëëlëëtë äärtïïççlë]",
+    "filterChip": {
+      "selected": "[Ççüürrëëññtly sëëlëëççtëëd]",
+      "unselected": "[Dööüüblë tääp tö fïïltëër]"
+    },
+    "fontOption": {
+      "selected": "[{fontName}, sëëlëëççtëëd]",
+      "unselected": "{fontName}"
+    },
+    "fontSize": {
+      "default": "[{label}, {points} pööïïññts, dëëfääüült]",
+      "label": "[{label}, {points} pööïïññts]"
+    },
+    "progress": {
+      "label": "[Rëëäädïïññg pröögrëëss]",
+      "value": "[{count} pëërççëëññt]"
+    },
+    "skeletonLoading": "[Lööäädïïññg äärtïïççlëës]",
+    "themeChip": {
+      "selected": "[Ççüürrëëññtly sëëlëëççtëëd]",
+      "unselected": "[Dööüüblë tääp tö sëëlëëççt]"
+    },
+    "unarchiveAction": "[Üüññäärççhïïvë äärtïïççlë]"
+  },
+  "about": {
+    "acknowledgements": {
+      "rowLabel": "[Ööpëëñ-sööüürççë ääççkññööwlëëdgëëmëëññts]"
+    },
+    "footer": "[Vëërsö {version} · Büüïïlt wïïth ççäärë]",
+    "github": {
+      "rowLabel": "[Vïïëëw ööñ GïïtHüüb]"
+    },
+    "privacyPolicy": {
+      "rowLabel": "[Prïïvääççy pöölïïççy]"
+    },
+    "title": "[Ääbööüüt Vëërsö]",
+    "version": {
+      "rowLabel": "[Vëërsïïööñ]"
+    }
+  },
+  "addArticle": {
+    "close": {
+      "accessibilityHint": "[Dïïsmïïss äädd äärtïïççlë shëëëët]",
+      "accessibilityLabel": "[Ççlöösë]"
+    },
+    "error": {
+      "noLibraryFolder": "[Ññö lïïbrääry fööldëër sëëlëëççtëëd.]"
+    },
+    "failure": {
+      "headline": "[Ççööüüld ññööt säävë äärtïïççlë]",
+      "tryAgain": "[Try Äägääïïñ]"
+    },
+    "idle": {
+      "instructions": "[Päästë ä lïïññk tö säävë ääñ äärtïïççlë tö yööüür lïïbrääry.]",
+      "placeholder": "[Päästë ä lïïññk…]",
+      "save": "[Säävë]"
+    },
+    "navTitle": "[Äädd Äärtïïççlë]",
+    "saving": {
+      "message": "[Säävïïññg äärtïïççlë…]"
+    },
+    "success": {
+      "headline": "[Äärtïïççlë säävëëd!]",
+      "subheadline": "[Ïït wïïll ääppëëäär ïïñ yööüür lïïbrääry shöörtly.]"
+    }
+  },
+  "articleCard": {
+    "accessibilityHint": "[Dööüüblë tääp tö ööpëëñ]",
+    "accessibilityLabel": "[{title}, {source}, {estimatedReadTime}]",
+    "estimatedReadTime": "[{count} mïïñ rëëääd]"
+  },
+  "contextMenu": {
+    "archive": "[Äärççhïïvë]",
+    "delete": "[Dëëlëëtë]",
+    "markAsRead": "[Määrk ääs rëëääd]",
+    "markAsUnread": "[Määrk ääs üüññrëëääd]",
+    "open": "[Ööpëëñ]",
+    "unarchive": "[Üüññäärççhïïvë]"
+  },
+  "dialog": {
+    "bulkDelete": {
+      "title": "{count, plural, one {Delete # article?} other {Delete # articles?}}"
+    },
+    "changeFolder": {
+      "cancel": "[Ççääññççëël]",
+      "message": "[Yööüür ööld fööldëër wööñ't bë tööüüççhëëd ïïf yööü ççhöööösë Ññö.]",
+      "no": "[Këëëëp ïïñ Ööld Fööldëër]",
+      "title": "[Möövë yööüür ëëxïïstïïññg äärtïïççlëës tö thë ññëëw fööldëër?]",
+      "yes": "[Möövë Äärtïïççlëës]"
+    },
+    "deleteArticle": {
+      "cancel": "[Ççääññççëël]",
+      "confirm": "[Dëëlëëtë]",
+      "message": "[Thïïs ççääññññööt bë üüññdööññë. Thë fïïlë wïïll bë pëërmääññëëññtly rëëmöövëëd frööm yööüür ïÇçlööüüd Drïïvë.]",
+      "title": "[Dëëlëëtë äärtïïççlë?]"
+    }
+  },
+  "error": {
+    "fileRead": {
+      "cta": "[Ööpëëñ öörïïgïïññääl]",
+      "headline": "[Thïïs äärtïïççlë ççööüüldñ't bë lööäädëëd.]"
+    },
+    "fileWrite": {
+      "message": "[Ççööüüldñ't säävë äärtïïççlë.]",
+      "subtext": "[Ççhëëççk thäät yööüür fööldëër ïïs ääççççëëssïïblë ääññd try äägääïïñ.]"
+    },
+    "folderMissing": {
+      "cta": "[Ççhöööösë ññëëw fööldëër]",
+      "headline": "[Fööldëër ññööt fööüüññd.]",
+      "subheadline": "[Thë fööldëër määy häävë bëëëëñ möövëëd öör dëëlëëtëëd. Ççhöööösë ä ññëëw ööññë tö ççööññtïïññüüë.]"
+    },
+    "generic": "[Söömëëthïïññg wëëññt wrööññg. Plëëääsë try äägääïïñ.]",
+    "iCloudUnavailable": {
+      "headline": "[ïÇçlööüüd Drïïvë ïïs üüññäävääïïlääblë.]",
+      "subheadline": "[Gö tö Sëëttïïññgs → [Yööüür Ññäämë] → ïÇçlööüüd tö rë-ëëññääblë ïït.]"
+    },
+    "noFolder": {
+      "cta": "[Ççhöööösë fööldëër]",
+      "headline": "[Ññö fööldëër sëëlëëççtëëd.]",
+      "subheadline": "[Ççhöööösë ä fööldëër ïïñ ïÇçlööüüd Drïïvë tö stäärt säävïïññg äärtïïççlëës.]"
+    },
+    "offline": {
+      "articleUnavailable": "[Ññööt äävääïïlääblë ööfflïïññë.]",
+      "banner": {
+        "headline": "[Yööü'rë ööfflïïññë.]",
+        "subheadline": "[Säävëëd äärtïïççlëës äärë stïïll äävääïïlääblë.]"
+      }
+    },
+    "parsing": {
+      "dismiss": "[Dïïsmïïss]",
+      "headline": "[Ççööüüldñ't rëëääd thïïs äärtïïççlë.]",
+      "openInSafari": "[Ööpëëñ ïïñ Sääfäärï]",
+      "subheadline": "[Thë päägë määy bë bëëhïïññd ä pääywääll öör rëëqüüïïrë ä löögïïñ.]"
+    }
+  },
+  "filter": {
+    "all": {
+      "_label": "[Ääll]",
+      "accessibilityLabel": "[Ääll äärtïïççlëës, {count} töötääl]"
+    },
+    "archived": {
+      "_label": "[Äärççhïïvëëd]",
+      "accessibilityLabel": "{count, plural, one {Archived, # article} other {Archived, # articles}}"
+    },
+    "chip": {
+      "selected": {
+        "hint": "[Ççüürrëëññtly sëëlëëççtëëd]"
+      },
+      "unselected": {
+        "hint": "[Dööüüblë tääp tö fïïltëër]"
+      }
+    },
+    "read": {
+      "_label": "[Rëëääd]",
+      "accessibilityLabel": "{count, plural, one {Read, # article} other {Read, # articles}}"
+    },
+    "reading": {
+      "_label": "[Rëëäädïïññg]",
+      "accessibilityLabel": "{count, plural, one {Reading, # article} other {Reading, # articles}}"
+    },
+    "unread": {
+      "_label": "[Üüññrëëääd]",
+      "accessibilityLabel": "{count, plural, one {Unread, # article} other {Unread, # articles}}"
+    }
+  },
+  "home": {
+    "archiveToggle": {
+      "showArchive": "[Shööw äärççhïïvëëd äärtïïççlëës]",
+      "showLibrary": "[Shööw rëëäädïïññg lïïst]"
+    },
+    "bulkSelect": {
+      "cancel": "[Ççääññççëël]",
+      "delete": "[Dëëlëëtë]",
+      "markRead": "[Määrk rëëääd]",
+      "select": "[Sëëlëëççt]"
+    },
+    "dateFilter": {
+      "any": "[Ääññy tïïmë]",
+      "label": "[Ääddëëd]",
+      "month": "[Pääst mööññth]",
+      "week": "[Pääst wëëëëk]",
+      "year": "[Pääst yëëäär]"
+    },
+    "empty": {
+      "archive": {
+        "headline": "[Ññööthïïññg äärççhïïvëëd]",
+        "subheadline": "[Äärtïïççlëës yööü äärççhïïvë wïïll ääppëëäär hëërë.]"
+      },
+      "noArticles": {
+        "headline": "[Ññö äärtïïççlëës yëët]",
+        "subheadline": "[Shäärë ääñ äärtïïççlë frööm Sääfäärï tö gëët stäärtëëd.]"
+      },
+      "noRead": {
+        "headline": "[Ññööthïïññg rëëääd yëët]",
+        "subheadline": "[Äärtïïççlëës yööü fïïññïïsh rëëäädïïññg wïïll ääppëëäär hëërë.]"
+      },
+      "noReading": {
+        "headline": "[Ññööthïïññg ïïñ pröögrëëss]",
+        "subheadline": "[Äärtïïççlëës yööü'rë ççüürrëëññtly rëëäädïïññg wïïll ääppëëäär hëërë.]"
+      },
+      "noResults": {
+        "headline": "[Ññö rëësüülts]",
+        "subheadline": "[Try ä dïïffëërëëññt sëëäärççh tëërm.]"
+      },
+      "noUnread": {
+        "headline": "[Ññööthïïññg üüññrëëääd]",
+        "subheadline": "[Äärtïïççlëës yööü häävëëñ't rëëääd yëët wïïll ääppëëäär hëërë.]"
+      }
+    },
+    "loading": {
+      "accessibilityLabel": "[Lööäädïïññg äärtïïççlëës]"
+    },
+    "navTitle": "[Vëërsö]",
+    "pullToRefresh": {
+      "accessibilityLabel": "[Rëëfrëësh äärtïïççlë lïïst]"
+    },
+    "search": {
+      "cancel": "[Ççääññççëël]",
+      "clear": {
+        "accessibilityLabel": "[Ççlëëäär sëëäärççh]"
+      },
+      "placeholder": "[Sëëäärççh tïïtlëës, tëëxt, öör sïïtë…]"
+    },
+    "settings": {
+      "accessibilityLabel": "[Sëëttïïññgs]"
+    },
+    "sort": {
+      "newestFirst": "[Söört ññëëwëëst fïïrst]",
+      "oldestFirst": "[Söört ööldëëst fïïrst]"
+    },
+    "tagFilter": {
+      "allTags": "[Ääll täägs]",
+      "button": {
+        "accessibilityLabel": "[Fïïltëër by täägs]"
+      },
+      "close": {
+        "accessibilityLabel": "[Ççlöösë tääg fïïltëër]"
+      },
+      "noMatches": "[Ññö määtççhïïññg täägs]",
+      "searchPlaceholder": "[Sëëäärççh täägs…]",
+      "title": "[Täägs]"
+    }
+  },
+  "import": {
+    "close": {
+      "accessibilityHint": "[Dïïsmïïss ïïmpöört shëëëët]"
+    },
+    "done": {
+      "doneButton": "[Dööññë]",
+      "headline": "[Ïïmpöört Ççöömplëëtë]",
+      "importAnotherButton": "[Ïïmpöört Ääññööthëër Fïïlë]",
+      "skippedSuffix": "{count, plural, one {, # skipped} other {, # skipped}}",
+      "summary": "{count, plural, one {# article imported} other {# articles imported}}"
+    },
+    "failed": {
+      "headline": "[Ïïmpöört Fääïïlëëd]"
+    },
+    "idle": {
+      "headline": "[Ïïmpöört Äärtïïççlëës]",
+      "noFolderWarning": "[Sëët yööüür äärtïïççlëës fööldëër ïïñ Stööräägë sëëttïïññgs bëëföörë ïïmpöörtïïññg.]",
+      "selectFileButton": "[Sëëlëëççt Ëëxpöört Fïïlë]",
+      "subtitle": "[Ïïmpöört yööüür rëëäädïïññg lïïst frööm GöööödLïïññks, Ïïññstääpääpëër, Pööççkëët, Rëëäädwïïsë Rëëäädëër, öör Määttëër.]"
+    },
+    "parsing": {
+      "message": "[Rëëäädïïññg fïïlë…]"
+    },
+    "writing": {
+      "message": "[Ïïmpöörtïïññg äärtïïççlëës…]"
+    }
+  },
+  "launch": {
+    "brandName": "[Vëërsö]"
+  },
+  "onboarding": {
+    "analyticsConsent": {
+      "acceptCta": "[Süürë, why ññööt]",
+      "declineCta": "[Ññö thääññks]",
+      "headline": "[Hëëlp määkë Vëërsö bëëttëër]",
+      "subheadline": "[Shäärë ääññööññymööüüs üüsäägë däätä — ññö pëërsööññääl ïïññfö, ññö äärtïïççlë ççööññtëëññt, ëëvëër.]"
+    },
+    "folder": {
+      "chooseCta": "[Ççhöööösë fööldëër…]",
+      "continueCta": "[Ççööññtïïññüüë]",
+      "headline": "[Whëërë shööüüld Vëërsö säävë yööüür äärtïïççlëës?]",
+      "obsidianTip": "[Üüsïïññg Ööbsïïdïïääñ? Pööïïññt Vëërsö tö ä fööldëër ïïññsïïdë yööüür vääüült ääññd äärtïïççlëës wïïll ääppëëäär thëërë ääüütöömäätïïççäälly.]",
+      "privacyNote": "[Vëërsö ññëëvëër üüplööääds yööüür fïïlëës. Thëëy lïïvë ïïñ yööüür ïÇçlööüüd Drïïvë.]",
+      "subheadline": "[Pïïççk ä fööldëër ïïñ ïÇçlööüüd Drïïvë. Vëërsö säävëës ëëääççh äärtïïççlë ääs ä Määrkdööwñ fïïlë yööü ççääñ ööpëëñ ääññywhëërë.]"
+    },
+    "theme": {
+      "continue": "[Ççööññtïïññüüë]",
+      "headline": "[Ççhöööösë yööüür rëëäädïïññg thëëmë]",
+      "subheadline": "[Yööü ççääñ ççhääññgë thïïs ääññy tïïmë frööm sëëttïïññgs.]"
+    },
+    "tour": {
+      "headline": "[Hëërë's hööw ïït wöörks]",
+      "skip": "[Skïïp]",
+      "startReading": "[Stäärt rëëäädïïññg]",
+      "step1": "[Shäärë ääññy äärtïïççlë frööm Sääfäärï öör yööüür brööwsëër tö säävë ïït ïïññstääññtly.]",
+      "step2": "[Ööpëëñ Vëërsö tö rëëääd. Yööüür lïïst ïïs äälwääys ïïñ syññç wïïth yööüür fïïlëës.]",
+      "step3": "[Määrk äärtïïççlëës ääs rëëääd whëëñ yööü'rë dööññë. Thëëy stääy ïïñ yööüür fööldëër föörëëvëër.]"
+    },
+    "welcome": {
+      "cta": "[Gëët stäärtëëd]",
+      "headline": "[Yööüür äärtïïççlëës. Yööüür fïïlëës.]",
+      "subheadline": "[Ä qüüïïëët plääççë tö rëëääd. Ññö ääççççööüüññts, ññö äälgöörïïthms — jüüst Määrkdööwñ fïïlëës ïïñ yööüür ïÇçlööüüd Drïïvë.]"
+    }
+  },
+  "privacyPolicy": {
+    "navTitle": "[Prïïvääççy Pöölïïççy]"
+  },
+  "readerSettings": {
+    "fontSize": {
+      "l": "[L]",
+      "m": "[M]",
+      "s": "[S]",
+      "sectionLabel": "[Tëëxt sïïzë]",
+      "xl": "[XL]",
+      "xs": "[XS]",
+      "xxl": "[XXL]"
+    },
+    "lineSpacing": {
+      "airy": "[Ääïïry]",
+      "compact": "[Ççöömpääççt]",
+      "normal": "[Ññöörmääl]",
+      "relaxed": "[Rëëlääxëëd]",
+      "sectionLabel": "[Lïïññë spääççïïññg]"
+    },
+    "margins": {
+      "sectionLabel": "[Määrgïïññs]"
+    },
+    "theme": {
+      "sectionLabel": "[Thëëmë]",
+      "selected": {
+        "hint": "[Ççüürrëëññtly sëëlëëççtëëd]"
+      }
+    },
+    "title": "[Rëëäädïïññg sëëttïïññgs]"
+  },
+  "reading": {
+    "back": {
+      "accessibilityLabel": "[Bääççk tö rëëäädïïññg lïïst]"
+    },
+    "body": {
+      "image": {
+        "accessibilityLabel": "[Ïïmäägë]"
+      },
+      "loading": "[Lööäädïïññg…]"
+    },
+    "controls": {
+      "decreaseFontSize": "[Dëëççrëëääsë fööññt sïïzë]",
+      "increaseFontSize": "[Ïïññççrëëääsë fööññt sïïzë]",
+      "lineSpacing": {
+        "_label": "[Lïïññë spääççïïññg]",
+        "hint": "[Dööüüblë tääp tö ööpëëñ spääççïïññg ööptïïööññs]"
+      },
+      "margins": {
+        "_label": "[Määrgïïññs]",
+        "hint": "[Dööüüblë tääp tö ööpëëñ määrgïïñ ööptïïööññs]"
+      },
+      "markAsRead": "[Määrk ääs rëëääd]",
+      "markAsUnread": "[Määrk ääs üüññrëëääd]",
+      "theme": {
+        "_label": "[Thëëmë]",
+        "hint": "[Dööüüblë tääp tö ööpëëñ thëëmë ööptïïööññs]"
+      },
+      "tts": {
+        "pause": "[Pääüüsë tëëxt-tö-spëëëëççh]",
+        "play": "[Plääy tëëxt-tö-spëëëëççh]"
+      }
+    },
+    "controlsSheet": {
+      "closeAccessibilityHint": "[Dïïsmïïss ççööññtrööls]",
+      "fontSizeLabel": "[Fööññt sïïzë]",
+      "lineSpacingLabel": "[Lïïññë spääççïïññg]"
+    },
+    "header": {
+      "byline": "[By {author}]"
+    },
+    "immersiveHint": "[Tääp ääññywhëërë tö rëëvëëääl ççööññtrööls]",
+    "openExternal": {
+      "accessibilityLabel": "[Ööpëëñ öörïïgïïññääl äärtïïççlë]"
+    },
+    "relatedArticles": {
+      "sectionHeader": "[Rëëläätëëd]"
+    },
+    "splitView": {
+      "placeholder": {
+        "accessibilityLabel": "[Ññö äärtïïççlë sëëlëëççtëëd]",
+        "headline": "[Sëëlëëççt ääñ äärtïïççlë]"
+      }
+    }
+  },
+  "settings": {
+    "about": {
+      "versionRowLabel": "[Vëërsïïööñ {version}]"
+    },
+    "analytics": {
+      "rowLabel": "[Shäärë ääññööññymööüüs däätä]",
+      "subtitle": "[Ññö pëërsööññääl ïïññfö öör äärtïïççlë ççööññtëëññt, ëëvëër.]"
+    },
+    "folder": {
+      "emptyValue": "[Ññööt sëët]",
+      "rowLabel": "[Äärtïïççlëës fööldëër]"
+    },
+    "font": {
+      "preview": "[Thë qüüïïççk brööwñ fööx jüümps öövëër thë lääzy döög]",
+      "sectionLabel": "[Fööññt]"
+    },
+    "fontSize": {
+      "sectionLabel": "[Sïïzë]",
+      "valueLabel": "[{size}pt]"
+    },
+    "import": {
+      "rowLabel": "[Ïïmpöört Äärtïïççlëës]"
+    },
+    "privacyPolicy": {
+      "rowLabel": "[Prïïvääççy Pöölïïççy]"
+    },
+    "section": {
+      "about": "[Ääbööüüt]",
+      "privacy": "[Prïïvääççy]",
+      "reading": "[Rëëäädïïññg]",
+      "storage": "[Stööräägë]"
+    },
+    "title": "[Sëëttïïññgs]"
+  },
+  "share": {
+    "cancel": "[Ççääññççëël]",
+    "duplicate": {
+      "cancel": "[Ççääññççëël]",
+      "headline": "[Äärtïïççlë äälrëëäädy säävëëd]",
+      "saveCopy": "[Säävë ääs ççööpy]",
+      "subheadline": "[Thïïs lïïññk ïïs äälrëëäädy ïïñ yööüür lïïbrääry ääs \"{existingTitle}\".]",
+      "success": {
+        "saved": "[Säävëëd]",
+        "updated": "[Üüpdäätëëd]"
+      },
+      "updateExisting": "[Üüpdäätë ëëxïïstïïññg]"
+    },
+    "error": {
+      "dismiss": "[Dïïsmïïss]",
+      "headline": "[Ççööüüldñ't säävë thïïs äärtïïççlë.]",
+      "noFolder": {
+        "cta": "[Ööpëëñ Vëërsö tö fïïññïïsh sëëtüüp]",
+        "message": "[Fööldëër ññööt ççööññfïïgüürëëd.]"
+      },
+      "openInSafari": "[Ööpëëñ ïïñ Sääfäärï]",
+      "subheadline": "[Thë päägë ççööüüldñ't bë rëëääd. Yööü ççääñ ööpëëñ ïït dïïrëëççtly ïïñ Sääfäärï.]"
+    },
+    "preview": {
+      "loading": {
+        "accessibilityLabel": "[Lööäädïïññg äärtïïççlë prëëvïïëëw]"
+      }
+    },
+    "save": {
+      "default": "[Säävë]",
+      "error": "[Try äägääïïñ]",
+      "loading": "[Säävïïññg…]",
+      "success": "[Säävëëd]"
+    },
+    "title": "[Säävë tö Vëërsö]"
+  },
+  "status": {
+    "read": "[Rëëääd]",
+    "reading": "[Rëëäädïïññg]",
+    "unread": "[Üüññrëëääd]"
+  },
+  "swipe": {
+    "archive": "[Äärççhïïvë]",
+    "delete": "[Dëëlëëtë]",
+    "markRead": "[Määrk Rëëääd]",
+    "markUnread": "[Määrk Üüññrëëääd]",
+    "unarchive": "[Üüññäärççhïïvë]"
+  },
+  "tagsEditor": {
+    "cancel": "[Ççääññççëël]",
+    "instructions": "[Ççöömmä-sëëpääräätëëd täägs. Stöörëëd ïïñ thë äärtïïççlë's YÄML sö thëëy wöörk wïïth Ööbsïïdïïääñ.]",
+    "placeholder": "[ë.g. rëësëëäärççh, dëësïïgñ]",
+    "save": "[Säävë]",
+    "saveFailed": {
+      "message": "[Ççhëëççk fööldëër ääççççëëss öör dïïsk spääççë, thëëñ try äägääïïñ.]",
+      "ok": "[ÖK]",
+      "title": "[Ççööüüldñ't säävë täägs]"
+    }
+  },
+  "theme": {
+    "ink": "[Ïïññk]",
+    "night": "[Ññïïght]",
+    "paper": "[Pääpëër]",
+    "sepia": "[Sëëpïïä]"
+  },
+  "tts": {
+    "nowPlaying": {
+      "pause": "[Pääüüsë]",
+      "play": "[Plääy]",
+      "skipForward": "[Skïïp föörwäärd]"
+    }
+  },
+  "web": {
+    "changeFolder": {
+      "label": "[Ççhääññgë fööldëër]"
+    },
+    "fontFamily": {
+      "dyslexic": "[ÖöpëëñDyslëëxïïç]",
+      "georgia": "[Gëëöörgïïä]",
+      "mono": "[Mööññö]",
+      "system": "[Systëëm]"
+    },
+    "reader": {
+      "backButton": {
+        "label": "[Lïïbrääry]"
+      },
+      "backToLibrary": {
+        "label": "[Bääççk tö lïïbrääry]"
+      },
+      "error": {
+        "articleNotFound": "[Äärtïïççlë ññööt fööüüññd: {filename}]",
+        "fallback": "[Äärtïïççlë ññööt fööüüññd.]",
+        "loadFailed": "[Fääïïlëëd tö lööääd äärtïïççlë]",
+        "noFolder": "[Ññö fööldëër sëëlëëççtëëd. Gö bääççk ääññd ççhöööösë yööüür lïïbrääry fööldëër.]",
+        "permissionDenied": "[Fööldëër pëërmïïssïïööñ dëëññïïëëd. Gö bääççk ääññd rë-sëëlëëççt yööüür lïïbrääry.]"
+      },
+      "toggleControls": {
+        "hide": "[Hïïdë ççööññtrööls]",
+        "show": "[Shööw ççööññtrööls]"
+      }
+    },
+    "unsupportedBrowser": {
+      "headline": "[Brööwsëër ññööt süüppöörtëëd]",
+      "subheadline": "[Vëërsö Wëëb üüsëës thë Fïïlë Systëëm Ääççççëëss ÄPÏ, whïïççh rëëqüüïïrëës Ççhröömë öör Ëëdgë 86+. Plëëääsë ööpëëñ thïïs päägë ïïñ ä süüppöörtëëd brööwsëër.]"
+    }
+  }
+}
