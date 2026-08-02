@@ -16,7 +16,12 @@ if [[ ! -f "$SECRETS" ]]; then
     exit 1
   fi
   cp "$TEMPLATE" "$SECRETS"
-  echo "Created $SECRETS from $TEMPLATE (local only, gitignored). Edit to override TELEMETRY_DECK_APP_ID if needed."
+  echo "Created $SECRETS from $TEMPLATE (local only, gitignored). Edit to set DEVELOPMENT_TEAM, or override TELEMETRY_DECK_APP_ID if needed."
+fi
+
+if ! grep -q "^DEVELOPMENT_TEAM[[:space:]]*=[[:space:]]*.\+" "$SECRETS"; then
+  echo "warning: DEVELOPMENT_TEAM is not set in $SECRETS — builds will fail to code sign." >&2
+  echo "         Find your Team ID at developer.apple.com → Membership details." >&2
 fi
 
 exec xcodegen generate "$@"
