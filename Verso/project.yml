@@ -78,6 +78,7 @@ targets:
     bundleId: com.fabiosasseron.verso.ShareExtension
     sources:
       - ShareExtension/Sources
+      - ShareExtension/Resources
       - Generated
       - Shared
     dependencies:
