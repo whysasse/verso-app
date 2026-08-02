@@ -9,6 +9,7 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 - Strings marked *invariant* (e.g. brand names) must not be translated — see `docs/LOCALIZATION.md` §4 for the full list (`Verso`, `Obsidian`, `iCloud Drive`, `Markdown`, `Safari`, `GitHub`, `OpenDyslexic`, theme enum keys). Invariant cells repeat the `en` string unchanged.
 - `en-CA` is an alias of `en` (no separate column — see `docs/LOCALIZATION.md` §1).
 - `fr-CA` / `pt-BR` strings below are a **first draft** (FAB-275 step 3, shared string source). Final linguistic/diacritic QA happens in step 7.
+- `fr-CA` register: **tutoiement** (tu/ton/ta/tes), no `vous`. Confirmed during the fr-CA linguistic review (`docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md`) — Quebec consumer apps default to `tu`; `vous` reads as stiff/corporate for this product. Avoid France-specific phrasing and English loanwords where a standard Quebec term exists (e.g. `téléverser` not `uploader`, `courriel` not `email` if the word is ever needed). The settings.font.preview pangram is the one exception — it's a fixed sample sentence, not address copy, so it keeps its original imperative form.
 
 ---
 
@@ -18,16 +19,16 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.welcome.headline` | Headline | Your articles. Your files. | Vos articles. Vos fichiers. | Seus artigos. Seus arquivos. | — |
-| `onboarding.welcome.subheadline` | Subheadline | A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive. | Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans votre iCloud Drive. | Um lugar tranquilo para ler. Sem contas, sem algoritmos — apenas arquivos Markdown no seu iCloud Drive. | — |
+| `onboarding.welcome.headline` | Headline | Your articles. Your files. | Tes articles. Tes fichiers. | Seus artigos. Seus arquivos. | — |
+| `onboarding.welcome.subheadline` | Subheadline | A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive. | Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans ton iCloud Drive. | Um lugar tranquilo para ler. Sem contas, sem algoritmos — apenas arquivos Markdown no seu iCloud Drive. | — |
 | `onboarding.welcome.cta` | Primary button | Get started | Commencer | Começar | — |
 
 ### OB-2 · Theme Picker
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.theme.headline` | Headline | Choose your reading theme | Choisissez votre thème de lecture | Escolha seu tema de leitura | — |
-| `onboarding.theme.subheadline` | Subheadline | You can change this any time from settings. | Vous pouvez le modifier à tout moment dans les réglages. | Você pode alterar isso a qualquer momento nas configurações. | — |
+| `onboarding.theme.headline` | Headline | Choose your reading theme | Choisis ton thème de lecture | Escolha seu tema de leitura | — |
+| `onboarding.theme.subheadline` | Subheadline | You can change this any time from settings. | Tu peux le modifier à tout moment dans les réglages. | Você pode alterar isso a qualquer momento nas configurações. | — |
 | `onboarding.theme.continue` | Primary button | Continue | Continuer | Continuar | — |
 | `theme.paper` | Theme label | Paper | Papier | Papel | Shared with Settings / Reader Settings |
 | `theme.sepia` | Theme label | Sepia | Sépia | Sépia | Shared |
@@ -38,21 +39,21 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.folder.headline` | Headline | Where should Verso save your articles? | Où Verso doit-il enregistrer vos articles? | Onde o Verso deve guardar seus artigos? | Corrected "store" → "save" during step 4 view-wiring pass to match shipped code — fr-CA/pt-BR already said "save" (enregistrer/guardar), so en was the stale one. |
-| `onboarding.folder.subheadline` | Subheadline | Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere. | Choisissez un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que vous pouvez ouvrir n'importe où. | Escolha uma pasta no iCloud Drive. O Verso salva cada artigo como um arquivo Markdown que você pode abrir em qualquer lugar. | Code previously had different wording ("Articles are saved as Markdown files — yours to keep."); switched to this canonical copy during step 4 view-wiring pass since fr-CA/pt-BR were already translated against it. |
+| `onboarding.folder.headline` | Headline | Where should Verso save your articles? | Où Verso doit-il enregistrer tes articles? | Onde o Verso deve guardar seus artigos? | Corrected "store" → "save" during step 4 view-wiring pass to match shipped code — fr-CA/pt-BR already said "save" (enregistrer/guardar), so en was the stale one. |
+| `onboarding.folder.subheadline` | Subheadline | Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere. | Choisis un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que tu peux ouvrir n'importe où. | Escolha uma pasta no iCloud Drive. O Verso salva cada artigo como um arquivo Markdown que você pode abrir em qualquer lugar. | Code previously had different wording ("Articles are saved as Markdown files — yours to keep."); switched to this canonical copy during step 4 view-wiring pass since fr-CA/pt-BR were already translated against it. |
 | `onboarding.folder.chooseCta` | Folder-picker row placeholder (shown before a folder is selected; replaced by the folder name once one is) | Choose folder… | Choisir un dossier… | Escolher pasta… | Added ellipsis during step 4 view-wiring pass to match the row-placeholder treatment shipped in code (not a standalone button as the original "Primary button" location implied). |
 | `onboarding.folder.continueCta` | Primary button | Continue | Continuer | Continuar | Added during step 4 view-wiring pass — missed in the original audit. |
-| `onboarding.folder.privacyNote` | Caption below Continue button | Verso never uploads your files. They live in your iCloud Drive. | Verso ne téléverse jamais vos fichiers. Ils restent dans votre iCloud Drive. | O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive. | Added during step 4 view-wiring pass — missed in the original audit. |
-| `onboarding.folder.obsidianTip` | Tip text | Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically. | Vous utilisez Obsidian? Pointez Verso vers un dossier dans votre coffre et les articles y apparaîtront automatiquement. | Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente. | Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md. |
+| `onboarding.folder.privacyNote` | Caption below Continue button | Verso never uploads your files. They live in your iCloud Drive. | Verso ne téléverse jamais tes fichiers. Ils restent dans ton iCloud Drive. | O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive. | Added during step 4 view-wiring pass — missed in the original audit. |
+| `onboarding.folder.obsidianTip` | Tip text | Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically. | Tu utilises Obsidian? Pointe Verso vers un dossier dans ton coffre et les articles y apparaîtront automatiquement. | Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente. | Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md. |
 
 ### OB-4 · Quick Tour
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `onboarding.tour.headline` | Headline | Here's how it works | Voici comment ça fonctionne | Veja como funciona | — |
-| `onboarding.tour.step1` | Step 1 label | Share any article from Safari or your browser to save it instantly. | Partagez n'importe quel article depuis Safari ou votre navigateur pour l'enregistrer instantanément. | Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente. | — |
-| `onboarding.tour.step2` | Step 2 label | Open Verso to read. Your list is always in sync with your files. | Ouvrez Verso pour lire. Votre liste est toujours synchronisée avec vos fichiers. | Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos. | — |
-| `onboarding.tour.step3` | Step 3 label | Mark articles as read when you're done. They stay in your folder forever. | Marquez les articles comme lus une fois terminés. Ils restent dans votre dossier pour toujours. | Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre. | — |
+| `onboarding.tour.step1` | Step 1 label | Share any article from Safari or your browser to save it instantly. | Partage n'importe quel article depuis Safari ou ton navigateur pour l'enregistrer instantanément. | Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente. | — |
+| `onboarding.tour.step2` | Step 2 label | Open Verso to read. Your list is always in sync with your files. | Ouvre Verso pour lire. Ta liste est toujours synchronisée avec tes fichiers. | Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos. | — |
+| `onboarding.tour.step3` | Step 3 label | Mark articles as read when you're done. They stay in your folder forever. | Marque les articles comme lus une fois terminés. Ils restent dans ton dossier pour toujours. | Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre. | — |
 | `onboarding.tour.skip` | Text button | Skip | Ignorer | Pular | — |
 | `onboarding.tour.startReading` | Primary button | Start reading | Commencer à lire | Começar a ler | — |
 
@@ -62,8 +63,8 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.analyticsConsent.headline` | Headline | Help make Verso better | Aidez à améliorer Verso | Ajude a melhorar o Verso | Added during step 4 view-wiring pass — missed in the original audit. |
-| `onboarding.analyticsConsent.subheadline` | Subheadline | Share anonymous usage data — no personal info, no article content, ever. | Partagez des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais. | Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca. | — |
+| `onboarding.analyticsConsent.headline` | Headline | Help make Verso better | Aide à améliorer Verso | Ajude a melhorar o Verso | Added during step 4 view-wiring pass — missed in the original audit. |
+| `onboarding.analyticsConsent.subheadline` | Subheadline | Share anonymous usage data — no personal info, no article content, ever. | Partage des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais. | Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca. | — |
 | `onboarding.analyticsConsent.acceptCta` | Primary button | Sure, why not | Bien sûr, pourquoi pas | Claro, por que não | — |
 | `onboarding.analyticsConsent.declineCta` | Secondary button | No thanks | Non merci | Não, obrigado | — |
 
@@ -127,14 +128,14 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `filter.read.accessibilityLabel` | VoiceOver label | Read, {count} articles | Lus, {count} articles | Lidos, {count} artigos | ⚠️ plural |
 | `filter.archived.accessibilityLabel` | VoiceOver label | Archived, {count} articles | Archivés, {count} articles | Arquivados, {count} artigos | ⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`. |
 | `filter.chip.selected.hint` | VoiceOver hint (any chip) | Currently selected | Actuellement sélectionné | Selecionado atualmente | — |
-| `filter.chip.unselected.hint` | VoiceOver hint (any chip) | Double tap to filter | Appuyez deux fois pour filtrer | Toque duas vezes para filtrar | — |
+| `filter.chip.unselected.hint` | VoiceOver hint (any chip) | Double tap to filter | Appuie deux fois pour filtrer | Toque duas vezes para filtrar | — |
 
 ### Article Card
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `articleCard.accessibilityLabel` | VoiceOver row label | {title}, {source}, {estimated read time} | {title}, {source}, {estimated read time} | {title}, {source}, {estimated read time} | Dynamic — template only, no literal text to translate |
-| `articleCard.accessibilityHint` | VoiceOver row hint | Double tap to open | Appuyez deux fois pour ouvrir | Toque duas vezes para abrir | — |
+| `articleCard.accessibilityHint` | VoiceOver row hint | Double tap to open | Appuie deux fois pour ouvrir | Toque duas vezes para abrir | — |
 | `articleCard.estimatedReadTime` | Read time label | {N} min read | {N} min de lecture | {N} min de leitura | ⚠️ plural: "1 min read" / "{N} min read". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: "min" is already an invariant abbreviation in both languages, no plural variant needed. |
 
 ### Status Badges
@@ -150,17 +151,17 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `home.empty.noArticles.headline` | Empty state headline | No articles yet | Aucun article pour l'instant | Nenhum artigo ainda | — |
-| `home.empty.noArticles.subheadline` | Empty state subheadline | Share an article from Safari to get started. | Partagez un article depuis Safari pour commencer. | Compartilhe um artigo do Safari para começar. | — |
+| `home.empty.noArticles.subheadline` | Empty state subheadline | Share an article from Safari to get started. | Partage un article depuis Safari pour commencer. | Compartilhe um artigo do Safari para começar. | — |
 | `home.empty.noResults.headline` | Search empty state headline | No results | Aucun résultat | Nenhum resultado | — |
-| `home.empty.noResults.subheadline` | Search empty state subheadline | Try a different search term. | Essayez un autre terme de recherche. | Tente outro termo de busca. | — |
+| `home.empty.noResults.subheadline` | Search empty state subheadline | Try a different search term. | Essaie un autre terme de recherche. | Tente outro termo de busca. | — |
 | `home.empty.archive.headline` | Archive empty state headline | Nothing archived | Rien d'archivé | Nada arquivado | — |
-| `home.empty.archive.subheadline` | Archive empty state subheadline | Articles you archive will appear here. | Les articles que vous archivez apparaîtront ici. | Os artigos que você arquivar vão aparecer aqui. | — |
+| `home.empty.archive.subheadline` | Archive empty state subheadline | Articles you archive will appear here. | Les articles que tu archives apparaîtront ici. | Os artigos que você arquivar vão aparecer aqui. | — |
 | `home.empty.noUnread.headline` | Unread-filter empty state headline | Nothing unread | Aucun article non lu | Nenhum artigo não lido | Added during step 5 web-wiring pass — Web has a per-filter empty state with no iOS equivalent (iOS doesn't filter the list by read status the same way). needs_review. |
-| `home.empty.noUnread.subheadline` | Unread-filter empty state subheadline | Articles you haven't read yet will appear here. | Les articles que vous n'avez pas encore lus apparaîtront ici. | Os artigos que você ainda não leu vão aparecer aqui. | needs_review. |
+| `home.empty.noUnread.subheadline` | Unread-filter empty state subheadline | Articles you haven't read yet will appear here. | Les articles que tu n'as pas encore lus apparaîtront ici. | Os artigos que você ainda não leu vão aparecer aqui. | needs_review. |
 | `home.empty.noReading.headline` | Reading-filter empty state headline | Nothing in progress | Rien en cours | Nada em andamento | Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review. |
-| `home.empty.noReading.subheadline` | Reading-filter empty state subheadline | Articles you're currently reading will appear here. | Les articles que vous lisez actuellement apparaîtront ici. | Os artigos que você está lendo no momento vão aparecer aqui. | needs_review. |
+| `home.empty.noReading.subheadline` | Reading-filter empty state subheadline | Articles you're currently reading will appear here. | Les articles que tu lis actuellement apparaîtront ici. | Os artigos que você está lendo no momento vão aparecer aqui. | needs_review. |
 | `home.empty.noRead.headline` | Read-filter empty state headline | Nothing read yet | Rien de lu pour l'instant | Nada lido ainda | Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review. |
-| `home.empty.noRead.subheadline` | Read-filter empty state subheadline | Articles you finish reading will appear here. | Les articles que vous terminez de lire apparaîtront ici. | Os artigos que você terminar de ler vão aparecer aqui. | needs_review. |
+| `home.empty.noRead.subheadline` | Read-filter empty state subheadline | Articles you finish reading will appear here. | Les articles que tu termines de lire apparaîtront ici. | Os artigos que você terminar de ler vão aparecer aqui. | needs_review. |
 | `home.loading.accessibilityLabel` | Skeleton loading state | Loading articles | Chargement des articles | Carregando artigos | — |
 
 ### Swipe Actions
@@ -199,7 +200,7 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `dialog.deleteArticle.title` | Dialog title | Delete article? | Supprimer l'article? | Excluir artigo? | — |
-| `dialog.deleteArticle.message` | Dialog message | This cannot be undone. The file will be permanently removed from your iCloud Drive. | Cette action est irréversible. Le fichier sera définitivement supprimé de votre iCloud Drive. | Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive. | — |
+| `dialog.deleteArticle.message` | Dialog message | This cannot be undone. The file will be permanently removed from your iCloud Drive. | Cette action est irréversible. Le fichier sera définitivement supprimé de ton iCloud Drive. | Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive. | — |
 | `dialog.deleteArticle.confirm` | Destructive button | Delete | Supprimer | Excluir | — |
 | `dialog.deleteArticle.cancel` | Cancel button | Cancel | Annuler | Cancelar | — |
 
@@ -212,12 +213,12 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `addArticle.navTitle` | Sheet nav bar title | Add Article | Ajouter un article | Adicionar artigo | — |
 | `addArticle.close.accessibilityLabel` | Close (X) toolbar button | Close | Fermer | Fechar | — |
 | `addArticle.close.accessibilityHint` | Close button VoiceOver hint | Dismiss add article sheet | Fermer la feuille d'ajout d'article | Fechar a tela de adicionar artigo | — |
-| `addArticle.idle.instructions` | Idle state body copy | Paste a link to save an article to your library. | Collez un lien pour enregistrer un article dans votre bibliothèque. | Cole um link para salvar um artigo na sua biblioteca. | — |
-| `addArticle.idle.placeholder` | URL text field placeholder | Paste a link… | Collez un lien… | Cole um link… | — |
+| `addArticle.idle.instructions` | Idle state body copy | Paste a link to save an article to your library. | Colle un lien pour enregistrer un article dans ta bibliothèque. | Cole um link para salvar um artigo na sua biblioteca. | — |
+| `addArticle.idle.placeholder` | URL text field placeholder | Paste a link… | Colle un lien… | Cole um link… | — |
 | `addArticle.idle.save` | Primary button | Save | Enregistrer | Salvar | — |
 | `addArticle.saving.message` | In-progress state | Saving article… | Enregistrement de l'article… | Salvando artigo… | — |
-| `addArticle.success.headline` | Success state headline | Article saved! | Article enregistré! | Artigo salvo! | — |
-| `addArticle.success.subheadline` | Success state subheadline | It will appear in your library shortly. | Il apparaîtra bientôt dans votre bibliothèque. | Ele aparecerá em breve na sua biblioteca. | — |
+| `addArticle.success.headline` | Success state headline | Article saved! | Article enregistré | Artigo salvo! | — |
+| `addArticle.success.subheadline` | Success state subheadline | It will appear in your library shortly. | Il apparaîtra bientôt dans ta bibliothèque. | Ele aparecerá em breve na sua biblioteca. | — |
 | `addArticle.failure.headline` | Failure state headline | Could not save article | Impossible d'enregistrer l'article | Não foi possível salvar o artigo | — |
 | `addArticle.failure.tryAgain` | Failure state primary button | Try Again | Réessayer | Tentar novamente | — |
 | `addArticle.error.noLibraryFolder` | Error message when no folder is bookmarked yet | No library folder selected. | Aucun dossier de bibliothèque sélectionné. | Nenhuma pasta de biblioteca selecionada. | Edge case — folder bookmark missing mid-flow |
@@ -230,7 +231,7 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `reading.splitView.placeholder.headline` | Detail column, no article selected (regular-width iPad) | Select an article | Sélectionnez un article | Selecione um artigo | Added during step 4 view-wiring pass — iPad split view postdates the original audit. |
+| `reading.splitView.placeholder.headline` | Detail column, no article selected (regular-width iPad) | Select an article | Sélectionne un article | Selecione um artigo | Added during step 4 view-wiring pass — iPad split view postdates the original audit. |
 | `reading.splitView.placeholder.accessibilityLabel` | Same placeholder, combined accessibility element | No article selected | Aucun article sélectionné | Nenhum artigo selecionado | — |
 
 ### Top Bar
@@ -251,14 +252,14 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `tagsEditor.cancel` | Toolbar button | Cancel | Annuler | Cancelar | — |
 | `tagsEditor.save` | Toolbar button | Save | Enregistrer | Salvar | — |
 | `tagsEditor.saveFailed.title` | Alert title | Couldn't save tags | Impossible d'enregistrer les étiquettes | Não foi possível salvar as etiquetas | — |
-| `tagsEditor.saveFailed.message` | Alert message | Check folder access or disk space, then try again. | Vérifiez l'accès au dossier ou l'espace disque, puis réessayez. | Verifique o acesso à pasta ou o espaço em disco e tente novamente. | — |
+| `tagsEditor.saveFailed.message` | Alert message | Check folder access or disk space, then try again. | Vérifie l'accès au dossier ou l'espace disque, puis réessaie. | Verifique o acesso à pasta ou o espaço em disco e tente novamente. | — |
 | `tagsEditor.saveFailed.ok` | Alert button | OK | OK | OK | Invariant — standard alert acknowledgement across all three locales |
 
 ### Immersive Hint
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `reading.immersiveHint` | Hint pill (first launch only) | Tap anywhere to reveal controls | Touchez n'importe où pour afficher les commandes | Toque em qualquer lugar para mostrar os controles | Never shown when VoiceOver is active |
+| `reading.immersiveHint` | Hint pill (first launch only) | Tap anywhere to reveal controls | Touche n'importe où pour afficher les commandes | Toque em qualquer lugar para mostrar os controles | Never shown when VoiceOver is active |
 
 ### Bottom Bar (Reading Controls)
 
@@ -267,11 +268,11 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `reading.controls.decreaseFontSize` | Icon button accessibility label | Decrease font size | Réduire la taille du texte | Diminuir tamanho da fonte | — |
 | `reading.controls.increaseFontSize` | Icon button accessibility label | Increase font size | Augmenter la taille du texte | Aumentar tamanho da fonte | — |
 | `reading.controls.lineSpacing` | Icon button accessibility label | Line spacing | Interligne | Espaçamento entre linhas | — |
-| `reading.controls.lineSpacing.hint` | VoiceOver hint | Double tap to open spacing options | Appuyez deux fois pour ouvrir les options d'interligne | Toque duas vezes para abrir as opções de espaçamento | — |
+| `reading.controls.lineSpacing.hint` | VoiceOver hint | Double tap to open spacing options | Appuie deux fois pour ouvrir les options d'interligne | Toque duas vezes para abrir as opções de espaçamento | — |
 | `reading.controls.margins` | Icon button accessibility label | Margins | Marges | Margens | — |
-| `reading.controls.margins.hint` | VoiceOver hint | Double tap to open margin options | Appuyez deux fois pour ouvrir les options de marges | Toque duas vezes para abrir as opções de margem | — |
+| `reading.controls.margins.hint` | VoiceOver hint | Double tap to open margin options | Appuie deux fois pour ouvrir les options de marges | Toque duas vezes para abrir as opções de margem | — |
 | `reading.controls.theme` | Icon button accessibility label | Theme | Thème | Tema | — |
-| `reading.controls.theme.hint` | VoiceOver hint | Double tap to open theme options | Appuyez deux fois pour ouvrir les options de thème | Toque duas vezes para abrir as opções de tema | — |
+| `reading.controls.theme.hint` | VoiceOver hint | Double tap to open theme options | Appuie deux fois pour ouvrir les options de thème | Toque duas vezes para abrir as opções de tema | — |
 | `reading.controls.markAsRead` | Icon button accessibility label | Mark as read | Marquer comme lu | Marcar como lido | — |
 | `reading.controls.markAsUnread` | Icon button accessibility label | Mark as unread | Marquer comme non lu | Marcar como não lido | — |
 | `reading.controls.tts.play` | TTS button accessibility label | Play text-to-speech | Lire la synthèse vocale | Reproduzir texto em voz | — |
@@ -373,8 +374,8 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `dialog.changeFolder.title` | Dialog title | Move your existing articles to the new folder? | Déplacer vos articles existants vers le nouveau dossier? | Mover seus artigos existentes para a nova pasta? | Corrected to match shipped copy. |
-| `dialog.changeFolder.message` | Dialog message | Your old folder won't be touched if you choose No. | Votre ancien dossier ne sera pas touché si vous choisissez Non. | Sua pasta antiga não será alterada se você escolher Não. | Corrected to match shipped copy. |
+| `dialog.changeFolder.title` | Dialog title | Move your existing articles to the new folder? | Déplacer tes articles existants vers le nouveau dossier? | Mover seus artigos existentes para a nova pasta? | Corrected to match shipped copy. |
+| `dialog.changeFolder.message` | Dialog message | Your old folder won't be touched if you choose No. | Ton ancien dossier ne sera pas touché si tu choisis Non. | Sua pasta antiga não será alterada se você escolher Não. | Corrected to match shipped copy. |
 | `dialog.changeFolder.yes` | Confirm button | Move Articles | Déplacer les articles | Mover Artigos | Corrected to match shipped copy (Title Case). |
 | `dialog.changeFolder.no` | Secondary button | Keep in Old Folder | Garder dans l'ancien dossier | Manter na pasta antiga | Corrected to match shipped copy. |
 | `dialog.changeFolder.cancel` | Cancel button | Cancel | Annuler | Cancelar | — |
@@ -387,8 +388,8 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 |-----|----------|----|-------|-------|-------|
 | `import.close.accessibilityHint` | Close (X) toolbar button VoiceOver hint | Dismiss import sheet | Fermer la feuille d'importation | Fechar a tela de importação | Close (X) button itself reuses `addArticle.close.accessibilityLabel` ("Close") — identical wording/affordance across sheets. |
 | `import.idle.headline` | Idle state headline | Import Articles | Importer des articles | Importar artigos | Coincidentally matches `settings.import.rowLabel`'s wording today, but kept as a separate key — a settings row label and a screen headline are different copy slots that could diverge independently. |
-| `import.idle.subtitle` | Idle state subtitle | Import your reading list from GoodLinks, Instapaper, Pocket, Readwise Reader, or Matter. | Importez votre liste de lecture depuis GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter. | Importe sua lista de leitura do GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter. | Third-party product names invariant. |
-| `import.idle.noFolderWarning` | Idle state warning, shown only when no articles folder is set | Set your articles folder in Storage settings before importing. | Définissez votre dossier d'articles dans les réglages Stockage avant d'importer. | Defina sua pasta de artigos nas configurações de Armazenamento antes de importar. | — |
+| `import.idle.subtitle` | Idle state subtitle | Import your reading list from GoodLinks, Instapaper, Pocket, Readwise Reader, or Matter. | Importe ta liste de lecture depuis GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter. | Importe sua lista de leitura do GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter. | Third-party product names invariant. |
+| `import.idle.noFolderWarning` | Idle state warning, shown only when no articles folder is set | Set your articles folder in Storage settings before importing. | Définis ton dossier d'articles dans les réglages Stockage avant d'importer. | Defina sua pasta de artigos nas configurações de Armazenamento antes de importar. | — |
 | `import.idle.selectFileButton` | Idle state primary CTA | Select Export File | Sélectionner le fichier d'exportation | Selecionar arquivo de exportação | — |
 | `import.parsing.message` | Parsing state message | Reading file… | Lecture du fichier… | Lendo arquivo… | — |
 | `import.writing.message` | Writing state message | Importing articles… | Importation des articles… | Importando artigos… | — |
@@ -442,7 +443,7 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `error.offline.banner.headline` | Inline banner headline | You're offline. | Vous êtes hors ligne. | Você está off-line. | — |
+| `error.offline.banner.headline` | Inline banner headline | You're offline. | Tu es hors ligne. | Você está off-line. | — |
 | `error.offline.banner.subheadline` | Inline banner subheadline | Saved articles are still available. | Les articles enregistrés restent disponibles. | Os artigos salvos continuam disponíveis. | — |
 | `error.offline.articleUnavailable` | Article row (unavailable article) | Not available offline. | Non disponible hors ligne. | Não disponível off-line. | Greyed-out row only |
 
@@ -460,7 +461,7 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `error.noFolder.headline` | Full-screen error headline | No folder selected. | Aucun dossier sélectionné. | Nenhuma pasta selecionada. | — |
-| `error.noFolder.subheadline` | Full-screen error subheadline | Choose a folder in iCloud Drive to start saving articles. | Choisissez un dossier dans iCloud Drive pour commencer à enregistrer des articles. | Escolha uma pasta no iCloud Drive para começar a salvar artigos. | — |
+| `error.noFolder.subheadline` | Full-screen error subheadline | Choose a folder in iCloud Drive to start saving articles. | Choisis un dossier dans iCloud Drive pour commencer à enregistrer des articles. | Escolha uma pasta no iCloud Drive para começar a salvar artigos. | — |
 | `error.noFolder.cta` | CTA button | Choose folder | Choisir un dossier | Escolher pasta | — |
 
 ### Folder Not Found (Scenario 4)
@@ -468,7 +469,7 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `error.folderMissing.headline` | Full-screen error headline | Folder not found. | Dossier introuvable. | Pasta não encontrada. | — |
-| `error.folderMissing.subheadline` | Full-screen error subheadline | The folder may have been moved or deleted. Choose a new one to continue. | Le dossier a peut-être été déplacé ou supprimé. Choisissez-en un nouveau pour continuer. | A pasta pode ter sido movida ou excluída. Escolha uma nova para continuar. | — |
+| `error.folderMissing.subheadline` | Full-screen error subheadline | The folder may have been moved or deleted. Choose a new one to continue. | Le dossier a peut-être été déplacé ou supprimé. Choisis-en un nouveau pour continuer. | A pasta pode ter sido movida ou excluída. Escolha uma nova para continuar. | — |
 | `error.folderMissing.cta` | CTA button | Choose new folder | Choisir un nouveau dossier | Escolher nova pasta | — |
 
 ### iCloud Unavailable (Scenario 5)
@@ -476,14 +477,14 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `error.iCloudUnavailable.headline` | Inline banner headline | iCloud Drive is unavailable. | iCloud Drive est indisponible. | O iCloud Drive está indisponível. | `iCloud Drive` invariant |
-| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | Allez dans Réglages → [Your Name] → iCloud pour le réactiver. | Vá em Configurações → [Your Name] → iCloud para reativá-lo. | `[Your Name]` is **intentional** in all locales — it matches Apple's on-screen label for the device-owner row in iOS Settings. Keep the placeholder; do not insert a real name. Translators should match Apple's localized Settings path wording for "Réglages"/"Configurações" once confirmed against an fr-CA/pt-BR device — flag for step 7 QA. |
+| `error.iCloudUnavailable.subheadline` | Inline banner subheadline | Go to Settings → [Your Name] → iCloud to re-enable it. | Va dans Réglages → [Your Name] → iCloud pour le réactiver. | Vá em Configurações → [Your Name] → iCloud para reativá-lo. | `[Your Name]` is **intentional** in all locales — it matches Apple's on-screen label for the device-owner row in iOS Settings. Keep the placeholder; do not insert a real name. Translators should match Apple's localized Settings path wording for "Réglages"/"Configurações" once confirmed against an fr-CA/pt-BR device — flag for step 7 QA. |
 
 ### File Write Error (Scenario 6)
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `error.fileWrite.message` | Toast message | Couldn't save article. | Impossible d'enregistrer l'article. | Não foi possível salvar o artigo. | 3s auto-dismiss |
-| `error.fileWrite.subtext` | Toast subtext | Check that your folder is accessible and try again. | Vérifiez que votre dossier est accessible et réessayez. | Verifique se sua pasta está acessível e tente novamente. | — |
+| `error.fileWrite.subtext` | Toast subtext | Check that your folder is accessible and try again. | Vérifie que ton dossier est accessible et réessaie. | Verifique se sua pasta está acessível e tente novamente. | — |
 
 ### File Read Error (Scenario 7)
 
@@ -497,7 +498,7 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `share.error.headline` | Share sheet error state | Couldn't save this article. | Impossible d'enregistrer cet article. | Não foi possível salvar este artigo. | Replaces §8 `share.error.couldNotParse` |
-| `share.error.subheadline` | Share sheet error subheadline | The page couldn't be read. You can open it directly in Safari. | La page n'a pas pu être lue. Vous pouvez l'ouvrir directement dans Safari. | A página não pôde ser lida. Você pode abri-la diretamente no Safari. | `Safari` invariant |
+| `share.error.subheadline` | Share sheet error subheadline | The page couldn't be read. You can open it directly in Safari. | La page n'a pas pu être lue. Tu peux l'ouvrir directement dans Safari. | A página não pôde ser lida. Você pode abri-la diretamente no Safari. | `Safari` invariant |
 | `share.error.openInSafari` | Primary CTA | Open in Safari | Ouvrir dans Safari | Abrir no Safari | Accent color |
 | `share.error.dismiss` | Secondary CTA | Dismiss | Fermer | Descartar | — |
 
@@ -506,7 +507,7 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `share.duplicate.headline` | Share sheet duplicate state | Article already saved | Article déjà enregistré | Artigo já salvo | — |
-| `share.duplicate.subheadline` | Body copy | This link is already in your library as "{existingTitle}". | Ce lien est déjà dans votre bibliothèque sous le nom « {existingTitle} ». | Este link já está na sua biblioteca como "{existingTitle}". | `{existingTitle}` from existing file frontmatter; fr-CA uses guillemets « » per Québec French convention |
+| `share.duplicate.subheadline` | Body copy | This link is already in your library as "{existingTitle}". | Ce lien est déjà dans ta bibliothèque sous le nom « {existingTitle} ». | Este link já está na sua biblioteca como "{existingTitle}". | `{existingTitle}` from existing file frontmatter; fr-CA uses guillemets « » per Québec French convention |
 | `share.duplicate.updateExisting` | Primary button | Update existing | Mettre à jour l'existant | Atualizar existente | — |
 | `share.duplicate.saveCopy` | Secondary button | Save as copy | Enregistrer une copie | Salvar como cópia | Appends ` (Copy)` to title (or ` 2` after existing ` (Copy)`) — fr-CA/pt-BR suffix wording TBD in step 7 (e.g. ` (Copie)` / ` (Cópia)`) |
 | `share.duplicate.cancel` | Text button | Cancel | Annuler | Cancelar | Completes extension without writing pending JSON |
@@ -521,7 +522,7 @@ In-app **Add Article** uses the same headline, subheadline, and button labels as
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `error.generic` | Last-resort fallback | Something went wrong. Please try again. | Une erreur s'est produite. Veuillez réessayer. | Algo deu errado. Tente novamente. | — |
+| `error.generic` | Last-resort fallback | Something went wrong. Please try again. | Une erreur s'est produite. Réessaie. | Algo deu errado. Tente novamente. | — |
 
 ---
 
@@ -531,12 +532,12 @@ These strings are never visible on screen. They are set via `.accessibilityLabel
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `a11y.articleRow.hint` | Article list row hint | Double tap to open | Touchez deux fois pour ouvrir | Toque duas vezes para abrir | — |
+| `a11y.articleRow.hint` | Article list row hint | Double tap to open | Touche deux fois pour ouvrir | Toque duas vezes para abrir | — |
 | `a11y.articleRow.label` | Article list row label | {title}, {source}, {estimatedReadTime} | {title}, {source}, {estimatedReadTime} | {title}, {source}, {estimatedReadTime} | Dynamic — composed from already-translated fragments, no literal text to translate |
 | `a11y.filterChip.selected` | Selected filter chip hint | Currently selected | Actuellement sélectionné | Atualmente selecionado | — |
-| `a11y.filterChip.unselected` | Unselected filter chip hint | Double tap to filter | Touchez deux fois pour filtrer | Toque duas vezes para filtrar | — |
+| `a11y.filterChip.unselected` | Unselected filter chip hint | Double tap to filter | Touche deux fois pour filtrer | Toque duas vezes para filtrar | — |
 | `a11y.themeChip.selected` | Selected theme chip hint | Currently selected | Actuellement sélectionné | Atualmente selecionado | — |
-| `a11y.themeChip.unselected` | Unselected theme chip hint | Double tap to select | Touchez deux fois pour sélectionner | Toque duas vezes para selecionar | — |
+| `a11y.themeChip.unselected` | Unselected theme chip hint | Double tap to select | Touche deux fois pour sélectionner | Toque duas vezes para selecionar | — |
 | `a11y.fontOption.selected` | Selected font option announcement | {fontName}, selected | {fontName}, sélectionné | {fontName}, selecionado | — |
 | `a11y.fontOption.unselected` | Unselected font option | {fontName} | {fontName} | {fontName} | Font names are invariant |
 | `a11y.fontSize.label` | Font size step label | {label}, {points} points | {label}, {points} points | {label}, {points} pontos | e.g. "Medium, 18 points" → "Moyen, 18 points" → "Médio, 18 pontos". `{label}` is the full-word size name (Extra small/Small/Medium/…), not the XS/S/M abbreviation — see §4 Reader Settings open question |
@@ -571,7 +572,7 @@ These strings are never visible on screen. They are set via `.accessibilityLabel
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `web.unsupportedBrowser.headline` | Full-screen notice when File System Access API is unavailable | Browser not supported | Navigateur non pris en charge | Navegador não compatível | — |
-| `web.unsupportedBrowser.subheadline` | Same screen, body copy | Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser. | Verso Web utilise l'API File System Access, qui nécessite Chrome ou Edge 86+. Veuillez ouvrir cette page dans un navigateur pris en charge. | O Verso Web usa a File System Access API, que requer Chrome ou Edge 86+. Abra esta página em um navegador compatível. | `Verso Web`, `File System Access API`, `Chrome`, `Edge` invariant. |
+| `web.unsupportedBrowser.subheadline` | Same screen, body copy | Verso Web uses the File System Access API, which requires Chrome or Edge 86+. Please open this page in a supported browser. | Verso Web utilise l'API File System Access, qui nécessite Chrome ou Edge 86+. Ouvre cette page dans un navigateur pris en charge. | O Verso Web usa a File System Access API, que requer Chrome ou Edge 86+. Abra esta página em um navegador compatível. | `Verso Web`, `File System Access API`, `Chrome`, `Edge` invariant. |
 | `web.changeFolder.label` | Link below the article list to re-pick the library folder | Change folder | Changer de dossier | Alterar pasta | — |
 | `web.fontFamily.system` | Font-family option label | System | Système | Sistema | — |
 | `web.fontFamily.mono` | Font-family option label | Mono | Mono | Mono | — |
@@ -580,8 +581,8 @@ These strings are never visible on screen. They are set via `.accessibilityLabel
 | `web.reader.toggleControls.show` | Reader-screen "Aa" button tooltip when controls are hidden | Show controls | Afficher les commandes | Mostrar controles | — |
 | `web.reader.toggleControls.hide` | Reader-screen "Aa" button tooltip when controls are visible | Hide controls | Masquer les commandes | Ocultar controles | — |
 | `web.reader.backButton.label` | Reader-screen back link (visible text, the "←" glyph is decorative and not part of the translated string) | Library | Bibliothèque | Biblioteca | — |
-| `web.reader.error.noFolder` | Reader-screen error when no folder is bookmarked | No folder selected. Go back and choose your library folder. | Aucun dossier sélectionné. Revenez en arrière et choisissez votre dossier de bibliothèque. | Nenhuma pasta selecionada. Volte e escolha a pasta da sua biblioteca. | Distinct from `error.noFolder.*` (home-screen full error view, headline/subheadline/cta) — this is a single inline string on the reader page. |
-| `web.reader.error.permissionDenied` | Reader-screen error when folder permission was revoked | Folder permission denied. Go back and re-select your library. | Autorisation du dossier refusée. Revenez en arrière et resélectionnez votre bibliothèque. | Permissão da pasta negada. Volte e selecione novamente sua biblioteca. | — |
+| `web.reader.error.noFolder` | Reader-screen error when no folder is bookmarked | No folder selected. Go back and choose your library folder. | Aucun dossier sélectionné. Reviens en arrière et choisis ton dossier de bibliothèque. | Nenhuma pasta selecionada. Volte e escolha a pasta da sua biblioteca. | Distinct from `error.noFolder.*` (home-screen full error view, headline/subheadline/cta) — this is a single inline string on the reader page. |
+| `web.reader.error.permissionDenied` | Reader-screen error when folder permission was revoked | Folder permission denied. Go back and re-select your library. | Autorisation du dossier refusée. Reviens en arrière et resélectionne ta bibliothèque. | Permissão da pasta negada. Volte e selecione novamente sua biblioteca. | — |
 | `web.reader.error.articleNotFound` | Reader-screen error when the file isn't found in the folder | Article not found: {filename} | Article introuvable : {filename} | Artigo não encontrado: {filename} | `{filename}` not translated. |
 | `web.reader.error.loadFailed` | Reader-screen generic load failure (caught exception, no specific message) | Failed to load article | Échec du chargement de l'article | Falha ao carregar o artigo | — |
 | `web.reader.error.fallback` | Reader-screen fallback when article is missing with no specific error | Article not found. | Article introuvable. | Artigo não encontrado. | — |

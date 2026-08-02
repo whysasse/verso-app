@@ -196,6 +196,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | Codegen: generate Localizable.xcstrings / L10n.swift / Web message JSONs | `docs/copy/codegen/generate.py` |
 | Codegen: pseudo-locale for layout-flex QA (accented +30%) | `docs/copy/codegen/pseudolocalize.py` |
 | Localization — locales, plurals, formatting, invariants, pseudolocalization (EN-CA/FR-CA/PT-BR) | `docs/LOCALIZATION.md` |
+| Linguistic review checklist (send to translator) | `docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md` or `docs/copy/UI_COPY_LINGUISTIC_REVIEW_pt-BR.md` |
 | User flows and navigation mechanics | `docs/user-flows.md`, `docs/navigation-patterns.md` |
 | Design system philosophy and reading behavior | `docs/DESIGN_SYSTEM_FOUNDATIONS.md` |
 | iCloud/Obsidian file-first decisions | `docs/OBSIDIAN_INTEGRATION.md` |
