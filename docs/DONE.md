@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**154 completed issues.**
+**155 completed issues.**
 
 ## iOS
 
@@ -1482,6 +1482,13 @@
   ## Completed Work
 
   * Fixed missing `GENERATE_INFOPLIST_FILE: YES` setting in `project.yml`
+
+- [x] 🔵 **FAB-8** · Add GitHub Actions CI (build-only)  `Done` `Low`
+  `.github/workflows/ci.yml` — builds the `Verso` scheme unsigned on every push/PR to `main` (XcodeGen generate → xcodebuild, `CODE_SIGNING_ALLOWED=NO`).
+
+  Originally attempted on `claude/exciting-engelbart-6294a1` (2026-05-09), which debugged the destination/simulator/asset-catalog issues but was never merged and went untracked after the Linear migration. Rebuilt fresh against the current project structure rather than resurrected — that branch predated most of the current app and could not be merged as-is. Reused its proven `platform=macOS,variant=Designed for iPad` + `CODE_SIGNING_ALLOWED=NO` combination, verified locally against a truly fresh checkout (no `Secrets.xcconfig`, no `.xcodeproj`) before landing. Completed 2026-08-02.
+
+  Build-only for now — does not run `VersoTests`. A follow-up to add test execution would need its own simulator-availability investigation.
   * Fixed typo in `ContentView.swift`: `VerseTheme` → `VersoTheme`
   * Successfully built project for iPhone 17 simulator (iOS 16.0+)
   * Verified all source files are properly referenced in the Xcode project
