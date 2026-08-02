@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate Xcode project
         working-directory: Verso
-        run: xcodegen generate
+        run: ./generate-xcodeproj.sh
 
       - name: Build (no code signing)
         working-directory: Verso
