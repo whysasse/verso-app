@@ -20,18 +20,6 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>NSUbiquitousContainers</key>
-	<dict>
-		<key>iCloud.com.fabiosasseron.verso</key>
-		<dict>
-			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
-			<true/>
-			<key>NSUbiquitousContainerName</key>
-			<string>Verso</string>
-			<key>NSUbiquitousContainerSupportedFolderLevels</key>
-			<string>Any</string>
-		</dict>
-	</dict>
 	<key>TelemetryDeckAppID</key>
 	<string>$(TELEMETRY_DECK_APP_ID)</string>
 	<key>UIAppFonts</key>

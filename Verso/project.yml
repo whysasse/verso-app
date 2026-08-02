@@ -52,11 +52,6 @@ targets:
         UISupportedInterfaceOrientations_iPad:
           - UIInterfaceOrientationPortrait
         TelemetryDeckAppID: "$(TELEMETRY_DECK_APP_ID)"
-        NSUbiquitousContainers:
-          iCloud.com.fabiosasseron.verso:
-            NSUbiquitousContainerIsDocumentScopePublic: true
-            NSUbiquitousContainerName: Verso
-            NSUbiquitousContainerSupportedFolderLevels: Any
         UIAppFonts:
           - Fonts/OpenDyslexic-Regular.ttf
     configFiles:
