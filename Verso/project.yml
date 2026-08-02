@@ -13,6 +13,11 @@ options:
   deploymentTarget:
     iOS: "16.0"
 
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
 targets:
   Verso:
     type: application
@@ -39,6 +44,8 @@ targets:
       path: Resources/Info.plist
       properties:
         CFBundleDisplayName: Verso
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
         UIApplicationSupportsIndirectInputEvents: true
