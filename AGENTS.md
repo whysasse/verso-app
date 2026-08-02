@@ -49,49 +49,6 @@ Articles are saved as plain Markdown files to a user-selected iCloud Drive folde
 
 ---
 
-## Source Layout
-
-```
-Verso/
-  project.yml                        ← XcodeGen config
-  Sources/
-    App/
-      VersoApp.swift                 ← Entry point
-      ContentView.swift              ← Root view
-      VersoMainSplitView.swift       ← Navigation orchestration
-      DocumentPicker.swift
-    Design/
-      Colors.swift, Typography.swift, Spacing.swift, Radius.swift,
-      ThemeManager.swift, Animation.swift, DesignSystemPreview.swift
-    Components/
-      Buttons/, Cards/, Indicators/, Inputs/, Reading/, Settings/, etc.
-      VersoNavigationBar.swift, FolderPickerPrompt.swift
-    Screens/
-      ArticleList/, ArticleReader/, Onboarding/, Settings/, Launch/
-    Services/
-      ArticleLibraryService.swift, ArticleParserService.swift, MarkdownReader.swift,
-      MarkdownWriter.swift, ReadabilityParser.swift, FolderBookmarkService.swift,
-      ICloudFileWatcher.swift, ReadingPreferencesService.swift, RelatedArticlesService.swift,
-      TTSService.swift, AnalyticsService.swift, ArticleMarkdownImageLocalizer.swift,
-      PendingArticleIngester.swift, ArticlePlainText.swift, DebugSeedService.swift,
-      ParsedArticle.swift
-      Import/ → ImportOrchestrator.swift, PocketParser.swift, InstapaperParser.swift,
-                GoodLinksParser.swift, MatterParser.swift, ReadwiseParser.swift, ImportFileParser.swift
-  Shared/
-    AppConstants.swift, ArticleDuplicateFinder.swift, ArticleParsingError.swift,
-    DuplicateSaveResolution.swift, LibraryBookmarkResolver.swift, PendingArticle.swift,
-    ReadingEstimate.swift, ShareDuplicateArticleTitle.swift, SwiftSoupParser.swift, VersoArticleURL.swift
-  ShareExtension/
-    Sources/
-      ShareView.swift, ShareViewController.swift, ShareViewModel.swift
-
-verso-web/
-  app/
-    layout.tsx, globals.css (token definitions), providers/ThemeProvider.tsx, etc.
-```
-
----
-
 ## Build & Run
 
 ### iOS
