@@ -29,11 +29,23 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 - [ ] 🟡 **FAB-150** · [Phase 2] App Store release checklist  `Backlog` `Medium`
   Parent checklist for shipping Verso to the App Store after Phase 2 feature work ([FAB-51](https://linear.app/fabiosasseron/issue/FAB-51/phase-2-implement-scroll-position-saving) → [FAB-52](https://linear.app/fabiosasseron/issue/FAB-52/phase-2-implement-tagging-system) → [FAB-50](https://linear.app/fabiosasseron/issue/FAB-50/phase-2-implement-full-text-body-search) → [FAB-53](https://linear.app/fabiosasseron/issue/FAB-53/phase-2-implement-bulk-actions)).
 
+  ## Signing & privacy (step 1 — done 2026-08-02, see [FAB-150-step1-signing-and-privacy.md](plans/FAB-150-step1-signing-and-privacy.md))
+
+  - [x] Code signing: DEVELOPMENT_TEAM plumbed through all three targets, Distribution identity resolves automatically (no more hardcoded `Apple Development`)
+  - [x] Register App ID `com.fabiosasseron.verso` + App Groups capability
+  - [x] Register App ID `com.fabiosasseron.verso.ShareExtension` + App Groups capability
+  - [x] Register App Group `group.com.fabiosasseron.verso`
+  - [x] Remove inert iCloud ubiquity container declaration (`NSUbiquitousContainers`)
+  - [x] `PrivacyInfo.xcprivacy` manifests for app + Share Extension, audited against actual API/data usage
+  - [x] Single-source app/extension version numbers (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`)
+  - [x] App Store Connect app record created (public listing name "Version Reader" — "Verso" was taken; in-app branding/docs stay Verso)
+  - [x] `xcodebuild archive` succeeds end to end for the `Verso` scheme with a Distribution identity
+
   ## Store & compliance
 
-  - [ ] App Store Connect metadata (name, subtitle, description, keywords, support URL)
+  - [ ] App Store Connect metadata — subtitle, description, keywords, support URL (app record + listing name already done, see above)
   - [ ] Screenshots for required device classes
-  - [ ] Privacy nutrition labels / manifest aligned with app behavior (file-first, optional TelemetryDeck if enabled)
+  - [ ] Privacy nutrition labels (App Store Connect questionnaire) — `PrivacyInfo.xcprivacy` manifest already done, see above
   - [ ] Age rating questionnaire
 
   ## Release process
