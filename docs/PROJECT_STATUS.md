@@ -56,7 +56,7 @@ Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of rec
 
 - Phase 3 (Expansion): highlighting (FAB-54), RSVP reading mode (FAB-277)
 - Phase 4: iPad support (FAB-131, FAB-154 → FAB-162)
-- FAB-150 (App Store release checklist): signing and privacy manifest done; TestFlight/submission blocked until Xcode 27 reaches GA (Fabio runs the macOS 27 public preview, so no earlier Xcode installs, and App Store Connect doesn't accept beta-toolchain builds)
+- FAB-150 (App Store release checklist): signing and privacy manifest done; Apple's floor for App Store Connect uploads is Xcode 26 / iOS 26 SDK (since 2026-04-28) — Fabio's local Xcode 27 beta can't produce a submittable binary, but GitHub Actions `macos-26` runners can, so the release path is CI rather than his laptop (see FAB-150 step 3)
 
 ---
 
