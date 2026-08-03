@@ -53,6 +53,7 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   - [ ] TestFlight build for smoke testing
   - [ ] App Review notes (Share Extension, iCloud folder access, etc.)
   - [ ] Final binary submission
+  - [ ] **QA note:** Fabio develops locally against the iOS 27 SDK (Xcode 27 beta); the CI release pipeline (step 3) builds against the iOS 26 SDK. Different SDKs can change system-provided behavior (control appearance, default animations, layout metrics), so a local Debug build isn't a reliable stand-in for what ships. Treat the **TestFlight build itself as the QA artifact** — install and check it on a real device before promoting, don't sign off from local builds. This gap closes on its own once Xcode 27 reaches GA and local/CI converge.
 
   ## Product docs
 

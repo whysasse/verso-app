@@ -8,6 +8,7 @@ Articles are saved as plain Markdown files to a user-selected iCloud Drive folde
 
 - **Figma:** https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
 - **Issue Tracker:** `docs/BACKLOG.md` (Linear retired 2026-06-12)
+- **Note:** GitHub Issues on `whysasse/verso-app` is not a tracker and is not kept in sync — it's a leftover migration artifact from the Linear→GitHub move, tidied once (see `docs/DONE.md` "Repo Admin"); don't treat its issue list as authoritative or reconcile it against BACKLOG.md again.
 
 ---
 
@@ -141,7 +142,7 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 
 - **`docs/BACKLOG.md` is the issue tracker of record** (Linear is retired). `docs/DONE.md` is the archive of completed issues. Never copy issue tables into other docs — link to BACKLOG instead.
 
-- **Backlog hygiene:** New issues get the next FAB-xx number; when an issue is completed, move its entry from BACKLOG.md to DONE.md (with completion date) in the same commit as the implementing change.
+- **Backlog hygiene:** New issues get the next FAB-xx number; when an issue is completed, move its entry from BACKLOG.md to DONE.md (with completion date) in the same commit as the implementing change. For long-lived parent checklists (e.g. FAB-150), use `Refs #NNN` rather than `Closes #NNN`/`Fixes #NNN` in PR bodies — the closing keywords auto-close the parent issue the moment any one PR merges, even though the checklist isn't done.
 
 - **Every doc starts with a header:** `**Version:** · **Date:** · **Status:**` where Status is one of `Draft`, `Active`, `Locked` (decisions final), or `Archived`.
 

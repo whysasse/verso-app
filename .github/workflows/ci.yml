@@ -7,16 +7,27 @@ on:
     branches: [main]
 
 jobs:
+  # Fast smoke check: Debug, running "Designed for iPad" so it builds without a
+  # device/simulator boot. Kept alongside the Release/iOS job below because it's
+  # ~1 minute and catches ordinary compile errors on every push/PR without
+  # waiting on the slower, more realistic build. It would NOT have caught the
+  # SwiftSoup Swift 6.4 regression that forced the 2.13.7 floor bump (011122c)
+  # — that only reproduced in Release, on-device, with whole-module optimization
+  # — which is exactly what the release-check job below exists to catch.
   build:
-    name: Build
-    runs-on: macos-15
+    name: Build (Debug, macOS)
+    runs-on: macos-26
 
     steps:
       - uses: actions/checkout@v4
 
+      # Pinned explicitly (not "latest-stable") because Apple requires Xcode 26+ / iOS 26 SDK
+      # for App Store Connect uploads since 2026-04-28, and the runner's default Xcode drifts
+      # over time (26.5 -> 26.6 in July 2026). A release pipeline shouldn't silently change
+      # compiler underneath it. 26.6 is the current default on the macos-26 image.
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "latest-stable"
+          xcode-version: "26.6"
 
       - name: Cache Swift Package Manager
         uses: actions/cache@v4
@@ -45,6 +56,52 @@ jobs:
             -scheme Verso \
             -configuration Debug \
             -destination "platform=macOS,variant=Designed for iPad" \
+            CODE_SIGNING_ALLOWED=NO \
+            ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
+            build | xcpretty
+
+  # Release-fidelity check: Release configuration, generic iOS device destination,
+  # matching the archive release.yml actually produces (minus signing). This is
+  # the job that would have caught the SwiftSoup Swift 6.4 regression, since that
+  # only appeared under Release/device/whole-module-optimization, not Debug/macOS.
+  release-check:
+    name: Build (Release, iOS device)
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.6"
+
+      - name: Cache Swift Package Manager
+        uses: actions/cache@v4
+        with:
+          path: Verso/Verso.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Verso/project.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Install xcpretty
+        run: gem install xcpretty --no-document
+
+      - name: Generate Xcode project
+        working-directory: Verso
+        run: ./generate-xcodeproj.sh
+
+      - name: Build (Release, iOS, no code signing)
+        working-directory: Verso
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Verso.xcodeproj \
+            -scheme Verso \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
             CODE_SIGNING_ALLOWED=NO \
             ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
             build | xcpretty
