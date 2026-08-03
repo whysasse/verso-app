@@ -65,10 +65,11 @@ jobs:
         env:
           DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
-          cat > Secrets.xcconfig <<EOF
-          DEVELOPMENT_TEAM = $DEVELOPMENT_TEAM
-          TELEMETRY_DECK_APP_ID = AF772698-A152-4DBF-AEAA-B49EFDC7BF8C
-          EOF
+          # Derived from the checked-in template rather than a third hardcoded copy
+          # of TELEMETRY_DECK_APP_ID (step 1 already consolidated app+extension onto
+          # one xcconfig value) — only DEVELOPMENT_TEAM's blank placeholder is filled.
+          sed "s/^DEVELOPMENT_TEAM =.*/DEVELOPMENT_TEAM = $DEVELOPMENT_TEAM/" \
+            Secrets.xcconfig.template > Secrets.xcconfig
 
       - name: Generate Xcode project
         working-directory: Verso
@@ -106,6 +107,29 @@ jobs:
           echo "$ASC_KEY_P8" | base64 --decode > "$AUTH_KEY_PATH"
           echo "AUTH_KEY_PATH=$AUTH_KEY_PATH" >> "$GITHUB_ENV"
 
+          # xcodebuild's -authenticationKeyPath flags (archive/exportArchive steps)
+          # take AUTH_KEY_PATH directly and don't need this. xcrun altool (upload
+          # step) only ever looks in ./private_keys, ~/private_keys, ~/.private_keys,
+          # or ~/.appstoreconnect/private_keys — never $RUNNER_TEMP — so without this
+          # it would silently fail to find the key. This env var tells it the actual
+          # directory instead of moving the file into one of the fixed guessed paths.
+          echo "API_PRIVATE_KEYS_DIR=$AUTH_KEY_DIR" >> "$GITHUB_ENV"
+
+      - name: Determine app version from tag
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+            VERSION="${TAG#v}"
+            if ! [[ "$VERSION" =~ ^[0-9]+(\.[0-9]+){0,2}$ ]]; then
+              echo "::error::Tag '$TAG' doesn't look like vX.Y[.Z] — refusing to guess a MARKETING_VERSION from it."
+              exit 1
+            fi
+            echo "MARKETING_VERSION=$VERSION" >> "$GITHUB_ENV"
+            echo "Tagged release: MARKETING_VERSION=$VERSION (from tag $TAG)"
+          else
+            echo "No tag on this run (workflow_dispatch) — shipping the MARKETING_VERSION already committed in project.yml. Only the build number (CURRENT_PROJECT_VERSION) is bumped, from the run number."
+          fi
+
       - name: Archive
         working-directory: Verso
         env:
@@ -113,6 +137,10 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -o pipefail
+          EXTRA_SETTINGS=()
+          if [ -n "$MARKETING_VERSION" ]; then
+            EXTRA_SETTINGS+=("MARKETING_VERSION=$MARKETING_VERSION")
+          fi
           xcodebuild archive \
             -project Verso.xcodeproj \
             -scheme Verso \
@@ -123,7 +151,8 @@ jobs:
             -authenticationKeyPath "$AUTH_KEY_PATH" \
             -authenticationKeyID "$ASC_KEY_ID" \
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            "${EXTRA_SETTINGS[@]}"
 
       - name: Export IPA
         working-directory: Verso
