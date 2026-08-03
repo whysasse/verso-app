@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-06-15 | **PRD Version:** 1.7
+**Date:** 2026-08-03 | **PRD Version:** 1.7
 
 ---
 
@@ -110,3 +110,14 @@ See `docs/BACKLOG.md` for detailed step checklists and `docs/DONE.md` for comple
 
 - **Issue Tracker:** `docs/BACKLOG.md` (Linear retired 2026-06-12)
 - **Figma:** https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
+
+## GitHub Issues Housekeeping — 2026-08-03
+
+The Linear→GitHub migration (2026-06-12) had left `whysasse/verso-app` with issues from other, unrelated Linear-migrated projects mixed in, and its open/closed state had drifted from `BACKLOG.md`/`DONE.md`. Reconciled:
+
+- **98 misplaced issues transferred out** to their correct repos: 45 → `deriva-app`, 5 → `solfa-app`, 25 → `penumbra-app`, 23 → a newly created private `flux-app` (no repo previously existed for this project).
+- **1 stray test issue closed** (non-Linear noise).
+- **7 issues closed** that `DONE.md` already showed as completed (state had never been updated after the work shipped).
+- **1 issue reopened** (`FAB-150`, App Store release checklist) — it had been auto-closed when its step-1 PR merged, but Store/TestFlight/submission steps remain per `BACKLOG.md`.
+
+`verso-app` now has 174 issues, all genuinely Verso-scoped, with open/closed state matching `BACKLOG.md`.
