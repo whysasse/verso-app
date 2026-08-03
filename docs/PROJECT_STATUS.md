@@ -17,7 +17,7 @@ Verso is a minimalist, open-source article reader with iOS and web platforms. Ar
 | Platform | Status |
 |----------|--------|
 | **iOS** (SwiftUI, iOS 16+) | Implementation underway |
-| **Web** (Next.js 16 + TypeScript + Tailwind) | Phase 1 complete ✅; Phase 3+ in backlog |
+| **Web** (Next.js 16 + TypeScript + Tailwind) | Phases 1–3 complete ✅; Phase 4+ in backlog |
 
 ---
 
@@ -44,37 +44,40 @@ The design system and all screen designs are **complete**. Implementation is act
   - Buttons (`VersoButton`)
   - Reading (`MarkdownBodyView`, `ReadingChrome`, `ReadingControls`, `ArticleHeader`, `ScrollProgress`, `RelatedArticlesSection`, `ImmersiveHintPill`)
   - Settings (`ThemeSelector`, `SettingsRow`)
+- **Live data wiring** — Screens read from Core Data via `@FetchRequest` against `ArticleLibraryService` (e.g. `ArticleListView`); no mock data remains
+- **iCloud Drive folder picker** — End-to-end via `FolderBookmarkService` and security-scoped bookmarks (FAB-44, FAB-99)
+- **Auto-status progression** — `unread → reading → read` tracked on scroll, persisted to Core Data and YAML frontmatter (FAB-113)
+- **Search** — Title-only real-time filter on Home, wired to `SearchBar` (MVP scope; full-text body search is a separate, unshipped issue — FAB-50)
+- **Core Data read cache** — Rebuilt from `.md` files via `ICloudFileWatcher` (FAB-9, FAB-12, FAB-13); Phase 2 additions (tags, scroll position, bulk actions) shipped in `d560482` (FAB-51–53)
 
 ### 🔲 Remaining (iOS)
 
-- Wiring screens to live data via the services layer
-- iCloud Drive folder picker integration end-to-end
-- Auto-status progression on scroll (unread → reading → read)
-- Search functionality (title-only MVP)
-- Core Data read cache sync
+Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of record):
+
+- Phase 3 (Expansion): highlighting (FAB-54), RSVP reading mode (FAB-277)
+- Phase 4: iPad support (FAB-131, FAB-154 → FAB-162)
+- FAB-150 (App Store release checklist): signing and privacy manifest done; TestFlight/submission blocked until Xcode 27 reaches GA (Fabio runs the macOS 27 public preview, so no earlier Xcode installs, and App Store Connect doesn't accept beta-toolchain builds)
 
 ---
 
 ## Web — Current State
 
-**Phase 1 (Foundation) ✅ Complete** (2026-06-15, FAB-165). Scaffolded as a Next.js 16 app with design system ported and running. Phases 3+ queued in backlog.
+**Phases 1–3 ✅ Complete** (FAB-165 → FAB-170). Scaffolded as a Next.js 16 app with design system ported, article list and reader screens wired to live data, and the full reading experience (scroll persistence, auto-status progression, auto-hide chrome) in place.
 
-### ✅ Done (Phase 1)
+### ✅ Done (Phases 1–3)
 
-- Project scaffold (`verso-web/`) initialized
-- Next.js 16.2.6 + TypeScript 5 with strict mode
-- Tailwind CSS 4 configured with PostCSS
-- Design tokens ported to `globals.css` — all 4 themes (Paper, Sepia, Night, Ink) + fixed tokens (spacing, typography, radius)
-- Theme system (`ThemeProvider.tsx`) — React context, localStorage persistence, system dark-mode detection
-- Directory structure: `app/`, `components/`, `hooks/`, `services/`, `types/`, `public/fonts/`
-- Root layout (`app/layout.tsx`) with ThemeProvider
-- Home page (`app/page.tsx`) with article listing, search, filtering, theme switcher
-- Data layer foundation: `useArticleLibrary` hook, article types, File System Access API integration
+- Project scaffold (`verso-web/`) — Next.js 16.2.6 + TypeScript 5 (strict mode), Tailwind CSS 4 + PostCSS, directory structure (`app/`, `components/`, `hooks/`, `services/`, `types/`, `public/fonts/`)
+- Design tokens ported to `globals.css` — all 4 themes (Paper, Sepia, Night, Ink) + fixed tokens (spacing, typography, radius); `ThemeProvider.tsx` with localStorage persistence and system dark-mode detection (FAB-165)
+- Data layer — `Article` type mirroring iOS YAML frontmatter, `FileSystemService` (File System Access API), `useArticleLibrary` hook (FAB-166)
+- Article list screen — `ArticleListPage`, `FilterChipBar`, `SearchBar`, `ArticleCard`, `EmptyState`, `LoadingState`, unsupported-browser gate (FAB-167)
+- Article reader — `ArticleReaderPage`, `MarkdownRenderer` (`react-markdown` + `remark-gfm`), typography controls (font family/size/line-height), persisted prefs (FAB-168)
+- Auto-hide chrome + reading controls panel — `useIdleChrome`, `ScrollProgressBar`, first-use hint, mark-as-read (FAB-169)
+- Scroll position persistence + auto-status progression — mirrors iOS: scroll restore/save to YAML frontmatter, `unread → reading` on open, `reading → read` at 90% scroll (FAB-170)
 - Dev server verified: `npm run dev` runs cleanly at http://localhost:3000
 
 ### 🔲 Remaining (Web)
 
-Web platform issues are tracked in **`docs/BACKLOG.md`** (the issue tracker of record). **Phase 2 not yet scoped.** Future phases 3–5 span URL ingestion, bulk import, PWA support, and advanced features (FAB-171 → FAB-175).
+Web platform issues are tracked in **`docs/BACKLOG.md`** (the issue tracker of record). Phases 4–5 (FAB-171 → FAB-175) remain: URL article ingestion, bulk import (Pocket/Instapaper/GoodLinks), PWA support, and advanced features (TTS, related articles, tags, keyboard shortcuts).
 
 ---
 
@@ -110,14 +113,3 @@ See `docs/BACKLOG.md` for detailed step checklists and `docs/DONE.md` for comple
 
 - **Issue Tracker:** `docs/BACKLOG.md` (Linear retired 2026-06-12)
 - **Figma:** https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
-
-## GitHub Issues Housekeeping — 2026-08-03
-
-The Linear→GitHub migration (2026-06-12) had left `whysasse/verso-app` with issues from other, unrelated Linear-migrated projects mixed in, and its open/closed state had drifted from `BACKLOG.md`/`DONE.md`. Reconciled:
-
-- **98 misplaced issues transferred out** to their correct repos: 45 → `deriva-app`, 5 → `solfa-app`, 25 → `penumbra-app`, 23 → a newly created private `flux-app` (no repo previously existed for this project).
-- **1 stray test issue closed** (non-Linear noise).
-- **7 issues closed** that `DONE.md` already showed as completed (state had never been updated after the work shipped).
-- **1 issue reopened** (`FAB-150`, App Store release checklist) — it had been auto-closed when its step-1 PR merged, but Store/TestFlight/submission steps remain per `BACKLOG.md`.
-
-`verso-app` now has 174 issues, all genuinely Verso-scoped, with open/closed state matching `BACKLOG.md`.
