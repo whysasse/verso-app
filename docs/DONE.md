@@ -1835,3 +1835,17 @@
 
   **Completed:** 2026-06-21.
 
+## Repo Admin
+
+- [x] GitHub Issues Housekeeping — Reconcile `whysasse/verso-app` after Linear migration  `Done`
+  The Linear→GitHub migration (2026-06-12) had left `whysasse/verso-app` with issues from other, unrelated Linear-migrated projects mixed in, and its open/closed state had drifted from `BACKLOG.md`/`DONE.md`. Reconciled:
+
+  - **98 misplaced issues transferred out** to their correct repos: 45 → `deriva-app`, 5 → `solfa-app`, 25 → `penumbra-app`, 23 → a newly created private `flux-app` (no repo previously existed for this project).
+  - **1 stray test issue closed** (non-Linear noise).
+  - **7 issues closed** that `DONE.md` already showed as completed (state had never been updated after the work shipped).
+  - **1 issue reopened** (`FAB-150`, App Store release checklist) — it had been auto-closed when its step-1 PR merged (a `Closes #NNN` keyword in the PR body), but Store/TestFlight/submission steps remain per `BACKLOG.md`.
+
+  `verso-app` now has 174 issues, all genuinely Verso-scoped, with open/closed state matching `BACKLOG.md`. Reminder: GitHub Issues on `whysasse/verso-app` is a migration artifact, not a second tracker — see `AGENTS.md`.
+
+  **Completed:** 2026-08-03.
+
