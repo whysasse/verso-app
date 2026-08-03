@@ -1,6 +1,6 @@
 # Verso — Developer Handoff
 
-**Version:** 1.2 | **Date:** 2026-06-12 | **Status:** Ready for development
+**Version:** 1.3 | **Date:** 2026-08-03 | **Status:** Ready for development
 
 This is the AI entry point for implementation. Read this file first, then fetch the linked docs only for the specific domain you're working in.
 
@@ -54,7 +54,7 @@ OpenDyslexic is bundled at `verso-web/public/fonts/OpenDyslexic-Regular.ttf` and
 
 ### Web Roadmap
 
-See **`docs/BACKLOG.md`** for the authoritative issue tracker. Web platform work is tracked under FAB-166 through FAB-174 and organized in phases.
+See **`docs/BACKLOG.md`** for the authoritative issue tracker. Phases 1–3 (FAB-165 through FAB-170) are done; remaining web backlog is FAB-171 through FAB-175 — see `docs/PROJECT_STATUS.md` for current status.
 
 Place new web screens under `verso-web/app/<screen>/page.tsx`.
 
