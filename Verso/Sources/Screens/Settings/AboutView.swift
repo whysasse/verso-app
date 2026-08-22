@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AboutView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.openURL) private var openURL
 
     private var colors: ThemeColors { themeManager.colors }
 
@@ -65,14 +66,19 @@ struct AboutView: View {
 
             Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
 
-            // GitHub
-            NavigationLink(destination: InAppWebView(url: githubURL, title: L10n.About.githubRowLabel)) {
+            // GitHub — opens in Safari rather than an embedded in-app browser.
+            // An unrestricted WKWebView here would let a reviewer (or user) browse
+            // all of GitHub from inside Verso, which forces an 18+ App Store age
+            // rating under Apple's "unrestricted web access" rule. See FAB-150 step 2.
+            Button {
+                openURL(githubURL)
+            } label: {
                 HStack {
                     Text(L10n.About.githubRowLabel)
                         .font(VersoTypography.UI.input)
                         .foregroundColor(colors.textPrimary)
                     Spacer()
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "arrow.up.right.square")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(colors.textSecondary)
                 }
