@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated: May 2026**
+**Last updated: August 2026**
 
 Verso is a minimalist article reader that stores everything locally on your device and in your personal iCloud Drive. Your reading data is yours.
 
@@ -34,4 +34,4 @@ If this policy changes in a meaningful way, the update will be noted with a new 
 
 ## Contact
 
-Questions? Open an issue on [GitHub](https://github.com/whysasse/verso-app) or email **remi.lecuyer@gmail.com**.
+Questions? Open an issue on [GitHub](https://github.com/whysasse/verso-app) or email **fabiosasseron@me.com**.
