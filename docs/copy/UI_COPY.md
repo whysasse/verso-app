@@ -55,9 +55,10 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `onboarding.tour.step2` | Step 2 label | Open Verso to read. Your list is always in sync with your files. | Ouvre Verso pour lire. Ta liste est toujours synchronisée avec tes fichiers. | Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos. | — |
 | `onboarding.tour.step3` | Step 3 label | Mark articles as read when you're done. They stay in your folder forever. | Marque les articles comme lus une fois terminés. Ils restent dans ton dossier pour toujours. | Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre. | — |
 | `onboarding.tour.skip` | Text button | Skip | Ignorer | Pular | — |
+| `onboarding.tour.next` | Text/chevron button on non-final tour steps | Next | Suivant | Próximo | Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users. |
 | `onboarding.tour.startReading` | Primary button | Start reading | Commencer à lire | Começar a ler | — |
 
-QuickTourView now implements the 3-step carousel (FAB-281). The interim illustration keys (`onboarding.tour.illustration*`) are retired — they were removed from the generated artifacts alongside the carousel rewrite and should not be referenced in new code.
+QuickTourView now implements the 3-step carousel (FAB-281). The interim illustration keys (`onboarding.tour.illustration*`) are retired — they were removed from the generated artifacts alongside the carousel rewrite and should not be referenced in new code. As of FAB-285, the 3 tour steps are flattened into `OnboardingFlowView`'s own outer `TabView` (tags 4–6) rather than nested in a second `TabView` inside `QuickTourView` — two stacked paging containers on the same axis were absorbing the swipe gesture. `QuickTourView` no longer owns its own page-dot indicator; `OnboardingFlowView`'s single 7-dot indicator covers the whole flow.
 
 ### OB-5 · Analytics Consent
 

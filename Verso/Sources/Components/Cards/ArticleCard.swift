@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ArticleCard: View {
-    let article: Article
+    @ObservedObject var article: Article
     @EnvironmentObject var themeManager: ThemeManager
     private var colors: ThemeColors { themeManager.colors }
 

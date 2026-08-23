@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**26 open issues** across iOS, Web, Design, and Infra.
+**27 open issues** across iOS, Web, Design, and Infra.
 
 ## iOS
 

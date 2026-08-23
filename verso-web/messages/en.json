@@ -300,6 +300,7 @@
     },
     "tour": {
       "headline": "Here's how it works",
+      "next": "Next",
       "skip": "Skip",
       "startReading": "Start reading",
       "step1": "Share any article from Safari or your browser to save it instantly.",

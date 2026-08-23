@@ -636,6 +636,10 @@ enum L10n {
         static var tourHeadline: String {
             String(localized: "onboarding.tour.headline", defaultValue: "Here's how it works", comment: "Headline")
         }
+        /// "Next" -- Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users.
+        static var tourNext: String {
+            String(localized: "onboarding.tour.next", defaultValue: "Next", comment: "Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users.")
+        }
         /// "Skip" -- Text button
         static var tourSkip: String {
             String(localized: "onboarding.tour.skip", defaultValue: "Skip", comment: "Text button")

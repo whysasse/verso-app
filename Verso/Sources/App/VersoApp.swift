@@ -47,6 +47,7 @@ struct VersoApp: App {
                         Task { await PendingArticleIngester().ingest(folderURL: folderBookmarkService.folderURL, context: context) }
                         if let url = folderBookmarkService.folderURL {
                             startWatcher(url: url)
+                            Task { await articleLibraryService.rebuildCache(from: url, context: context) }
                         }
                     }
                 }

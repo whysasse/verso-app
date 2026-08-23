@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**155 completed issues.**
+**163 completed issues.**
 
 ## iOS
 
@@ -671,6 +671,29 @@
   * Should work offline or degrade gracefully without a network connection
   * User should have some control over what gets linked (e.g., minimum relevance threshold, ability to dismiss suggestions)
   * Privacy implications of any server-side processing should be evaluated
+
+
+### TestFlight bugs — 2026-08-23
+
+- [x] 🟠 **FAB-285** · Onboarding "How it works" tour has no way to advance except Skip  `Done` `High`
+  On the tour screen (3 steps, after the folder picker), nothing advanced the steps except the Skip button — no swipe, no tap target. Root cause: `QuickTourView` put its own 3-step `TabView` (page style, swipeable) *inside* `OnboardingFlowView`'s 5-screen `TabView` (also page style, swipeable) — two horizontally-paging containers on the same axis, a known SwiftUI/UIKit conflict. Since the tour was the *last* of the outer TabView's pages, it had nowhere further to swipe to, so it absorbed the gesture and the inner tour never saw it; this also produced two overlapping page-dot indicators. Fixed by flattening the 3 tour steps directly into `OnboardingFlowView`'s own `TabView` (tags 4–6) — `QuickTourView` no longer owns a `TabView` or page-dot indicator; it now renders a single step's content, parameterized by `stepNumber`, and `OnboardingFlowView`'s outer 7-dot indicator covers the whole flow. Added an explicit "Next" button (with chevron) on the two non-final tour steps — not swipe-only — for discoverability and for VoiceOver/Switch Control users; the final step still reads "Start reading" and Skip still works from any step. New copy key `onboarding.tour.next` added to `docs/copy/UI_COPY.md` and regenerated via `docs/copy/codegen/generate.py`.
+
+  **Completed:** 2026-08-23.
+
+- [x] 🟠 **FAB-286** · New files dropped into the folder aren't picked up automatically  `Done` `High`
+  First run correctly picked up the pre-existing .md files in the chosen folder; files added to that folder afterward didn't show up in the list. The library rescan was wired to `ICloudFileWatcher`, but that watcher is built on `NSMetadataQuery` (Spotlight), whose coverage of an arbitrary folder picked through the Files/document picker — outside the app's own iCloud container — is unreliable. Fixed by also calling `articleLibraryService.rebuildCache(from:context:)` inside `VersoApp.swift`'s existing `scenePhase == .active` branch, alongside the `PendingArticleIngester` call already there — this guarantees a rescan every time the app returns to the foreground, independent of whether the watcher fires.
+
+  **Completed:** 2026-08-23.
+
+- [x] 🟠 **FAB-288** · Status badge in the "All" list doesn't refresh after reading an article  `Done` `High`
+  Opening an unread article correctly flipped it to Reading in Core Data right away (and to Read once scrolled ~95% through), but the badge on the list row didn't repaint until something else forced the list to redraw (e.g. pull-to-refresh), because `ArticleCard` held the article as a plain, unobserved reference rather than one SwiftUI was told to watch. Fixed by changing `let article: Article` to `@ObservedObject var article: Article` in `ArticleCard.swift` — the standard fix for a Core Data object whose attribute changes need to redraw a specific row. Checked `ArticleListView.swift`'s `rowLabel(for:)` and swipe-action closures for the same plain-reference pattern; both only pass `article` through as a fresh function/closure parameter each render (not a stored field), so no further fix was needed there.
+
+  **Completed:** 2026-08-23.
+
+- [x] 🟡 **FAB-287** · "All" tab count includes archived articles  `Done` `Medium`
+  The number on the "All" filter chip should only reflect Unread + Reading + Read, since archived articles never show in any of those lists — but it summed the per-status counts across *every* `ArticleStatus` case, including `.archived`, always overcounting by however many articles were archived. Fixed in `FilterChipBar.swift` by summing only Unread + Reading + Read for the "All" count via a new `allCount` computed property, excluding Archived; the Archived chip keeps its own (already-correct) count.
+
+  **Completed:** 2026-08-23.
 
 
 ## Web

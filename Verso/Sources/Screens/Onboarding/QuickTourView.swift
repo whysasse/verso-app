@@ -1,14 +1,40 @@
 import SwiftUI
 
+/// A single "how it works" tour step (steps 1–3). Flattened directly into
+/// `OnboardingFlowView`'s own outer `TabView` as tags 4–6 (FAB-285) — this view
+/// no longer owns a `TabView` or page-dot indicator of its own. Nesting a second
+/// swipeable `TabView` inside `OnboardingFlowView`'s paging `TabView` meant two
+/// horizontally-paging containers stacked on the same axis, which conflicted for
+/// the swipe gesture; the outer container, with nowhere further to swipe on its
+/// last page, simply absorbed it.
 struct QuickTourView: View {
     @EnvironmentObject var themeManager: ThemeManager
-    let onComplete: () -> Void
 
-    @State private var currentStep = 0
-    private let stepCount = 3
+    /// 1-indexed step within the 3-step tour.
+    let stepNumber: Int
+    /// Advances to the next tour step, or finishes onboarding on the final step.
+    let onNext: () -> Void
+    /// Skips straight to the end of onboarding, regardless of which tour step this is.
+    let onSkip: () -> Void
 
     private var colors: ThemeColors { themeManager.colors }
-    private var isLastStep: Bool { currentStep == stepCount - 1 }
+    private var isLastStep: Bool { stepNumber == 3 }
+
+    private var symbol: String {
+        switch stepNumber {
+        case 1: return "square.and.arrow.up"
+        case 2: return "book.pages"
+        default: return "checkmark.circle"
+        }
+    }
+
+    private var stepText: String {
+        switch stepNumber {
+        case 1: return L10n.Onboarding.tourStep1
+        case 2: return L10n.Onboarding.tourStep2
+        default: return L10n.Onboarding.tourStep3
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,71 +51,49 @@ struct QuickTourView: View {
                     .foregroundColor(colors.textPrimary)
                     .multilineTextAlignment(.center)
 
-                TabView(selection: $currentStep) {
-                    TourStep(
-                        symbol: "square.and.arrow.up",
-                        text: L10n.Onboarding.tourStep1,
-                        colors: colors,
-                        stepNumber: 1
-                    )
-                    .tag(0)
-
-                    TourStep(
-                        symbol: "book.pages",
-                        text: L10n.Onboarding.tourStep2,
-                        colors: colors,
-                        stepNumber: 2
-                    )
-                    .tag(1)
-
-                    TourStep(
-                        symbol: "checkmark.circle",
-                        text: L10n.Onboarding.tourStep3,
-                        colors: colors,
-                        stepNumber: 3
-                    )
-                    .tag(2)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                TourStep(
+                    symbol: symbol,
+                    text: stepText,
+                    colors: colors,
+                    stepNumber: stepNumber
+                )
                 .frame(height: 200)
             }
             .padding(.horizontal, VersoSpacing.lg)
 
             Spacer()
 
-            VStack(spacing: VersoSpacing.lg) {
-                pageDots
+            nextControl
+                .padding(.horizontal, VersoSpacing.lg)
+                .padding(.bottom, VersoSpacing.xl)
+        }
+    }
 
-                if isLastStep {
-                    Button(L10n.Onboarding.tourStartReading, action: onComplete)
-                        .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
+    @ViewBuilder
+    private var nextControl: some View {
+        if isLastStep {
+            Button(L10n.Onboarding.tourStartReading, action: onNext)
+                .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
+        } else {
+            Button(action: onNext) {
+                HStack(spacing: VersoSpacing.xs) {
+                    Text(L10n.Onboarding.tourNext)
+                    Image(systemName: "chevron.right")
                 }
             }
-            .padding(.horizontal, VersoSpacing.lg)
-            .padding(.bottom, VersoSpacing.xl)
+            .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
         }
     }
 
     private var skipButton: some View {
         Button(L10n.Onboarding.tourSkip) {
-            onComplete()
+            onSkip()
         }
         .font(VersoTypography.UI.input)
         .foregroundColor(colors.textSecondary)
         .buttonStyle(.plain)
         .opacity(isLastStep ? 0 : 1)
         .disabled(isLastStep)
-    }
-
-    private var pageDots: some View {
-        HStack(spacing: VersoSpacing.xs) {
-            ForEach(0..<stepCount, id: \.self) { index in
-                Capsule()
-                    .fill(index == currentStep ? colors.accent : colors.border)
-                    .frame(width: index == currentStep ? 20 : 8, height: 8)
-                    .animation(VersoAnimation.fast, value: currentStep)
-            }
-        }
     }
 }
 
@@ -125,7 +129,7 @@ private struct TourStep: View {
     struct Preview: View {
         @StateObject private var themeManager = ThemeManager()
         var body: some View {
-            QuickTourView(onComplete: {})
+            QuickTourView(stepNumber: 1, onNext: {}, onSkip: {})
                 .environmentObject(themeManager)
                 .background(themeManager.colors.background.ignoresSafeArea())
         }
