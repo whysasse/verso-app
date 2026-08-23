@@ -6,15 +6,21 @@ struct FilterChipBar: View {
 
     @EnvironmentObject var themeManager: ThemeManager
 
+    /// Unread + Reading + Read only — excludes Archived, which never shows in any of those lists
+    /// and has its own chip/count already.
+    private var allCount: Int {
+        [ArticleStatus.unread, .reading, .read].reduce(0) { $0 + counts[$1, default: 0] }
+    }
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: VersoSpacing.xs) {
                 FilterChip(
                     label: L10n.Filter.all,
-                    count: counts.values.reduce(0, +),
+                    count: allCount,
                     isActive: activeFilter == nil,
                     colors: themeManager.colors,
-                    accessibilityLabel: L10n.Filter.allAccessibilityLabel(count: counts.values.reduce(0, +))
+                    accessibilityLabel: L10n.Filter.allAccessibilityLabel(count: allCount)
                 ) {
                     activeFilter = nil
                 }

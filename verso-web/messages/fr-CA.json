@@ -2,13 +2,13 @@
   "a11y": {
     "archiveAction": "Archiver l'article",
     "articleRow": {
-      "hint": "Touchez deux fois pour ouvrir",
+      "hint": "Touche deux fois pour ouvrir",
       "label": "{title}, {source}, {estimatedReadTime}"
     },
     "deleteAction": "Supprimer l'article",
     "filterChip": {
       "selected": "Actuellement sélectionné",
-      "unselected": "Touchez deux fois pour filtrer"
+      "unselected": "Touche deux fois pour filtrer"
     },
     "fontOption": {
       "selected": "{fontName}, sélectionné",
@@ -25,7 +25,7 @@
     "skeletonLoading": "Chargement des articles",
     "themeChip": {
       "selected": "Actuellement sélectionné",
-      "unselected": "Touchez deux fois pour sélectionner"
+      "unselected": "Touche deux fois pour sélectionner"
     },
     "unarchiveAction": "Désarchiver l'article"
   },
@@ -58,8 +58,8 @@
       "tryAgain": "Réessayer"
     },
     "idle": {
-      "instructions": "Collez un lien pour enregistrer un article dans votre bibliothèque.",
-      "placeholder": "Collez un lien…",
+      "instructions": "Colle un lien pour enregistrer un article dans ta bibliothèque.",
+      "placeholder": "Colle un lien…",
       "save": "Enregistrer"
     },
     "navTitle": "Ajouter un article",
@@ -67,12 +67,12 @@
       "message": "Enregistrement de l'article…"
     },
     "success": {
-      "headline": "Article enregistré!",
-      "subheadline": "Il apparaîtra bientôt dans votre bibliothèque."
+      "headline": "Article enregistré",
+      "subheadline": "Il apparaîtra bientôt dans ta bibliothèque."
     }
   },
   "articleCard": {
-    "accessibilityHint": "Appuyez deux fois pour ouvrir",
+    "accessibilityHint": "Appuie deux fois pour ouvrir",
     "accessibilityLabel": "{title}, {source}, {estimatedReadTime}",
     "estimatedReadTime": "{count} min de lecture"
   },
@@ -90,15 +90,15 @@
     },
     "changeFolder": {
       "cancel": "Annuler",
-      "message": "Votre ancien dossier ne sera pas touché si vous choisissez Non.",
+      "message": "Ton ancien dossier ne sera pas touché si tu choisis Non.",
       "no": "Garder dans l'ancien dossier",
-      "title": "Déplacer vos articles existants vers le nouveau dossier?",
+      "title": "Déplacer tes articles existants vers le nouveau dossier?",
       "yes": "Déplacer les articles"
     },
     "deleteArticle": {
       "cancel": "Annuler",
       "confirm": "Supprimer",
-      "message": "Cette action est irréversible. Le fichier sera définitivement supprimé de votre iCloud Drive.",
+      "message": "Cette action est irréversible. Le fichier sera définitivement supprimé de ton iCloud Drive.",
       "title": "Supprimer l'article?"
     }
   },
@@ -109,27 +109,27 @@
     },
     "fileWrite": {
       "message": "Impossible d'enregistrer l'article.",
-      "subtext": "Vérifiez que votre dossier est accessible et réessayez."
+      "subtext": "Vérifie que ton dossier est accessible et réessaie."
     },
     "folderMissing": {
       "cta": "Choisir un nouveau dossier",
       "headline": "Dossier introuvable.",
-      "subheadline": "Le dossier a peut-être été déplacé ou supprimé. Choisissez-en un nouveau pour continuer."
+      "subheadline": "Le dossier a peut-être été déplacé ou supprimé. Choisis-en un nouveau pour continuer."
     },
-    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "generic": "Une erreur s'est produite. Réessaie.",
     "iCloudUnavailable": {
       "headline": "iCloud Drive est indisponible.",
-      "subheadline": "Allez dans Réglages → [Your Name] → iCloud pour le réactiver."
+      "subheadline": "Va dans Réglages → [Your Name] → iCloud pour le réactiver."
     },
     "noFolder": {
       "cta": "Choisir un dossier",
       "headline": "Aucun dossier sélectionné.",
-      "subheadline": "Choisissez un dossier dans iCloud Drive pour commencer à enregistrer des articles."
+      "subheadline": "Choisis un dossier dans iCloud Drive pour commencer à enregistrer des articles."
     },
     "offline": {
       "articleUnavailable": "Non disponible hors ligne.",
       "banner": {
-        "headline": "Vous êtes hors ligne.",
+        "headline": "Tu es hors ligne.",
         "subheadline": "Les articles enregistrés restent disponibles."
       }
     },
@@ -154,7 +154,7 @@
         "hint": "Actuellement sélectionné"
       },
       "unselected": {
-        "hint": "Appuyez deux fois pour filtrer"
+        "hint": "Appuie deux fois pour filtrer"
       }
     },
     "read": {
@@ -191,27 +191,27 @@
     "empty": {
       "archive": {
         "headline": "Rien d'archivé",
-        "subheadline": "Les articles que vous archivez apparaîtront ici."
+        "subheadline": "Les articles que tu archives apparaîtront ici."
       },
       "noArticles": {
         "headline": "Aucun article pour l'instant",
-        "subheadline": "Partagez un article depuis Safari pour commencer."
+        "subheadline": "Partage un article depuis Safari pour commencer."
       },
       "noRead": {
         "headline": "Rien de lu pour l'instant",
-        "subheadline": "Les articles que vous terminez de lire apparaîtront ici."
+        "subheadline": "Les articles que tu termines de lire apparaîtront ici."
       },
       "noReading": {
         "headline": "Rien en cours",
-        "subheadline": "Les articles que vous lisez actuellement apparaîtront ici."
+        "subheadline": "Les articles que tu lis actuellement apparaîtront ici."
       },
       "noResults": {
         "headline": "Aucun résultat",
-        "subheadline": "Essayez un autre terme de recherche."
+        "subheadline": "Essaie un autre terme de recherche."
       },
       "noUnread": {
         "headline": "Aucun article non lu",
-        "subheadline": "Les articles que vous n'avez pas encore lus apparaîtront ici."
+        "subheadline": "Les articles que tu n'as pas encore lus apparaîtront ici."
       }
     },
     "loading": {
@@ -264,9 +264,9 @@
     },
     "idle": {
       "headline": "Importer des articles",
-      "noFolderWarning": "Définissez votre dossier d'articles dans les réglages Stockage avant d'importer.",
+      "noFolderWarning": "Définis ton dossier d'articles dans les réglages Stockage avant d'importer.",
       "selectFileButton": "Sélectionner le fichier d'exportation",
-      "subtitle": "Importez votre liste de lecture depuis GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter."
+      "subtitle": "Importe ta liste de lecture depuis GoodLinks, Instapaper, Pocket, Readwise Reader ou Matter."
     },
     "parsing": {
       "message": "Lecture du fichier…"
@@ -282,34 +282,35 @@
     "analyticsConsent": {
       "acceptCta": "Bien sûr, pourquoi pas",
       "declineCta": "Non merci",
-      "headline": "Aidez à améliorer Verso",
-      "subheadline": "Partagez des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais."
+      "headline": "Aide à améliorer Verso",
+      "subheadline": "Partage des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais."
     },
     "folder": {
       "chooseCta": "Choisir un dossier…",
       "continueCta": "Continuer",
-      "headline": "Où Verso doit-il enregistrer vos articles?",
-      "obsidianTip": "Vous utilisez Obsidian? Pointez Verso vers un dossier dans votre coffre et les articles y apparaîtront automatiquement.",
-      "privacyNote": "Verso ne téléverse jamais vos fichiers. Ils restent dans votre iCloud Drive.",
-      "subheadline": "Choisissez un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que vous pouvez ouvrir n'importe où."
+      "headline": "Où Verso doit-il enregistrer tes articles?",
+      "obsidianTip": "Tu utilises Obsidian? Pointe Verso vers un dossier dans ton coffre et les articles y apparaîtront automatiquement.",
+      "privacyNote": "Verso ne téléverse jamais tes fichiers. Ils restent dans ton iCloud Drive.",
+      "subheadline": "Choisis un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que tu peux ouvrir n'importe où."
     },
     "theme": {
       "continue": "Continuer",
-      "headline": "Choisissez votre thème de lecture",
-      "subheadline": "Vous pouvez le modifier à tout moment dans les réglages."
+      "headline": "Choisis ton thème de lecture",
+      "subheadline": "Tu peux le modifier à tout moment dans les réglages."
     },
     "tour": {
       "headline": "Voici comment ça fonctionne",
+      "next": "Suivant",
       "skip": "Ignorer",
       "startReading": "Commencer à lire",
-      "step1": "Partagez n'importe quel article depuis Safari ou votre navigateur pour l'enregistrer instantanément.",
-      "step2": "Ouvrez Verso pour lire. Votre liste est toujours synchronisée avec vos fichiers.",
-      "step3": "Marquez les articles comme lus une fois terminés. Ils restent dans votre dossier pour toujours."
+      "step1": "Partage n'importe quel article depuis Safari ou ton navigateur pour l'enregistrer instantanément.",
+      "step2": "Ouvre Verso pour lire. Ta liste est toujours synchronisée avec tes fichiers.",
+      "step3": "Marque les articles comme lus une fois terminés. Ils restent dans ton dossier pour toujours."
     },
     "welcome": {
       "cta": "Commencer",
-      "headline": "Vos articles. Vos fichiers.",
-      "subheadline": "Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans votre iCloud Drive."
+      "headline": "Tes articles. Tes fichiers.",
+      "subheadline": "Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans ton iCloud Drive."
     }
   },
   "privacyPolicy": {
@@ -358,17 +359,17 @@
       "increaseFontSize": "Augmenter la taille du texte",
       "lineSpacing": {
         "_label": "Interligne",
-        "hint": "Appuyez deux fois pour ouvrir les options d'interligne"
+        "hint": "Appuie deux fois pour ouvrir les options d'interligne"
       },
       "margins": {
         "_label": "Marges",
-        "hint": "Appuyez deux fois pour ouvrir les options de marges"
+        "hint": "Appuie deux fois pour ouvrir les options de marges"
       },
       "markAsRead": "Marquer comme lu",
       "markAsUnread": "Marquer comme non lu",
       "theme": {
         "_label": "Thème",
-        "hint": "Appuyez deux fois pour ouvrir les options de thème"
+        "hint": "Appuie deux fois pour ouvrir les options de thème"
       },
       "tts": {
         "pause": "Mettre en pause la synthèse vocale",
@@ -383,7 +384,7 @@
     "header": {
       "byline": "Par {author}"
     },
-    "immersiveHint": "Touchez n'importe où pour afficher les commandes",
+    "immersiveHint": "Touche n'importe où pour afficher les commandes",
     "openExternal": {
       "accessibilityLabel": "Ouvrir l'article original"
     },
@@ -393,7 +394,7 @@
     "splitView": {
       "placeholder": {
         "accessibilityLabel": "Aucun article sélectionné",
-        "headline": "Sélectionnez un article"
+        "headline": "Sélectionne un article"
       }
     }
   },
@@ -437,7 +438,7 @@
       "cancel": "Annuler",
       "headline": "Article déjà enregistré",
       "saveCopy": "Enregistrer une copie",
-      "subheadline": "Ce lien est déjà dans votre bibliothèque sous le nom « {existingTitle} ».",
+      "subheadline": "Ce lien est déjà dans ta bibliothèque sous le nom « {existingTitle} ».",
       "success": {
         "saved": "Enregistré",
         "updated": "Mis à jour"
@@ -452,7 +453,7 @@
         "message": "Dossier non configuré."
       },
       "openInSafari": "Ouvrir dans Safari",
-      "subheadline": "La page n'a pas pu être lue. Vous pouvez l'ouvrir directement dans Safari."
+      "subheadline": "La page n'a pas pu être lue. Tu peux l'ouvrir directement dans Safari."
     },
     "preview": {
       "loading": {
@@ -485,7 +486,7 @@
     "placeholder": "p. ex. recherche, design",
     "save": "Enregistrer",
     "saveFailed": {
-      "message": "Vérifiez l'accès au dossier ou l'espace disque, puis réessayez.",
+      "message": "Vérifie l'accès au dossier ou l'espace disque, puis réessaie.",
       "ok": "OK",
       "title": "Impossible d'enregistrer les étiquettes"
     }
@@ -524,8 +525,8 @@
         "articleNotFound": "Article introuvable : {filename}",
         "fallback": "Article introuvable.",
         "loadFailed": "Échec du chargement de l'article",
-        "noFolder": "Aucun dossier sélectionné. Revenez en arrière et choisissez votre dossier de bibliothèque.",
-        "permissionDenied": "Autorisation du dossier refusée. Revenez en arrière et resélectionnez votre bibliothèque."
+        "noFolder": "Aucun dossier sélectionné. Reviens en arrière et choisis ton dossier de bibliothèque.",
+        "permissionDenied": "Autorisation du dossier refusée. Reviens en arrière et resélectionne ta bibliothèque."
       },
       "toggleControls": {
         "hide": "Masquer les commandes",
@@ -534,7 +535,7 @@
     },
     "unsupportedBrowser": {
       "headline": "Navigateur non pris en charge",
-      "subheadline": "Verso Web utilise l'API File System Access, qui nécessite Chrome ou Edge 86+. Veuillez ouvrir cette page dans un navigateur pris en charge."
+      "subheadline": "Verso Web utilise l'API File System Access, qui nécessite Chrome ou Edge 86+. Ouvre cette page dans un navigateur pris en charge."
     }
   }
 }
