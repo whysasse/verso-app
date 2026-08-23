@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-08-03 | **PRD Version:** 1.7
+**Date:** 2026-08-23 | **PRD Version:** 1.7
 
 ---
 
@@ -56,7 +56,8 @@ Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of rec
 
 - Phase 3 (Expansion): highlighting (FAB-54), RSVP reading mode (FAB-277)
 - Phase 4: iPad support (FAB-131, FAB-154 → FAB-162)
-- FAB-150 (App Store release checklist): signing and privacy manifest done; Apple's floor for App Store Connect uploads is Xcode 26 / iOS 26 SDK (since 2026-04-28) — Fabio's local Xcode 27 beta can't produce a submittable binary, but GitHub Actions `macos-26` runners can, so the release path is CI rather than his laptop (see FAB-150 step 3)
+- FAB-150 (App Store release checklist): signing and privacy manifest done; the CI release path (step 3) is no longer just planned — `release.yml` has shipped a real TestFlight build via GitHub Actions (2026-08-23), so the "Fabio's laptop only has a beta Xcode" constraint no longer blocks releases. Store & compliance metadata, App Review notes, and final submission are still outstanding — see BACKLOG.md.
+- First TestFlight round (FAB-285–288, 2026-08-23): fixed onboarding tour navigation, live file sync on foreground, stale status badges, and the "All" filter count including archived articles — all four caught during Fabio's own TestFlight testing.
 
 ---
 

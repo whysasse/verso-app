@@ -87,11 +87,13 @@ enum VersoTheme: String { case paper, sepia, night, ink }
 ### Article Status (`Colors.swift`)
 
 ```swift
-enum ArticleStatus: String { case unread, reading, read }
+enum ArticleStatus: String { case unread, reading, read, archived }
 ```
 
-Badge colors: unread `#4A90D9` · reading `#D4A353` · read `#5AAF7A`
-SF Symbols: `circle` · `book.pages` · `checkmark` (16pt, white, 28×28 badge). (`book.open` is not a real SF Symbol — don't reintroduce it.)
+Badge colors: unread `#4A90D9` · reading `#D4A353` · read `#5AAF7A` · archived `#8E8E93`
+SF Symbols: `circle` · `book.pages` · `checkmark` · `archivebox` (16pt, white, 28×28 badge). (`book.open` is not a real SF Symbol — don't reintroduce it.)
+
+`.archived` is a real, distinct status — filter counts (`FilterChipBar`) and `StatusBadge` must account for it explicitly rather than assuming only 3 cases (FAB-287 was exactly this mistake: the "All" count summed all 4 cases instead of excluding archived).
 
 ### Spacing, Radius, Typography, Animation
 

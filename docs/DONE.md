@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**163 completed issues.**
+**164 completed issues.**
 
 ## iOS
 
@@ -692,6 +692,11 @@
 
 - [x] 🟡 **FAB-287** · "All" tab count includes archived articles  `Done` `Medium`
   The number on the "All" filter chip should only reflect Unread + Reading + Read, since archived articles never show in any of those lists — but it summed the per-status counts across *every* `ArticleStatus` case, including `.archived`, always overcounting by however many articles were archived. Fixed in `FilterChipBar.swift` by summing only Unread + Reading + Read for the "All" count via a new `allCount` computed property, excluding Archived; the Archived chip keeps its own (already-correct) count.
+
+  **Completed:** 2026-08-23.
+
+- [x] 🔵 **FAB-289** · Release pipeline hardening (`release.yml`, `ci.yml`)  `Done` `Low`
+  Follow-up pass after `release.yml`'s first successful run (32651214255), scoped to changes around the archive/sign/upload steps only — those were left byte-for-byte untouched. Added SPM caching to `release.yml` (mirroring `ci.yml`'s existing cache step, same key). Confirmed via a real run (32652825341) that the cache genuinely hits, but delivers no measurable speedup (5m50s → 5m49s across two full runs): the cached path (`.../xcshareddata/swiftpm`) mostly holds `Package.resolved`, not the downloaded package sources, so there's little to actually cache — worth knowing so no one re-chases this expecting a win. Bumped `actions/checkout@v4` → `@v7` in both workflows (clean, no new warnings) — but a full log grep on the verification run found the Node 20 deprecation notice we were trying to clear is actually emitted by `actions/cache@v4`, not `checkout`, so that specific warning is still present; bumping `actions/cache` would be the actual fix, if ever worth doing (low priority, cosmetic). Investigated the "untrusted tap" Homebrew annotation seen during `brew install xcodegen`: tested `HOMEBREW_NO_AUTO_UPDATE=1` / `HOMEBREW_NO_INSTALL_CLEANUP=1` on a real run, confirmed the warning still fired identically — disproving the auto-update theory — so reverted rather than ship an ineffective fix. It's macos-26 runner-image noise (a pre-tapped, untrusted `aws` tap triggering Homebrew's trust check on any `brew` command), not something this repo's workflow config can address; left as-is. Also corrected `release.yml`'s header comment, which had called it "UNTESTED SCAFFOLDING... has never run successfully" — no longer true.
 
   **Completed:** 2026-08-23.
 
