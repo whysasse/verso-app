@@ -1,14 +1,11 @@
 name: Release
 
-# UNTESTED SCAFFOLDING (FAB-150 step 3, Tasks 2-3, 2026-08-03).
-#
-# This workflow has never run successfully — it can't, until the six secrets
-# below exist (FAB-150-step3-ci-release-pipeline.md, Task 0). It was written
-# to match the plan's design but not exercised against a real Apple Developer
-# account. Expect the first several runs to fail on provisioning specifics;
-# that's expected per the plan, not evidence this file is wrong. In
-# particular, the upload step (xcrun altool) is a best-guess at what's
-# current — verify against the runner image before trusting it.
+# PROVEN RELEASE PATH — first succeeded 2026-08-23 (run 32651214255), archiving,
+# signing, and uploading a real build to TestFlight end to end. Two earlier runs
+# that same day (12:20, 12:27) failed on signing-certificate specifics before
+# 7060ea9 pinned ExportOptions' signingCertificate to Apple Distribution; that
+# history is expected per the original rollout plan
+# (FAB-150-step3-ci-release-pipeline.md), not evidence of a design problem.
 #
 # Required secrets (GitHub -> Settings -> Secrets and variables -> Actions):
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8, DIST_CERT_P12, DIST_CERT_PASSWORD,
@@ -29,7 +26,7 @@ jobs:
     runs-on: macos-26
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Verify required secrets are configured
         env:
@@ -56,6 +53,14 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "26.6"
+
+      - name: Cache Swift Package Manager
+        uses: actions/cache@v4
+        with:
+          path: Verso/Verso.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Verso/project.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - name: Install XcodeGen
         run: brew install xcodegen
