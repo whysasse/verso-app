@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verso — Privacy Policy</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #FBF9F4;
+    --text: #1A1A1A;
+    --text-secondary: #5C5A54;
+    --accent: #A8562F;
+    --border: #E4DFD3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17161A;
+      --text: #EDEAE2;
+      --text-secondary: #B0ACA0;
+      --accent: #E08A5C;
+      --border: #322F35;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+  h1 {
+    font-family: "New York", Georgia, "Times New Roman", serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .updated {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0 0 40px;
+  }
+  h2 {
+    font-family: "New York", Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 36px 0 12px;
+  }
+  p, li { font-size: 16px; color: var(--text); }
+  a { color: var(--accent); }
+  ul { padding-left: 20px; }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0 24px;
+  }
+  .home-link {
+    display: inline-block;
+    margin-bottom: 32px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+  .home-link:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <a class="home-link" href="https://github.com/whysasse/verso-app">← Verso on GitHub</a>
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: August 2026</p>
+
+  <p>Verso is a minimalist article reader that stores everything locally on your device and in your personal iCloud Drive. Your reading data is yours.</p>
+
+  <h2>What We Collect</h2>
+  <p><strong>By default: nothing.</strong> Verso does not collect, transmit, or share any personal information, usage data, or analytics.</p>
+  <p><strong>Optional anonymous analytics:</strong> During setup, you may choose to share anonymous usage data to help improve Verso. If you opt in, Verso uses <a href="https://telemetrydeck.com">TelemetryDeck</a> to send privacy-preserving signals (e.g., "an article was saved"). No personal data, article content, IP addresses, or identifying information is ever collected. You can change this preference at any time in Settings → Privacy.</p>
+
+  <h2>How Your Data Is Stored</h2>
+  <ul>
+    <li>Articles are saved as Markdown files in a folder you choose on your iCloud Drive.</li>
+    <li>Reading preferences (theme, font) are stored locally in your device's UserDefaults.</li>
+    <li>No account is required. No server receives your data.</li>
+  </ul>
+
+  <h2>iCloud Drive</h2>
+  <p>If you choose an iCloud Drive folder, your article files sync across your Apple devices via your personal iCloud account, subject to Apple's iCloud privacy policy. Verso has no access to this sync process and receives no copy of your files.</p>
+
+  <h2>Third-Party Services</h2>
+  <p>Verso fetches article content from URLs you provide. This is a direct connection from your device to the publisher's website — no proxy, no intermediary.</p>
+
+  <h2>Children's Privacy</h2>
+  <p>Verso does not knowingly collect data from anyone, including children.</p>
+
+  <h2>Changes to This Policy</h2>
+  <p>If this policy changes in a meaningful way, the update will be noted with a new date at the top of this document and released with the app update.</p>
+
+  <h2>Contact</h2>
+  <p>Questions? Open an issue on <a href="https://github.com/whysasse/verso-app">GitHub</a> or email <strong>fabiosasseron@me.com</strong>.</p>
+
+  <hr>
+  <p class="updated">This page mirrors the privacy policy bundled inside the Verso app (Settings → About → Privacy Policy).</p>
+</main>
+</body>
+</html>
