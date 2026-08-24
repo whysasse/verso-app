@@ -7,13 +7,21 @@ on:
     branches: [main]
 
 jobs:
-  # Fast smoke check: Debug, running "Designed for iPad" so it builds without a
+  # Fast smoke check: Debug, generic iOS destination so it builds without a
   # device/simulator boot. Kept alongside the Release/iOS job below because it's
   # ~1 minute and catches ordinary compile errors on every push/PR without
   # waiting on the slower, more realistic build. It would NOT have caught the
   # SwiftSoup Swift 6.4 regression that forced the 2.13.7 floor bump (011122c)
   # — that only reproduced in Release, on-device, with whole-module optimization
   # — which is exactly what the release-check job below exists to catch.
+  #
+  # Was "platform=macOS,variant=Designed for iPad" until 2026-08-24, when
+  # TARGETED_DEVICE_FAMILY was restricted to iPhone-only (FAB-150 sequencing
+  # decision — iPad UI isn't built yet, see FAB-131). That destination needs
+  # iPad idiom support to resolve, so it stopped being valid for this scheme;
+  # "generic/platform=iOS" is the standard no-simulator-boot equivalent for an
+  # iPhone-only target. NOT yet verified by a real CI run — first push after
+  # this change should be watched to confirm this job still passes.
   build:
     name: Build (Debug, macOS)
     runs-on: macos-26
@@ -55,7 +63,7 @@ jobs:
             -project Verso.xcodeproj \
             -scheme Verso \
             -configuration Debug \
-            -destination "platform=macOS,variant=Designed for iPad" \
+            -destination "generic/platform=iOS" \
             CODE_SIGNING_ALLOWED=NO \
             ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
             build | xcpretty

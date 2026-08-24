@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-08-23 | **PRD Version:** 1.7
+**Date:** 2026-08-24 | **PRD Version:** 1.7
 
 ---
 
@@ -52,11 +52,12 @@ The design system and all screen designs are **complete**. Implementation is act
 
 ### 🔲 Remaining (iOS)
 
-Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of record):
+Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of record). Non-iPad work is sequenced into three phases as of 2026-08-24 (see BACKLOG.md's "Current sequencing" note for full detail):
 
-- Phase 3 (Expansion): highlighting (FAB-54), RSVP reading mode (FAB-277)
-- Phase 4: iPad support (FAB-131, FAB-154 → FAB-162)
-- FAB-150 (App Store release checklist): signing and privacy manifest done; the CI release path (step 3) is no longer just planned — `release.yml` has shipped a real TestFlight build via GitHub Actions (2026-08-23), so the "Fabio's laptop only has a beta Xcode" constraint no longer blocks releases. Store & compliance metadata, App Review notes, and final submission are still outstanding — see BACKLOG.md.
+- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) is implemented but blocked on Fabio smoke-testing a real GoodLinks export before it can close. FAB-150 (App Store release checklist): signing, privacy manifest, and the CI release path are done — `release.yml` has shipped two real TestFlight builds via GitHub Actions (2026-08-23). Store & compliance metadata, screenshots, App Review notes, and final submission remain; draft copy and answers for all of it are in `docs/APP_STORE_LISTING.md` (2026-08-24), awaiting Fabio's review.
+- **Phase B (next) — localization (FAB-275).** Steps 1–6 done. Step 7 (FR-CA/PT-BR translation + linguistic QA) and step 8 (App Store metadata localization + Québec Bill 96 compliance) remain, plus FAB-283 (small copy-wiring fix) and FAB-284 (language picker, needs a UX placement decision).
+- **Phase C (after launch) — polish backlog.** Highlighting (FAB-54), RSVP reading mode (FAB-277), VoiceOver progress announcement (FAB-278) — each needs a UX decision from Fabio before implementation.
+- **Phase 4 (deferred, excluded from this sequencing): iPad support** (FAB-131, FAB-154 → FAB-162).
 - First TestFlight round (FAB-285–288, 2026-08-23): fixed onboarding tour navigation, live file sync on foreground, stale status badges, and the "All" filter count including archived articles — all four caught during Fabio's own TestFlight testing.
 
 ---
