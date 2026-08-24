@@ -2,11 +2,24 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**164 completed issues.**
+**166 completed issues.**
 
 ## iOS
 
 ### Phase 1 — Foundation
+
+- [x] ⚪ **FAB-163** · Shipped: Duplicate article detection (share extension + in-app)  `Done` `No priority`
+  Implemented duplicate detection when saving an article whose canonical source URL already exists in the library (YAML `url:` in root + `Archive/` .md files).
+
+  **Share extension:** After parse, resolves library folder via app-group bookmark; if duplicate, prompts **Update existing** / **Save as copy** / **Cancel** (cancel completes without pending JSON). Pending payload carries `DuplicateSaveResolution` for ingester.
+
+  **Main app:** `MarkdownWriter.replaceArticle` preserves `added`, `status`, `scroll_position`, `tags`; `PendingArticleIngester` updates Core Data by file path on replace. Analytics `article.saved` includes `duplicate_resolution`: `none` | `update` | `copy`.
+
+  **In-app Add Article:** Same duplicate UI and write paths for parity.
+
+  **Docs:** `docs/copy/UI_COPY.md` (share.duplicate.\*), `docs/ANALYTICS_STRATEGY.md`.
+
+  Verified 2026-08-24: both write paths (`AddArticleView.replaceArticleInLibrary` / `applyDuplicateCopy` and `PendingArticleIngester`) confirmed wired to `MarkdownWriter.replaceArticle`; share extension prompt (`ShareViewModel.duplicatePrompt`) confirmed present. Completed 2026-08-24.
 
 - [x] 🔴 **FAB-9** · [ARCH] Define Article Core Data model  `Done` `Urgent`
   Create the Core Data entity for Article with fields: id (UUID), filePath (String), title (String), url (String), status (String: unread/reading/read), dateAdded (Date), source (String). This is a cache only — never the source of truth.
@@ -638,6 +651,25 @@
   - [x] No URL in clipboard → field stays empty
   - [x] Non-URL text in clipboard → field stays empty
   - [x] Field already has content → no overwrite
+
+- [x] 🟡 **FAB-290** · [Phase 2] Adopt manually-added Markdown files into the reading list  `Done` `Medium`
+  A note dragged into the reading folder by hand, or an existing Obsidian note, now shows up as an article instead of being silently skipped. Decisions from the 2026-08-24 brainstorm with Fabio, all shipped:
+
+  **`MarkdownReader`:** `.invalidFrontmatter` (no `---` block) and `.missingTitle` no longer throw — both are graceful-default paths per `docs/OBSIDIAN_INTEGRATION.md` §9. No frontmatter → the whole file becomes the article body. Missing/empty `title` → falls back to the filename, stripped of extension and a leading `YYYY-MM-DD ` prefix (`MarkdownReader.synthesizedTitle(from:)`). `added`/`status` already defaulted correctly and are unchanged. `ParsedArticle` gained `needsAdoption: Bool` (true iff no frontmatter, or frontmatter with no title — recomputed fresh from disk on every read, never cached) and `unrecognizedFrontmatterLines: [String]` (any YAML key Verso doesn't own — `aliases`, `cssclass`, a personal `tags` scheme, etc. — preserved verbatim as a side effect of the frontmatter parser already being line-based).
+
+  **Lazy write:** detecting a file needs adoption never touches disk — it's cached in Core Data with synthesized defaults and just appears in the list.
+
+  **Adoption commit, on first write-back:** `MarkdownWriter.adoptIfNeeded(fileURL:in:)` is called from every write-back path — `ArticleListView` (toggle read/unread, archive, bulk mark-read), `ArticleReaderView` (status advance, scroll-position auto-save — the path that fires almost immediately after opening a file), and `ArticleTagsEditorSheet` (tag save). It's a no-op (`nil`) for a file that already has title'd frontmatter. Otherwise it builds a full Verso frontmatter block via a new `buildFrontmatter(for:preservingUnrecognized:)` overload (merges in the unrecognized keys rather than dropping them) and renames the file to `YYYY-MM-DD Title.md` — deliberately *not* reusing `generateFilename()`'s literal `"Article"` token (that convention is specific to brand-new Verso-authored articles per FAB-10; adopting someone else's note shouldn't insert it), reusing `uniqueFilename()` for collisions. Old file removed after the new one writes successfully; each call site updates the in-memory `Article.filePath` (and saves the context) before the old path can vanish from under `NSMetadataQuery`, so the list doesn't flash a duplicate or lose selection.
+
+  **First-run notice:** ships as a one-time `.alert` at the app root (`ContentView`, driven by a new `AdoptionNoticeService` environment object `AdoptionNoticeService.notify()`), copy key `notice.fileAdopted.message` / `.dismiss` in `docs/copy/UI_COPY.md` (en/fr-CA/pt-BR, regenerated via `docs/copy/codegen/generate.py`). Exact placement (toast vs. modal vs. row subtitle) was an explicit open question in the original brainstorm and is **not fully resolved** — an alert was the lowest-risk option given no toast component exists yet in the codebase; revisit if it reads as too intrusive in practice.
+
+  **Explicitly out of scope (per brainstorm, left as open questions):** a Settings toggle to opt out of auto-adoption. The known rename-vs-Obsidian-wikilinks trade-off is documented in `docs/OBSIDIAN_INTEGRATION.md` §9 but not otherwise mitigated.
+
+  **Tests:** `MarkdownReaderTests.swift` (no frontmatter, frontmatter without title, unrecognized custom keys, filename date-prefix stripping) and `MarkdownWriterTests.swift` (`buildFrontmatter` merge, adopt-and-rename for both no-frontmatter and missing-title cases, already-adopted no-op, filename collision handling) — 20 new tests, all passing alongside the existing suite (26 total).
+
+  **Docs:** `docs/OBSIDIAN_INTEGRATION.md` (v2.0 → v2.1) — §2, §6, §9 updated to describe adoption instead of "skip file"; `docs/copy/UI_COPY.md` new "File Adopted" entry.
+
+  **Completed:** 2026-08-24.
 
 
 ### Phase 3 — Expansion

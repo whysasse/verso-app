@@ -278,6 +278,12 @@
   "launch": {
     "brandName": "Verso"
   },
+  "notice": {
+    "fileAdopted": {
+      "dismiss": "OK",
+      "message": "Verso a ajouté des métadonnées de lecture à cette note et l'a renommée pour qu'elle corresponde à ta bibliothèque."
+    }
+  },
   "onboarding": {
     "analyticsConsent": {
       "acceptCta": "Bien sûr, pourquoi pas",

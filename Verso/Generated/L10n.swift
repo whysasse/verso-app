@@ -579,6 +579,16 @@ enum L10n {
             String(localized: "launch.brandName", defaultValue: "Verso", comment: "Invariant — brand name. Added during step 4 view-wiring pass — `LaunchView.swift` had no UI_COPY entry yet.")
         }
     }
+    enum Notice {
+        /// "OK" -- Invariant — standard alert acknowledgement across all three locales
+        static var fileAdoptedDismiss: String {
+            String(localized: "notice.fileAdopted.dismiss", defaultValue: "OK", comment: "Invariant — standard alert acknowledgement across all three locales")
+        }
+        /// "Verso added reading metadata to this note and renamed it to match your library." -- Shown once, the first time Verso adopts a manually-added/foreign `.md` file (FAB-290) — never silent. Exact placement (toast vs. one-time modal vs. row subtitle) is still an open question; current build shows it as a one-time alert.
+        static var fileAdoptedMessage: String {
+            String(localized: "notice.fileAdopted.message", defaultValue: "Verso added reading metadata to this note and renamed it to match your library.", comment: "Shown once, the first time Verso adopts a manually-added/foreign `.md` file (FAB-290) — never silent. Exact placement (toast vs. one-time modal vs. row subtitle) is still an open question; current build shows it as a one-time alert.")
+        }
+    }
     enum Onboarding {
         /// "Sure, why not" -- Primary button
         static var analyticsConsentAcceptCta: String {

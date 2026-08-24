@@ -72,6 +72,7 @@ targets:
         CODE_SIGN_STYLE: Automatic
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+        TARGETED_DEVICE_FAMILY: "1"
     entitlements:
       path: Resources/Verso.entitlements
       properties:
@@ -98,7 +99,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.fabiosasseron.verso.ShareExtension
         CODE_SIGN_STYLE: Automatic
         SWIFT_VERSION: 5.0
-        TARGETED_DEVICE_FAMILY: "1,2"
+        TARGETED_DEVICE_FAMILY: "1"
         INFOPLIST_FILE: ShareExtension/Resources/Info.plist
     entitlements:
       path: ShareExtension/Resources/ShareExtension.entitlements
@@ -121,4 +122,4 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.fabiosasseron.verso.tests
         CODE_SIGN_STYLE: Automatic
-        TARGETED_DEVICE_FAMILY: "1,2"
+        TARGETED_DEVICE_FAMILY: "1"

@@ -9,6 +9,7 @@ struct VersoApp: App {
     @StateObject private var articleLibraryService = ArticleLibraryService()
     @StateObject private var readingPreferences = ReadingPreferencesService()
     @StateObject private var fileWatcher = ICloudFileWatcher()
+    @StateObject private var adoptionNoticeService = AdoptionNoticeService()
     @Environment(\.scenePhase) private var scenePhase
     private let context = CoreDataStack.shared.persistentContainer.viewContext
 
@@ -27,6 +28,7 @@ struct VersoApp: App {
                 .environmentObject(folderBookmarkService)
                 .environmentObject(articleLibraryService)
                 .environmentObject(readingPreferences)
+                .environmentObject(adoptionNoticeService)
                 .onAppear {
                     folderBookmarkService.restore()
                     applyWindowBackground()

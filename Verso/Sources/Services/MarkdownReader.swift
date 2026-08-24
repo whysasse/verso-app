@@ -2,16 +2,10 @@ import Foundation
 import os.log
 
 enum MarkdownReaderError: Error, LocalizedError {
-    case invalidFrontmatter(String)
-    case missingTitle(String)
     case fileReadFailed(Error)
 
     var errorDescription: String? {
         switch self {
-        case .invalidFrontmatter(let msg):
-            return "Invalid frontmatter: \(msg)"
-        case .missingTitle(let filename):
-            return "Missing required title in \(filename)"
         case .fileReadFailed(let underlying):
             return "Failed to read file: \(underlying.localizedDescription)"
         }
@@ -31,8 +25,9 @@ struct MarkdownReader {
         return f
     }()
 
-    /// Reads all .md files in a directory, returning successfully parsed articles.
-    /// Files that fail to parse are logged and skipped.
+    /// Reads all .md files in a directory, returning successfully parsed articles. Every `.md` file
+    /// is a candidate article now (FAB-290) -- a file only fails to parse (logged and skipped) if
+    /// it can't be read from disk at all (`.fileReadFailed`), not for missing/invalid frontmatter.
     static func readAll(from directoryURL: URL) -> [ParsedArticle] {
         let fm = FileManager.default
         guard let enumerator = fm.enumerator(at: directoryURL,
@@ -64,14 +59,15 @@ struct MarkdownReader {
             throw MarkdownReaderError.fileReadFailed(error)
         }
 
-        // 2. Split on line-boundary --- delimiters to avoid splitting on horizontal rules in body
+        // 2. Split on line-boundary --- delimiters to avoid splitting on horizontal rules in body.
+        // A file with no opening/closing `---` pair at all -- including one with no frontmatter
+        // whatsoever -- is graceful-degraded per docs/OBSIDIAN_INTEGRATION.md §9: the whole file
+        // becomes the article body instead of being skipped (FAB-290).
         let normalized = content.hasPrefix("---") ? content : "---\n" + content
-        guard let frontmatterRange = extractFrontmatter(from: normalized) else {
-            throw MarkdownReaderError.invalidFrontmatter("Expected opening and closing '---' delimiters in \(fileURL.lastPathComponent)")
-        }
-
-        let frontmatterRaw = frontmatterRange.frontmatter
-        let body = frontmatterRange.body.trimmingCharacters(in: .whitespacesAndNewlines)
+        let frontmatterRange = extractFrontmatter(from: normalized)
+        let hadFrontmatter = frontmatterRange != nil
+        let frontmatterRaw = frontmatterRange?.frontmatter ?? ""
+        let body = (frontmatterRange?.body ?? content).trimmingCharacters(in: .whitespacesAndNewlines)
 
         // 3. Parse YAML lines
         var title: String?
@@ -82,6 +78,10 @@ struct MarkdownReader {
         var author: String?
         var siteName: String?
         var scrollPosition: Double?
+        // Keys Verso doesn't recognize (e.g. Obsidian's `aliases`, `cssclass`, a personal `tags`
+        // scheme), kept verbatim so a later adoption commit can merge them back in rather than
+        // silently dropping another tool's fields (FAB-290; see MarkdownWriter.adoptIfNeeded).
+        var unrecognizedLines: [String] = []
 
         let lines = frontmatterRaw.components(separatedBy: .newlines)
         for line in lines {
@@ -119,12 +119,22 @@ struct MarkdownReader {
             } else if trimmed.hasPrefix("scroll_position:") {
                 let raw = trimmed.dropFirst("scroll_position:".count).trimmingCharacters(in: .whitespaces)
                 scrollPosition = Double(raw)
+            } else {
+                unrecognizedLines.append(line)
             }
         }
 
-        // 4. Validate required fields
-        guard let finalTitle = title, !finalTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw MarkdownReaderError.missingTitle(fileURL.lastPathComponent)
+        // 4. Missing/empty title -> fall back to the filename (FAB-290; previously threw
+        // .missingTitle and the file was skipped, contradicting the graceful-degradation this
+        // docs/OBSIDIAN_INTEGRATION.md §9 already promised).
+        let needsAdoption: Bool
+        let finalTitle: String
+        if let title, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            finalTitle = title
+            needsAdoption = !hadFrontmatter
+        } else {
+            finalTitle = synthesizedTitle(from: fileURL)
+            needsAdoption = true
         }
 
         // 5. Defaults for optional/missing fields
@@ -156,8 +166,24 @@ struct MarkdownReader {
             dateAdded: finalDateAdded,
             status: status,
             author: (authorTrimmed?.isEmpty == false) ? authorTrimmed : nil,
-            siteName: (siteTrimmed?.isEmpty == false) ? siteTrimmed : nil
+            siteName: (siteTrimmed?.isEmpty == false) ? siteTrimmed : nil,
+            needsAdoption: needsAdoption,
+            unrecognizedFrontmatterLines: unrecognizedLines
         )
+    }
+
+    /// Filename-derived fallback title for a file with no `title` key (or no frontmatter at all):
+    /// the filename without its extension, minus a leading `YYYY-MM-DD ` date prefix if present.
+    /// e.g. "2026-04-19 The Future of Reading Apps.md" -> "The Future of Reading Apps";
+    /// "meeting-notes.md" -> "meeting-notes".
+    static func synthesizedTitle(from fileURL: URL) -> String {
+        let base = fileURL.deletingPathExtension().lastPathComponent
+        guard let regex = try? NSRegularExpression(pattern: #"^\d{4}-\d{2}-\d{2} "#) else { return base }
+        let range = NSRange(base.startIndex..., in: base)
+        guard let match = regex.firstMatch(in: base, options: [], range: range), match.range.location == 0 else {
+            return base
+        }
+        return (base as NSString).substring(from: match.range.length)
     }
 
     // MARK: - Private Helpers

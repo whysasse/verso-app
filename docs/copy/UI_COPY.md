@@ -519,6 +519,13 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 
 In-app **Add Article** uses the same headline, subheadline, and button labels as the share duplicate flow for consistency. Future `Localizable.strings` keys may use the `addArticle.duplicate.*` prefix.
 
+### File Adopted (Manually-Added Note)
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `notice.fileAdopted.message` | One-time notice | Verso added reading metadata to this note and renamed it to match your library. | Verso a ajouté des métadonnées de lecture à cette note et l'a renommée pour qu'elle corresponde à ta bibliothèque. | O Verso adicionou metadados de leitura a esta nota e a renomeou para corresponder à sua biblioteca. | Shown once, the first time Verso adopts a manually-added/foreign `.md` file (FAB-290) — never silent. Exact placement (toast vs. one-time modal vs. row subtitle) is still an open question; current build shows it as a one-time alert. |
+| `notice.fileAdopted.dismiss` | Alert button | OK | OK | OK | Invariant — standard alert acknowledgement across all three locales |
+
 ### Generic Fallback
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
