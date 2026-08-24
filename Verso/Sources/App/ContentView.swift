@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var articleLibraryService: ArticleLibraryService
+    @EnvironmentObject var adoptionNoticeService: AdoptionNoticeService
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var showLaunch = true
     @State private var hasSeenRebuilding = false
@@ -23,6 +24,9 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)
+        .alert(L10n.Notice.fileAdoptedMessage, isPresented: $adoptionNoticeService.isPresented) {
+            Button(L10n.Notice.fileAdoptedDismiss, role: .cancel) {}
+        }
         .onReceive(articleLibraryService.$isRebuilding) { rebuilding in
             if rebuilding { hasSeenRebuilding = true }
             guard showLaunch, hasSeenRebuilding, !rebuilding else { return }

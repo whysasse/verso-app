@@ -29,6 +29,7 @@ struct ArticleReaderView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
+    @EnvironmentObject var adoptionNoticeService: AdoptionNoticeService
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -310,13 +311,24 @@ struct ArticleReaderView: View {
         }
     }
 
+    /// Runs the FAB-290 one-time adoption for `article`'s file if it still needs one (manually
+    /// added, no frontmatter or no `title`), updates the in-memory `filePath` to the renamed file,
+    /// and surfaces the one-time notice. Call before any frontmatter write-back below.
+    private func adoptIfNeeded(folderURL: URL) {
+        guard let newURL = try? MarkdownWriter.adoptIfNeeded(fileURL: URL(fileURLWithPath: article.filePath), in: folderURL) else { return }
+        article.filePath = newURL.path
+        adoptionNoticeService.notify()
+    }
+
     /// Matches list swipe semantics: YAML is source of truth for rebuilds (`ArticleLibraryService`); keep file in sync.
     private func persistStatusToMarkdownFile(_ status: Article.Status) {
         guard let folderURL = folderBookmarkService.folderURL else { return }
-        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !path.isEmpty else { return }
+        guard !article.filePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
+        adoptIfNeeded(folderURL: folderURL)
+        try? viewContext.save() // durably persist the FAB-290 rename even if adoption is the only change this call makes
+        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
         try? MarkdownWriter.updateStatus(status, for: path)
     }
 
@@ -335,10 +347,13 @@ struct ArticleReaderView: View {
         }
         lastPersistedScroll = fraction
         guard let folderURL = folderBookmarkService.folderURL else { return }
-        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !path.isEmpty else { return }
+        guard !article.filePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
+        // Scroll-position auto-save fires moments after opening a file, so this is usually the
+        // first write-back a manually-added article sees — the one-time adoption commit (FAB-290).
+        adoptIfNeeded(folderURL: folderURL)
+        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
             try MarkdownWriter.updateScrollPosition(fraction, for: path)
             article.scrollPosition = NSNumber(value: fraction)

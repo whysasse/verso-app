@@ -1,7 +1,7 @@
 # Verso — Obsidian Compatibility Technical Spec
 
-**Version:** 2.0
-**Date:** 2026-04-19
+**Version:** 2.1
+**Date:** 2026-08-24
 **Status:** Decisions locked
 **Related:** [PRD Section 14](PRD_MinimalistReaderApp.md#14-obsidian-compatibility)
 
@@ -23,7 +23,7 @@ Obsidian compatibility is not a feature or a mode — it is a natural consequenc
 | Write strategy | App writes only on explicit user actions (save article, mark as read) |
 | Field ownership | App owns `status` and `added`; all other fields are user-owned |
 | Full content | App writes the full parsed article body into the Markdown file — readable natively in Obsidian |
-| Graceful degradation | Missing field → use default; invalid frontmatter → skip file with warning; folder moved → prompt re-select |
+| Graceful degradation | Missing field → use default; no frontmatter (or frontmatter missing `title`) → adopt the file with synthesized defaults, see §9; folder moved → prompt re-select |
 | Change detection | NSMetadataQuery (iCloud-aware, iOS-native) — reactive re-parse when files change |
 
 ---
@@ -123,11 +123,14 @@ Identify affected file(s)
     ↓
 Parse YAML frontmatter
     ↓
-[Valid] → Update Core Data cache → refresh UI
-[Invalid frontmatter] → Log warning, skip file, leave cache as-is
+[Valid, or no/incomplete frontmatter] → Update Core Data cache → refresh UI (see §9)
 [File deleted] → Remove from reading list
 [Folder inaccessible] → Show empty state with re-select prompt
 ```
+
+Every `.md` file in the watched folder is a candidate article — including one with no frontmatter
+at all, or frontmatter missing `title` (FAB-290). There is no longer an "invalid frontmatter, skip
+file" branch; see §9.
 
 ---
 
@@ -166,11 +169,41 @@ Two concurrent writes (e.g., app and Obsidian both modifying the same file simul
 | Missing `status` field | Default to `unread` |
 | Missing `title` field | Use filename (without date prefix and extension) |
 | Missing `url` field | Show article without "Open in browser" option |
-| Invalid YAML frontmatter | Skip file silently; log warning for debugging |
-| File has no frontmatter | Skip file (not treated as a Reader article) |
+| Missing `added` field | Use the file's creation date |
+| File has no frontmatter (or unparseable `---` delimiters) | Whole file content becomes the article body; every field above is synthesized as if `title` and `added` were both missing |
 | Folder moved or deleted | Show empty state with prompt to re-select folder in Settings |
 | iCloud Drive unavailable | Show cached articles from Core Data with "Offline" indicator |
 | iCloud Drive not enabled | Show setup prompt explaining iCloud Drive is required |
+
+### Adopting manually-added files (FAB-290)
+
+A file that hits either of the two synthesized-title rows above (no frontmatter, or frontmatter
+missing `title`) is a candidate for **adoption** — the mechanism that turns a manually-dropped note
+or an existing Obsidian note into a normal Verso article:
+
+1. **Lazy read, not eager write.** Detecting that a file needs adoption never touches disk. It's
+   read into the Core Data cache with synthesized defaults and just appears in the list — the
+   original file is untouched until the user interacts with it. This matches the app's write
+   strategy principle (§2: writes only on explicit user action) and is the safer choice for a note
+   that's also live in an Obsidian vault or another tool.
+2. **Adoption commit, on first write-back.** The first time the user does something that would
+   normally update an app-authored article's frontmatter — mark read/unread, add/edit a tag, change
+   status, or scroll-position auto-save (which fires moments after the file is opened, so this is
+   usually the trigger in practice) — Verso performs a one-time adopt-and-rename:
+   - Builds a full Verso frontmatter block, **merged** with any frontmatter already in the file —
+     unrecognized keys (`aliases`, `cssclass`, a personal `tags` scheme, etc.) are preserved
+     verbatim, never dropped.
+   - Renames the file to the `YYYY-MM-DD Title.md` convention (§3), using the same collision
+     handling (`MarkdownWriter.uniqueFilename`) as any other Verso-authored file.
+   - Shows a one-time notice (`notice.fileAdopted.message` in `docs/copy/UI_COPY.md`) so the rename
+     is never silent.
+3. From that point on the file is indistinguishable from one Verso wrote itself.
+
+**Known trade-off:** renaming on adoption (rather than leaving the filename untouched) can break an
+Obsidian `[[wikilink]]` elsewhere in the vault that points at the note under its old name — doing the
+rename only on first interaction (not at detection) narrows the risk window but doesn't remove it.
+A Settings toggle to disable auto-adoption for a shared/actively-linked vault folder is an open
+question — see `docs/DONE.md` FAB-290.
 
 ---
 
@@ -211,3 +244,4 @@ The user manages the iCloud Drive folder in Settings.
 |---------|------|---------|
 | 1.0 | 2026-04-11 | Initial draft (Obsidian as optional mode) |
 | 2.0 | 2026-04-19 | Full rewrite: file-first architecture locked, Obsidian reframed as compatibility layer. All open questions resolved. iOS/iCloud Drive approach specified (NSMetadataQuery, security-scoped bookmarks). Full article body in file confirmed. Vault path user-configurable. |
+| 2.1 | 2026-08-24 | FAB-290: §9 rewritten — "no frontmatter" / "invalid frontmatter" no longer skip the file; both are graceful-degraded and adopted (lazy read, adopt-and-rename on first write-back). §2 and §6 updated to match. |

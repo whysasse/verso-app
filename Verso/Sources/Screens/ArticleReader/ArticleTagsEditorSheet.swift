@@ -5,6 +5,7 @@ struct ArticleTagsEditorSheet: View {
     @ObservedObject var article: Article
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
+    @EnvironmentObject var adoptionNoticeService: AdoptionNoticeService
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
 
@@ -70,13 +71,17 @@ struct ArticleTagsEditorSheet: View {
             dismiss()
             return
         }
-        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !path.isEmpty else {
+        guard !article.filePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             dismiss()
             return
         }
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
+        if let newURL = try? MarkdownWriter.adoptIfNeeded(fileURL: URL(fileURLWithPath: article.filePath), in: folderURL) {
+            article.filePath = newURL.path
+            adoptionNoticeService.notify()
+        }
+        let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
             try MarkdownWriter.updateTags(tags, for: path)
             article.tagsSerialized = Article.makeTagsSerialized(from: tags)

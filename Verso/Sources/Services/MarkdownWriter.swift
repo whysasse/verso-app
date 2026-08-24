@@ -82,7 +82,10 @@ struct MarkdownWriter {
     }
 
     /// Builds the YAML frontmatter string for the article.
-    static func buildFrontmatter(for article: ParsedArticle) -> String {
+    /// - Parameter unrecognizedLines: Raw frontmatter lines Verso doesn't own (e.g. Obsidian's
+    ///   `aliases`, `cssclass`, a personal `tags` scheme), carried forward verbatim from the
+    ///   original file so an adoption commit doesn't clobber another tool's fields (FAB-290).
+    static func buildFrontmatter(for article: ParsedArticle, preservingUnrecognized unrecognizedLines: [String] = []) -> String {
         var lines = ["---"]
 
         // Title (always present)
@@ -121,6 +124,8 @@ struct MarkdownWriter {
         // Added date
         let dateStr = dateFormatter.string(from: article.dateAdded)
         lines.append("added: \(dateStr)")
+
+        lines.append(contentsOf: unrecognizedLines)
 
         lines.append("---")
         return lines.joined(separator: "\n") + "\n"
@@ -218,6 +223,60 @@ struct MarkdownWriter {
             }
         }
         throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 2, userInfo: [NSLocalizedDescriptionKey: "Could not insert tags into frontmatter"]))
+    }
+
+    /// Filename for a freshly-adopted file: `YYYY-MM-DD Title.md` (docs/OBSIDIAN_INTEGRATION.md §3).
+    /// Unlike `generateFilename`, this never inserts an "Article" token -- it's renaming an
+    /// existing note the user (or another tool) authored, not writing a brand-new Verso article.
+    private static func adoptedFilename(for article: ParsedArticle) -> String {
+        let dateStr = dateFormatter.string(from: article.dateAdded)
+        let sanitizedTitle = sanitizeFilename(article.title)
+        let truncated = String(sanitizedTitle.prefix(100))
+        return "\(dateStr) \(truncated).md"
+    }
+
+    /// One-time "adoption" of a manually-added or foreign Markdown file (FAB-290): if `fileURL`
+    /// has no frontmatter, or frontmatter with no `title`, this builds a full Verso frontmatter
+    /// block -- merged with any unrecognized YAML keys already in the file -- and renames the file
+    /// to the `YYYY-MM-DD Title.md` convention (collisions handled by `uniqueFilename`, same as any
+    /// other Verso-authored file). From that point on the file is indistinguishable from one Verso
+    /// wrote itself, so no special-casing is needed downstream.
+    ///
+    /// Does nothing (`nil`) for a file that already has valid Verso frontmatter with a `title` --
+    /// this is deliberately called from every write-back path (mark read/unread, tag edit, status
+    /// change, scroll-position auto-save) rather than at read time, so a manually-added file that's
+    /// never interacted with is never touched on disk (lazy write, per the brainstorm decision).
+    /// - Returns: The new file URL if adoption happened, otherwise `nil`.
+    @discardableResult
+    static func adoptIfNeeded(fileURL: URL, in directoryURL: URL) throws -> URL? {
+        let parsed = try MarkdownReader.read(fileURL: fileURL)
+        guard parsed.needsAdoption else { return nil }
+
+        let frontmatter = buildFrontmatter(for: parsed, preservingUnrecognized: parsed.unrecognizedFrontmatterLines)
+        let content = frontmatter + parsed.contentMarkdown
+
+        let baseFilename = adoptedFilename(for: parsed)
+        let newFileURL: URL
+        if baseFilename == fileURL.lastPathComponent {
+            // Already named per convention -- just fill in the missing frontmatter in place.
+            newFileURL = fileURL
+        } else {
+            let filename = try uniqueFilename(baseName: baseFilename, in: directoryURL)
+            newFileURL = directoryURL.appendingPathComponent(filename)
+        }
+
+        do {
+            try content.write(to: newFileURL, atomically: true, encoding: .utf8)
+        } catch {
+            throw MarkdownWriterError.fileWriteFailed(error)
+        }
+        if newFileURL.path != fileURL.path {
+            // NSMetadataQuery observes this as a delete+create pair; callers update the in-memory
+            // article's filePath to newFileURL before the old path disappears from the cache, so
+            // the list doesn't flash a duplicate or lose selection while the query settles.
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+        return newFileURL
     }
 
     /// Writes a ParsedArticle to a .md file in the specified directory.

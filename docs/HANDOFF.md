@@ -139,8 +139,9 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 |------|---------|
 | `Services/ArticleLibraryService.swift` | Central article library — list, filter, search |
 | `Services/ArticleParserService.swift` | Orchestrates parsing pipeline |
-| `Services/MarkdownReader.swift` | Reads article `.md` files from disk |
-| `Services/MarkdownWriter.swift` | Writes article `.md` files to disk |
+| `Services/MarkdownReader.swift` | Reads article `.md` files from disk; gracefully adopts files with no frontmatter or no `title` (FAB-290) instead of skipping them |
+| `Services/MarkdownWriter.swift` | Writes article `.md` files to disk; `adoptIfNeeded` performs the one-time rename+merge for manually-added files (FAB-290) |
+| `Services/AdoptionNoticeService.swift` | Publishes the one-time "file adopted" notice shown at the app root (FAB-290) |
 | `Services/ReadabilityParser.swift` | Extracts readable content from HTML |
 | `Services/FolderBookmarkService.swift` | Persists iCloud folder security-scoped bookmark |
 | `Services/ICloudFileWatcher.swift` | Watches iCloud folder for file changes |

@@ -17,7 +17,15 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**27 open issues** across iOS, Web, Design, and Infra.
+**26 open issues** across iOS, Web, Design, and Infra.
+
+## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
+
+Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlog, which are deferred past this release.
+
+- **Phase A — ship this release.** Close FAB-163 (done, see [DONE.md](DONE.md)) and FAB-164 (blocked on Fabio smoke-testing a real GoodLinks export — can't be verified without it), then work FAB-150's remaining Store & compliance checklist. Draft ASC copy, App Review notes, and privacy/age-rating answers are in [APP_STORE_LISTING.md](APP_STORE_LISTING.md), awaiting Fabio's review before submission.
+- **Phase B — localization (FAB-275).** Steps 1–6 done. Step 7 (FR-CA/PT-BR translation + linguistic QA) and step 8 (App Store metadata localization + Québec Bill 96 compliance) remain, plus the small FAB-283 copy-wiring fix and the FAB-284 language-picker UX decision.
+- **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
 
@@ -44,9 +52,13 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   ## Store & compliance
 
   - [ ] App Store Connect metadata — subtitle, description, keywords, support URL (app record + listing name already done, see above)
-  - [ ] Screenshots for required device classes
+  - [x] Screenshots for required device classes — uploaded successfully 2026-08-25. The 2026-08-24 batch (1320×2868, 6.9") was correct; the earlier rejection was Fabio uploading into the wrong ASC slot (6.5" tab), not a dimension problem. See APP_STORE_LISTING.md.
   - [ ] Privacy nutrition labels (App Store Connect questionnaire) — `PrivacyInfo.xcprivacy` manifest already done, see above
   - [ ] Age rating questionnaire
+
+  Draft copy/answers for all four items above: [APP_STORE_LISTING.md](APP_STORE_LISTING.md) (2026-08-24) — needs Fabio's review before pasting into ASC.
+
+  **Device targeting (2026-08-24):** `TARGETED_DEVICE_FAMILY` restricted to iPhone-only (`"1"`) across the `Verso`, `ShareExtension`, and `VersoTests` targets in `Verso/project.yml` — was universal (`"1,2"`, or unset defaulting to universal on the main target), which meant the app could install on iPad today despite FAB-131's iPad UI work being deferred. `ci.yml`'s fast smoke-check job destination changed from `platform=macOS,variant=Designed for iPad` (needs iPad idiom support to resolve) to `generic/platform=iOS`. **Not yet verified by a real CI run or `xcodebuild archive`** — needs a push/PR to confirm `ci.yml` still passes, and ideally one release.yml run before the next TestFlight build, before trusting this.
 
   ## Release process
 
@@ -62,7 +74,6 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
   ## Depends on
 
   Close or hand off after core Phase 2 issues are done.
-
 
 ### Phase 3 — Expansion
 
@@ -226,17 +237,6 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 
 ### Phase 1 — Foundation
-
-- [ ] ⚪ **FAB-163** · Shipped: Duplicate article detection (share extension + in-app)  `In Review` `No priority`
-  Implemented duplicate detection when saving an article whose canonical source URL already exists in the library (YAML `url:` in root + `Archive/` .md files).
-
-  **Share extension:** After parse, resolves library folder via app-group bookmark; if duplicate, prompts **Update existing** / **Save as copy** / **Cancel** (cancel completes without pending JSON). Pending payload carries `DuplicateSaveResolution` for ingester.
-
-  **Main app:** `MarkdownWriter.replaceArticle` preserves `added`, `status`, `scroll_position`, `tags`; `PendingArticleIngester` updates Core Data by file path on replace. Analytics `article.saved` includes `duplicate_resolution`: `none` | `update` | `copy`.
-
-  **In-app Add Article:** Same duplicate UI and write paths for parity.
-
-  **Docs:** `docs/copy/UI_COPY.md` (share.duplicate.\*), `docs/ANALYTICS_STRATEGY.md`.
 
 - [ ] 🟡 **FAB-164** · Fix GoodLinks JSON backup import (native export format)  `In Review` `Medium`
   ## Root cause
@@ -521,5 +521,3 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
         **Phase A prep (2026-06-21):** codegen now correctly handles `filter.archived.accessibilityLabel` in TRUE_PLURAL_KEYS (was missing, producing "Archived, 1 articles"); `OnboardingThemePickerView` wired to `L10n.*` (FAB-283); `QuickTourView` rebuilt as 3-step carousel with Skip (FAB-281); Obsidian tip added to `OnboardingFolderPickerView` (FAB-280); `AboutView` rebuilt per spec + new `AcknowledgementsView` (FAB-279); font-size abbreviation labels translated per locale; `settings.fontSize.valueLabel` key added for "pt" suffix; 10 retired interim keys cleaned up. All changes verified via Web build. See DONE.md for completed issues.*
   - [ ] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** *Blocked by 6.* Québec French + Brazilian Portuguese. Verify plurals (esp. the 0-case), accents, and that **OpenDyslexic** renders ç ã õ â ê é à ü at all six reading sizes. *Done: both locales fully translated and QA'd.*
   - [ ] **8 · App Store metadata + Québec/Bill 96.** *Blocked by 7.* Localize store listing (name, subtitle, description, keywords, screenshots) for fr-CA + pt-BR; confirm Québec French-language compliance posture for distribution. *Done: localized listings ready; compliance confirmed.*
-
-

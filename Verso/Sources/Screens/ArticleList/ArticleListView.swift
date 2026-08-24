@@ -271,6 +271,7 @@ private struct ArticleListFetchedBody: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
     @EnvironmentObject var articleLibraryService: ArticleLibraryService
+    @EnvironmentObject var adoptionNoticeService: AdoptionNoticeService
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest private var articles: FetchedResults<Article>
@@ -555,9 +556,20 @@ private struct ArticleListFetchedBody: View {
         .padding(.top, VersoSpacing.sm)
     }
 
+    /// Runs the FAB-290 one-time adoption for `article`'s file if it still needs one (manually
+    /// added, no frontmatter or no `title`), updates the in-memory `filePath` to the renamed file,
+    /// and surfaces the one-time notice. Call before any frontmatter write-back below so an adopted
+    /// file's rename lands before the write it's piggybacking on.
+    private func adoptIfNeeded(_ article: Article, folderURL: URL) {
+        guard let newURL = try? MarkdownWriter.adoptIfNeeded(fileURL: URL(fileURLWithPath: article.filePath), in: folderURL) else { return }
+        article.filePath = newURL.path
+        adoptionNoticeService.notify()
+    }
+
     private func archiveArticle(_ article: Article) {
         guard let folderURL = folderBookmarkService.folderURL else { return }
         do {
+            adoptIfNeeded(article, folderURL: folderURL)
             let destination = try MarkdownWriter.archive(filePath: article.filePath, in: folderURL)
             try MarkdownWriter.updateStatus(.archived, for: destination.path)
             article.filePath = destination.path
@@ -569,6 +581,9 @@ private struct ArticleListFetchedBody: View {
     }
 
     private func toggleReadStatus(_ article: Article) {
+        if let folderURL = folderBookmarkService.folderURL {
+            adoptIfNeeded(article, folderURL: folderURL)
+        }
         let newStatus: Article.Status = article.statusEnum == .read ? .unread : .read
         article.statusEnum = newStatus
         try? viewContext.save()
@@ -580,6 +595,7 @@ private struct ArticleListFetchedBody: View {
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
         for article in articles where selectedArticleIds.contains(article.id) {
+            adoptIfNeeded(article, folderURL: folderURL)
             article.statusEnum = .read
             try? MarkdownWriter.updateStatus(.read, for: article.filePath)
         }
