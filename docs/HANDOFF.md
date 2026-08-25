@@ -15,6 +15,7 @@ Verso now has two platforms: **iOS** (MVP shipped) and **Web** (Next.js, in acti
 - **Entry point:** `Verso/Sources/App/VersoApp.swift` → `ContentView.swift`
 - **File-first:** Articles are Markdown files in a user-selected iCloud Drive folder. This is the source of truth.
 - **Core Data** (`CoreDataStack.shared`) is a read cache only — never write authoritative state to it.
+- **Core Data threading:** any service that fetches, mutates, or saves via `CoreDataStack.shared.persistentContainer.viewContext` must be `@MainActor`-isolated, since `viewContext` is confined to the main thread — see `ArticleLibraryService`, `ImportOrchestrator`, and `PendingArticleIngester` for the pattern. Skipping this caused a real crash (FAB-291, `docs/DONE.md`) when a background `Task` raced the UI's reads of the same Core Data objects.
 - **No tab bar.** Single `NavigationStack` throughout.
 - **Navigation:** `VersoMainSplitView.swift` orchestrates the root split/navigation structure.
 - **Share Extension** is a separate app target for saving articles from other apps.
