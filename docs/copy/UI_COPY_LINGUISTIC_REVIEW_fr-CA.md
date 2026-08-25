@@ -1,9 +1,9 @@
 # Verso — Révision linguistique (fr-CA)
 
 **Locale :** `fr-CA` (Québec French)
-**Réviseur :** Claude (révision linguistique automatisée, à valider par un réviseur humain)
-**Date :** 2026-06-21
-**Statut :** `Révisé — en attente d'approbation finale`
+**Réviseur :** Claude (révision linguistique automatisée) — approuvé par Fabio le 25 août 2026, sans correction
+**Date :** 2026-06-21 (approbation finale : 25 août 2026)
+**Statut :** `Approuvé`
 
 Merci de réviser les traductions de **Verso**, un lecteur d'articles minimaliste pour iOS et Web. L'application utilise un vocabulaire réduit et cohérent — environ 280 chaînes en tout. Ce document vous guide à travers chaque section.
 

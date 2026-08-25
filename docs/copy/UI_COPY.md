@@ -326,7 +326,7 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `readerSettings.fontSize.m` | Step label | M | M | M | Accessibility label: "Medium, 18 points, default" → fr-CA "Moyen, 18 points, par défaut" / pt-BR "Médio, 18 pontos, padrão" |
 | `readerSettings.fontSize.l` | Step label | L | G | G | Accessibility label: "Large, 20 points" → fr-CA "Grand, 20 points" / pt-BR "Grande, 20 pontos" |
 | `readerSettings.fontSize.xl` | Step label | XL | TG | GG | Accessibility label: "Extra large, 22 points" → fr-CA "Très grand, 22 points" / pt-BR "Extragrande, 22 pontos" |
-| `readerSettings.fontSize.xxl` | Step label | XXL | TTG | EEG | Accessibility label: "Extra extra large, 26 points" → fr-CA "Très très grand, 26 points" / pt-BR "Extra extragrande, 26 pontos" |
+| `readerSettings.fontSize.xxl` | Step label | XXL | TTG | GGG | Accessibility label: "Extra extra large, 26 points" → fr-CA "Très très grand, 26 points" / pt-BR "Extra extragrande, 26 pontos" |
 | `readerSettings.lineSpacing.sectionLabel` | Section label | Line spacing | Interligne | Espaçamento entre linhas | — |
 | `readerSettings.lineSpacing.compact` | Option label | Compact | Compact | Compacto | — |
 | `readerSettings.lineSpacing.normal` | Option label | Normal | Normal | Normal | — |
