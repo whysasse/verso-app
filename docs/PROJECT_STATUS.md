@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-08-24 | **PRD Version:** 1.7
+**Date:** 2026-08-25 | **PRD Version:** 1.7
 
 ---
 
@@ -54,7 +54,7 @@ The design system and all screen designs are **complete**. Implementation is act
 
 Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of record). Non-iPad work is sequenced into three phases as of 2026-08-24 (see BACKLOG.md's "Current sequencing" note for full detail):
 
-- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) is implemented but blocked on Fabio smoke-testing a real GoodLinks export before it can close. FAB-150 (App Store release checklist): signing, privacy manifest, and the CI release path are done — `release.yml` has shipped two real TestFlight builds via GitHub Actions (2026-08-23). Store & compliance metadata, screenshots, App Review notes, and final submission remain; draft copy and answers for all of it are in `docs/APP_STORE_LISTING.md` (2026-08-24), awaiting Fabio's review.
+- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) is implemented but blocked on Fabio smoke-testing a real GoodLinks export before it can close. FAB-150 (App Store release checklist): signing, privacy manifest, and the CI release path are done — `release.yml` has shipped three real TestFlight builds via GitHub Actions (2026-08-23, 2026-08-25). The 2026-08-25 build carries the fix for a crash on launch/foreground found via the first two TestFlight builds' crash logs — see FAB-291 in `docs/DONE.md` for the root cause and fix. Store & compliance metadata, screenshots, App Review notes, and final submission remain; draft copy and answers for all of it are in `docs/APP_STORE_LISTING.md` (2026-08-24), awaiting Fabio's review.
 - **Phase B (next) — localization (FAB-275).** Steps 1–6 done. Step 7 (FR-CA/PT-BR translation + linguistic QA) and step 8 (App Store metadata localization + Québec Bill 96 compliance) remain, plus FAB-283 (small copy-wiring fix) and FAB-284 (language picker, needs a UX placement decision).
 - **Phase C (after launch) — polish backlog.** Highlighting (FAB-54), RSVP reading mode (FAB-277), VoiceOver progress announcement (FAB-278) — each needs a UX decision from Fabio before implementation.
 - **Phase 4 (deferred, excluded from this sequencing): iPad support** (FAB-131, FAB-154 → FAB-162).
