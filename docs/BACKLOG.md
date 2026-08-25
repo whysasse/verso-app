@@ -17,14 +17,14 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**26 open issues** across iOS, Web, Design, and Infra.
+**25 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
 Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlog, which are deferred past this release.
 
 - **Phase A — ship this release.** Close FAB-163 (done, see [DONE.md](DONE.md)) and FAB-164 (blocked on Fabio smoke-testing a real GoodLinks export — can't be verified without it), then work FAB-150's remaining Store & compliance checklist. Draft ASC copy, App Review notes, and privacy/age-rating answers are in [APP_STORE_LISTING.md](APP_STORE_LISTING.md), awaiting Fabio's review before submission.
-- **Phase B — localization (FAB-275).** Steps 1–6 done. Step 7 (FR-CA/PT-BR translation + linguistic QA) and step 8 (App Store metadata localization + Québec Bill 96 compliance) remain, plus the small FAB-283 copy-wiring fix and the FAB-284 language-picker UX decision.
+- **Phase B — localization (FAB-275).** Steps 1–6 done. Step 7 (FR-CA/PT-BR translation + linguistic QA) and step 8 (App Store metadata localization + Québec Bill 96 compliance) remain, plus the FAB-284 language-picker UX decision. (FAB-283 copy-wiring fix already shipped 2026-06-21, see [DONE.md](DONE.md); the open checklist entry below was stale duplicate bookkeeping, removed 2026-08-25.)
 - **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -485,11 +485,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   No app implementation yet — tracking only.
 
-
-- [ ] 🟢 **FAB-283** · Wire `OnboardingThemePickerView.swift` hardcoded strings to `L10n.*`  `Backlog` `Low`
-  Found during the FAB-282 final sweep. `OnboardingThemePickerView.swift` has three hardcoded user-facing strings: `Text("Choose your theme")`, `Text("You can always change this later in Settings.")`, and `Button("Continue")`. Existing L10n keys differ slightly (`onboarding.theme.headline` = "Choose your reading theme", `onboarding.theme.subheadline` = "You can change this any time from settings."), so wiring them would change visible copy.
-
-  **Fix:** follow the FAB-281 pattern — add interim keys matching the shipped copy, wire the view, file a copy-reconciliation decision. `L10n.Onboarding.themeContinue` ("Continue") can be wired directly — it matches.
 
 - [ ] 🟢 **FAB-284** · Language picker (iOS + Web)  `Backlog` `Low`
   Both platforms currently resolve their locale automatically (iOS: device system language; Web, once step 5 lands: browser language via a cookie) with no in-app override. Add an explicit picker so a user can choose `en` / `fr-CA` / `pt-BR` regardless of device/browser language.
