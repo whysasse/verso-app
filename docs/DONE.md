@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**166 completed issues.**
+**167 completed issues.**
 
 ## iOS
 
@@ -731,6 +731,13 @@
   Follow-up pass after `release.yml`'s first successful run (32651214255), scoped to changes around the archive/sign/upload steps only — those were left byte-for-byte untouched. Added SPM caching to `release.yml` (mirroring `ci.yml`'s existing cache step, same key). Confirmed via a real run (32652825341) that the cache genuinely hits, but delivers no measurable speedup (5m50s → 5m49s across two full runs): the cached path (`.../xcshareddata/swiftpm`) mostly holds `Package.resolved`, not the downloaded package sources, so there's little to actually cache — worth knowing so no one re-chases this expecting a win. Bumped `actions/checkout@v4` → `@v7` in both workflows (clean, no new warnings) — but a full log grep on the verification run found the Node 20 deprecation notice we were trying to clear is actually emitted by `actions/cache@v4`, not `checkout`, so that specific warning is still present; bumping `actions/cache` would be the actual fix, if ever worth doing (low priority, cosmetic). Investigated the "untrusted tap" Homebrew annotation seen during `brew install xcodegen`: tested `HOMEBREW_NO_AUTO_UPDATE=1` / `HOMEBREW_NO_INSTALL_CLEANUP=1` on a real run, confirmed the warning still fired identically — disproving the auto-update theory — so reverted rather than ship an ineffective fix. It's macos-26 runner-image noise (a pre-tapped, untrusted `aws` tap triggering Homebrew's trust check on any `brew` command), not something this repo's workflow config can address; left as-is. Also corrected `release.yml`'s header comment, which had called it "UNTESTED SCAFFOLDING... has never run successfully" — no longer true.
 
   **Completed:** 2026-08-23.
+
+### TestFlight bugs — 2026-08-25
+
+- [x] 🔴 **FAB-291** · App crashes on launch and on foregrounding (Core Data thread-safety violation)  `Done` `Urgent`
+  Reported by Fabio, reproduced by a friend's device too — crashed both on a cold launch and when switching back to Verso from another app. Confirmed via two real crash logs pulled from Xcode Organizer (TestFlight builds 4 and 5): both were Swift runtime traps ("Unexpectedly found nil while unwrapping an Optional value") reading a non-optional `@NSManaged` property — `Article.id` (a `ForEach` in the article list) in one, `Article.dateAdded` (`ArticleReaderView`'s header) in the other. Root cause: `PendingArticleIngester` was the only Core Data-touching service in the codebase not isolated to `@MainActor` (unlike `ArticleLibraryService` and `ImportOrchestrator`, which both correctly are). Since `viewContext` is confined to the main thread, `PendingArticleIngester.ingest(...)` — kicked off via a plain `Task { }` in `VersoApp.swift`'s `onAppear` and `.onChange(of: scenePhase)` (i.e. on every launch and every foreground) — was fetching, mutating, and saving `Article` objects from a background thread at the same moment the UI was reading those same objects on the main thread. One of the crash logs shows this directly: `PendingArticleIngester.upsertCoreData` mid-`context.save()` on a background dispatch thread, at the exact instant the main thread crashed reading `Article.id`. This is a race, not a deterministic bug — explains why it wasn't consistently reproducible in dev, and why it was more likely whenever a share-extension import was pending during launch/foreground. **Fix:** added `@MainActor` to `PendingArticleIngester`, matching the existing pattern on its sibling services. **Not yet verified by a real build/CI run** — see [[project_verso]] / next TestFlight upload. `RelatedArticlesService` (also Core Data-touching, also not `@MainActor`) is lower risk — it's read-only and currently only called from a `.task` already on the main actor — but is a good candidate for the same hardening as a follow-up if it's ever called from elsewhere.
+
+  **Completed:** 2026-08-25.
 
 
 ## Web

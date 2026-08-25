@@ -5,6 +5,11 @@ import OSLog
 private let logger = Logger(subsystem: "com.fabiosasseron.verso", category: "ingestion")
 private let appGroupID = AppConstants.appGroupID
 
+/// Runs on the main actor because it reads/writes `CoreDataStack.shared.persistentContainer.viewContext`,
+/// which (like `ArticleLibraryService` and `ImportOrchestrator`) is confined to the main thread.
+/// Without this, ingestion racing the UI's fetch on app launch / foreground caused sporadic
+/// crashes reading `Article` properties mid-fault (FAB-291).
+@MainActor
 struct PendingArticleIngester {
 
     func ingest(folderURL: URL?, context: NSManagedObjectContext) async {
