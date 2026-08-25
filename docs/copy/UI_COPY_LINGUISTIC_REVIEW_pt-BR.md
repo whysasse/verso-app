@@ -1,9 +1,9 @@
 # Verso — Revisão Linguística (pt-BR)
 
 **Idioma:** `pt-BR` (Português Brasileiro)  
-**Revisor:** Claude (revisão assistida por IA) — aguardando aprovação final do Fabio  
-**Data:** 21 de junho de 2026  
-**Status:** `Em revisão`
+**Revisor:** Claude (revisão assistida por IA) — aprovado por Fabio em 25 de agosto de 2026, com 1 correção  
+**Data:** 21 de junho de 2026 (aprovação final: 25 de agosto de 2026)  
+**Status:** `Aprovado`
 
 Obrigado por revisar as traduções do **Verso**, um leitor minimalista de artigos para iOS e Web. O aplicativo usa um vocabulário pequeno e consistente — cerca de 280 strings no total. Este documento guia você por cada seção.
 
@@ -246,7 +246,7 @@ Estes elementos aparecem como chips compactos. O português é ~15–30% mais lo
 | ✓ | `readerSettings.fontSize.m` | M | *M* | « Médio, 18 pontos, padrão » |
 | ✓ | `readerSettings.fontSize.l` | L | *G* | « Grande, 20 pontos » |
 | ✓ | `readerSettings.fontSize.xl` | XL | *GG* | « Extragrande, 22 pontos » |
-| ✗ | `readerSettings.fontSize.xxl` | XXL | *EEG* | « Extra extragrande, 26 pontos » (rótulo de acessibilidade — esse mantém-se igual). ✗ ver correção nº 9 no Resumo (abreviação visual colide com a sigla médica de eletroencefalograma). |
+| ✓ | `readerSettings.fontSize.xxl` | XXL | *GGG* | « Extra extragrande, 26 pontos » (rótulo de acessibilidade — esse mantém-se igual). Corrigido de "EEG" (colidia com a sigla médica de eletroencefalograma) — ver correção nº 9 no Resumo. Fabio escolheu "GGG" (estendendo o padrão G/GG já usado em L/XL) em vez do "XG" originalmente sugerido aqui. |
 | ✓ | `readerSettings.lineSpacing.sectionLabel` | Line spacing | *Espaçamento entre linhas* | — |
 | ✓ | `readerSettings.lineSpacing.compact` | Compact | *Compacto* | — |
 | ✓ | `readerSettings.lineSpacing.normal` | Normal | *Normal* | — |
@@ -471,7 +471,7 @@ Por favor, liste todas as correções propostas abaixo.
 | 6 | 2. Início · Estados vazios (Web) | `home.empty.noUnread.headline` | Nenhum artigo não lido | Nada não lido | Consistência com os estados vazios irmãos da Web ("Nada em andamento", "Nada lido ainda"), que seguem o padrão "Nada + adjetivo" em vez de "Nenhum artigo + adjetivo". |
 | 7 | 3. Visualização de leitura | `reading.controls.tts.play` | Reproduzir texto em voz | Ler em voz alta | "Texto em voz" não é uma construção natural em português (o termo técnico usa "fala", não "voz" desse jeito); "ler em voz alta" é natural e funciona bem como rótulo de botão. |
 | 8 | 3. Visualização de leitura | `reading.controls.tts.pause` | Pausar texto em voz | Pausar leitura em voz alta | Mesmo motivo do item 7. |
-| 9 | 4. Configurações de leitura | `readerSettings.fontSize.xxl` | EEG | XG | "EEG" colide com a sigla médica de eletroencefalograma, o que é um problema real de UX; o padrão real de tamanhos no Brasil é PP, P, M, G, GG, XG (não "EEG"). |
+| 9 | 4. Configurações de leitura | `readerSettings.fontSize.xxl` | EEG | **GGG** (decisão final do Fabio, 25/08/2026 — substitui a sugestão "XG" abaixo) | "EEG" colide com a sigla médica de eletroencefalograma, o que é um problema real de UX. Sugestão original desta revisão era "XG" (padrão PP, P, M, G, GG, XG); Fabio preferiu estender o padrão G/GG já usado em L/XL para "GGG" em vez de trocar de convenção. |
 | 10 | 5. Configurações (modal) | `settings.privacyPolicy.rowLabel` | Política de Privacidade | Política de privacidade | Title Case (maiúscula em cada palavra) não é convenção em português; corrige para combinar com `about.privacyPolicy.rowLabel`, que já usa a capitalização correta. |
 | 11 | 6. Sobre | `privacyPolicy.navTitle` | Política de Privacidade | Política de privacidade | Mesma correção de capitalização do item 10 — falta de consistência entre as três ocorrências da mesma frase no app. |
 | 12 | 5. Configurações (modal) | `dialog.changeFolder.yes` | Mover Artigos | Mover artigos | Mesma inconsistência de Title Case; o botão `dialog.changeFolder.no`, na mesma tela, já usa a capitalização correta. |
