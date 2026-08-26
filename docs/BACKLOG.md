@@ -23,8 +23,8 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlog, which are deferred past this release.
 
-- **Phase A — ship this release.** Close FAB-163 (done, see [DONE.md](DONE.md)) and FAB-164 (blocked on Fabio smoke-testing a real GoodLinks export — can't be verified without it), then work FAB-150's remaining Store & compliance checklist. Draft ASC copy, App Review notes, and privacy/age-rating answers are in [APP_STORE_LISTING.md](APP_STORE_LISTING.md), awaiting Fabio's review before submission.
-- **Phase B — localization (FAB-275).** Steps 1–7 done (step 7 signed off by Fabio 2026-08-25, one correction applied — see step 7 below). Step 8 (App Store metadata localization + Québec Bill 96 compliance) remains, plus the FAB-284 language-picker UX decision. (FAB-283 copy-wiring fix already shipped 2026-06-21, see [DONE.md](DONE.md); the open checklist entry that duplicated it was stale bookkeeping, removed 2026-08-25.)
+- **Phase A — ship this release.** FAB-163 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: FAB-164 (blocked on Fabio smoke-testing a real GoodLinks export) and the final binary submission itself.
+- **Phase B — localization (FAB-275).** Steps 1–7 done (step 7 signed off by Fabio 2026-08-25, one correction applied — see step 7 below). Step 8 (App Store metadata localization + Québec Bill 96 compliance) is partially done: listing text drafted, Bill 96 posture decided (risk-accepted, not legally confirmed), but Fabio's own review of the listing text and the ASC submission itself are still open. FAB-284 language-picker UX decision also remains. (FAB-283 copy-wiring fix already shipped 2026-06-21, see [DONE.md](DONE.md); the open checklist entry that duplicated it was stale bookkeeping, removed 2026-08-25.)
 - **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -46,24 +46,24 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   - [x] Remove inert iCloud ubiquity container declaration (`NSUbiquitousContainers`)
   - [x] `PrivacyInfo.xcprivacy` manifests for app + Share Extension, audited against actual API/data usage
   - [x] Single-source app/extension version numbers (`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`)
-  - [x] App Store Connect app record created (public listing name "Version Reader" — "Verso" was taken; in-app branding/docs stay Verso)
+  - [x] App Store Connect app record created (public listing name `Verso Reader` as of 2026-08-25, renamed from the placeholder "Version Reader"; "Verso" alone was taken. In-app branding/docs stay "Verso")
   - [x] `xcodebuild archive` succeeds end to end for the `Verso` scheme with a Distribution identity
 
   ## Store & compliance
 
-  - [ ] App Store Connect metadata — subtitle, description, keywords, support URL (app record + listing name already done, see above)
+  - [x] App Store Connect metadata — subtitle (option 2), description, keywords, support URL — reviewed by Fabio and entered into ASC 2026-08-25
   - [x] Screenshots for required device classes — uploaded successfully 2026-08-25. The 2026-08-24 batch (1320×2868, 6.9") was correct; the earlier rejection was Fabio uploading into the wrong ASC slot (6.5" tab), not a dimension problem. See APP_STORE_LISTING.md.
-  - [ ] Privacy nutrition labels (App Store Connect questionnaire) — `PrivacyInfo.xcprivacy` manifest already done, see above
-  - [ ] Age rating questionnaire
+  - [x] Privacy nutrition labels (App Store Connect questionnaire) — entered into ASC 2026-08-25
+  - [x] Age rating questionnaire — completed in ASC 2026-08-25
 
-  Draft copy/answers for all four items above: [APP_STORE_LISTING.md](APP_STORE_LISTING.md) (2026-08-24) — needs Fabio's review before pasting into ASC.
+  Copy/answers for all items above: [APP_STORE_LISTING.md](APP_STORE_LISTING.md) — reviewed by Fabio and pasted into ASC 2026-08-25.
 
-  **Device targeting (2026-08-24):** `TARGETED_DEVICE_FAMILY` restricted to iPhone-only (`"1"`) across the `Verso`, `ShareExtension`, and `VersoTests` targets in `Verso/project.yml` — was universal (`"1,2"`, or unset defaulting to universal on the main target), which meant the app could install on iPad today despite FAB-131's iPad UI work being deferred. `ci.yml`'s fast smoke-check job destination changed from `platform=macOS,variant=Designed for iPad` (needs iPad idiom support to resolve) to `generic/platform=iOS`. **Not yet verified by a real CI run or `xcodebuild archive`** — needs a push/PR to confirm `ci.yml` still passes, and ideally one release.yml run before the next TestFlight build, before trusting this.
+  **Device targeting (2026-08-24):** `TARGETED_DEVICE_FAMILY` restricted to iPhone-only (`"1"`) across the `Verso`, `ShareExtension`, and `VersoTests` targets in `Verso/project.yml` — was universal (`"1,2"`, or unset defaulting to universal on the main target), which meant the app could install on iPad today despite FAB-131's iPad UI work being deferred. `ci.yml`'s fast smoke-check job destination changed from `platform=macOS,variant=Designed for iPad` (needs iPad idiom support to resolve) to `generic/platform=iOS`. **Verified 2026-08-25** — Claude Code confirmed both `ci.yml` jobs (Build Debug macOS, Build Release iOS device) passed green on PRs #326–#328, all merged after this change; no longer a risk.
 
   ## Release process
 
   - [x] TestFlight build for smoke testing — `release.yml` shipped successfully via GitHub Actions on 2026-08-23 (run `32651214255`, then a second run verifying the FAB-285–288 fixes and the pipeline optimization pass); the CI release path is proven, not just planned.
-  - [ ] App Review notes (Share Extension, iCloud folder access, etc.)
+  - [x] App Review notes (Share Extension, iCloud folder access, etc.) — pasted into ASC 2026-08-25
   - [ ] Final binary submission
   - [ ] **QA note:** Fabio develops locally against the iOS 27 SDK (Xcode 27 beta); the CI release pipeline (step 3) builds against the iOS 26 SDK. Different SDKs can change system-provided behavior (control appearance, default animations, layout metrics), so a local Debug build isn't a reliable stand-in for what ships. Treat the **TestFlight build itself as the QA artifact** — install and check it on a real device before promoting, don't sign off from local builds. This gap closes on its own once Xcode 27 reaches GA and local/CI converge.
 
@@ -248,14 +248,19 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   - [x] Import succeeds for minimal native-array fixture (same shape as public GoodLinks-Export.json converters).
   - [x] Legacy `{ "items": [...] }` + ISO dates path still works if present.
   - [x] GoodLinks array is not misclassified as Matter JSON (detector order / heuristics).
+  - [ ] Native-array path maps `readAt` → `Article.Status` (`.read` when non-null, `.unread` otherwise), same as the legacy path already does.
 
   ## Implementation
 
   Parser update in `Verso/Sources/Services/Import/GoodLinksParser.swift`. Regression tests added to `Verso/VersoTests/GoodLinksParserTests.swift` (2026-06-12).
 
-  **⚠️ Needs real-file smoke test before closing:**
-  - Run import with an actual GoodLinks JSON export (native top-level array format)
-  - Verify articles appear in the library with correct titles, dates, and tags
+  **Real-file check, 2026-08-26 (Fabio's actual export, `GoodLinks-Export-2026-08-25-20-25.json`, 485 items):** structure matches the native-array path exactly (top-level array, `url` + numeric `addedAt` per row) — `canParse`/`parse` should classify and decode it correctly. 481/485 items would import; 4 have no `title` in the source data (all PDFs/anchor-fragment URLs GoodLinks never resolved a title for) and get silently dropped by `mapNativeBookmarks`'s title-required `compactMap` — expected/acceptable, no fix needed. Tags round-trip correctly (60/485 items have tags).
+
+  **Bug found, not previously covered by acceptance criteria:** 86/485 items (~18%) have a non-null `readAt` in the export (i.e. were actually read in GoodLinks), but `mapNativeBookmarks` never reads `readAt` — it hardcodes every native-array import to `.unread`. Only `mapLegacyItems` (the `{"items": [...]}` path) checks `readAt`. Fix: mirror that same `readAt != nil ? .read : .unread` logic inside `mapNativeBookmarks`. New acceptance criterion added above.
+
+  **⚠️ Still needs before closing:**
+  - Fix the `readAt` → status mapping gap above.
+  - Run the actual import through the Verso app UI with this real file (the check above was structural/logic-level against the parser code, not a live on-device import) — confirm articles appear with correct titles, dates, tags, and (once fixed) read/unread status.
 
 
 ## Web
@@ -515,4 +520,4 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
         **Phase A prep (2026-06-21):** codegen now correctly handles `filter.archived.accessibilityLabel` in TRUE_PLURAL_KEYS (was missing, producing "Archived, 1 articles"); `OnboardingThemePickerView` wired to `L10n.*` (FAB-283); `QuickTourView` rebuilt as 3-step carousel with Skip (FAB-281); Obsidian tip added to `OnboardingFolderPickerView` (FAB-280); `AboutView` rebuilt per spec + new `AcknowledgementsView` (FAB-279); font-size abbreviation labels translated per locale; `settings.fontSize.valueLabel` key added for "pt" suffix; 10 retired interim keys cleaned up. All changes verified via Web build. See DONE.md for completed issues.*
   - [x] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** *Blocked by 6.* Québec French + Brazilian Portuguese. Verify plurals (esp. the 0-case), accents, and that **OpenDyslexic** renders ç ã õ â ê é à ü at all six reading sizes. *Done: both locales fully translated and QA'd.* — **Done 2026-08-25.** Fabio reviewed and approved both `docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md` (no corrections) and `..._pt-BR.md` (one correction: `readerSettings.fontSize.xxl` pt-BR abbreviation changed from `EEG` — collided with the medical abbreviation for electroencephalogram — to `GGG`, extending the existing G/GG pattern from L/XL rather than switching to the review's originally-suggested `XG`). Applied directly to `docs/copy/UI_COPY.md` and regenerated `Localizable.xcstrings`/`L10n.swift`/`verso-web/messages/*.json` via `docs/copy/codegen/generate.py` — zero drift otherwise.
-  - [ ] **8 · App Store metadata + Québec/Bill 96.** *Blocked by 7.* Localize store listing (name, subtitle, description, keywords, screenshots) for fr-CA + pt-BR; confirm Québec French-language compliance posture for distribution. *Done: localized listings ready; compliance confirmed.*
+  - [ ] **8 · App Store metadata + Québec/Bill 96.** *Blocked by 7.* Localize store listing (name, subtitle, description, keywords, screenshots) for fr-CA + pt-BR; confirm Québec French-language compliance posture for distribution. *Done: localized listings ready; compliance confirmed.* — **Partially done, 2026-08-25.** fr-CA/pt-BR listing text drafted (`docs/APP_STORE_LISTING_LOCALIZED.md`, PR #330, merged). Bill 96 compliance posture: Fabio decided to treat the existing fr-CA in-app translation as sufficient for now, without seeking formal legal confirmation — a provisional, risk-accepted call, not a resolved legal question. **Still open:** Fabio hasn't reviewed/signed off on the localized *listing text itself* the way he did the in-app strings for step 7; the ASC "Name" field per-storefront decision is undecided; and pasting the fr-CA/pt-BR listing into App Store Connect is still a manual step for Fabio, same as the English one.
