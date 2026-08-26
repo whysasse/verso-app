@@ -6,7 +6,7 @@
 
 **Invariant terms kept as-is in both locales** (per `docs/LOCALIZATION.md` §4): `Verso` · `Obsidian` · `iCloud Drive` · `Markdown` · `Safari` · `GitHub` · `OpenDyslexic` · `New York` · `San Francisco` · `Georgia` (font names) · `Chrome` · `Pocket` · `Instapaper` · `GoodLinks` (product names) · `YAML`. Theme *labels* are translated (Papier/Sépia/Nuit/Encre — Papel/Sépia/Noite/Tinta), matching `docs/LOCALIZATION.md` §5.
 
-**App name field:** the ASC record is registered as `Version Reader` (English) because `Verso` was already taken — see `APP_STORE_LISTING.md`. Kept as `Version Reader` in both locales below rather than translating a registered product name. ASC does let you set a different localized "Name" per language if you'd rather have a French/Portuguese storefront name instead — that's a call for Fabio, not assumed here.
+**App name field:** the ASC record name is `Verso Reader` — renamed from the placeholder `Version Reader` per Fabio's decision, 2026-08-25 — used consistently across all locales (English, fr-CA, pt-BR), not translated per storefront. See `APP_STORE_LISTING.md`.
 
 ---
 
@@ -122,7 +122,7 @@ Salve seus artigos como arquivos Markdown no seu próprio iCloud Drive. Funciona
 
 ## Open items
 
-- [ ] Fabio review/edit both translations — this doc has not been through a linguistic-review pass the way `UI_COPY.md` was (see `docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md` / `_pt-BR.md`, still awaiting his sign-off themselves per FAB-275 step 7).
-- [ ] Confirm subtitle option #2 is still the one Fabio wants — picked during this session; the base `APP_STORE_LISTING.md` doc still needs its own subtitle checkbox resolved.
-- [ ] Decide whether the ASC "Name" field should also be localized per-storefront, or stay `Version Reader` everywhere.
-- [ ] **Québec Bill 96 compliance posture — not addressed here.** Whether shipping a French Québec storefront listing triggers any additional French-language requirement under Bill 96 for app distribution needs Fabio's (or a lawyer's) call before this is submitted. Tracked as open in `docs/BACKLOG.md` FAB-275 step 8.
+- [x] Fabio review/edit both translations — reviewed and approved as drafted, 2026-08-25. Pasted into App Store Connect the same day.
+- [x] Confirm subtitle option #2 is still the one Fabio wants — confirmed, and now also reflected in the base `APP_STORE_LISTING.md` doc.
+- [x] Decide whether the ASC "Name" field should also be localized per-storefront, or stay one name everywhere — decided 2026-08-25: `Verso Reader`, everywhere, no per-locale variation.
+- [x] **Québec Bill 96 compliance posture — decided by Fabio, 2026-08-25.** Provisional call: having a complete fr-CA in-app translation already shipped is treated as sufficient for now; no formal legal consultation sought at this time. This is a risk-accepted judgment call, not a confirmed legal clearance — the specific question of whether the App Store *listing itself* (vs. the app) must also be in French to comply with Bill 96 was researched but not authoritatively resolved (see the Cowork session's 2026-08-25 research summary). Revisit with an actual Québec consumer/language-law read if this ever becomes higher-stakes (e.g. a compliance complaint, or before a much larger user base). Tracked as resolved-for-now in `docs/BACKLOG.md` FAB-275 step 8.

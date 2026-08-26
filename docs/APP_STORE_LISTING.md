@@ -1,8 +1,8 @@
 # Verso — App Store Connect Listing Draft (FAB-150)
 
-**Status:** Draft for Fabio's review. Nothing here is submitted — copy it into App Store Connect once you're happy with it, or edit in place and tell me what to change.
+**Status:** Reviewed by Fabio and entered into App Store Connect 2026-08-25 (subtitle, description, keywords, privacy nutrition labels, age rating, and App Review notes all pasted in). Only the final binary submission for review is still pending.
 
-**Public listing name:** `Version Reader` (App Store Connect record already created under this name — "Verso" was taken. In-app branding, docs, and this file all keep saying "Verso" for everything except the literal App Store name field.)
+**Public listing name:** `Verso Reader` — renamed from the placeholder `Version Reader` per Fabio's decision, 2026-08-25, to be used consistently across all storefronts/locales (no per-locale name). In-app branding, docs, and this file otherwise keep saying "Verso" everywhere except the literal App Store name field.
 
 ---
 
@@ -10,11 +10,9 @@
 
 Pick one, or tell me the angle you'd rather hit:
 
-1. **"Read & save, as Markdown files"** (30 chars) — leads with the mechanism
-2. **"Your articles, saved as files"** (29 chars) — leads with ownership
-3. **"Markdown articles, your files"** (29 chars) — similar, "Markdown" first
-
-I'd lean toward #1 or #2 — "file-first" is the actual differentiator per `PROJECT_STATUS.md`, and Obsidian users searching the App Store are more likely to stop on "Markdown" or "files" than on generic reading-app language.
+1. "Read & save, as Markdown files" (30 chars) — leads with the mechanism
+2. **"Your articles, saved as files"** (29 chars) — leads with ownership ← **Fabio's pick, confirmed 2026-08-25, entered into ASC**
+3. "Markdown articles, your files" (29 chars) — similar, "Markdown" first
 
 ---
 
@@ -136,10 +134,10 @@ No device frames or marketing overlays — raw captures only, as scoped.
 
 ## Open items before this can actually be submitted
 
-- [ ] Fabio picks a subtitle
-- [ ] Fabio reviews/edits the description and keywords
+- [x] Fabio picks a subtitle — option 2, "Your articles, saved as files" (2026-08-25)
+- [x] Fabio reviews/edits the description and keywords — confirmed as drafted (2026-08-25)
 - [x] Screenshots — uploaded successfully 2026-08-25 (original 1320×2868 set; the earlier rejection was the wrong ASC tab, not the images)
-- [ ] Privacy nutrition labels entered in ASC (draft above)
-- [ ] Age rating questionnaire completed in ASC (draft above, verify against live form)
-- [ ] App Review notes pasted into ASC
+- [x] Privacy nutrition labels entered in ASC (2026-08-25, per the draft above)
+- [x] Age rating questionnaire completed in ASC (2026-08-25, per the draft above)
+- [x] App Review notes pasted into ASC (2026-08-25)
 - [ ] Final binary submitted for review
