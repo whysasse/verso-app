@@ -100,6 +100,7 @@ struct GoodLinksParser: ImportFileParser {
 
             let tags = (row["tags"] as? [String]) ?? []
             let dateAdded = dateFromAddedAt(row["addedAt"]) ?? Date()
+            let status: Article.Status = dateFromAddedAt(row["readAt"]) != nil ? .read : .unread
 
             return ParsedArticle(
                 id: nil,
@@ -110,7 +111,7 @@ struct GoodLinksParser: ImportFileParser {
                 tags: tags.isEmpty ? nil : tags,
                 scrollPosition: nil,
                 dateAdded: dateAdded,
-                status: .unread,
+                status: status,
                 author: nil,
                 siteName: nil
             )

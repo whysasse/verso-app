@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**167 completed issues.**
+**168 completed issues.**
 
 ## iOS
 
@@ -20,6 +20,32 @@
   **Docs:** `docs/copy/UI_COPY.md` (share.duplicate.\*), `docs/ANALYTICS_STRATEGY.md`.
 
   Verified 2026-08-24: both write paths (`AddArticleView.replaceArticleInLibrary` / `applyDuplicateCopy` and `PendingArticleIngester`) confirmed wired to `MarkdownWriter.replaceArticle`; share extension prompt (`ShareViewModel.duplicatePrompt`) confirmed present. Completed 2026-08-24.
+
+- [x] 🟡 **FAB-164** · Fix GoodLinks JSON backup import (native export format)  `Done` `Medium`
+  ## Root cause
+
+  GoodLinks exports a **top-level JSON array** of bookmarks with `addedAt` as a numeric Unix timestamp (`url`, `title`, `tags`, etc.). Verso only matched a **dictionary** with `items` and ISO strings `created_at` / `read_at`, so real backups failed `canParse` → unsupported format or bad decode. Fixed 2026-06-12.
+
+  **Real-file smoke test (2026-08-25), against Fabio's actual export (`GoodLinks-Export-2026-08-25-20-25.json`, 485 items):** structure matches the native-array path exactly (top-level array, `url` + numeric `addedAt` per row) and classifies/decodes correctly. 481/485 items would import; 4 have no `title` in the source data at all (all PDFs/anchor-fragment URLs GoodLinks never resolved a title for) and get silently dropped by `mapNativeBookmarks`'s title-required `compactMap` — expected/acceptable, no fix needed. Tags round-trip correctly (60/485 items have tags).
+
+  **Bug found:** 86/485 items (~18%) have a non-null `readAt` in the export (i.e. were actually read in GoodLinks), but `mapNativeBookmarks` hardcoded every native-array import's status to `.unread` and never read any read-status field from the row, even though the sibling legacy `{ "items": [...] }` path correctly derived `.read` vs `.unread` from `readAt`. This meant all importable articles would land as unread instead of the true 86 read / 395 unread split.
+
+  ## Fix (2026-08-26)
+
+  `mapNativeBookmarks` now computes `status` the same way `dateFromAddedAt` already parses `addedAt`: `.read` when `row["readAt"]` decodes to a numeric timestamp (Double or Int), `.unread` otherwise. The real export's native rows carry `readAt` as a Unix timestamp, not the ISO string the legacy path expects — no `Date` parsing needed, presence is enough.
+
+  ## Acceptance criteria
+
+  - [x] Import succeeds for minimal native-array fixture (same shape as public GoodLinks-Export.json converters).
+  - [x] Legacy `{ "items": [...] }` + ISO dates path still works if present.
+  - [x] GoodLinks array is not misclassified as Matter JSON (detector order / heuristics).
+  - [x] Native-array rows with a numeric `readAt` import as `.read`; rows without it import as `.unread`.
+
+  ## Implementation
+
+  Parser update in `Verso/Sources/Services/Import/GoodLinksParser.swift`. Regression tests in `Verso/VersoTests/GoodLinksParserTests.swift` (`testNativeTopLevelArrayParses` for the no-`readAt` → `.unread` case, added 2026-06-12; `testNativeTopLevelArrayWithReadAtParsesAsRead` for the numeric-`readAt` → `.read` case, added 2026-08-26). Full `VersoTests` suite (27 tests) passes.
+
+  **Real-file recheck (2026-08-26):** ran the app's actual import pipeline (`ImportFormatDetector` → `GoodLinksParser` → `MarkdownWriter` → Core Data insert) against Fabio's real GoodLinks export (`GoodLinks-Export-2026-08-25-20-25.json`, 485 rows, kept local/untracked per privacy — not committed) via an isolated in-memory Core Data store. Result: 481 articles imported (4 rows have no `title` key at all — genuinely untitled GoodLinks bookmarks, correctly dropped), split **86 read / 395 unread**, matching the source data's 86 non-null `readAt` rows exactly. Titles, dates, and tags all came through correctly.
 
 - [x] 🔴 **FAB-9** · [ARCH] Define Article Core Data model  `Done` `Urgent`
   Create the Core Data entity for Article with fields: id (UUID), filePath (String), title (String), url (String), status (String: unread/reading/read), dateAdded (Date), source (String). This is a cache only — never the source of truth.
