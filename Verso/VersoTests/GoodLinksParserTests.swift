@@ -57,6 +57,29 @@ final class GoodLinksParserTests: XCTestCase {
         XCTAssertEqual(articles[0].dateAdded.timeIntervalSince1970, expected.timeIntervalSince1970, accuracy: 0.001)
     }
 
+    func testNativeTopLevelArrayWithReadAtParsesAsRead() throws {
+        let url = try writeJSON(
+            """
+            [
+              {
+                "url": "https://example.com/a",
+                "title": "Article A",
+                "tags": ["swift", "ios"],
+                "addedAt": 1715376000.5,
+                "readAt": 1715380000.0,
+                "starred": false,
+                "summary": ""
+              }
+            ]
+            """
+        )
+        let parser = GoodLinksParser()
+        XCTAssertTrue(parser.canParse(url))
+        let articles = try parser.parse(url)
+        XCTAssertEqual(articles.count, 1)
+        XCTAssertEqual(articles[0].status, .read)
+    }
+
     func testNativeBookmarksWrappedInItemsObject() throws {
         let url = try writeJSON(
             """

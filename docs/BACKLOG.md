@@ -23,8 +23,8 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlog, which are deferred past this release.
 
-- **Phase A — ship this release.** FAB-163 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: FAB-164 (blocked on Fabio smoke-testing a real GoodLinks export) and the final binary submission itself.
-- **Phase B — localization (FAB-275).** Steps 1–7 done (step 7 signed off by Fabio 2026-08-25, one correction applied — see step 7 below). Step 8 (App Store metadata localization + Québec Bill 96 compliance) is partially done: listing text drafted, Bill 96 posture decided (risk-accepted, not legally confirmed), but Fabio's own review of the listing text and the ASC submission itself are still open. FAB-284 language-picker UX decision also remains. (FAB-283 copy-wiring fix already shipped 2026-06-21, see [DONE.md](DONE.md); the open checklist entry that duplicated it was stale bookkeeping, removed 2026-08-25.)
+- **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
+- **Phase B — localization (FAB-275).** Steps 1–8 done. Step 7 signed off by Fabio 2026-08-25 (one correction applied — see step 7 below). Step 8 (App Store metadata localization + Québec Bill 96 compliance) is also done as of 2026-08-25: listing text drafted, reviewed and approved by Fabio, entered into App Store Connect; Bill 96 posture decided (risk-accepted, not legally confirmed — see `APP_STORE_LISTING_LOCALIZED.md`). Only FAB-284 (language-picker UX decision) remains open in this phase. (FAB-283 copy-wiring fix already shipped 2026-06-21, see [DONE.md](DONE.md); the open checklist entry that duplicated it was stale bookkeeping, removed 2026-08-25.)
 - **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -234,33 +234,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   ## Blocked by
 
   [FAB-156](https://linear.app/fabiosasseron/issue/FAB-156/phase-4-article-list-adaptive-layout-ipad-compact), [FAB-157](https://linear.app/fabiosasseron/issue/FAB-157/phase-4-reading-view-split-behavior-680pt-column), [FAB-158](https://linear.app/fabiosasseron/issue/FAB-158/phase-4-settings-and-modals-on-ipad), [FAB-159](https://linear.app/fabiosasseron/issue/FAB-159/phase-4-onboarding-and-launch-on-ipad), [FAB-160](https://linear.app/fabiosasseron/issue/FAB-160/phase-4-add-article-tags-sheet-on-ipad), [FAB-161](https://linear.app/fabiosasseron/issue/FAB-161/phase-4-share-extension-adaptive-ui) (share extension)
-
-
-### Phase 1 — Foundation
-
-- [ ] 🟡 **FAB-164** · Fix GoodLinks JSON backup import (native export format)  `In Review` `Medium`
-  ## Root cause
-
-  GoodLinks exports a **top-level JSON array** of bookmarks with `addedAt` as a numeric Unix timestamp (`url`, `title`, `tags`, etc.). Verso only matched a **dictionary** with `items` and ISO strings `created_at` / `read_at`, so real backups failed `canParse` → unsupported format or bad decode.
-
-  ## Acceptance criteria
-
-  - [x] Import succeeds for minimal native-array fixture (same shape as public GoodLinks-Export.json converters).
-  - [x] Legacy `{ "items": [...] }` + ISO dates path still works if present.
-  - [x] GoodLinks array is not misclassified as Matter JSON (detector order / heuristics).
-  - [ ] Native-array path maps `readAt` → `Article.Status` (`.read` when non-null, `.unread` otherwise), same as the legacy path already does.
-
-  ## Implementation
-
-  Parser update in `Verso/Sources/Services/Import/GoodLinksParser.swift`. Regression tests added to `Verso/VersoTests/GoodLinksParserTests.swift` (2026-06-12).
-
-  **Real-file check, 2026-08-26 (Fabio's actual export, `GoodLinks-Export-2026-08-25-20-25.json`, 485 items):** structure matches the native-array path exactly (top-level array, `url` + numeric `addedAt` per row) — `canParse`/`parse` should classify and decode it correctly. 481/485 items would import; 4 have no `title` in the source data (all PDFs/anchor-fragment URLs GoodLinks never resolved a title for) and get silently dropped by `mapNativeBookmarks`'s title-required `compactMap` — expected/acceptable, no fix needed. Tags round-trip correctly (60/485 items have tags).
-
-  **Bug found, not previously covered by acceptance criteria:** 86/485 items (~18%) have a non-null `readAt` in the export (i.e. were actually read in GoodLinks), but `mapNativeBookmarks` never reads `readAt` — it hardcodes every native-array import to `.unread`. Only `mapLegacyItems` (the `{"items": [...]}` path) checks `readAt`. Fix: mirror that same `readAt != nil ? .read : .unread` logic inside `mapNativeBookmarks`. New acceptance criterion added above.
-
-  **⚠️ Still needs before closing:**
-  - Fix the `readAt` → status mapping gap above.
-  - Run the actual import through the Verso app UI with this real file (the check above was structural/logic-level against the parser code, not a live on-device import) — confirm articles appear with correct titles, dates, tags, and (once fixed) read/unread status.
 
 
 ## Web
