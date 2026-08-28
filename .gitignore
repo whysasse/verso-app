@@ -80,3 +80,10 @@ Verso/Secrets.xcconfig
 # Stray scratch files left in sandboxed sessions (filesystem quirk prevents deletion;
 # renamed with a leading dot instead so they stop showing up as untracked)
 docs/copy/.ignore_*
+
+# SampleArticles/ is bundled into the app as a resource folder (see Verso/project.yml) —
+# its 14 tracked .md files are intentional demo/seed content. Real import-test fixtures
+# (GoodLinks/Pocket/Instapaper exports dropped in for a smoke test) are JSON/CSV, never
+# meant to ship in the bundle or be committed — ignore those, not the curated .md files.
+SampleArticles/*.json
+SampleArticles/*.csv
