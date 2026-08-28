@@ -1950,7 +1950,24 @@
   - [x] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** Fabio reviewed and approved both `docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md` (no corrections) and `..._pt-BR.md` (one correction: `readerSettings.fontSize.xxl` pt-BR abbreviation changed from `EEG` — collided with the medical abbreviation for electroencephalogram — to `GGG`). Applied to `docs/copy/UI_COPY.md`; regenerated `Localizable.xcstrings`/`L10n.swift`/`verso-web/messages/*.json` with zero drift otherwise. — **Done 2026-08-25.**
   - [x] **8 · App Store metadata + Québec/Bill 96.** fr-CA/pt-BR listing text drafted (`docs/APP_STORE_LISTING_LOCALIZED.md`), reviewed and approved by Fabio, and pasted into App Store Connect 2026-08-25. ASC "Name" field decided: `Verso Reader`, everywhere, no per-locale variation. Bill 96 compliance posture decided by Fabio: the existing complete fr-CA in-app translation is treated as sufficient for now — a provisional, risk-accepted call, not a formal legal clearance; revisit if this ever becomes higher-stakes. — **Done 2026-08-25.**
 
-  **Completed:** 2026-08-25. Only [FAB-284](BACKLOG.md) (language picker, a separate follow-up issue) remains open from this area.
+  **Completed:** 2026-08-25. FAB-284 (language picker, a separate follow-up issue — see below) shipped 2026-08-28.
+
+- [x] 🟢 **FAB-284** · Language picker (iOS + Web)  `Done` `Low`
+  Explicit override so a user can pick `en` / `fr-CA` / `pt-BR` regardless of device/browser language, instead of relying solely on auto-detection.
+
+  **UX decisions (Fabio, 2026-08-28):** new **General** section in Settings, above Reading (language is app-wide, not reading-specific) — a dedicated section rather than folding it into Reading or pushing to its own screen. Picker style matches the existing Font picker: stacked rows with a filled selection dot, not the Theme picker's swatch style. Includes a 4th **Automatic** option to revert to auto-detection after overriding. Language changes require a restart to take effect (standard "restart to apply" prompt) rather than building a live Bundle-swap layer for a rarely-used setting.
+
+  **iOS:** new `LocaleManager` (`Verso/Sources/Services/LocaleManager.swift`) mirrors `ThemeManager`'s persistence pattern, writing the standard `AppleLanguages` UserDefaults override (Apple's own supported mechanism — no `exit()` call, which risks an App Store review flag). New `SettingsRowType.language` case renders the stacked-row-with-dot style. `SettingsView` gained a General section with the four options; picking one shows an alert ("Restart Verso") rather than force-quitting the app itself.
+
+  **Web:** `LocaleProvider` gained the `setLocale` it was already scaffolded for (see the FAB-275 step 5 comment that named this exact follow-up) — writes the `verso-locale` cookie, or clears it for Automatic (the existing first-visit detection effect already re-runs whenever the cookie is absent, so no separate code path was needed), then `router.refresh()`. New `LanguageSwitcher` sits next to the existing `ThemeSwitcher` on the article list page.
+
+  **Copy:** 9 new keys added to `docs/copy/UI_COPY.md` (`settings.section.general`, `settings.language.*`, `language.*`) and regenerated into `Localizable.xcstrings`/`L10n.swift`/`verso-web/messages/*.json` — 286 keys total, no warnings. The four language names (`language.en/frCA/ptBR`, plus `language.automatic`) are shown as autonyms — each language's own name in its own language, e.g. "Français (Canada)" stays "Français (Canada)" regardless of active UI language — matching the platform convention Apple's own Language & Region picker uses, so a reader scanning in any language recognizes their own. **Not yet through the formal linguistic-review pass** FAB-275 step 7 gave the rest of the file (`UI_COPY_LINGUISTIC_REVIEW_fr-CA.md`/`_pt-BR.md`) — worth a look before relying on the fr-CA/pt-BR restart-prompt wording.
+
+  **Known gap, out of scope for this pass:** the Share Extension target doesn't pick up the override — `AppleLanguages` is set via `UserDefaults.standard`, which is scoped per-target, and the Share Extension is a separate target/process from the main app. It'll keep following the system language until reopened with the override also written to the shared App Group suite. Flagged for a possible fast-follow, not fixed here.
+
+  **Verified:** `xcodebuild` for the `Verso` scheme (Debug, iOS Simulator) — build succeeded, no new warnings. `cd verso-web && npx tsc --noEmit` and `npm run build` — both clean.
+
+  **Completed:** 2026-08-28.
 
 ## Repo Admin
 

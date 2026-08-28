@@ -361,6 +361,22 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `settings.analytics.rowLabel` | Row label, analytics toggle | Share anonymous data | Partager des données anonymes | Compartilhar dados anônimos | — |
 | `settings.analytics.subtitle` | Row sub-label, analytics toggle | No personal info or article content, ever. | Aucune information personnelle ni contenu d'article, jamais. | Nenhuma informação pessoal ou conteúdo de artigo, nunca. | — |
 
+### Language Picker (FAB-284)
+
+> Added for FAB-284 (in-app language picker, iOS + Web). New **General** section sits above **Reading** in Settings. `fr-CA`/`pt-BR` translations below are a first draft — they have not been through the formal linguistic-review pass FAB-275 step 7 gave the rest of this file (see `docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md` / `_pt-BR.md`); worth a look before this ships.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `settings.section.general` | Section header | General | Général | Geral | New section, sits above `settings.section.reading`. |
+| `settings.language.sectionLabel` | Section label above language list | Language | Langue | Idioma | — |
+| `language.automatic` | Language option label | Automatic | Automatique | Automático | Reverts to auto-detecting the device/browser language rather than pinning one. |
+| `language.en` | Language option label | English | English | English | Autonym, invariant — language names in a picker are shown in their own language regardless of active UI locale (matches Apple's own Language & Region picker), so a reader scanning in any language still recognizes their own. |
+| `language.frCA` | Language option label | Français (Canada) | Français (Canada) | Français (Canada) | Autonym, invariant — see `language.en`. |
+| `language.ptBR` | Language option label | Português (Brasil) | Português (Brasil) | Português (Brasil) | Autonym, invariant — see `language.en`. |
+| `settings.language.restartTitle` | Alert title, shown after picking a different language | Restart Verso | Redémarrer Verso | Reiniciar o Verso | True in-app language switching without relaunch isn't supported — closing/reopening is required for the new language to take effect. |
+| `settings.language.restartMessage` | Alert message | Close and reopen the app to apply your language change. | Ferme et rouvre l'appli pour appliquer ton changement de langue. | Feche e reabra o app para aplicar a mudança de idioma. | — |
+| `settings.language.restartButton` | Alert dismiss button | OK | OK | OK | — |
+
 ### Privacy Policy Screen
 
 > Added during step 4 view-wiring pass — the destination screen opened by `settings.privacyPolicy.rowLabel` / `about.privacyPolicyLinkLabel` had no key of its own for its nav bar title.

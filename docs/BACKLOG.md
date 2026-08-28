@@ -17,14 +17,14 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**24 open issues** across iOS, Web, Design, and Infra.
+**23 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
 Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlog, which are deferred past this release.
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
-- **Phase B — localization (FAB-275).** Steps 1–8 done. Step 7 signed off by Fabio 2026-08-25 (one correction applied — see step 7 below). Step 8 (App Store metadata localization + Québec Bill 96 compliance) is also done as of 2026-08-25: listing text drafted, reviewed and approved by Fabio, entered into App Store Connect; Bill 96 posture decided (risk-accepted, not legally confirmed — see `APP_STORE_LISTING_LOCALIZED.md`). Only FAB-284 (language-picker UX decision) remains open in this phase. (FAB-283 copy-wiring fix already shipped 2026-06-21, see [DONE.md](DONE.md); the open checklist entry that duplicated it was stale bookkeeping, removed 2026-08-25.)
+- **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
 - **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -464,10 +464,4 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   No app implementation yet — tracking only.
 
 
-- [ ] 🟢 **FAB-284** · Language picker (iOS + Web)  `Backlog` `Low`
-  Both platforms currently resolve their locale automatically (iOS: device system language; Web, once step 5 lands: browser language via a cookie) with no in-app override. Add an explicit picker so a user can choose `en` / `fr-CA` / `pt-BR` regardless of device/browser language.
-
-  **iOS:** likely lives in Settings, alongside the existing theme picker. **Web:** `LocaleProvider` (see `docs/plans/FAB-275-step5-web-i18n-infra.md`, step 3) is deliberately shaped the same way as `ThemeProvider` so adding a `setLocale` + a switcher (mirroring the existing `ThemeSwitcher`) is a small diff, not a rewrite, once this is picked up.
-
-  Filed as a deliberate follow-up — both platforms localize correctly via auto-detection without this. Where it lives in the UI is a UX call for Fabio, not a technical one.
 

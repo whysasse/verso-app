@@ -4429,6 +4429,222 @@
         }
       }
     },
+    "settings.section.general": {
+      "extractionState": "manual",
+      "comment": "New section, sits above `settings.section.reading`.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Général"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Geral"
+          }
+        }
+      }
+    },
+    "settings.language.sectionLabel": {
+      "extractionState": "manual",
+      "comment": "Section label above language list",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Langue"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Idioma"
+          }
+        }
+      }
+    },
+    "language.automatic": {
+      "extractionState": "manual",
+      "comment": "Reverts to auto-detecting the device/browser language rather than pinning one.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Automatique"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Automático"
+          }
+        }
+      }
+    },
+    "language.en": {
+      "extractionState": "manual",
+      "comment": "Autonym, invariant — language names in a picker are shown in their own language regardless of active UI locale (matches Apple's own Language & Region picker), so a reader scanning in any language still recognizes their own.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        }
+      }
+    },
+    "language.frCA": {
+      "extractionState": "manual",
+      "comment": "Autonym, invariant — see `language.en`.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français (Canada)"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français (Canada)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français (Canada)"
+          }
+        }
+      }
+    },
+    "language.ptBR": {
+      "extractionState": "manual",
+      "comment": "Autonym, invariant — see `language.en`.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português (Brasil)"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português (Brasil)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português (Brasil)"
+          }
+        }
+      }
+    },
+    "settings.language.restartTitle": {
+      "extractionState": "manual",
+      "comment": "True in-app language switching without relaunch isn't supported — closing/reopening is required for the new language to take effect.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restart Verso"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Redémarrer Verso"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Reiniciar o Verso"
+          }
+        }
+      }
+    },
+    "settings.language.restartMessage": {
+      "extractionState": "manual",
+      "comment": "Alert message",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close and reopen the app to apply your language change."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ferme et rouvre l'appli pour appliquer ton changement de langue."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Feche e reabra o app para aplicar a mudança de idioma."
+          }
+        }
+      }
+    },
+    "settings.language.restartButton": {
+      "extractionState": "manual",
+      "comment": "Alert dismiss button",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "OK"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "OK"
+          }
+        }
+      }
+    },
     "privacyPolicy.navTitle": {
       "extractionState": "manual",
       "comment": "Same text as `settings.privacyPolicy.rowLabel`, kept as a separate key since a nav title and a row label are different copy slots.",

@@ -14,12 +14,12 @@ const COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
 
 interface LocaleContextValue {
   locale: VersoLocale;
-  // No `setLocale` yet -- there's no in-app language picker on either platform today
-  // (see "Decision: no language picker yet" in
-  // docs/plans/FAB-275-step5-web-i18n-infra.md). This context is shaped like
-  // ThemeContext on purpose so adding one later (FAB-284) is a small diff, not a
-  // rewrite: wire a setter here that calls writeCookie + router.refresh(), mirroring
-  // useTheme's setTheme.
+  /** FAB-284: explicit language picker. Passing "automatic" clears the cookie
+   * instead of writing one -- the effect below already re-detects from
+   * `navigator.language` whenever the cookie is absent, so clearing it and
+   * refreshing is enough to fall back to auto-detection, no separate code path
+   * needed. */
+  setLocale: (locale: VersoLocale | "automatic") => void;
 }
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -31,6 +31,10 @@ function readCookie(name: string): string | undefined {
 
 function writeCookie(name: string, value: string) {
   document.cookie = `${name}=${value}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; samesite=lax`;
+}
+
+function clearCookie(name: string) {
+  document.cookie = `${name}=; path=/; max-age=0`;
 }
 
 function detectFromBrowser(): VersoLocale {
@@ -71,16 +75,25 @@ export function LocaleProvider({
     }
   }, [initialLocale, router]);
 
+  function setLocale(next: VersoLocale | "automatic") {
+    if (next === "automatic") {
+      clearCookie(COOKIE_NAME);
+    } else {
+      writeCookie(COOKIE_NAME, next);
+    }
+    router.refresh();
+  }
+
   return (
-    <LocaleContext.Provider value={{ locale: initialLocale }}>
+    <LocaleContext.Provider value={{ locale: initialLocale, setLocale }}>
       {children}
     </LocaleContext.Provider>
   );
 }
 
 /** Named to avoid colliding with next-intl's own `useLocale()` -- this one exposes our
- * app-level locale context (ready for a future `setLocale`), next-intl's is for reading
- * the active locale inside message formatting. */
+ * app-level locale context (locale + setLocale), next-intl's is for reading the active
+ * locale inside message formatting. */
 export function useVersoLocale(): LocaleContextValue {
   const ctx = useContext(LocaleContext);
   if (!ctx) {

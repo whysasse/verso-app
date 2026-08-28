@@ -5,6 +5,7 @@ enum SettingsRowType {
     case folder(label: String, path: String)
     case font(name: String, preview: String, isSelected: Bool)
     case theme
+    case language(name: String, isSelected: Bool)
 }
 
 struct SettingsRow: View {
@@ -37,6 +38,8 @@ struct SettingsRow: View {
             fontRow(name: name, preview: preview, isSelected: isSelected)
         case .theme:
             ThemeSelector()
+        case .language(let name, let isSelected):
+            languageRow(name: name, isSelected: isSelected)
         }
     }
 
@@ -91,6 +94,21 @@ struct SettingsRow: View {
             }
         }
         .frame(minHeight: 78)
+    }
+
+    private func languageRow(name: String, isSelected: Bool) -> some View {
+        HStack {
+            Text(name)
+                .font(VersoTypography.UI.input)
+                .foregroundColor(colors.textPrimary)
+            Spacer()
+            if isSelected {
+                Circle()
+                    .fill(colors.accent)
+                    .frame(width: 8, height: 8)
+            }
+        }
+        .frame(minHeight: 44)
     }
 }
 
