@@ -1928,6 +1928,30 @@
 
   **Completed:** 2026-06-21.
 
+## Localization — FAB-275 epic closeout
+
+- [x] 🟠 **FAB-275** · Localization: EN-CA, FR-CA, PT-BR (epic)  `Done` `High`
+  Shipped Verso in **EN-CA, FR-CA, and PT-BR** across iOS and Web.
+
+  Strategy and all decisions are documented in `docs/LOCALIZATION.md`; English base copy lives in `docs/copy/UI_COPY.md`.
+
+  **Key decisions (**`docs/LOCALIZATION.md`**):** `en-CA` aliases `en` (no separate bundle); plurals via CLDR (FR treats 0 as singular, PT-BR treats 0 as plural); theme *labels* translated but enum keys kept; per-locale font preview; no RTL.
+
+  ---
+
+  ### Ordered backlog (all steps complete)
+
+  - [x] **1 · Strategy & decisions doc** → [FAB-276](#) above. Ratified `docs/LOCALIZATION.md`; linked from `HANDOFF.md`. — **Done 2026-06-17.**
+  - [x] **2 · Locale-aware formatting** (dates, reading-time, TTS voice), iOS + Web. `WPM = 220` centralized in `ReadingEstimate.swift`; TTS voice follows content language in `TTSService.swift`; date style corrected `.long` → `.medium` in `ArticleHeader.swift`. — **Done 2026-06-21.**
+  - [x] **3 · Shared, platform-neutral string source.** `docs/copy/UI_COPY.md` carries full `en`/`fr-CA`/`pt-BR` columns for all ~262 keys; `docs/copy/codegen/generate.py` generates `Localizable.xcstrings` + `L10n.swift` from it (verified zero drift on regeneration). — **Done 2026-06-21.**
+  - [x] **4 · iOS i18n infrastructure.** `Localizable.xcstrings` + `L10n.swift` generated and registered in `project.yml` for `Verso` and `ShareExtension` targets (see FAB-282 above); ~20 views wired to `L10n.*`; CLDR plural variants encoded for the 7 true-plural keys. — **Done 2026-06-21.**
+  - [x] **5 · Web i18n infrastructure.** `next-intl` installed (cookie-based locale); `LocaleProvider` mirrors `ThemeProvider`; `generate.py` also emits `verso-web/messages/{en,fr-CA,pt-BR}.json`; all Web components wired to `useTranslations`, zero hardcoded UI strings. Two spots where Web hardcoded `en-CA` for dates regardless of active UI locale (`ArticleCard.tsx`, `article/[id]/page.tsx`) fixed to be locale-aware via `Intl.DateTimeFormat`. `npm run build` verified clean. — **Done 2026-06-21.**
+  - [x] **6 · Pseudolocalization + layout flex QA.** See "Phase B — Pseudolocalization & layout flex QA" above. — **Done 2026-06-21.**
+  - [x] **7 · FR-CA & PT-BR translation + linguistic/diacritic QA.** Fabio reviewed and approved both `docs/copy/UI_COPY_LINGUISTIC_REVIEW_fr-CA.md` (no corrections) and `..._pt-BR.md` (one correction: `readerSettings.fontSize.xxl` pt-BR abbreviation changed from `EEG` — collided with the medical abbreviation for electroencephalogram — to `GGG`). Applied to `docs/copy/UI_COPY.md`; regenerated `Localizable.xcstrings`/`L10n.swift`/`verso-web/messages/*.json` with zero drift otherwise. — **Done 2026-08-25.**
+  - [x] **8 · App Store metadata + Québec/Bill 96.** fr-CA/pt-BR listing text drafted (`docs/APP_STORE_LISTING_LOCALIZED.md`), reviewed and approved by Fabio, and pasted into App Store Connect 2026-08-25. ASC "Name" field decided: `Verso Reader`, everywhere, no per-locale variation. Bill 96 compliance posture decided by Fabio: the existing complete fr-CA in-app translation is treated as sufficient for now — a provisional, risk-accepted call, not a formal legal clearance; revisit if this ever becomes higher-stakes. — **Done 2026-08-25.**
+
+  **Completed:** 2026-08-25. Only [FAB-284](BACKLOG.md) (language picker, a separate follow-up issue) remains open from this area.
+
 ## Repo Admin
 
 - [x] GitHub Issues Housekeeping — Reconcile `whysasse/verso-app` after Linear migration  `Done`
