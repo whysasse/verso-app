@@ -147,6 +147,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | `Services/FolderBookmarkService.swift` | Persists iCloud folder security-scoped bookmark |
 | `Services/ICloudFileWatcher.swift` | Watches iCloud folder for file changes |
 | `Services/ReadingPreferencesService.swift` | Persists font, size, spacing preferences |
+| `Services/LocaleManager.swift` | Explicit UI-language override (FAB-284) — Automatic/English/Français (Canada)/Português (Brasil), writes the standard `AppleLanguages` UserDefaults key |
 | `Services/RelatedArticlesService.swift` | Finds related articles by tag/domain |
 | `Services/TTSService.swift` | Text-to-speech playback |
 | `Services/AnalyticsService.swift` | TelemetryDeck event logging |
@@ -209,6 +210,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | Full product requirements | `docs/PRD_MinimalistReaderApp.md` |
 | Web CSS tokens (authoritative source) | `verso-web/app/globals.css` |
 | Web theme provider implementation | `verso-web/app/providers/ThemeProvider.tsx` |
+| Web locale provider implementation, language picker (FAB-284) | `verso-web/app/providers/LocaleProvider.tsx` |
 
 ---
 

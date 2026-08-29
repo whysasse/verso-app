@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-08-28 | **PRD Version:** 1.7
+**Date:** 2026-08-29 | **PRD Version:** 1.7
 
 ---
 
@@ -54,8 +54,8 @@ The design system and all screen designs are **complete**. Implementation is act
 
 Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of record). Non-iPad work is sequenced into three phases as of 2026-08-24 (see BACKLOG.md's "Current sequencing" note for full detail):
 
-- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) closed 2026-08-26: a real-file smoke test surfaced a second bug (native-array imports always landed as `.unread`), fixed and reverified against Fabio's real export (86 read / 395 unread, matching the source data) — see `docs/DONE.md`. FAB-150 (App Store release checklist): signing, privacy manifest, and the CI release path are done — `release.yml` has shipped three real TestFlight builds via GitHub Actions (2026-08-23, 2026-08-25). The 2026-08-25 build carries the fix for a crash on launch/foreground found via the first two TestFlight builds' crash logs — see FAB-291 in `docs/DONE.md` for the root cause and fix. Store & compliance metadata, screenshots, App Review notes, and final submission remain; draft copy and answers for all of it are in `docs/APP_STORE_LISTING.md` (2026-08-24), awaiting Fabio's review.
-- **Phase B — localization (FAB-275).** Done 2026-08-25 — all 8 steps complete (see `docs/DONE.md`): FR-CA/PT-BR translated and linguistically QA'd, App Store metadata localized and pasted into App Store Connect, Québec Bill 96 posture decided (risk-accepted, not legally confirmed). Only FAB-284 (language picker, needs a UX placement decision) remains open in this area.
+- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) closed 2026-08-26: a real-file smoke test surfaced a second bug (native-array imports always landed as `.unread`), fixed and reverified against Fabio's real export (86 read / 395 unread, matching the source data) — see `docs/DONE.md`. FAB-150 (App Store release checklist): signing, privacy manifest, the CI release path, and Store & compliance metadata (subtitle, description, keywords, screenshots, privacy nutrition labels, age rating, App Review notes) are all done — Fabio reviewed and entered everything into App Store Connect 2026-08-25, see `docs/APP_STORE_LISTING.md`. Only the final binary submission itself remains.
+- **Phase B — localization (FAB-275).** Done 2026-08-25 — all 8 steps complete (see `docs/DONE.md`): FR-CA/PT-BR translated and linguistically QA'd, App Store metadata localized and pasted into App Store Connect, Québec Bill 96 posture decided (risk-accepted, not legally confirmed). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this area.
 - **Phase C (after launch) — polish backlog.** Highlighting (FAB-54), RSVP reading mode (FAB-277), VoiceOver progress announcement (FAB-278) — each needs a UX decision from Fabio before implementation.
 - **Phase 4 (deferred, excluded from this sequencing): iPad support** (FAB-131, FAB-154 → FAB-162).
 - First TestFlight round (FAB-285–288, 2026-08-23): fixed onboarding tour navigation, live file sync on foreground, stale status badges, and the "All" filter count including archived articles — all four caught during Fabio's own TestFlight testing.
@@ -93,7 +93,7 @@ The localization epic is broken into phases reflecting implementation ordering:
 | **Phase B** | Step 6 | Pseudolocalization + layout flex QA (Web pseudo-locale infra, ControlRow label fix) | ✅ Done 2026-06-21 |
 | **Phase C** | Step 7 | FR-CA & PT-BR translation + linguistic/diacritic QA | ✅ Done 2026-08-25 |
 | **Phase D** | Step 8 | App Store metadata + Québec/Bill 96 compliance | ✅ Done 2026-08-25 |
-| **Phase E** | FAB-284 (post-275) | Language picker (iOS + Web) | 🔲 Future |
+| **Phase E** | FAB-284 (post-275) | Language picker (iOS + Web) | ✅ Done 2026-08-28 |
 
 See `docs/BACKLOG.md` for detailed step checklists and `docs/DONE.md` for completed issues.
 
