@@ -178,18 +178,18 @@ struct ArticleListView: View {
 
     private var selectionHeaderRow: some View {
         HStack {
+            Text(L10n.Home.navTitle)
+                .font(VersoTypography.UI.screenTitle)
+                .foregroundColor(themeManager.colors.textPrimary)
+
+            Spacer()
+
             Button(L10n.Home.bulkSelectCancel) {
                 isSelecting = false
                 selectedArticleIds.removeAll()
             }
             .font(VersoTypography.UI.button)
             .foregroundColor(themeManager.colors.accent)
-
-            Spacer()
-
-            Text(L10n.Home.navTitle)
-                .font(VersoTypography.UI.screenTitle)
-                .foregroundColor(themeManager.colors.textPrimary)
         }
         .frame(height: 44)
     }
