@@ -142,7 +142,9 @@ enum ArticleStatus: String, CaseIterable {
     case read = "Read"
     case archived = "Archived"
 
-    /// Localized filter-chip label. `rawValue` stays a stable, English, non-localized
+    /// Localized label, e.g. `StatusBadge`'s `.archived` fallback below, and (as of FAB-292) the
+    /// article list's Unread/Read/Archived section headers, which call `L10n.Filter.*` directly
+    /// rather than through this property. `rawValue` stays a stable, English, non-localized
     /// identifier -- this is the only thing views should put in `Text(...)`.
     var filterLabel: String {
         switch self {
@@ -150,16 +152,6 @@ enum ArticleStatus: String, CaseIterable {
         case .reading:  return L10n.Filter.reading
         case .read:     return L10n.Filter.read
         case .archived: return L10n.Filter.archived
-        }
-    }
-
-    /// Localized VoiceOver label for a filter chip, e.g. "Unread, 5 articles".
-    func filterAccessibilityLabel(count: Int) -> String {
-        switch self {
-        case .unread:   return L10n.Filter.unreadAccessibilityLabel(count: count)
-        case .reading:  return L10n.Filter.readingAccessibilityLabel(count: count)
-        case .read:     return L10n.Filter.readAccessibilityLabel(count: count)
-        case .archived: return L10n.Filter.archivedAccessibilityLabel(count: count)
         }
     }
 

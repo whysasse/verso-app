@@ -817,6 +817,78 @@
         }
       }
     },
+    "home.search.icon.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Tapping expands into the full-width field (`home.search.placeholder`) with `home.search.cancel` to collapse back.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Rechercher"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Buscar"
+          }
+        }
+      }
+    },
+    "home.overflow.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Opens a menu with `home.bulkSelect.select` and `home.settings.accessibilityLabel` as items — both existing strings, reused as visible menu-item text.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Plus"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mais"
+          }
+        }
+      }
+    },
+    "home.addArticle.accessibilityLabel": {
+      "extractionState": "manual",
+      "comment": "Same wording as `addArticle.navTitle`. Previously this button had no explicit accessibility label.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajouter un article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Adicionar artigo"
+          }
+        }
+      }
+    },
     "home.search.placeholder": {
       "extractionState": "manual",
       "comment": "Updated during step 4 view-wiring pass — code's placeholder is more specific than the doc's original \"Search titles…\" (search now also matches body text and site name), value corrected to match shipped behaviour.",
@@ -1011,31 +1083,31 @@
     },
     "home.tagFilter.button.accessibilityLabel": {
       "extractionState": "manual",
-      "comment": "Added during step 4 view-wiring pass — tag filtering postdates the original audit. \"Tag\" rendered as étiquette/etiqueta (standard software term), not a literal \"mot-clé\"/\"marcador\".",
+      "comment": "Reworded for FAB-292 — this one icon now opens `FilterPanel` (tag selection + the date-range section below), replacing the old separate tag-icon-button and inline date-range row. \"Tag\" rendered as étiquette/etiqueta (standard software term), not a literal \"mot-clé\"/\"marcador\".",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Filter by tags"
+            "value": "Filter by tags or date"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Filtrer par étiquettes"
+            "value": "Filtrer par étiquettes ou par date"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Filtrar por etiquetas"
+            "value": "Filtrar por etiquetas ou data"
           }
         }
       }
     },
     "home.tagFilter.title": {
       "extractionState": "manual",
-      "comment": "Side panel header",
+      "comment": "`ArticleTagsEditorSheet` nav title only (FAB-292: `FilterPanel`'s own header moved to `home.filterPanel.title` since this key is shared with that unrelated per-article tags editor)",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1059,7 +1131,7 @@
     },
     "home.tagFilter.searchPlaceholder": {
       "extractionState": "manual",
-      "comment": "Side panel search field",
+      "comment": "Panel's tag search field",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1131,55 +1203,55 @@
     },
     "home.tagFilter.close.accessibilityLabel": {
       "extractionState": "manual",
-      "comment": "Close (X) button",
+      "comment": "Reworded for FAB-292 — same button, now closes the combined tag + date panel (`home.filterPanel.title`), not tag-only.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Close tag filter"
+            "value": "Close filters"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Fermer le filtre d'étiquettes"
+            "value": "Fermer les filtres"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Fechar filtro de etiquetas"
+            "value": "Fechar filtros"
           }
         }
       }
     },
-    "filter.all": {
+    "home.filterPanel.title": {
       "extractionState": "manual",
-      "comment": "Filter chip label",
+      "comment": "Panel header (was `home.tagFilter.title`, now split out — see note above)",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "All"
+            "value": "Filters"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Tous"
+            "value": "Filtres"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Todos"
+            "value": "Filtros"
           }
         }
       }
     },
     "filter.unread": {
       "extractionState": "manual",
-      "comment": "Filter chip label",
+      "comment": "Unread section header",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1203,7 +1275,7 @@
     },
     "filter.reading": {
       "extractionState": "manual",
-      "comment": "Filter chip label",
+      "comment": "Not shown directly — kept only because `ArticleStatus.filterLabel`'s switch still references it",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1227,7 +1299,7 @@
     },
     "filter.read": {
       "extractionState": "manual",
-      "comment": "Filter chip label",
+      "comment": "Read section header",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1251,7 +1323,7 @@
     },
     "filter.archived": {
       "extractionState": "manual",
-      "comment": "Added during step 4 view-wiring pass — `FilterChipBar.swift` renders a chip for every `ArticleStatus` case, including `.archived`, which the original audit missed.",
+      "comment": "Archived section header",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -1269,30 +1341,6 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Arquivados"
-          }
-        }
-      }
-    },
-    "filter.all.accessibilityLabel": {
-      "extractionState": "manual",
-      "comment": "⚠️ plural",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "All articles, %lld total"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Tous les articles, %lld au total"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Todos os artigos, %lld no total"
           }
         }
       }
@@ -1350,66 +1398,6 @@
                 "stringUnit": {
                   "state": "needs_review",
                   "value": "Não lidos, %lld artigos"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "filter.reading.accessibilityLabel": {
-      "extractionState": "manual",
-      "comment": "⚠️ plural",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Reading, %lld article"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Reading, %lld articles"
-                }
-              }
-            }
-          }
-        },
-        "fr-CA": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "needs_review",
-                  "value": "En cours, %lld article"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "needs_review",
-                  "value": "En cours, %lld articles"
-                }
-              }
-            }
-          }
-        },
-        "pt-BR": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "needs_review",
-                  "value": "Lendo, %lld artigo"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "needs_review",
-                  "value": "Lendo, %lld artigos"
                 }
               }
             }
@@ -1479,7 +1467,7 @@
     },
     "filter.archived.accessibilityLabel": {
       "extractionState": "manual",
-      "comment": "⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`.",
+      "comment": "⚠️ plural",
       "localizations": {
         "en": {
           "variations": {
@@ -1537,50 +1525,158 @@
         }
       }
     },
-    "filter.chip.selected.hint": {
+    "home.section.continueReading": {
       "extractionState": "manual",
-      "comment": "VoiceOver hint (any chip)",
+      "comment": "Pinned section for status `.reading` articles, shown above Unread.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Currently selected"
+            "value": "Continue Reading"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Actuellement sélectionné"
+            "value": "Reprendre la lecture"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Selecionado atualmente"
+            "value": "Continuar lendo"
           }
         }
       }
     },
-    "filter.chip.unselected.hint": {
+    "home.section.continueReading.accessibilityLabel": {
       "extractionState": "manual",
-      "comment": "VoiceOver hint (any chip)",
+      "comment": "⚠️ plural",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Continue Reading, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Continue Reading, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "fr-CA": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Reprendre la lecture, %lld article"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Reprendre la lecture, %lld articles"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Continuar lendo, %lld artigo"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "needs_review",
+                  "value": "Continuar lendo, %lld artigos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "home.section.continueReading.progressCaption": {
+      "extractionState": "manual",
+      "comment": "`{N}` reuses the generic count-placeholder convention (see `articleCard.estimatedReadTime`), here holding a 0–100 percentage rather than an item count. Value comes from `Article.scrollPosition` (already persisted, `ArticleReaderView.swift`), not a new field.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Double tap to filter"
+            "value": "%lld% read"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Appuie deux fois pour filtrer"
+            "value": "%lld % lu"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Toque duas vezes para filtrar"
+            "value": "%lld% lido"
+          }
+        }
+      }
+    },
+    "home.section.toggleHint": {
+      "extractionState": "manual",
+      "comment": "Shared by both collapsible section headers — wording doesn't depend on current expand/collapse state.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to show or hide"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Appuie deux fois pour afficher ou masquer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque duas vezes para mostrar ou ocultar"
+          }
+        }
+      }
+    },
+    "home.section.collapsedCaption": {
+      "extractionState": "manual",
+      "comment": "Caption shown under a collapsed section header",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapsed — tap to expand"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Réduit — appuie pour développer"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Recolhido — toque para expandir"
           }
         }
       }
@@ -2457,6 +2553,30 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Excluir"
+          }
+        }
+      }
+    },
+    "contextMenu.addTags": {
+      "extractionState": "manual",
+      "comment": "Opens `ArticleTagsEditorSheet` for the tapped article — same sheet used from the reading view.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Tags"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajouter des étiquettes"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Adicionar etiquetas"
           }
         }
       }

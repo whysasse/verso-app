@@ -41,14 +41,14 @@ by_key = {r["key"]: r for r in rows}
 
 # Keys that are ⚠️-flagged in UI_COPY.md AND whose wording genuinely changes between
 # singular/plural (so they need a real CLDR plural-variation block in the catalog).
-# The other ⚠️-flagged keys (filter.all.accessibilityLabel, articleCard.estimatedReadTime)
-# keep the same wording regardless of count ("min" doesn't pluralize, "All articles" is a
-# fixed category label) so they're handled as plain %lld substitutions, no variation needed.
+# The other ⚠️-flagged key (articleCard.estimatedReadTime) keeps the same wording
+# regardless of count ("min" doesn't pluralize) so it's handled as a plain %lld
+# substitution, no variation needed.
 TRUE_PLURAL_KEYS = {
     "filter.unread.accessibilityLabel",
-    "filter.reading.accessibilityLabel",
     "filter.read.accessibilityLabel",
     "filter.archived.accessibilityLabel",
+    "home.section.continueReading.accessibilityLabel",
     "dialog.bulkDelete.title",
     "import.done.summary",
     "import.done.skippedSuffix",
@@ -64,10 +64,10 @@ PLURAL_ONE_FORMS = {
         "fr": "Non lus, %lld article",
         "pt": "Não lidos, %lld artigo",
     },
-    "filter.reading.accessibilityLabel": {
-        "en": "Reading, %lld article",
-        "fr": "En cours, %lld article",
-        "pt": "Lendo, %lld artigo",
+    "home.section.continueReading.accessibilityLabel": {
+        "en": "Continue Reading, %lld article",
+        "fr": "Reprendre la lecture, %lld article",
+        "pt": "Continuar lendo, %lld artigo",
     },
     "filter.read.accessibilityLabel": {
         "en": "Read, %lld article",

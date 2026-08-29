@@ -166,6 +166,10 @@ enum L10n {
         }
     }
     enum ContextMenu {
+        /// "Add Tags" -- Opens `ArticleTagsEditorSheet` for the tapped article — same sheet used from the reading view.
+        static var addTags: String {
+            String(localized: "contextMenu.addTags", defaultValue: "Add Tags", comment: "Opens `ArticleTagsEditorSheet` for the tapped article — same sheet used from the reading view.")
+        }
         /// "Archive" -- Context menu item
         static var archive: String {
             String(localized: "contextMenu.archive", defaultValue: "Archive", comment: "Context menu item")
@@ -316,49 +320,29 @@ enum L10n {
         }
     }
     enum Filter {
-        /// "All" -- Filter chip label
-        static var all: String {
-            String(localized: "filter.all", defaultValue: "All", comment: "Filter chip label")
-        }
-        /// "All articles, {count} total" -- ⚠️ plural
-        static func allAccessibilityLabel(count: Int) -> String {
-            String(localized: "filter.all.accessibilityLabel", defaultValue: "All articles, \(count) total", comment: "⚠️ plural")
-        }
-        /// "Archived" -- Added during step 4 view-wiring pass — `FilterChipBar.swift` renders a chip for every `ArticleStatus` case, including `.archived`, which the original audit missed.
+        /// "Archived" -- Archived section header
         static var archived: String {
-            String(localized: "filter.archived", defaultValue: "Archived", comment: "Added during step 4 view-wiring pass — `FilterChipBar.swift` renders a chip for every `ArticleStatus` case, including `.archived`, which the original audit missed.")
+            String(localized: "filter.archived", defaultValue: "Archived", comment: "Archived section header")
         }
-        /// "Archived, {count} articles" -- ⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`.
+        /// "Archived, {count} articles" -- ⚠️ plural
         static func archivedAccessibilityLabel(count: Int) -> String {
-            String(localized: "filter.archived.accessibilityLabel", defaultValue: "Archived, \(count) articles", comment: "⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`.")
+            String(localized: "filter.archived.accessibilityLabel", defaultValue: "Archived, \(count) articles", comment: "⚠️ plural")
         }
-        /// "Currently selected" -- VoiceOver hint (any chip)
-        static var chipSelectedHint: String {
-            String(localized: "filter.chip.selected.hint", defaultValue: "Currently selected", comment: "VoiceOver hint (any chip)")
-        }
-        /// "Double tap to filter" -- VoiceOver hint (any chip)
-        static var chipUnselectedHint: String {
-            String(localized: "filter.chip.unselected.hint", defaultValue: "Double tap to filter", comment: "VoiceOver hint (any chip)")
-        }
-        /// "Read" -- Filter chip label
+        /// "Read" -- Read section header
         static var read: String {
-            String(localized: "filter.read", defaultValue: "Read", comment: "Filter chip label")
+            String(localized: "filter.read", defaultValue: "Read", comment: "Read section header")
         }
         /// "Read, {count} articles" -- ⚠️ plural
         static func readAccessibilityLabel(count: Int) -> String {
             String(localized: "filter.read.accessibilityLabel", defaultValue: "Read, \(count) articles", comment: "⚠️ plural")
         }
-        /// "Reading" -- Filter chip label
+        /// "Reading" -- Not shown directly — kept only because `ArticleStatus.filterLabel`'s switch still references it
         static var reading: String {
-            String(localized: "filter.reading", defaultValue: "Reading", comment: "Filter chip label")
+            String(localized: "filter.reading", defaultValue: "Reading", comment: "Not shown directly — kept only because `ArticleStatus.filterLabel`'s switch still references it")
         }
-        /// "Reading, {count} articles" -- ⚠️ plural
-        static func readingAccessibilityLabel(count: Int) -> String {
-            String(localized: "filter.reading.accessibilityLabel", defaultValue: "Reading, \(count) articles", comment: "⚠️ plural")
-        }
-        /// "Unread" -- Filter chip label
+        /// "Unread" -- Unread section header
         static var unread: String {
-            String(localized: "filter.unread", defaultValue: "Unread", comment: "Filter chip label")
+            String(localized: "filter.unread", defaultValue: "Unread", comment: "Unread section header")
         }
         /// "Unread, {count} articles" -- ⚠️ plural
         static func unreadAccessibilityLabel(count: Int) -> String {
@@ -366,6 +350,10 @@ enum L10n {
         }
     }
     enum Home {
+        /// "Add article" -- Same wording as `addArticle.navTitle`. Previously this button had no explicit accessibility label.
+        static var addArticleAccessibilityLabel: String {
+            String(localized: "home.addArticle.accessibilityLabel", defaultValue: "Add article", comment: "Same wording as `addArticle.navTitle`. Previously this button had no explicit accessibility label.")
+        }
         /// "Show archived articles" -- Archive toggle accessibility label
         static var archiveToggleShowArchive: String {
             String(localized: "home.archiveToggle.showArchive", defaultValue: "Show archived articles", comment: "Archive toggle accessibility label")
@@ -458,6 +446,10 @@ enum L10n {
         static var emptyNoUnreadSubheadline: String {
             String(localized: "home.empty.noUnread.subheadline", defaultValue: "Articles you haven't read yet will appear here.", comment: "needs_review.")
         }
+        /// "Filters" -- Panel header (was `home.tagFilter.title`, now split out — see note above)
+        static var filterPanelTitle: String {
+            String(localized: "home.filterPanel.title", defaultValue: "Filters", comment: "Panel header (was `home.tagFilter.title`, now split out — see note above)")
+        }
         /// "Loading articles" -- Skeleton loading state
         static var loadingAccessibilityLabel: String {
             String(localized: "home.loading.accessibilityLabel", defaultValue: "Loading articles", comment: "Skeleton loading state")
@@ -465,6 +457,10 @@ enum L10n {
         /// "Verso" -- Invariant — brand name
         static var navTitle: String {
             String(localized: "home.navTitle", defaultValue: "Verso", comment: "Invariant — brand name")
+        }
+        /// "More" -- Opens a menu with `home.bulkSelect.select` and `home.settings.accessibilityLabel` as items — both existing strings, reused as visible menu-item text.
+        static var overflowAccessibilityLabel: String {
+            String(localized: "home.overflow.accessibilityLabel", defaultValue: "More", comment: "Opens a menu with `home.bulkSelect.select` and `home.settings.accessibilityLabel` as items — both existing strings, reused as visible menu-item text.")
         }
         /// "Refresh article list" -- Pull-to-refresh
         static var pullToRefreshAccessibilityLabel: String {
@@ -478,9 +474,33 @@ enum L10n {
         static var searchClearAccessibilityLabel: String {
             String(localized: "home.search.clear.accessibilityLabel", defaultValue: "Clear search", comment: "Clear search button")
         }
+        /// "Search" -- Tapping expands into the full-width field (`home.search.placeholder`) with `home.search.cancel` to collapse back.
+        static var searchIconAccessibilityLabel: String {
+            String(localized: "home.search.icon.accessibilityLabel", defaultValue: "Search", comment: "Tapping expands into the full-width field (`home.search.placeholder`) with `home.search.cancel` to collapse back.")
+        }
         /// "Search titles, text, or site…" -- Updated during step 4 view-wiring pass — code's placeholder is more specific than the doc's original 'Search titles…' (search now also matches body text and site name), value corrected to match shipped behaviour.
         static var searchPlaceholder: String {
             String(localized: "home.search.placeholder", defaultValue: "Search titles, text, or site…", comment: "Updated during step 4 view-wiring pass — code's placeholder is more specific than the doc's original 'Search titles…' (search now also matches body text and site name), value corrected to match shipped behaviour.")
+        }
+        /// "Collapsed — tap to expand" -- Caption shown under a collapsed section header
+        static var sectionCollapsedCaption: String {
+            String(localized: "home.section.collapsedCaption", defaultValue: "Collapsed — tap to expand", comment: "Caption shown under a collapsed section header")
+        }
+        /// "Continue Reading" -- Pinned section for status `.reading` articles, shown above Unread.
+        static var sectionContinueReading: String {
+            String(localized: "home.section.continueReading", defaultValue: "Continue Reading", comment: "Pinned section for status `.reading` articles, shown above Unread.")
+        }
+        /// "Continue Reading, {count} articles" -- ⚠️ plural
+        static func sectionContinueReadingAccessibilityLabel(count: Int) -> String {
+            String(localized: "home.section.continueReading.accessibilityLabel", defaultValue: "Continue Reading, \(count) articles", comment: "⚠️ plural")
+        }
+        /// "{N}% read" -- `{N}` reuses the generic count-placeholder convention (see `articleCard.estimatedReadTime`), here holding a 0–100 percentage rather than an item count. Value comes from `Article.scrollPosition` (already persisted, `ArticleReaderView.swift`), not a new field.
+        static func sectionContinueReadingProgressCaption(count: Int) -> String {
+            String(localized: "home.section.continueReading.progressCaption", defaultValue: "\(count)% read", comment: "`{N}` reuses the generic count-placeholder convention (see `articleCard.estimatedReadTime`), here holding a 0–100 percentage rather than an item count. Value comes from `Article.scrollPosition` (already persisted, `ArticleReaderView.swift`), not a new field.")
+        }
+        /// "Double tap to show or hide" -- Shared by both collapsible section headers — wording doesn't depend on current expand/collapse state.
+        static var sectionToggleHint: String {
+            String(localized: "home.section.toggleHint", defaultValue: "Double tap to show or hide", comment: "Shared by both collapsible section headers — wording doesn't depend on current expand/collapse state.")
         }
         /// "Settings" -- Settings icon button
         static var settingsAccessibilityLabel: String {
@@ -498,25 +518,25 @@ enum L10n {
         static var tagFilterAllTags: String {
             String(localized: "home.tagFilter.allTags", defaultValue: "All tags", comment: "Row that clears the tag selection")
         }
-        /// "Filter by tags" -- Added during step 4 view-wiring pass — tag filtering postdates the original audit. 'Tag' rendered as étiquette/etiqueta (standard software term), not a literal 'mot-clé'/'marcador'.
+        /// "Filter by tags or date" -- Reworded for FAB-292 — this one icon now opens `FilterPanel` (tag selection + the date-range section below), replacing the old separate tag-icon-button and inline date-range row. 'Tag' rendered as étiquette/etiqueta (standard software term), not a literal 'mot-clé'/'marcador'.
         static var tagFilterButtonAccessibilityLabel: String {
-            String(localized: "home.tagFilter.button.accessibilityLabel", defaultValue: "Filter by tags", comment: "Added during step 4 view-wiring pass — tag filtering postdates the original audit. 'Tag' rendered as étiquette/etiqueta (standard software term), not a literal 'mot-clé'/'marcador'.")
+            String(localized: "home.tagFilter.button.accessibilityLabel", defaultValue: "Filter by tags or date", comment: "Reworded for FAB-292 — this one icon now opens `FilterPanel` (tag selection + the date-range section below), replacing the old separate tag-icon-button and inline date-range row. 'Tag' rendered as étiquette/etiqueta (standard software term), not a literal 'mot-clé'/'marcador'.")
         }
-        /// "Close tag filter" -- Close (X) button
+        /// "Close filters" -- Reworded for FAB-292 — same button, now closes the combined tag + date panel (`home.filterPanel.title`), not tag-only.
         static var tagFilterCloseAccessibilityLabel: String {
-            String(localized: "home.tagFilter.close.accessibilityLabel", defaultValue: "Close tag filter", comment: "Close (X) button")
+            String(localized: "home.tagFilter.close.accessibilityLabel", defaultValue: "Close filters", comment: "Reworded for FAB-292 — same button, now closes the combined tag + date panel (`home.filterPanel.title`), not tag-only.")
         }
         /// "No matching tags" -- Empty state inside the panel
         static var tagFilterNoMatches: String {
             String(localized: "home.tagFilter.noMatches", defaultValue: "No matching tags", comment: "Empty state inside the panel")
         }
-        /// "Search tags…" -- Side panel search field
+        /// "Search tags…" -- Panel's tag search field
         static var tagFilterSearchPlaceholder: String {
-            String(localized: "home.tagFilter.searchPlaceholder", defaultValue: "Search tags…", comment: "Side panel search field")
+            String(localized: "home.tagFilter.searchPlaceholder", defaultValue: "Search tags…", comment: "Panel's tag search field")
         }
-        /// "Tags" -- Side panel header
+        /// "Tags" -- `ArticleTagsEditorSheet` nav title only (FAB-292: `FilterPanel`'s own header moved to `home.filterPanel.title` since this key is shared with that unrelated per-article tags editor)
         static var tagFilterTitle: String {
-            String(localized: "home.tagFilter.title", defaultValue: "Tags", comment: "Side panel header")
+            String(localized: "home.tagFilter.title", defaultValue: "Tags", comment: "`ArticleTagsEditorSheet` nav title only (FAB-292: `FilterPanel`'s own header moved to `home.filterPanel.title` since this key is shared with that unrelated per-article tags editor)")
         }
     }
     enum Import {
