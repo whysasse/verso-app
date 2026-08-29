@@ -71,7 +71,15 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CODE_SIGN_STYLE: Automatic
         ENABLE_USER_SCRIPT_SANDBOXING: YES
-        SWIFT_EMIT_LOC_STRINGS: YES
+        # OFF on purpose: with this ON, every Xcode build auto-scans Swift source and
+        # merges anything that looks like a string literal into Localizable.xcstrings --
+        # stray characters, SF Symbol descriptions, raw format strings, none of it
+        # belonging to our actual copy pipeline. That catalog is a generated artifact of
+        # docs/copy/UI_COPY.md via docs/copy/codegen/generate.py; runtime String(localized:)
+        # lookups work identically either way, this setting only controls Xcode's own
+        # build-time auto-extraction/merge step. (Found 2026-08-29 after a routine
+        # Xcode build silently appended 16 junk entries.)
+        SWIFT_EMIT_LOC_STRINGS: NO
         TARGETED_DEVICE_FAMILY: "1"
     entitlements:
       path: Resources/Verso.entitlements
