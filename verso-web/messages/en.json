@@ -275,6 +275,12 @@
       "message": "Importing articles…"
     }
   },
+  "language": {
+    "automatic": "Automatic",
+    "en": "English",
+    "frCA": "Français (Canada)",
+    "ptBR": "Português (Brasil)"
+  },
   "launch": {
     "brandName": "Verso"
   },
@@ -427,11 +433,18 @@
     "import": {
       "rowLabel": "Import Articles"
     },
+    "language": {
+      "restartButton": "OK",
+      "restartMessage": "Close and reopen the app to apply your language change.",
+      "restartTitle": "Restart Verso",
+      "sectionLabel": "Language"
+    },
     "privacyPolicy": {
       "rowLabel": "Privacy Policy"
     },
     "section": {
       "about": "About",
+      "general": "General",
       "privacy": "Privacy",
       "reading": "Reading",
       "storage": "Storage"

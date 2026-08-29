@@ -573,6 +573,24 @@ enum L10n {
             String(localized: "import.writing.message", defaultValue: "Importing articles…", comment: "Writing state message")
         }
     }
+    enum Language {
+        /// "Automatic" -- Reverts to auto-detecting the device/browser language rather than pinning one.
+        static var automatic: String {
+            String(localized: "language.automatic", defaultValue: "Automatic", comment: "Reverts to auto-detecting the device/browser language rather than pinning one.")
+        }
+        /// "English" -- Autonym, invariant — language names in a picker are shown in their own language regardless of active UI locale (matches Apple's own Language & Region picker), so a reader scanning in any language still recognizes their own.
+        static var en: String {
+            String(localized: "language.en", defaultValue: "English", comment: "Autonym, invariant — language names in a picker are shown in their own language regardless of active UI locale (matches Apple's own Language & Region picker), so a reader scanning in any language still recognizes their own.")
+        }
+        /// "Français (Canada)" -- Autonym, invariant — see `language.en`.
+        static var frCA: String {
+            String(localized: "language.frCA", defaultValue: "Français (Canada)", comment: "Autonym, invariant — see `language.en`.")
+        }
+        /// "Português (Brasil)" -- Autonym, invariant — see `language.en`.
+        static var ptBR: String {
+            String(localized: "language.ptBR", defaultValue: "Português (Brasil)", comment: "Autonym, invariant — see `language.en`.")
+        }
+    }
     enum Launch {
         /// "Verso" -- Invariant — brand name. Added during step 4 view-wiring pass — `LaunchView.swift` had no UI_COPY entry yet.
         static var brandName: String {
@@ -894,6 +912,22 @@ enum L10n {
         static var importRowLabel: String {
             String(localized: "settings.import.rowLabel", defaultValue: "Import Articles", comment: "Row label")
         }
+        /// "OK" -- Alert dismiss button
+        static var languageRestartButton: String {
+            String(localized: "settings.language.restartButton", defaultValue: "OK", comment: "Alert dismiss button")
+        }
+        /// "Close and reopen the app to apply your language change." -- Alert message
+        static var languageRestartMessage: String {
+            String(localized: "settings.language.restartMessage", defaultValue: "Close and reopen the app to apply your language change.", comment: "Alert message")
+        }
+        /// "Restart Verso" -- True in-app language switching without relaunch isn't supported — closing/reopening is required for the new language to take effect.
+        static var languageRestartTitle: String {
+            String(localized: "settings.language.restartTitle", defaultValue: "Restart Verso", comment: "True in-app language switching without relaunch isn't supported — closing/reopening is required for the new language to take effect.")
+        }
+        /// "Language" -- Section label above language list
+        static var languageSectionLabel: String {
+            String(localized: "settings.language.sectionLabel", defaultValue: "Language", comment: "Section label above language list")
+        }
         /// "Privacy Policy" -- Distinct row/casing from `about.privacyPolicy.rowLabel` ('Privacy policy') — same destination, surfaced directly in Settings as well as inside the About sub-page; not deduplicated since they're different controls authored independently.
         static var privacyPolicyRowLabel: String {
             String(localized: "settings.privacyPolicy.rowLabel", defaultValue: "Privacy Policy", comment: "Distinct row/casing from `about.privacyPolicy.rowLabel` ('Privacy policy') — same destination, surfaced directly in Settings as well as inside the About sub-page; not deduplicated since they're different controls authored independently.")
@@ -901,6 +935,10 @@ enum L10n {
         /// "About" -- Section header
         static var sectionAbout: String {
             String(localized: "settings.section.about", defaultValue: "About", comment: "Section header")
+        }
+        /// "General" -- New section, sits above `settings.section.reading`.
+        static var sectionGeneral: String {
+            String(localized: "settings.section.general", defaultValue: "General", comment: "New section, sits above `settings.section.reading`.")
         }
         /// "Privacy" -- Section header
         static var sectionPrivacy: String {

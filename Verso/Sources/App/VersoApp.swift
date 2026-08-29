@@ -5,6 +5,7 @@ import TelemetryDeck
 @main
 struct VersoApp: App {
     @StateObject private var themeManager = ThemeManager()
+    @StateObject private var localeManager = LocaleManager()
     @StateObject private var folderBookmarkService = FolderBookmarkService()
     @StateObject private var articleLibraryService = ArticleLibraryService()
     @StateObject private var readingPreferences = ReadingPreferencesService()
@@ -25,6 +26,7 @@ struct VersoApp: App {
             ContentView()
                 .environment(\.managedObjectContext, context)
                 .environmentObject(themeManager)
+                .environmentObject(localeManager)
                 .environmentObject(folderBookmarkService)
                 .environmentObject(articleLibraryService)
                 .environmentObject(readingPreferences)

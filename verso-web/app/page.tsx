@@ -11,8 +11,23 @@ import { ArticleCard } from "./components/ArticleCard";
 import { EmptyState } from "./components/EmptyState";
 import { LoadingState } from "./components/LoadingState";
 import { useTheme, type VersoTheme } from "./providers/ThemeProvider";
+import { useVersoLocale } from "./providers/LocaleProvider";
 
 const THEMES: VersoTheme[] = ["paper", "sepia", "night", "ink"];
+
+// FAB-284: the picker only ever offers these four -- "pseudo" (part of
+// LocaleProvider's broader VersoLocale type) is a developer-only QA locale,
+// opted into via the cookie directly, never surfaced here.
+type LanguageOption = "automatic" | "en" | "fr-CA" | "pt-BR";
+const LANGUAGE_OPTIONS: LanguageOption[] = ["automatic", "en", "fr-CA", "pt-BR"];
+// `docs/copy/UI_COPY.md` keys are `language.frCA`/`language.ptBR` (dots split into
+// namespaces), which don't match the hyphenated locale codes above -- map between them.
+const LANGUAGE_MESSAGE_KEY: Record<LanguageOption, string> = {
+  automatic: "automatic",
+  en: "en",
+  "fr-CA": "frCA",
+  "pt-BR": "ptBR",
+};
 
 // ── Unsupported browser screen ──────────────────────────────────────
 function UnsupportedScreen() {
@@ -46,6 +61,43 @@ function UnsupportedScreen() {
       <p style={{ margin: 0, maxWidth: 320, fontSize: "var(--type-ui-list-subtitle-size)" }}>
         {t("subheadline")}
       </p>
+    </div>
+  );
+}
+
+// ── Language switcher (top-right, FAB-284) ───────────────────────────
+function LanguageSwitcher() {
+  const { locale, setLocale } = useVersoLocale();
+  const t = useTranslations("language");
+  // "Automatic" has no corresponding `locale` value of its own -- it's active
+  // whenever nothing else is (i.e. never, once any explicit pick has run,
+  // since setLocale always writes a real cookie for the other three). This
+  // mirrors the picker only ever reflecting the *last explicit choice*, same
+  // as iOS's LocaleManager.
+  return (
+    <div style={{ display: "flex", gap: "var(--spacing-xxs)" }}>
+      {LANGUAGE_OPTIONS.map((option) => (
+        <button
+          key={option}
+          onClick={() => setLocale(option)}
+          title={t(LANGUAGE_MESSAGE_KEY[option])}
+          style={{
+            padding: "2px 8px",
+            fontSize: "var(--type-ui-caption-size)",
+            borderRadius: "var(--radius-pill)",
+            border:
+              option === locale
+                ? "1px solid var(--color-accent)"
+                : "1px solid var(--color-border)",
+            color: option === locale ? "var(--color-accent)" : "var(--color-text-secondary)",
+            backgroundColor: "transparent",
+            cursor: "pointer",
+            transition: "border-color 0.15s ease, color 0.15s ease",
+          }}
+        >
+          {option === "automatic" ? "Auto" : option.split("-")[0].toUpperCase()}
+        </button>
+      ))}
     </div>
   );
 }
@@ -165,7 +217,10 @@ export default function ArticleListPage() {
           >
             Verso
           </h1>
-          <ThemeSwitcher />
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-sm)" }}>
+            <LanguageSwitcher />
+            <ThemeSwitcher />
+          </div>
         </div>
       </header>
 

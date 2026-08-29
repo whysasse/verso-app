@@ -6,12 +6,14 @@ struct SettingsView: View {
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
     @EnvironmentObject var articleLibraryService: ArticleLibraryService
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
+    @EnvironmentObject var localeManager: LocaleManager
     @Environment(\.managedObjectContext) var viewContext
 
     @State private var showFolderPicker = false
     @State private var showMoveDialog = false
     @State private var pendingNewURL: URL? = nil
     @State private var showImport = false
+    @State private var showLanguageRestartAlert = false
     @State private var analyticsOptIn = AnalyticsService.shared.isOptedIn
 
     private var colors: ThemeColors { themeManager.colors }
@@ -30,6 +32,8 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                generalSection
+                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
                 readingSection
                 Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
                 storageSection
@@ -72,9 +76,40 @@ struct SettingsView: View {
         } message: {
             Text(L10n.Dialog.changeFolderMessage)
         }
+        .alert(L10n.Settings.languageRestartTitle, isPresented: $showLanguageRestartAlert) {
+            Button(L10n.Settings.languageRestartButton) { }
+        } message: {
+            Text(L10n.Settings.languageRestartMessage)
+        }
     }
 
     // MARK: - Sections
+
+    private var generalSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader(L10n.Settings.sectionGeneral)
+
+            sectionLabel(L10n.Settings.languageSectionLabel)
+            VStack(spacing: 0) {
+                ForEach(AppLocale.allCases) { locale in
+                    let isSelected = localeManager.selectedLocale == locale
+                    SettingsRow(
+                        type: .language(name: locale.displayName, isSelected: isSelected),
+                        action: {
+                            guard !isSelected else { return }
+                            localeManager.selectedLocale = locale
+                            showLanguageRestartAlert = true
+                        }
+                    )
+                    .padding(.horizontal, VersoSpacing.md)
+                    if locale != AppLocale.allCases.last {
+                        Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                    }
+                }
+            }
+            .padding(.bottom, VersoSpacing.sm)
+        }
+    }
 
     private var readingSection: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -298,4 +333,5 @@ struct SettingsView: View {
     .environmentObject(FolderBookmarkService())
     .environmentObject(ArticleLibraryService())
     .environmentObject(ReadingPreferencesService())
+    .environmentObject(LocaleManager())
 }
