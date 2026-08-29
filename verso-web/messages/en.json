@@ -77,6 +77,7 @@
     "estimatedReadTime": "{count} min read"
   },
   "contextMenu": {
+    "addTags": "Add Tags",
     "archive": "Archive",
     "delete": "Delete",
     "markAsRead": "Mark as read",
@@ -141,36 +142,24 @@
     }
   },
   "filter": {
-    "all": {
-      "_label": "All",
-      "accessibilityLabel": "All articles, {count} total"
-    },
     "archived": {
       "_label": "Archived",
       "accessibilityLabel": "{count, plural, one {Archived, # article} other {Archived, # articles}}"
-    },
-    "chip": {
-      "selected": {
-        "hint": "Currently selected"
-      },
-      "unselected": {
-        "hint": "Double tap to filter"
-      }
     },
     "read": {
       "_label": "Read",
       "accessibilityLabel": "{count, plural, one {Read, # article} other {Read, # articles}}"
     },
-    "reading": {
-      "_label": "Reading",
-      "accessibilityLabel": "{count, plural, one {Reading, # article} other {Reading, # articles}}"
-    },
+    "reading": "Reading",
     "unread": {
       "_label": "Unread",
       "accessibilityLabel": "{count, plural, one {Unread, # article} other {Unread, # articles}}"
     }
   },
   "home": {
+    "addArticle": {
+      "accessibilityLabel": "Add article"
+    },
     "archiveToggle": {
       "showArchive": "Show archived articles",
       "showLibrary": "Show reading list"
@@ -214,10 +203,16 @@
         "subheadline": "Articles you haven't read yet will appear here."
       }
     },
+    "filterPanel": {
+      "title": "Filters"
+    },
     "loading": {
       "accessibilityLabel": "Loading articles"
     },
     "navTitle": "Verso",
+    "overflow": {
+      "accessibilityLabel": "More"
+    },
     "pullToRefresh": {
       "accessibilityLabel": "Refresh article list"
     },
@@ -226,7 +221,19 @@
       "clear": {
         "accessibilityLabel": "Clear search"
       },
+      "icon": {
+        "accessibilityLabel": "Search"
+      },
       "placeholder": "Search titles, text, or site…"
+    },
+    "section": {
+      "collapsedCaption": "Collapsed — tap to expand",
+      "continueReading": {
+        "_label": "Continue Reading",
+        "accessibilityLabel": "{count, plural, one {Continue Reading, # article} other {Continue Reading, # articles}}",
+        "progressCaption": "{count}% read"
+      },
+      "toggleHint": "Double tap to show or hide"
     },
     "settings": {
       "accessibilityLabel": "Settings"
@@ -238,10 +245,10 @@
     "tagFilter": {
       "allTags": "All tags",
       "button": {
-        "accessibilityLabel": "Filter by tags"
+        "accessibilityLabel": "Filter by tags or date"
       },
       "close": {
-        "accessibilityLabel": "Close tag filter"
+        "accessibilityLabel": "Close filters"
       },
       "noMatches": "No matching tags",
       "searchPlaceholder": "Search tags…",

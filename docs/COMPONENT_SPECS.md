@@ -1,9 +1,9 @@
 # Component Specs — Verso
 
-**Version:** 1.0
-**Date:** 2026-05-03
+**Version:** 1.1
+**Date:** 2026-08-29
 **Status:** Draft
-**Related:** FAB-87
+**Related:** FAB-87, FAB-292
 
 This document is the developer-handoff view of Verso's UI components. For each component it provides anatomy, exact dimensions, typography, and color rules (tokens per element, per state) in a single place.
 
@@ -96,58 +96,60 @@ Title search input below the navigation bar.
 
 ---
 
-### FilterChipBar
+### Article List Header Row (FAB-292)
 
-Horizontal scrolling row that contains all `FilterChip` components.
+Replaced the previous stacked search bar / tag-filter button / date-range row / `FilterChipBar` (all four removed) with a single row shared with the "Verso" title.
 
 **Anatomy**
-- Horizontally scrolling HStack of `FilterChip` items: All · Unread · Reading · Read
+- Title ("Verso", `screenTitle` — 34pt bold), leading
+- Four plain icon buttons, trailing, tight 2pt gaps: search (magnifying glass), filter (funnel — opens `FilterPanel`, covering both tags and date range), Add (a filled accent circle with a plus glyph), overflow ("•••", opens a menu with Select and Settings)
+- Tapping the search icon replaces this whole row with a full-width `SearchBar` + a "Cancel" button (existing `SearchBar` component, unchanged dimensions)
+- While bulk-select mode is active, this row becomes a leading "Cancel" button with the title still trailing
 
 **Dimensions**
 
 | Property | Value |
 |----------|-------|
-| Height | 36pt |
-| Horizontal padding (edges) | md — 16pt |
-| Gap between chips | xs — 8pt |
-| Scroll | Horizontal, no snap |
-
----
-
-### FilterChip
-
-Single selectable chip inside `FilterChipBar`. Always shows a count inline after the label.
-
-**Anatomy**
-- Label + count text (e.g., "Unread 12")
-- Background pill
-
-**Dimensions**
-
-| Property | Value |
-|----------|-------|
-| Height | 36pt |
-| Horizontal padding | sm — 12pt |
-| Corner radius | 18pt (fully rounded, `radius/pill`) |
-
-**Typography**
-
-| Element | Font | Weight | Size |
-|---------|------|--------|------|
-| Label + count | SF Pro | Semibold | 15pt |
+| Icon touch target | 44×44pt (each) |
+| Gap between icons | 2pt |
+| Add button visual circle | 32pt diameter, centered in its 44×44 target |
+| Filter icon active-count badge | 16pt min-diameter capsule, `accent` fill, white text |
 
 **Color rules**
 
 | Element | Token | State |
 |---------|-------|-------|
-| Label | `textSecondary` | Unselected |
-| Label | `accent` | Selected |
-| Background | Transparent | Unselected |
-| Background | `accent` at 15% opacity | Selected |
-| Border | `border` 1pt | Unselected |
-| Border | None | Selected |
-| Background | `accent` at 25% opacity | Pressed |
-| Entire chip | 50% opacity modifier | Zero count (all tokens unchanged) |
+| Icons | `accent` | Always (plain, no background chip) |
+| Add button circle | `accent` fill, white glyph | Always |
+| Filter icon | `line.3.horizontal.decrease.circle` vs `.fill` variant | Filled when tags and/or a non-default date range are active |
+
+---
+
+### Article List Sections (FAB-292)
+
+Replaced the status `FilterChipBar` (all-time filter by tap) with always-visible, collapsible `List` sections, grouped from the same fetch rather than gated by a single active filter.
+
+**Anatomy**
+- **Continue Reading** — status `.reading` articles, pinned first; each card shows `ScrollProgress` + a "N% read" caption instead of the date line (see `ArticleCard`'s `showsProgress` mode below)
+- **Unread** — status `.unread`
+- **Read** — status `.read`, collapsed by default (chevron toggle, "Collapsed — tap to expand" caption shown while collapsed)
+- **Archived** — status `.archived`, collapsed by default, same treatment as Read
+- Any section with zero matching articles is omitted entirely, not shown empty
+
+**Dimensions**
+
+| Property | Value |
+|----------|-------|
+| Section header height | ≥36pt (touch target for the collapsible ones) |
+| Section header top padding | md — 16pt |
+| Section header bottom padding | xs — 8pt |
+
+**Typography**
+
+| Element | Font | Weight | Size |
+|---------|------|--------|------|
+| Section header label | `listTitle` | Semibold | 17pt |
+| Collapsed caption | `caption` | Regular | 13pt |
 
 ---
 
@@ -179,6 +181,8 @@ Primary list item. Displays one saved article.
 | Title | SF Pro | Semibold | 17pt | 1.3× |
 | Source name | SF Pro | Regular | 15pt | 1.4× |
 | Date / read time | SF Pro | Regular | 13pt | — |
+
+**Progress mode (FAB-292)** — `showsProgress: Bool` param, used by the article list's Continue Reading section: replaces the date line with a `ScrollProgress` bar (4pt tall, `xxs` — 4pt top padding) plus a "N% read" caption in the same `caption` style. Percentage is `Article.scrollPosition` (already persisted by `ArticleReaderView`), not a new field.
 
 **Color rules**
 

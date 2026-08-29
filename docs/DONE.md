@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**168 completed issues.**
+**169 completed issues.**
 
 ## iOS
 
@@ -588,6 +588,24 @@
 
 
 ### Phase 2 — Experience
+
+- [x] 🟡 **FAB-292** · Redesign article list: icon-first header + grouped-by-progress body  `Done` `Medium`
+  Replaced the article list's four stacked control rows (search bar, tag-filter icon button, date-range row, status `FilterChipBar`) with one icon-first header row sharing "Verso"'s line, and replaced the status filter chips with always-visible, collapsible list sections. Design: [Verso Article List](https://claude.ai/code/artifact/ba753f85-c837-42a0-b11c-78c91e13d238) (settled 2026-08-29 design review). Completed 2026-08-29.
+
+  ## What shipped
+
+  * **Header row** (`ArticleListView.swift`): "Verso" + four plain icon buttons — search (expands into a full-width field with Cancel, replacing the row), filter (opens the combined tag + date panel below), Add (filled accent circle), and a "•••" overflow menu (Select, Settings). While bulk-selecting, the row becomes a Cancel button instead.
+  * **`FilterPanel`** (renamed from `TagFilterPanel`): now combines tag selection with the date-range presets that previously lived in their own inline row — one filter icon covers both facets, with an active-count badge (tags + date) carried over from the old tag-only badge.
+  * **Sections replace the status chip bar**: `ArticleListFetchedBody` now fetches every status (search/date predicate only, no status clause) and groups client-side into **Continue Reading** (`.reading`, pinned first, each card showing `ScrollProgress` + a live "N% read" caption via `Article.scrollPosition`), **Unread**, **Read** (collapsed by default), and **Archived** (collapsed by default — kept so archived articles stay reachable; the approved mockups didn't show this case since the sample data had none). Empty sections are omitted entirely rather than shown empty.
+  * **`.contextMenu`** (long-press) added per row: Select, Mark as Read/Unread, Add Tags (opens the existing `ArticleTagsEditorSheet`), Archive — same actions the swipe gestures already perform, now with a tap-discoverable path. Also wired up `contextMenu.open`/`.archive`/`.unarchive`/`.markAsRead`/`.markAsUnread` — these were documented in `UI_COPY.md` but never consumed by any code before this (same stale-doc pattern as FAB-278's `home.dateFilter.label`).
+  * **`ArticleCard`** gained a `showsProgress` param (Continue Reading cards) that swaps the date line for a progress bar + percentage.
+  * **Removed**: `FilterChipBar.swift`, `FilterChip.swift`, and `ArticleStatus.filterAccessibilityLabel(count:)` (now-dead code with no other call sites). `filterLabel` stays — `StatusBadge`'s `.archived` fallback still uses it.
+  * **Copy**: `docs/copy/UI_COPY.md` + `docs/copy/codegen/generate.py` updated and regenerated — several new keys (search/filter/overflow/add-article a11y labels, section headers and hints, `contextMenu.addTags`), two existing keys reworded in place (`home.tagFilter.button.accessibilityLabel`, `.close.accessibilityLabel`, both single-use), and five genuinely dead keys removed (`filter.all`, `.all.accessibilityLabel`, `.reading.accessibilityLabel`, `.chip.selected.hint`, `.chip.unselected.hint`). New fr-CA/pt-BR strings are `needs_review` in the generated catalog, same as every other new string in this pipeline — not a special gap.
+  * `docs/COMPONENT_SPECS.md` updated (v1.1): new Header Row and Sections entries replacing the old FilterChipBar/FilterChip specs, plus a note on `ArticleCard`'s progress mode.
+
+  ## Verified
+
+  `xcodegen generate` + `xcodebuild -scheme Verso -destination 'generic/platform=iOS Simulator' build` — succeeded, no new warnings.
 
 - [x] 🟡 **FAB-39** · [TTS] Implement text-to-speech playback  `Done` `Medium`
   Use AVSpeechSynthesizer to read the article aloud. Strip Markdown syntax before passing to the synthesizer. Start from the current scroll position.

@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ArticleCard: View {
     @ObservedObject var article: Article
+    /// FAB-292: Continue Reading section cards show saved scroll progress instead of the date line.
+    var showsProgress: Bool = false
     @EnvironmentObject var themeManager: ThemeManager
     private var colors: ThemeColors { themeManager.colors }
 
@@ -29,6 +31,10 @@ struct ArticleCard: View {
         return article.dateAdded.formatted(date: .abbreviated, time: .omitted)
     }
 
+    private var progressFraction: Double {
+        max(0, min(1, article.scrollPosition?.doubleValue ?? 0))
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: VersoSpacing.md) {
             VStack(alignment: .leading, spacing: VersoSpacing.xxs) {
@@ -46,9 +52,17 @@ struct ArticleCard: View {
                         .lineSpacing(6) // 1.4× line height for 15pt: 15 × 0.4 = 6
                 }
 
-                Text(formattedDate)
-                    .font(VersoTypography.UI.caption)
-                    .foregroundColor(colors.textSecondary)
+                if showsProgress {
+                    ScrollProgress(progress: progressFraction)
+                        .padding(.top, VersoSpacing.xxs)
+                    Text(L10n.Home.sectionContinueReadingProgressCaption(count: Int((progressFraction * 100).rounded())))
+                        .font(VersoTypography.UI.caption)
+                        .foregroundColor(colors.textSecondary)
+                } else {
+                    Text(formattedDate)
+                        .font(VersoTypography.UI.caption)
+                        .foregroundColor(colors.textSecondary)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -66,9 +80,11 @@ struct ArticleCard: View {
     let reading = Article.create(in: context, filePath: "b", title: "How to Build a Minimalist Reading Habit", url: URL(string: "https://medium.com"), status: .reading, source: "medium.com")
     let read = Article.create(in: context, filePath: "c", title: "Why Paper Still Matters", status: .read, source: "nytimes.com")
 
-    VStack(spacing: 12) {
+    reading.scrollPosition = NSNumber(value: 0.62)
+
+    return VStack(spacing: 12) {
         ArticleCard(article: unread)
-        ArticleCard(article: reading)
+        ArticleCard(article: reading, showsProgress: true)
         ArticleCard(article: read)
     }
     .padding()

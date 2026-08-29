@@ -1,7 +1,7 @@
 import SwiftUI
 import CoreData
 
-// MARK: - List filters (FAB-50)
+// MARK: - List filters (FAB-50, header/sections redesigned FAB-292)
 
 private enum ArticleListDatePreset: String, CaseIterable, Identifiable {
     case any = "Any time"
@@ -34,18 +34,6 @@ private enum ArticleListDatePreset: String, CaseIterable, Identifiable {
     }
 }
 
-private extension ArticleStatus {
-    /// Storage string on `Article.status` (Core Data).
-    var storageStatusValue: String {
-        switch self {
-        case .unread: return Article.Status.unread.rawValue
-        case .reading: return Article.Status.reading.rawValue
-        case .read: return Article.Status.read.rawValue
-        case .archived: return Article.Status.archived.rawValue
-        }
-    }
-}
-
 struct ArticleListView: View {
     /// Owned by `VersoMainSplitView`; binding it into this List's `selection:` is what lets
     /// NavigationSplitView auto-collapse to the detail column on iPhone when a row is tapped.
@@ -57,19 +45,20 @@ struct ArticleListView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @State private var searchText = ""
-    @State private var activeFilter: ArticleStatus?
+    @State private var isSearching = false
     @State private var datePreset: ArticleListDatePreset = .any
     @State private var showFolderPicker = false
     @State private var showAddArticle = false
     @State private var showSettings = false
     @State private var selectedTags = Set<String>()
-    @State private var showTagPanel = false
+    @State private var showFilterPanel = false
     @State private var isSelecting = false
     @State private var selectedArticleIds = Set<UUID>()
     @State private var confirmBulkDelete = false
 
-    /// Fetched independently of the list predicate so the tag panel always sees every available tag,
-    /// even when the active filter or search narrows the visible articles to zero.
+    /// Fetched independently of the list predicate so the filter panel always sees every available
+    /// tag, even when search/date/tag narrowing has reduced the visible articles to zero. Still
+    /// excludes archived, same as before -- archived-only tags aren't useful filter targets.
     @FetchRequest(
         sortDescriptors: [],
         predicate: NSPredicate(format: "status != %@", Article.Status.archived.rawValue),
@@ -81,29 +70,20 @@ struct ArticleListView: View {
         return unique.sorted()
     }
 
+    /// Count of non-default filter facets currently applied (tags + date range), shown as a
+    /// badge on the filter icon -- same affordance the old tag-only button had, extended to cover
+    /// both facets now that one icon opens both.
+    private var activeFilterCount: Int {
+        selectedTags.count + (datePreset == .any ? 0 : 1)
+    }
+
     private var listPredicate: NSPredicate {
-        Self.makeListPredicate(
-            activeFilter: activeFilter,
-            searchText: searchText,
-            datePreset: datePreset
-        )
+        Self.makeListPredicate(searchText: searchText, datePreset: datePreset)
     }
 
     /// Forces `@FetchRequest` to rebuild when inputs affecting Core Data matching change.
     private var listFetchIdentity: String {
-        Self.listPredicateSignature(
-            activeFilter: activeFilter,
-            searchText: searchText,
-            datePreset: datePreset
-        )
-    }
-
-    private var statusCounts: [ArticleStatus: Int] {
-        ArticleStatus.allCases.reduce(into: [:]) { result, chip in
-            let req = NSFetchRequest<Article>(entityName: "Article")
-            req.predicate = NSPredicate(format: "status == %@", chip.storageStatusValue)
-            result[chip] = (try? viewContext.count(for: req)) ?? 0
-        }
+        Self.listPredicateSignature(searchText: searchText, datePreset: datePreset)
     }
 
     var body: some View {
@@ -117,50 +97,21 @@ struct ArticleListView: View {
                     .padding(.top, VersoSpacing.md)
                 }
 
-                // Outside `.id(listFetchIdentity)` so typing doesn’t recreate this view and drop keyboard focus.
-                HStack(spacing: VersoSpacing.sm) {
-                    SearchBar(text: $searchText, placeholder: L10n.Home.searchPlaceholder)
-                        .environmentObject(themeManager)
-
-                    Button {
-                        withAnimation(VersoAnimation.normal) { showTagPanel = true }
-                    } label: {
-                        Image(systemName: selectedTags.isEmpty ? "tag" : "tag.fill")
-                            .font(.system(size: 17, weight: .regular))
-                            .foregroundColor(themeManager.colors.accent)
-                            .frame(width: 44, height: 44)
-                            .background(themeManager.colors.surface)
-                            .cornerRadius(VersoRadius.sm)
-                            .overlay(alignment: .topTrailing) {
-                                if !selectedTags.isEmpty {
-                                    Text("\(selectedTags.count)")
-                                        .font(.system(size: 11, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 5)
-                                        .frame(minWidth: 16, minHeight: 16)
-                                        .background(Capsule().fill(themeManager.colors.accent))
-                                        .offset(x: 4, y: -4)
-                                }
-                            }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(L10n.Home.tagFilterButtonAccessibilityLabel)
-                }
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.top, VersoSpacing.md)
+                // Outside `.id(listFetchIdentity)` so typing doesn't recreate this view and drop keyboard focus.
+                headerRow
+                    .padding(.horizontal, VersoSpacing.md)
+                    .padding(.top, VersoSpacing.md)
+                    .padding(.bottom, VersoSpacing.sm)
 
                 ArticleListFetchedBody(
                     listGeometry: listGeometry,
                     listPredicate: listPredicate,
+                    hasNarrowingFilter: !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || datePreset != .any,
                     selectedArticle: $selectedArticle,
-                    searchText: $searchText,
-                    activeFilter: $activeFilter,
-                    datePreset: $datePreset,
                     selectedTags: $selectedTags,
                     isSelecting: $isSelecting,
                     selectedArticleIds: $selectedArticleIds,
                     confirmBulkDelete: $confirmBulkDelete,
-                    statusCounts: statusCounts,
                     showFolderPicker: $showFolderPicker,
                     showAddArticle: $showAddArticle,
                     showSettings: $showSettings
@@ -174,21 +125,22 @@ struct ArticleListView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(themeManager.colors.background)
             .overlay {
-                if showTagPanel {
+                if showFilterPanel {
                     ZStack(alignment: .trailing) {
                         Color.black.opacity(0.35)
                             .ignoresSafeArea()
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                withAnimation(VersoAnimation.normal) { showTagPanel = false }
+                                withAnimation(VersoAnimation.normal) { showFilterPanel = false }
                             }
                             .transition(.opacity)
 
-                        TagFilterPanel(
+                        FilterPanel(
                             tags: allTagsSorted,
                             selectedTags: $selectedTags,
+                            datePreset: $datePreset,
                             onClose: {
-                                withAnimation(VersoAnimation.normal) { showTagPanel = false }
+                                withAnimation(VersoAnimation.normal) { showFilterPanel = false }
                             }
                         )
                         .environmentObject(themeManager)
@@ -196,40 +148,161 @@ struct ArticleListView: View {
                             DragGesture()
                                 .onEnded { value in
                                     if value.translation.width > 60 {
-                                        withAnimation(VersoAnimation.normal) { showTagPanel = false }
+                                        withAnimation(VersoAnimation.normal) { showFilterPanel = false }
                                     }
                                 }
                         )
                         .transition(.move(edge: .trailing))
                     }
-                    .animation(VersoAnimation.normal, value: showTagPanel)
+                    .animation(VersoAnimation.normal, value: showFilterPanel)
                 }
             }
+        }
+    }
+
+    // MARK: - Header row (FAB-292)
+
+    /// "Verso" and its controls share one row: while selecting, it becomes a Cancel button; while
+    /// searching, it becomes the expanded search field. Otherwise it's the title plus four icons
+    /// (search, filter, add, overflow).
+    @ViewBuilder
+    private var headerRow: some View {
+        if isSelecting {
+            selectionHeaderRow
+        } else if isSearching {
+            searchActiveRow
+        } else {
+            defaultHeaderRow
+        }
+    }
+
+    private var selectionHeaderRow: some View {
+        HStack {
+            Button(L10n.Home.bulkSelectCancel) {
+                isSelecting = false
+                selectedArticleIds.removeAll()
+            }
+            .font(VersoTypography.UI.button)
+            .foregroundColor(themeManager.colors.accent)
+
+            Spacer()
+
+            Text(L10n.Home.navTitle)
+                .font(VersoTypography.UI.screenTitle)
+                .foregroundColor(themeManager.colors.textPrimary)
+        }
+        .frame(height: 44)
+    }
+
+    private var searchActiveRow: some View {
+        HStack(spacing: VersoSpacing.sm) {
+            SearchBar(text: $searchText, placeholder: L10n.Home.searchPlaceholder)
+                .environmentObject(themeManager)
+
+            Button(L10n.Home.searchCancel) {
+                withAnimation(VersoAnimation.fast) {
+                    isSearching = false
+                    searchText = ""
+                }
+            }
+            .buttonStyle(.plain)
+            .font(VersoTypography.UI.button)
+            .foregroundColor(themeManager.colors.accent)
+        }
+    }
+
+    private var defaultHeaderRow: some View {
+        HStack(spacing: 2) {
+            Text(L10n.Home.navTitle)
+                .font(VersoTypography.UI.screenTitle)
+                .foregroundColor(themeManager.colors.textPrimary)
+                .lineLimit(1)
+
+            Spacer(minLength: VersoSpacing.xs)
+
+            Button {
+                withAnimation(VersoAnimation.fast) { isSearching = true }
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(themeManager.colors.accent)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.Home.searchIconAccessibilityLabel)
+
+            Button {
+                withAnimation(VersoAnimation.normal) { showFilterPanel = true }
+            } label: {
+                Image(systemName: activeFilterCount > 0 ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(themeManager.colors.accent)
+                    .frame(width: 44, height: 44)
+                    .overlay(alignment: .topTrailing) {
+                        if activeFilterCount > 0 {
+                            Text("\(activeFilterCount)")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 5)
+                                .frame(minWidth: 16, minHeight: 16)
+                                .background(Capsule().fill(themeManager.colors.accent))
+                                .offset(x: 2, y: 4)
+                        }
+                    }
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.Home.tagFilterButtonAccessibilityLabel)
+
+            Button {
+                showAddArticle = true
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(themeManager.colors.accent)
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "plus")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+                .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.Home.addArticleAccessibilityLabel)
+
+            Menu {
+                Button(L10n.Home.bulkSelectSelect) {
+                    isSelecting = true
+                }
+                Button(L10n.Home.settingsAccessibilityLabel) {
+                    showSettings = true
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(themeManager.colors.accent)
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel(L10n.Home.overflowAccessibilityLabel)
         }
     }
 
     // MARK: - Predicate helpers
 
     private static func listPredicateSignature(
-        activeFilter: ArticleStatus?,
         searchText: String,
         datePreset: ArticleListDatePreset
     ) -> String {
-        "\(activeFilter?.storageStatusValue ?? "all")|\(searchText)|\(datePreset.rawValue)"
+        "\(searchText)|\(datePreset.rawValue)"
     }
 
+    /// No status clause: `ArticleListFetchedBody` fetches every status and groups the results into
+    /// sections client-side (Continue Reading / Unread / Read / Archived), replacing the old
+    /// `activeFilter`-gated single predicate.
     private static func makeListPredicate(
-        activeFilter: ArticleStatus?,
         searchText: String,
         datePreset: ArticleListDatePreset
     ) -> NSPredicate {
         var parts: [NSPredicate] = []
-
-        if let filter = activeFilter {
-            parts.append(NSPredicate(format: "status == %@", filter.storageStatusValue))
-        } else {
-            parts.append(NSPredicate(format: "status != %@", Article.Status.archived.rawValue))
-        }
 
         let term = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !term.isEmpty {
@@ -243,6 +316,7 @@ struct ArticleListView: View {
             parts.append(NSPredicate(format: "dateAdded >= %@", start as NSDate))
         }
 
+        guard !parts.isEmpty else { return NSPredicate(value: true) }
         return NSCompoundPredicate(andPredicateWithSubpredicates: parts)
     }
 }
@@ -252,17 +326,16 @@ struct ArticleListView: View {
 private struct ArticleListFetchedBody: View {
     let listGeometry: GeometryProxy
     let listPredicate: NSPredicate
+    /// True when search text or a non-default date preset is applied -- used only to pick between
+    /// the "no matches" and "no articles at all" empty-state variant (tag narrowing is read
+    /// directly from `selectedTags` below).
+    let hasNarrowingFilter: Bool
 
     @Binding var selectedArticle: Article?
-    @Binding var searchText: String
-    @Binding var activeFilter: ArticleStatus?
-    @Binding var datePreset: ArticleListDatePreset
     @Binding var selectedTags: Set<String>
     @Binding var isSelecting: Bool
     @Binding var selectedArticleIds: Set<UUID>
     @Binding var confirmBulkDelete: Bool
-
-    let statusCounts: [ArticleStatus: Int]
 
     @Binding var showFolderPicker: Bool
     @Binding var showAddArticle: Bool
@@ -276,33 +349,31 @@ private struct ArticleListFetchedBody: View {
 
     @FetchRequest private var articles: FetchedResults<Article>
 
+    @State private var isReadExpanded = false
+    @State private var isArchivedExpanded = false
+    @State private var tagsEditorArticle: Article?
+
     init(
         listGeometry: GeometryProxy,
         listPredicate: NSPredicate,
+        hasNarrowingFilter: Bool,
         selectedArticle: Binding<Article?>,
-        searchText: Binding<String>,
-        activeFilter: Binding<ArticleStatus?>,
-        datePreset: Binding<ArticleListDatePreset>,
         selectedTags: Binding<Set<String>>,
         isSelecting: Binding<Bool>,
         selectedArticleIds: Binding<Set<UUID>>,
         confirmBulkDelete: Binding<Bool>,
-        statusCounts: [ArticleStatus: Int],
         showFolderPicker: Binding<Bool>,
         showAddArticle: Binding<Bool>,
         showSettings: Binding<Bool>
     ) {
         self.listGeometry = listGeometry
         self.listPredicate = listPredicate
+        self.hasNarrowingFilter = hasNarrowingFilter
         _selectedArticle = selectedArticle
-        _searchText = searchText
-        _activeFilter = activeFilter
-        _datePreset = datePreset
         _selectedTags = selectedTags
         _isSelecting = isSelecting
         _selectedArticleIds = selectedArticleIds
         _confirmBulkDelete = confirmBulkDelete
-        self.statusCounts = statusCounts
         _showFolderPicker = showFolderPicker
         _showAddArticle = showAddArticle
         _showSettings = showSettings
@@ -321,22 +392,18 @@ private struct ArticleListFetchedBody: View {
         }
     }
 
-    private var emptyUsesArchivedVariant: Bool {
-        activeFilter == .archived && searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && datePreset == .any
-    }
+    private var continueReadingArticles: [Article] { filteredArticles.filter { $0.statusEnum == .reading } }
+    private var unreadArticles: [Article] { filteredArticles.filter { $0.statusEnum == .unread } }
+    private var readArticles: [Article] { filteredArticles.filter { $0.statusEnum == .read } }
+    private var archivedArticles: [Article] { filteredArticles.filter { $0.statusEnum == .archived } }
 
-    /// Empty state when filters/search narrow the list but nothing matches.
+    /// Empty state when search/date/tags narrow the list but nothing matches any section.
     private var narrowedListShowsMiss: Bool {
-        let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !q.isEmpty { return true }
-        if datePreset != .any { return true }
-        if !selectedTags.isEmpty { return true }
-        return false
+        hasNarrowingFilter || !selectedTags.isEmpty
     }
 
     @ViewBuilder
-    private func rowLabel(for article: Article) -> some View {
+    private func rowLabel(for article: Article, showsProgress: Bool = false) -> some View {
         HStack(alignment: .top, spacing: VersoSpacing.sm) {
             if isSelecting {
                 Image(systemName: selectedArticleIds.contains(article.id) ? "checkmark.circle.fill" : "circle")
@@ -344,7 +411,7 @@ private struct ArticleListFetchedBody: View {
                     .foregroundColor(themeManager.colors.accent)
                     .padding(.top, 4)
             }
-            ArticleCard(article: article)
+            ArticleCard(article: article, showsProgress: showsProgress)
         }
     }
 
@@ -356,19 +423,8 @@ private struct ArticleListFetchedBody: View {
         // instead of opening an article, so the binding writes nowhere (`.constant(nil)`) and the
         // checkbox Button below handles the tap itself.
         List(selection: isSelecting ? .constant(nil) : $selectedArticle) {
-            dateFilterRow
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-
-            FilterChipBar(activeFilter: $activeFilter, counts: statusCounts)
-                .padding(.top, VersoSpacing.sm)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-
             if filteredArticles.isEmpty {
-                EmptyState(variant: emptyUsesArchivedVariant ? .noArchived : (narrowedListShowsMiss ? .searchMiss : .empty))
+                EmptyState(variant: narrowedListShowsMiss ? .searchMiss : .empty)
                     .environmentObject(themeManager)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: max(260, listGeometry.size.height * 0.52))
@@ -376,57 +432,45 @@ private struct ArticleListFetchedBody: View {
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             } else {
-                ForEach(filteredArticles) { article in
-                    Group {
-                        if isSelecting {
-                            // Bulk-select mode: tap toggles a checkbox, no navigation involved.
-                            // The List's selection binding is `.constant(nil)` while this is active,
-                            // so this Button's own tap handling is what fires here, not row selection.
-                            Button {
-                                if selectedArticleIds.contains(article.id) {
-                                    selectedArticleIds.remove(article.id)
-                                } else {
-                                    selectedArticleIds.insert(article.id)
-                                }
-                            } label: {
-                                rowLabel(for: article)
-                            }
-                            .buttonStyle(.plain)
-                        } else {
-                            // No Button/NavigationLink wrapper needed: this row's tap is handled by
-                            // the List's `selection:` binding above (`.tag` is what associates the
-                            // tap with this article).
-                            rowLabel(for: article)
-                        }
+                if !continueReadingArticles.isEmpty {
+                    sectionHeader(
+                        title: L10n.Home.sectionContinueReading,
+                        accessibilityLabel: L10n.Home.sectionContinueReadingAccessibilityLabel(count: continueReadingArticles.count)
+                    )
+                    articleRows(continueReadingArticles, showsProgress: true)
+                }
+
+                if !unreadArticles.isEmpty {
+                    sectionHeader(
+                        title: L10n.Filter.unread,
+                        accessibilityLabel: L10n.Filter.unreadAccessibilityLabel(count: unreadArticles.count)
+                    )
+                    articleRows(unreadArticles)
+                }
+
+                if !readArticles.isEmpty {
+                    collapsibleSectionHeader(
+                        title: L10n.Filter.read,
+                        accessibilityLabel: L10n.Filter.readAccessibilityLabel(count: readArticles.count),
+                        isExpanded: $isReadExpanded
+                    )
+                    if isReadExpanded {
+                        articleRows(readArticles)
+                    } else {
+                        collapsedCaptionRow
                     }
-                    .tag(article)
-                    .listRowInsets(EdgeInsets(
-                        top: 4.5, leading: VersoSpacing.md,
-                        bottom: 4.5, trailing: VersoSpacing.md
-                    ))
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        if article.statusEnum != .archived {
-                            Button {
-                                archiveArticle(article)
-                            } label: {
-                                Label(L10n.Swipe.archive, systemImage: "archivebox")
-                            }
-                            .tint(Color(hex: "766655"))
-                        }
-                    }
-                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                        let isRead = article.statusEnum == .read
-                        Button {
-                            toggleReadStatus(article)
-                        } label: {
-                            Label(
-                                isRead ? L10n.Swipe.markUnread : L10n.Swipe.markRead,
-                                systemImage: isRead ? "circle" : "checkmark.circle"
-                            )
-                        }
-                        .tint(isRead ? Color(hex: "4A90D9") : Color(hex: "5AAF7A"))
+                }
+
+                if !archivedArticles.isEmpty {
+                    collapsibleSectionHeader(
+                        title: L10n.Filter.archived,
+                        accessibilityLabel: L10n.Filter.archivedAccessibilityLabel(count: archivedArticles.count),
+                        isExpanded: $isArchivedExpanded
+                    )
+                    if isArchivedExpanded {
+                        articleRows(archivedArticles)
+                    } else {
+                        collapsedCaptionRow
                     }
                 }
             }
@@ -439,31 +483,9 @@ private struct ArticleListFetchedBody: View {
             guard let url = folderBookmarkService.folderURL else { return }
             await articleLibraryService.rebuildCache(from: url, context: viewContext)
         }
-        .versoNavigationBar(title: L10n.Home.navTitle, trailingIcon: "gear") {
-            showSettings = true
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(isSelecting ? L10n.Home.bulkSelectCancel : L10n.Home.bulkSelectSelect) {
-                    if isSelecting {
-                        isSelecting = false
-                        selectedArticleIds.removeAll()
-                    } else {
-                        isSelecting = true
-                    }
-                }
-                .font(VersoTypography.UI.button)
-                .foregroundColor(themeManager.colors.accent)
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                VersoToolbarIconButton(
-                    systemName: "plus.circle",
-                    accent: themeManager.colors.accent
-                ) {
-                    showAddArticle = true
-                }
-            }
-        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(themeManager.colors.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if isSelecting, !selectedArticleIds.isEmpty {
                 HStack(spacing: VersoSpacing.lg) {
@@ -496,7 +518,7 @@ private struct ArticleListFetchedBody: View {
                         .foregroundColor(themeManager.colors.border),
                     alignment: .top
                 )
-                // Match ReadingBottomBar: opaque fill through home indicator so controls aren’t clipped.
+                // Match ReadingBottomBar: opaque fill through home indicator so controls aren't clipped.
                 .background(themeManager.colors.background.ignoresSafeArea(edges: .bottom))
             }
         }
@@ -526,34 +548,152 @@ private struct ArticleListFetchedBody: View {
                 .environmentObject(folderBookmarkService)
                 .environment(\.managedObjectContext, viewContext)
         }
+        .sheet(item: $tagsEditorArticle) { article in
+            ArticleTagsEditorSheet(article: article)
+                .environmentObject(themeManager)
+                .environmentObject(folderBookmarkService)
+                .environmentObject(adoptionNoticeService)
+                .environment(\.managedObjectContext, viewContext)
+        }
     }
 
-    private var dateFilterRow: some View {
-        HStack {
-            Text(L10n.Home.dateFilterLabel)
-                .font(VersoTypography.UI.caption)
-                .foregroundColor(themeManager.colors.textSecondary)
-            Spacer()
-            Menu {
-                ForEach(ArticleListDatePreset.allCases) { preset in
-                    Button(preset.displayLabel) {
-                        datePreset = preset
+    // MARK: - Sections
+
+    private func sectionHeader(title: String, accessibilityLabel: String) -> some View {
+        Text(title)
+            .font(VersoTypography.UI.listTitle)
+            .foregroundColor(themeManager.colors.textPrimary)
+            .padding(.horizontal, VersoSpacing.md)
+            .padding(.top, VersoSpacing.md)
+            .padding(.bottom, VersoSpacing.xs)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityLabel(accessibilityLabel)
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+    }
+
+    private func collapsibleSectionHeader(title: String, accessibilityLabel: String, isExpanded: Binding<Bool>) -> some View {
+        Button {
+            withAnimation(VersoAnimation.fast) { isExpanded.wrappedValue.toggle() }
+        } label: {
+            HStack {
+                Text(title)
+                    .font(VersoTypography.UI.listTitle)
+                    .foregroundColor(themeManager.colors.textPrimary)
+                Spacer()
+                Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(themeManager.colors.textSecondary)
+            }
+            .padding(.horizontal, VersoSpacing.md)
+            .padding(.top, VersoSpacing.md)
+            .padding(.bottom, VersoSpacing.xs)
+            .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint(L10n.Home.sectionToggleHint)
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
+
+    private var collapsedCaptionRow: some View {
+        Text(L10n.Home.sectionCollapsedCaption)
+            .font(VersoTypography.UI.caption)
+            .foregroundColor(themeManager.colors.textSecondary)
+            .padding(.horizontal, VersoSpacing.md)
+            .padding(.bottom, VersoSpacing.xs)
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+    }
+
+    @ViewBuilder
+    private func articleRows(_ items: [Article], showsProgress: Bool = false) -> some View {
+        ForEach(items) { article in
+            Group {
+                if isSelecting {
+                    // Bulk-select mode: tap toggles a checkbox, no navigation involved.
+                    // The List's selection binding is `.constant(nil)` while this is active,
+                    // so this Button's own tap handling is what fires here, not row selection.
+                    Button {
+                        if selectedArticleIds.contains(article.id) {
+                            selectedArticleIds.remove(article.id)
+                        } else {
+                            selectedArticleIds.insert(article.id)
+                        }
+                    } label: {
+                        rowLabel(for: article, showsProgress: showsProgress)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    // No Button/NavigationLink wrapper needed: this row's tap is handled by
+                    // the List's `selection:` binding above (`.tag` is what associates the
+                    // tap with this article).
+                    rowLabel(for: article, showsProgress: showsProgress)
+                }
+            }
+            .tag(article)
+            .listRowInsets(EdgeInsets(
+                top: 4.5, leading: VersoSpacing.md,
+                bottom: 4.5, trailing: VersoSpacing.md
+            ))
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .contextMenu {
+                Button {
+                    isSelecting = true
+                } label: {
+                    Label(L10n.Home.bulkSelectSelect, systemImage: "checkmark.circle")
+                }
+                Button {
+                    toggleReadStatus(article)
+                } label: {
+                    let isRead = article.statusEnum == .read
+                    Label(
+                        isRead ? L10n.ContextMenu.markAsUnread : L10n.ContextMenu.markAsRead,
+                        systemImage: isRead ? "circle" : "checkmark.circle"
+                    )
+                }
+                Button {
+                    tagsEditorArticle = article
+                } label: {
+                    Label(L10n.ContextMenu.addTags, systemImage: "tag")
+                }
+                if article.statusEnum != .archived {
+                    Button {
+                        archiveArticle(article)
+                    } label: {
+                        Label(L10n.ContextMenu.archive, systemImage: "archivebox")
                     }
                 }
-            } label: {
-                HStack(spacing: VersoSpacing.xs) {
-                    Text(datePreset.displayLabel)
-                        .font(VersoTypography.UI.listSubtitle)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(themeManager.colors.textSecondary)
-                }
-                .foregroundColor(themeManager.colors.textPrimary)
             }
-            .buttonStyle(.plain)
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                if article.statusEnum != .archived {
+                    Button {
+                        archiveArticle(article)
+                    } label: {
+                        Label(L10n.Swipe.archive, systemImage: "archivebox")
+                    }
+                    .tint(Color(hex: "766655"))
+                }
+            }
+            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                let isRead = article.statusEnum == .read
+                Button {
+                    toggleReadStatus(article)
+                } label: {
+                    Label(
+                        isRead ? L10n.Swipe.markUnread : L10n.Swipe.markRead,
+                        systemImage: isRead ? "circle" : "checkmark.circle"
+                    )
+                }
+                .tint(isRead ? Color(hex: "4A90D9") : Color(hex: "5AAF7A"))
+            }
         }
-        .padding(.horizontal, VersoSpacing.md)
-        .padding(.top, VersoSpacing.sm)
     }
 
     /// Runs the FAB-290 one-time adoption for `article`'s file if it still needs one (manually
@@ -618,11 +758,14 @@ private struct ArticleListFetchedBody: View {
     }
 }
 
-// MARK: - Tag filter panel
+// MARK: - Filter panel (tags + date range)
 
-private struct TagFilterPanel: View {
+/// Combines tag selection with the date-range presets that previously lived in their own inline
+/// row above the (now-removed) status filter-chip bar -- one filter icon in the header opens both.
+private struct FilterPanel: View {
     let tags: [String]
     @Binding var selectedTags: Set<String>
+    @Binding var datePreset: ArticleListDatePreset
     let onClose: () -> Void
 
     @EnvironmentObject var themeManager: ThemeManager
@@ -637,6 +780,21 @@ private struct TagFilterPanel: View {
     var body: some View {
         VStack(spacing: 0) {
             header
+
+            Text(L10n.Home.dateFilterLabel)
+                .font(VersoTypography.UI.caption)
+                .foregroundColor(themeManager.colors.textSecondary)
+                .padding(.horizontal, VersoSpacing.md)
+                .padding(.top, VersoSpacing.sm)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            ForEach(ArticleListDatePreset.allCases) { preset in
+                tagRow(title: preset.displayLabel, isSelected: datePreset == preset) {
+                    datePreset = preset
+                }
+            }
+
+            Divider().background(themeManager.colors.border)
 
             SearchBar(text: $tagQuery, placeholder: L10n.Home.tagFilterSearchPlaceholder)
                 .padding(.horizontal, VersoSpacing.md)
@@ -690,7 +848,7 @@ private struct TagFilterPanel: View {
 
     private var header: some View {
         HStack {
-            Text(L10n.Home.tagFilterTitle)
+            Text(L10n.Home.filterPanelTitle)
                 .font(VersoTypography.UI.screenTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
             Spacer()

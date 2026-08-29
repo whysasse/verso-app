@@ -85,6 +85,16 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `home.sort.oldestFirst` | Sort toggle accessibility label (active) | Sort oldest first | Trier du plus ancien | Ordenar do mais antigo | — |
 | `home.pullToRefresh.accessibilityLabel` | Pull-to-refresh | Refresh article list | Actualiser la liste d'articles | Atualizar lista de artigos | — |
 
+### Header Row (FAB-292)
+
+> Added for FAB-292's redesigned header — "Verso" and four icon buttons (search, filter, add, overflow) now share one row instead of the previous four stacked control rows.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.search.icon.accessibilityLabel` | Collapsed search icon button (header row) | Search | Rechercher | Buscar | Tapping expands into the full-width field (`home.search.placeholder`) with `home.search.cancel` to collapse back. |
+| `home.overflow.accessibilityLabel` | "•••" overflow icon button (header row) | More | Plus | Mais | Opens a menu with `home.bulkSelect.select` and `home.settings.accessibilityLabel` as items — both existing strings, reused as visible menu-item text. |
+| `home.addArticle.accessibilityLabel` | "+" add-article icon button (header row) | Add article | Ajouter un article | Adicionar artigo | Same wording as `addArticle.navTitle`. Previously this button had no explicit accessibility label. |
+
 ### Search
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
@@ -107,29 +117,44 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `home.tagFilter.button.accessibilityLabel` | Tag-filter icon button (top of list) | Filter by tags | Filtrer par étiquettes | Filtrar por etiquetas | Added during step 4 view-wiring pass — tag filtering postdates the original audit. "Tag" rendered as étiquette/etiqueta (standard software term), not a literal "mot-clé"/"marcador". |
-| `home.tagFilter.title` | Side panel header | Tags | Étiquettes | Etiquetas | — |
-| `home.tagFilter.searchPlaceholder` | Side panel search field | Search tags… | Rechercher des étiquettes… | Buscar etiquetas… | — |
+| `home.tagFilter.button.accessibilityLabel` | Filter icon button (header row) | Filter by tags or date | Filtrer par étiquettes ou par date | Filtrar por etiquetas ou data | Reworded for FAB-292 — this one icon now opens `FilterPanel` (tag selection + the date-range section below), replacing the old separate tag-icon-button and inline date-range row. "Tag" rendered as étiquette/etiqueta (standard software term), not a literal "mot-clé"/"marcador". |
+| `home.tagFilter.title` | `ArticleTagsEditorSheet` nav title only (FAB-292: `FilterPanel`'s own header moved to `home.filterPanel.title` since this key is shared with that unrelated per-article tags editor) | Tags | Étiquettes | Etiquetas | — |
+| `home.tagFilter.searchPlaceholder` | Panel's tag search field | Search tags… | Rechercher des étiquettes… | Buscar etiquetas… | — |
 | `home.tagFilter.allTags` | Row that clears the tag selection | All tags | Toutes les étiquettes | Todas as etiquetas | — |
 | `home.tagFilter.noMatches` | Empty state inside the panel | No matching tags | Aucune étiquette correspondante | Nenhuma etiqueta correspondente | — |
-| `home.tagFilter.close.accessibilityLabel` | Close (X) button | Close tag filter | Fermer le filtre d'étiquettes | Fechar filtro de etiquetas | — |
+| `home.tagFilter.close.accessibilityLabel` | Close (X) button | Close filters | Fermer les filtres | Fechar filtros | Reworded for FAB-292 — same button, now closes the combined tag + date panel (`home.filterPanel.title`), not tag-only. |
 
-### Filter Chips
+### Filter Panel (FAB-292)
+
+> `FilterPanel` (renamed from `TagFilterPanel`) now combines tag selection with the date-range presets that previously lived in their own inline row. The date-range option labels (`home.dateFilter.any/week/month/year`) are unchanged and reused as-is inside the panel's new date section, under the existing `home.dateFilter.label` ("Added") heading.
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `filter.all` | Filter chip label | All | Tous | Todos | — |
-| `filter.unread` | Filter chip label | Unread | Non lus | Não lidos | — |
-| `filter.reading` | Filter chip label | Reading | En cours | Lendo | — |
-| `filter.read` | Filter chip label | Read | Lus | Lidos | — |
-| `filter.archived` | Filter chip label | Archived | Archivés | Arquivados | Added during step 4 view-wiring pass — `FilterChipBar.swift` renders a chip for every `ArticleStatus` case, including `.archived`, which the original audit missed. |
-| `filter.all.accessibilityLabel` | VoiceOver label | All articles, {count} total | Tous les articles, {count} au total | Todos os artigos, {count} no total | ⚠️ plural |
-| `filter.unread.accessibilityLabel` | VoiceOver label | Unread, {count} articles | Non lus, {count} articles | Não lidos, {count} artigos | ⚠️ plural |
-| `filter.reading.accessibilityLabel` | VoiceOver label | Reading, {count} articles | En cours, {count} articles | Lendo, {count} artigos | ⚠️ plural |
-| `filter.read.accessibilityLabel` | VoiceOver label | Read, {count} articles | Lus, {count} articles | Lidos, {count} artigos | ⚠️ plural |
-| `filter.archived.accessibilityLabel` | VoiceOver label | Archived, {count} articles | Archivés, {count} articles | Arquivados, {count} artigos | ⚠️ plural. Added during step 4 view-wiring pass — see note on `filter.archived`. |
-| `filter.chip.selected.hint` | VoiceOver hint (any chip) | Currently selected | Actuellement sélectionné | Selecionado atualmente | — |
-| `filter.chip.unselected.hint` | VoiceOver hint (any chip) | Double tap to filter | Appuie deux fois pour filtrer | Toque duas vezes para filtrar | — |
+| `home.filterPanel.title` | Panel header (was `home.tagFilter.title`, now split out — see note above) | Filters | Filtres | Filtros | — |
+
+### Article List Sections (formerly "Filter Chips")
+
+> FAB-292 removed the status filter-chip bar (`FilterChipBar`/`FilterChip`, deleted) in favor of always-visible, collapsible list sections. `filter.unread`/`filter.read`/`filter.archived` (and their `.accessibilityLabel` plurals) survive unchanged as the **Unread**/**Read**/**Archived** section titles and header accessibility labels — same words, new location. `filter.all`, `filter.reading.accessibilityLabel`, and the two chip-selection hints had no equivalent in the new design (there's no "All" section, and `filter.reading`'s accessibility role is replaced by `home.section.continueReading.accessibilityLabel` below) and were removed. `filter.reading` (bare label) stays — `ArticleStatus.filterLabel` still references it for `StatusBadge`'s `.archived` case, even though nothing shows it as standalone chip text anymore.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `filter.unread` | Unread section header | Unread | Non lus | Não lidos | — |
+| `filter.reading` | Not shown directly — kept only because `ArticleStatus.filterLabel`'s switch still references it | Reading | En cours | Lendo | — |
+| `filter.read` | Read section header | Read | Lus | Lidos | — |
+| `filter.archived` | Archived section header | Archived | Archivés | Arquivados | — |
+| `filter.unread.accessibilityLabel` | Unread section header VoiceOver label | Unread, {count} articles | Non lus, {count} articles | Não lidos, {count} artigos | ⚠️ plural |
+| `filter.read.accessibilityLabel` | Read section header VoiceOver label | Read, {count} articles | Lus, {count} articles | Lidos, {count} artigos | ⚠️ plural |
+| `filter.archived.accessibilityLabel` | Archived section header VoiceOver label | Archived, {count} articles | Archivés, {count} articles | Arquivados, {count} artigos | ⚠️ plural |
+
+### Article List Sections — Continue Reading, collapse (FAB-292)
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `home.section.continueReading` | Continue Reading section header | Continue Reading | Reprendre la lecture | Continuar lendo | Pinned section for status `.reading` articles, shown above Unread. |
+| `home.section.continueReading.accessibilityLabel` | Continue Reading section header VoiceOver label | Continue Reading, {count} articles | Reprendre la lecture, {count} articles | Continuar lendo, {count} artigos | ⚠️ plural |
+| `home.section.continueReading.progressCaption` | Visible caption on a Continue Reading card, replacing the date line | {N}% read | {N} % lu | {N}% lido | `{N}` reuses the generic count-placeholder convention (see `articleCard.estimatedReadTime`), here holding a 0–100 percentage rather than an item count. Value comes from `Article.scrollPosition` (already persisted, `ArticleReaderView.swift`), not a new field. |
+| `home.section.toggleHint` | VoiceOver hint on the Read/Archived section headers | Double tap to show or hide | Appuie deux fois pour afficher ou masquer | Toque duas vezes para mostrar ou ocultar | Shared by both collapsible section headers — wording doesn't depend on current expand/collapse state. |
+| `home.section.collapsedCaption` | Caption shown under a collapsed section header | Collapsed — tap to expand | Réduit — appuie pour développer | Recolhido — toque para expandir | — |
 
 ### Article Card
 
@@ -187,6 +212,8 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 ### Context Menu
 
+> `contextMenu.open`/`.archive`/`.unarchive`/`.markAsRead`/`.markAsUnread` were documented here but unwired in code until FAB-292 — same drift pattern as `home.dateFilter.label` (see `docs/BACKLOG.md` FAB-278). They're now consumed by the article list's long-press context menu (`contextMenu.open` excepted — the approved design didn't include an explicit "Open" item since tapping the row already opens it, so that one key remains documented but unused).
+
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `contextMenu.open` | Context menu item | Open | Ouvrir | Abrir | — |
@@ -195,6 +222,7 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `contextMenu.markAsRead` | Context menu item | Mark as read | Marquer comme lu | Marcar como lido | — |
 | `contextMenu.markAsUnread` | Context menu item | Mark as unread | Marquer comme non lu | Marcar como não lido | — |
 | `contextMenu.delete` | Context menu item | Delete | Supprimer | Excluir | Destructive |
+| `contextMenu.addTags` | Context menu item (article list, FAB-292) | Add Tags | Ajouter des étiquettes | Adicionar etiquetas | Opens `ArticleTagsEditorSheet` for the tapped article — same sheet used from the reading view. |
 
 ### Delete Confirmation Dialog
 

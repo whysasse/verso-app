@@ -77,6 +77,7 @@
     "estimatedReadTime": "{count} min de lecture"
   },
   "contextMenu": {
+    "addTags": "Ajouter des étiquettes",
     "archive": "Archiver",
     "delete": "Supprimer",
     "markAsRead": "Marquer comme lu",
@@ -141,36 +142,24 @@
     }
   },
   "filter": {
-    "all": {
-      "_label": "Tous",
-      "accessibilityLabel": "Tous les articles, {count} au total"
-    },
     "archived": {
       "_label": "Archivés",
       "accessibilityLabel": "{count, plural, one {Archivés, # article} other {Archivés, # articles}}"
-    },
-    "chip": {
-      "selected": {
-        "hint": "Actuellement sélectionné"
-      },
-      "unselected": {
-        "hint": "Appuie deux fois pour filtrer"
-      }
     },
     "read": {
       "_label": "Lus",
       "accessibilityLabel": "{count, plural, one {Lus, # article} other {Lus, # articles}}"
     },
-    "reading": {
-      "_label": "En cours",
-      "accessibilityLabel": "{count, plural, one {En cours, # article} other {En cours, # articles}}"
-    },
+    "reading": "En cours",
     "unread": {
       "_label": "Non lus",
       "accessibilityLabel": "{count, plural, one {Non lus, # article} other {Non lus, # articles}}"
     }
   },
   "home": {
+    "addArticle": {
+      "accessibilityLabel": "Ajouter un article"
+    },
     "archiveToggle": {
       "showArchive": "Afficher les articles archivés",
       "showLibrary": "Afficher la liste de lecture"
@@ -214,10 +203,16 @@
         "subheadline": "Les articles que tu n'as pas encore lus apparaîtront ici."
       }
     },
+    "filterPanel": {
+      "title": "Filtres"
+    },
     "loading": {
       "accessibilityLabel": "Chargement des articles"
     },
     "navTitle": "Verso",
+    "overflow": {
+      "accessibilityLabel": "Plus"
+    },
     "pullToRefresh": {
       "accessibilityLabel": "Actualiser la liste d'articles"
     },
@@ -226,7 +221,19 @@
       "clear": {
         "accessibilityLabel": "Effacer la recherche"
       },
+      "icon": {
+        "accessibilityLabel": "Rechercher"
+      },
       "placeholder": "Rechercher titres, texte ou site…"
+    },
+    "section": {
+      "collapsedCaption": "Réduit — appuie pour développer",
+      "continueReading": {
+        "_label": "Reprendre la lecture",
+        "accessibilityLabel": "{count, plural, one {Reprendre la lecture, # article} other {Reprendre la lecture, # articles}}",
+        "progressCaption": "{count} % lu"
+      },
+      "toggleHint": "Appuie deux fois pour afficher ou masquer"
     },
     "settings": {
       "accessibilityLabel": "Réglages"
@@ -238,10 +245,10 @@
     "tagFilter": {
       "allTags": "Toutes les étiquettes",
       "button": {
-        "accessibilityLabel": "Filtrer par étiquettes"
+        "accessibilityLabel": "Filtrer par étiquettes ou par date"
       },
       "close": {
-        "accessibilityLabel": "Fermer le filtre d'étiquettes"
+        "accessibilityLabel": "Fermer les filtres"
       },
       "noMatches": "Aucune étiquette correspondante",
       "searchPlaceholder": "Rechercher des étiquettes…",
