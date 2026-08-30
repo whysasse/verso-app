@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct RelatedArticlesSection: View {
     let articles: [Article]
