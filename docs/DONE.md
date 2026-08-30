@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**170 completed issues.**
+**171 completed issues.**
 
 ## iOS
 
@@ -22,6 +22,24 @@
   ## Verified
 
   New unit tests in `Verso/VersoTests/SwiftSoupParserTests.swift` (a synthetic Medium-like HTML fixture reproducing the reported junk) and `HTMLToMarkdownConverterNoiseTests` (the new drop rules in isolation) — 11 tests, all passing. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes; full `VersoTests` suite (17 tests) passes. Real-device confirmation against the original reported Medium article is Fabio's part after this PR.
+
+- [x] 🟠 **FAB-295** · Imported articles have no images  `Done` `High`
+  Articles saved through the Share Extension had no images at all. Not a download or renderer bug — `SwiftSoupParser.collectLines` simply had no `img`/`picture`/`figure` case, so `<img>` elements (void, no children) emitted nothing, the markdown never contained a `![](…)` reference, and the existing localizer/renderer had nothing to act on. Completed 2026-08-30, on top of FAB-294's `HTMLToMarkdownConverter` move.
+
+  ## Fix
+
+  * **`SwiftSoupParser.collectLines`**: added `img`/`picture`/`figure` cases, threading a `baseURL` (the article's source URL) through `extractContentMarkdown` → `htmlToMarkdown` → `collectLines` for relative-path resolution.
+    * `img`: resolves via SwiftSoup's own `element.outerHtml()` fed into `HTMLToMarkdownConverter.resolvedHTTPImageURL(forImgTag:baseURL:)` — reusing the exact tested src/srcset/lazy-load priority order rather than re-deriving it. Skips 1px trackers/avatars when `width`/`height` are both present and under 100.
+    * `picture`: reuses `HTMLToMarkdownConverter.bestImageURLAndAlt(inHTMLFragment:baseURL:)` against the element's own inner HTML — the same "best of `<source srcset>` / `<img>`" logic already proven for Guardian's markup.
+    * `figure`: prefers a nested `<picture>`, else a nested `<img>`; a non-empty `<figcaption>` becomes the caption/alt — but only after screening it with `HTMLToMarkdownConverter.isNoiseLine` first, so a lightbox label like "Press enter or click to view image in full size" sitting in a `<figcaption>` isn't promoted into a visible caption (caught by the new tests, not by manual review). Falls back to normal recursion when no image is found, so a figure wrapping something else (e.g. a code block) doesn't lose its content.
+  * Exposed three more `HTMLToMarkdownConverter` members as `internal`: `resolvedHTTPImageURL(forImgTag:baseURL:)`, `bestImageURLAndAlt(inHTMLFragment:baseURL:)`, `markdownSafeAltText(_:)`, `isNoiseLine(_:)`.
+  * **`ArticleMarkdownImageLocalizer`**: downloaded files now get stable, ordered names (`{stem}-01.jpg`, `-02.png`, …, zero-padded, per Fabio's request) instead of `UUID().uuidString`. The filename *prefix* truncates the stem to 80 chars (the `.media` directory name itself is untouched, so already-saved articles keep working); a same-name collision inside one article's media folder appends `-b`, `-c`, … (letters start at "b", matching `MarkdownWriter.uniqueFilename`'s existing "(2)", "(3)" convention where the plain name is the implicit first variant).
+  * **`MarkdownWriter.delete`/`archive`**: both now carry the `{stem}.media` sidecar folder along — removed on delete, moved into `Archive/` on archive — so an article's downloaded images don't become orphaned files in the user's iCloud Drive. Best-effort (`try?`) so a media-cleanup hiccup never fails the primary operation, which had already succeeded.
+  * Verified, no code change needed: `MarkdownReader.readAll` and `ArticleDuplicateFinder.scanDirectory` both filter on `fileURL.pathExtension == "md"`, so a `Foo.media` directory was already safe from appearing as an article.
+
+  ## Verified
+
+  New tests: `SwiftSoupParserImageTests` (bare `<img>`, lazy `data-src`, Guardian-style `<picture>`+`srcset`, figure+figcaption-as-alt, figcaption-noise-not-promoted, figure-fallback-on-non-image-content, tracking-pixel skip, no-dimensions-not-skipped, relative-URL resolution — 8 tests), `ArticleMarkdownImageLocalizerTests` (stem truncation, collision-letter naming — 7 tests), plus 4 new `MarkdownWriterTests` cases for delete/archive carrying or no-oping on the `.media` folder. 57 tests total in `VersoTests`, all passing. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes. Not verified here: an actual live Share Extension import with real images (Medium/Guardian/Substack) — Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 

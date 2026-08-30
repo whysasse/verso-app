@@ -68,7 +68,9 @@ enum HTMLToMarkdownConverter {
     }
 
     /// Avoid breaking `![](url)` markdown when captions contain `]` (rare from publishers).
-    private static func markdownSafeAltText(_ raw: String) -> String {
+    /// Internal (not `private`) so `SwiftSoupParser` can reuse it for the same sanitization
+    /// on the Share Extension's own emitted image lines (FAB-295).
+    static func markdownSafeAltText(_ raw: String) -> String {
         raw.replacingOccurrences(of: "]", with: ")")
             .replacingOccurrences(of: "[", with: "(")
     }
@@ -120,7 +122,10 @@ enum HTMLToMarkdownConverter {
         return work as String
     }
 
-    private static func bestImageURLAndAlt(inHTMLFragment inner: String, baseURL: URL?) -> (url: String, alt: String)? {
+    /// Internal (not `private`) so `SwiftSoupParser` can reuse the same "best of `<source
+    /// srcset>` / `<img>`" resolution for `<picture>` elements it encounters directly in the DOM
+    /// (FAB-295), rather than re-deriving this priority order a second time.
+    static func bestImageURLAndAlt(inHTMLFragment inner: String, baseURL: URL?) -> (url: String, alt: String)? {
         var bestURL: String?
         var altOut = ""
         if let imgRe = try? NSRegularExpression(pattern: #"<img[^>]*>"#, options: [.caseInsensitive]) {
@@ -150,7 +155,10 @@ enum HTMLToMarkdownConverter {
         return (url, altOut)
     }
 
-    private static func resolvedHTTPImageURL(forImgTag tag: String, baseURL: URL?) -> String? {
+    /// Internal (not `private`) so `SwiftSoupParser` can reuse this exact src/srcset/lazy-load
+    /// priority order for `<img>` elements it encounters directly in the DOM (FAB-295) — pass
+    /// `element.outerHtml()` as `tag` rather than re-deriving the same resolution logic.
+    static func resolvedHTTPImageURL(forImgTag tag: String, baseURL: URL?) -> String? {
         if let ss = attributeValue(attribute: "srcset", in: tag),
            let u = firstHTTPURL(inSrcset: ss, baseURL: baseURL) {
             return u
@@ -253,8 +261,11 @@ enum HTMLToMarkdownConverter {
     )
 
     /// True for a line that is pure noise on its own: a known UI-label fingerprint, only digits,
-    /// only separator punctuation, or a "N min read" label.
-    private static func isNoiseLine(_ line: String) -> Bool {
+    /// only separator punctuation, or a "N min read" label. Internal (not `private`) so
+    /// `SwiftSoupParser` can screen a `<figcaption>` before promoting it to an image's alt text
+    /// (FAB-295) — a lightbox label like "Press enter or click to view image in full size" must
+    /// not become a visible caption just because it happened to sit in a `<figcaption>`.
+    static func isNoiseLine(_ line: String) -> Bool {
         let trimmed = line.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return true }
         if fullscreenLineFingerprints.contains(lineFingerprint(trimmed)) { return true }

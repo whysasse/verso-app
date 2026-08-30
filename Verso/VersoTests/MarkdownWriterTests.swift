@@ -171,4 +171,53 @@ final class MarkdownWriterTests: XCTestCase {
         // The pre-existing file at the base name is untouched.
         XCTAssertTrue(FileManager.default.fileExists(atPath: tempDir.appendingPathComponent("\(dateStr) meeting-notes.md").path))
     }
+
+    // MARK: - delete/archive: `.media` sidecar folder (FAB-295)
+
+    private func makeMediaFolder(forArticleNamed name: String) throws -> URL {
+        let stem = (name as NSString).deletingPathExtension
+        let mediaDir = tempDir.appendingPathComponent("\(stem).media", isDirectory: true)
+        try FileManager.default.createDirectory(at: mediaDir, withIntermediateDirectories: true)
+        try Data([0x01]).write(to: mediaDir.appendingPathComponent("\(stem)-01.jpg"))
+        return mediaDir
+    }
+
+    func testDeleteRemovesSiblingMediaFolder() throws {
+        let articleURL = try write("---\ntitle: \"A\"\nstatus: unread\n---\nBody.", name: "Article.md")
+        let mediaDir = try makeMediaFolder(forArticleNamed: "Article.md")
+
+        try MarkdownWriter.delete(at: articleURL.path)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: articleURL.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: mediaDir.path), "Orphaned .media folder should be removed alongside the article")
+    }
+
+    func testDeleteWithNoMediaFolderStillDeletesArticle() throws {
+        let articleURL = try write("---\ntitle: \"A\"\nstatus: unread\n---\nBody.", name: "Article.md")
+
+        try MarkdownWriter.delete(at: articleURL.path)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: articleURL.path))
+    }
+
+    func testArchiveMovesSiblingMediaFolderIntoArchiveSubfolder() throws {
+        let articleURL = try write("---\ntitle: \"A\"\nstatus: unread\n---\nBody.", name: "Article.md")
+        _ = try makeMediaFolder(forArticleNamed: "Article.md")
+
+        let destination = try MarkdownWriter.archive(filePath: articleURL.path, in: tempDir)
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: tempDir.appendingPathComponent("Article.media").path))
+        let archivedMediaDir = destination.deletingLastPathComponent().appendingPathComponent("Article.media", isDirectory: true)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: archivedMediaDir.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: archivedMediaDir.appendingPathComponent("Article-01.jpg").path))
+    }
+
+    func testArchiveWithNoMediaFolderStillArchivesArticle() throws {
+        let articleURL = try write("---\ntitle: \"A\"\nstatus: unread\n---\nBody.", name: "Article.md")
+
+        let destination = try MarkdownWriter.archive(filePath: articleURL.path, in: tempDir)
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: destination.path))
+        XCTAssertEqual(destination.lastPathComponent, "Article.md")
+    }
 }

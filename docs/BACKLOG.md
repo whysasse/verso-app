@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**25 open issues** across iOS, Web, Design, and Infra.
+**24 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -31,7 +31,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 ### Bugs — import & rendering (reported by Fabio 2026-08-30)
 
-Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome). **FAB-294 is done** (see [DONE.md](DONE.md)) — FAB-295 lands on top of it, now cheaply, since `HTMLToMarkdownConverter` has already moved to `Verso/Shared/` and its URL-resolution helpers are ready to be exposed as `internal`.
+Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome). **Both are done** (see [DONE.md](DONE.md)).
 
 - [ ] 🟡 **FAB-293** · Markdown tables are not rendered in the reading view  `Todo` `Medium`
 
@@ -54,26 +54,6 @@ Four bugs found while reading a Medium article saved through the Share Extension
   - A table wider than the screen scrolls horizontally; the surrounding article text does not.
   - Dynamic Type at XXL doesn't clip cells (they wrap).
   - New unit tests in `Verso/VersoTests/` covering `MarkdownParser.parse` for: a basic table, alignment row, ragged rows, a pipe line with no delimiter row (must stay a paragraph). Add a `#Preview` sample containing a table to `MarkdownBodyView.swift`.
-
-- [ ] 🟠 **FAB-295** · Imported articles have no images  `Todo` `High`
-
-  **Symptom.** Articles saved through the Share Extension contain no images at all; the reading view shows text only.
-
-  **Root cause.** Not the download or the renderer — both already work. `SwiftSoupParser.collectLines` has no `img` / `picture` / `figure` case, so `<img>` elements hit the `default:` branch, which recurses into children; `<img>` is void, so nothing is emitted. The markdown therefore contains no `![](…)` at all, which means `ArticleMarkdownImageLocalizer.localizeMarkdownRemoteImages` (called from `MarkdownWriter.write` / `.replaceArticle`) finds zero matches and returns early. The in-app Readability path does this correctly via `HTMLToMarkdownConverter.insertMarkdownImages` — the extension just never runs it. `MarkdownBodyView.AsyncImageBlock` already resolves relative `./{stem}.media/…` paths against `baseDirectoryURL`, so rendering needs no change.
-
-  **Fix.**
-  1. Add `case "img"`, `case "picture"` and `case "figure"` to `collectLines` in `Verso/Shared/SwiftSoupParser.swift`, emitting `![alt](url)` on its own line surrounded by blanks. Reuse the URL-resolution logic already written for the Readability path rather than reimplementing it: once FAB-294 has moved `HTMLToMarkdownConverter` into `Verso/Shared/`, expose `resolvedHTTPImageURL(forImgTag:baseURL:)`, `firstHTTPURL(inSrcset:baseURL:)` and `canonicalImageURLString(_:baseURL:)` as `internal` and call them. This matters because Medium/Guardian lazy-load: the real URL lives in `srcset` or `data-src`, not `src`. For `<figure>`, emit the `<img>` line and use `<figcaption>` text as the alt/caption. Skip `data:` URIs, tracking pixels, and images smaller than ~100×100 when `width`/`height` attributes are present (avatars and 1px beacons).
-  2. **Rename downloaded files after the article**, per Fabio's request. In `Verso/Sources/Services/ArticleMarkdownImageLocalizer.swift` the media directory is already `{articleStem}.media/`, but individual files are `UUID().uuidString + ext`. Change to a stable, ordered, filesystem-safe name: `{articleStem}-01.jpg`, `-02.png`, … numbering in document order, zero-padded to 2. Truncate `{articleStem}` to ~80 chars (the article stem can already be 100+ chars and the full path has limits). On a name collision inside the media dir, append `-b`, `-c`. Keep the existing dedupe (`remoteToFilename`) so the same remote URL downloads once and both references point at the same file.
-  3. Verify `ICloudFileWatcher` / the library scan ignore `*.media` directories so the sidecar folders never surface as articles. Fix if they don't.
-  4. Confirm the media folder is deleted alongside the article when an article is deleted, and moved with it on archive (`Archive/`). Add it if missing — orphaned media folders in the user's iCloud Drive are a visible, user-owned-files problem.
-
-  **Acceptance.**
-  - Re-import the Medium article: the hero image and any inline images appear in the reading view.
-  - On disk: `2026-08-30 Article <title>.md` sits beside `2026-08-30 Article <title>.media/` containing `…-01.jpg`, `…-02.jpg`, and the markdown links them as `./<stem>.media/<stem>-01.jpg`.
-  - A Guardian article (`<picture>` + `srcset`) and a Substack article both bring their images across.
-  - Offline / 404 image: the article still saves, the failed image degrades to the placeholder, no crash.
-  - The `.media` folder does not appear as an article in the list.
-  - Unit tests for the naming scheme and for `collectLines` emitting image markdown from `src`, `srcset` and `data-src` fixtures.
 
 - [ ] 🟡 **FAB-296** · Duplicate articles appear in the list despite the duplicate check  `Todo` `Medium`
 
