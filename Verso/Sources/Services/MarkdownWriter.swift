@@ -131,13 +131,31 @@ struct MarkdownWriter {
         return lines.joined(separator: "\n") + "\n"
     }
 
-    /// Deletes the .md file at the given path.
-    static func delete(at filePath: String) throws {
-        try FileManager.default.removeItem(atPath: filePath)
+    /// The `{stem}.media` sidecar directory that sits beside a `.md` file, if any remote images
+    /// were localized into it (`ArticleMarkdownImageLocalizer`, FAB-140 / FAB-295).
+    private static func mediaDirectoryURL(forMarkdownPath filePath: String) -> URL {
+        let fileURL = URL(fileURLWithPath: filePath)
+        let stem = fileURL.deletingPathExtension().lastPathComponent
+        return fileURL.deletingLastPathComponent().appendingPathComponent("\(stem).media", isDirectory: true)
     }
 
-    /// Moves the .md file into an Archive/ subfolder of the given folder, creating it if needed.
-    /// Returns the destination URL.
+    /// Deletes the .md file at the given path, plus its `{stem}.media` sidecar folder if present
+    /// (FAB-295) -- an orphaned media folder in the user's iCloud Drive is a visible,
+    /// user-owned-files problem, not just internal cleanup.
+    static func delete(at filePath: String) throws {
+        let fm = FileManager.default
+        try fm.removeItem(atPath: filePath)
+        let mediaDir = mediaDirectoryURL(forMarkdownPath: filePath)
+        if fm.fileExists(atPath: mediaDir.path) {
+            // Best-effort: the primary delete already succeeded, and a media-cleanup hiccup
+            // shouldn't be reported as if the article itself failed to delete.
+            try? fm.removeItem(at: mediaDir)
+        }
+    }
+
+    /// Moves the .md file into an Archive/ subfolder of the given folder, creating it if needed,
+    /// carrying its `{stem}.media` sidecar folder along if present (FAB-295). Returns the
+    /// destination URL.
     @discardableResult
     static func archive(filePath: String, in folderURL: URL) throws -> URL {
         let archiveDir = folderURL.appendingPathComponent("Archive", isDirectory: true)
@@ -148,6 +166,14 @@ struct MarkdownWriter {
         let filename = URL(fileURLWithPath: filePath).lastPathComponent
         let destination = archiveDir.appendingPathComponent(filename)
         try fm.moveItem(atPath: filePath, toPath: destination.path)
+
+        let sourceMediaDir = mediaDirectoryURL(forMarkdownPath: filePath)
+        if fm.fileExists(atPath: sourceMediaDir.path) {
+            let destMediaDir = mediaDirectoryURL(forMarkdownPath: destination.path)
+            // Best-effort, same reasoning as delete() above -- the article itself already
+            // archived successfully.
+            try? fm.moveItem(at: sourceMediaDir, to: destMediaDir)
+        }
         return destination
     }
 

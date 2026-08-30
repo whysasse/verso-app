@@ -191,3 +191,113 @@ final class HTMLToMarkdownConverterNoiseTests: XCTestCase {
         XCTAssertTrue(result.contains("The results were surprising — nobody expected this outcome."))
     }
 }
+
+/// Regression coverage for FAB-295: the Share Extension's `SwiftSoupParser` path had no
+/// `<img>`/`<picture>`/`<figure>` handling at all, so imported articles saved with no images —
+/// `collectLines` fell through to `default:`, which recurses into an `<img>`'s (nonexistent,
+/// since it's a void element) children and emits nothing.
+final class SwiftSoupParserImageTests: XCTestCase {
+
+    private let sourceURL = URL(string: "https://example.com/articles/quiet-mornings")!
+
+    func testBareImgEmitsMarkdownImage() throws {
+        let html = """
+        <html><body><article>
+            <p>Intro paragraph.</p>
+            <img src="https://example.com/photo.jpg" alt="A quiet forest path" />
+            <p>Closing paragraph.</p>
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        XCTAssertTrue(article.contentMarkdown.contains("![A quiet forest path](https://example.com/photo.jpg)"))
+    }
+
+    func testLazyLoadedImgResolvesFromDataSrcWhenSrcIsPlaceholder() throws {
+        let html = """
+        <html><body><article>
+            <img src="data:image/gif;base64,R0lGOD" data-src="https://example.com/real-photo.jpg" alt="Real photo" />
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        XCTAssertTrue(article.contentMarkdown.contains("![Real photo](https://example.com/real-photo.jpg)"))
+        XCTAssertFalse(article.contentMarkdown.contains("data:image"))
+    }
+
+    func testGuardianStylePictureResolvesFromSourceSrcset() throws {
+        let html = """
+        <html><body><article>
+            <picture>
+                <source srcset="https://example.com/hero-1200.jpg 1200w, https://example.com/hero-600.jpg 600w" type="image/jpeg">
+                <img src="https://example.com/hero-fallback.jpg" alt="Hero fallback">
+            </picture>
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        // bestImageURLAndAlt prefers a resolvable <img> within the fragment over <source>; either
+        // real (non-placeholder) URL from this picture block is an acceptable, correct result.
+        XCTAssertTrue(
+            article.contentMarkdown.contains("hero-1200.jpg") || article.contentMarkdown.contains("hero-fallback.jpg"),
+            "Expected an image line resolved from the <picture> block: \(article.contentMarkdown)"
+        )
+    }
+
+    func testFigureWithImageAndCaptionUsesFigcaptionAsAlt() throws {
+        let html = """
+        <html><body><article>
+            <figure>
+                <img src="https://example.com/lake.jpg" alt="">
+                <figcaption>Morning fog over the lake, October 2025</figcaption>
+            </figure>
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        XCTAssertTrue(article.contentMarkdown.contains("![Morning fog over the lake, October 2025](https://example.com/lake.jpg)"))
+    }
+
+    func testFigureWrappingNonImageContentFallsBackToRecursion() throws {
+        let html = """
+        <html><body><article>
+            <p>Some setup text.</p>
+            <figure>
+                <pre><code>let x = 1</code></pre>
+                <figcaption>Listing 1</figcaption>
+            </figure>
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        // No image was found in the figure -- its content (the code block) must still survive
+        // via the fallback recursion, not vanish.
+        XCTAssertTrue(article.contentMarkdown.contains("let x = 1"))
+    }
+
+    func testTrackingPixelWithSmallExplicitDimensionsIsSkipped() throws {
+        let html = """
+        <html><body><article>
+            <p>Real paragraph.</p>
+            <img src="https://example.com/pixel.gif" width="1" height="1" alt="">
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        XCTAssertFalse(article.contentMarkdown.contains("pixel.gif"))
+    }
+
+    func testImageWithoutDeclaredDimensionsIsNotSkipped() throws {
+        let html = """
+        <html><body><article>
+            <img src="https://example.com/undeclared-size.jpg" alt="No dimensions given">
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        XCTAssertTrue(article.contentMarkdown.contains("undeclared-size.jpg"))
+    }
+
+    func testRelativeImageSrcResolvesAgainstArticleURL() throws {
+        let html = """
+        <html><body><article>
+            <img src="/media/photo.jpg" alt="Relative path photo">
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        XCTAssertTrue(article.contentMarkdown.contains("![Relative path photo](https://example.com/media/photo.jpg)"))
+    }
+}
