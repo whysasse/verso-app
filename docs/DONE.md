@@ -2,9 +2,26 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**169 completed issues.**
+**170 completed issues.**
 
 ## iOS
+
+### Bugs — import & rendering (reported by Fabio 2026-08-30)
+
+- [x] 🟠 **FAB-294** · Share Extension imports page chrome as body text  `Done` `High`
+  The Share Extension's `SwiftSoupParser` path leaked Medium-style page chrome (tag lists, toolbar labels like "Listen"/"Share", "N min read ·") into the saved article body: `collectLines` emitted every bare text node it walked past — including ones inside `<button>`/`<span>`/`<figcaption>` wrappers — and the extension never ran the cleanup pass (`HTMLToMarkdownConverter.sanitizeMarkdownBody`) the in-app Readability path already gets. Completed 2026-08-30.
+
+  ## Fix
+
+  * **`SwiftSoupParser.extractContentMarkdown`**: widened the DOM noise-removal selector to also drop `button, form, noscript, svg, iframe`, ARIA `[role=button]`/`[aria-hidden=true]`, and known Medium widget containers (`[data-testid*=audio/headerClap/headerSocial]`).
+  * **`collectLines`**: removed the bare-`TextNode` branch that was the actual leak — `p`/`li`/`h1`–`h6`/`blockquote`/`pre`/`code` already emit text correctly via `element.text()`; anything else now only contributes structure via recursion, not orphaned text. Added minimal `td`/`th` cases so incidental table cell text (no GFM rendering yet — that's FAB-293) degrades to loose lines instead of disappearing outright.
+  * **Moved `HTMLToMarkdownConverter`** out of `Sources/Services/ReadabilityParser.swift` (main-app-only) into `Verso/Shared/HTMLToMarkdownConverter.swift` so the Share Extension target can call it too — `Shared` was already a folder-based source for both targets in `project.yml`, so no target-membership change was needed, just `xcodegen generate`.
+  * `extractContentMarkdown` now runs its output through `HTMLToMarkdownConverter.sanitizeMarkdownBody(_:articleTitle:)` before returning, giving the extension the same title-echo removal, duplicate-block collapse, and noise-line filtering the in-app path already had.
+  * Extended `fullscreenLineFingerprints` with the reported labels (`listen`, `share`, `member-only story`, `featured`, `sign up`/`sign in`, `follow`, `press enter or click to view image in full size`) and added generic drop rules for digit-only lines, punctuation-only lines (`–`, `·`, `—`), and `^\d+\s*min read\s*·?$`.
+
+  ## Verified
+
+  New unit tests in `Verso/VersoTests/SwiftSoupParserTests.swift` (a synthetic Medium-like HTML fixture reproducing the reported junk) and `HTMLToMarkdownConverterNoiseTests` (the new drop rules in isolation) — 11 tests, all passing. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes; full `VersoTests` suite (17 tests) passes. Real-device confirmation against the original reported Medium article is Fabio's part after this PR.
 
 ### Phase 1 — Foundation
 
