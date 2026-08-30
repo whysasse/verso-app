@@ -16,7 +16,7 @@ struct SwiftSoupParser {
             let doc = try SwiftSoup.parse(html, url.absoluteString)
 
             let title = try extractTitle(from: doc, url: url)
-            let contentMarkdown = try extractContentMarkdown(from: doc)
+            let contentMarkdown = try extractContentMarkdown(from: doc, articleTitle: title)
             let author = extractAuthor(from: doc)
             let siteName = extractSiteLabel(from: doc)
 
@@ -85,9 +85,17 @@ struct SwiftSoupParser {
         return nil
     }
 
-    private static func extractContentMarkdown(from doc: Document) throws -> String {
-        // Remove noise elements before extracting text
-        try doc.select("script, style, nav, header, footer, aside, [role=navigation], [role=banner], [role=complementary]").remove()
+    private static func extractContentMarkdown(from doc: Document, articleTitle: String?) throws -> String {
+        // Remove noise elements before extracting text. Beyond the obvious page-chrome
+        // tags, this also drops interactive/toolbar elements (buttons, forms, embedded
+        // SVG icons) and known audio/clap/social-share widget containers that Medium
+        // and similar sites nest directly inside <article> (FAB-294).
+        let noiseSelector = "script, style, nav, header, footer, aside, "
+            + "[role=navigation], [role=banner], [role=complementary], "
+            + "button, form, noscript, svg, iframe, figure figcaption > button, "
+            + "[role=button], [aria-hidden=true], "
+            + "[data-testid*=audio], [data-testid*=headerClap], [data-testid*=headerSocial]"
+        try doc.select(noiseSelector).remove()
 
         // Prefer semantic content containers
         let contentElement: Element?
@@ -103,7 +111,12 @@ struct SwiftSoupParser {
             return ""
         }
 
-        return htmlToMarkdown(element)
+        let rawMarkdown = htmlToMarkdown(element)
+        // Run the same cleanup pass the in-app Readability path already gets
+        // (title-echo removal, duplicate-block collapse, UI-label line filtering)
+        // so the Share Extension's thinner SwiftSoup path isn't a second, worse-cleaned
+        // code path (FAB-294).
+        return HTMLToMarkdownConverter.sanitizeMarkdownBody(rawMarkdown, articleTitle: articleTitle)
     }
 
     private static func htmlToMarkdown(_ element: Element) -> String {
@@ -126,10 +139,13 @@ struct SwiftSoupParser {
 
     private static func collectLines(from node: Node, into lines: inout [String]) {
         for child in node.getChildNodes() {
-            if let textNode = child as? TextNode {
-                let text = textNode.text().trimmingCharacters(in: .whitespacesAndNewlines)
-                if !text.isEmpty { lines.append(text) }
-            } else if let element = child as? Element {
+            // Bare text nodes are intentionally not emitted here (FAB-294). Recursing
+            // into an unhandled wrapper tag (button, span, figcaption, …) used to
+            // surface every text node it walked past as its own line, which is how
+            // page chrome (toolbar labels, tag lists) leaked into the saved body.
+            // p/li/h1–h6/blockquote/pre/code/td/th below are the only text-emitting
+            // cases; anything else only contributes structure via recursion.
+            if let element = child as? Element {
                 let tag = element.tagName().lowercased()
                 switch tag {
                 case "h1":
@@ -178,6 +194,13 @@ struct SwiftSoupParser {
                 case "hr":
                     lines.append("---")
                     lines.append("")
+                case "td", "th":
+                    // No GFM table rendering yet (FAB-293) — keep cell text as a loose
+                    // line rather than losing it outright now that bare text nodes
+                    // are no longer emitted.
+                    if let text = try? element.text(), !text.isEmpty {
+                        lines.append(text)
+                    }
                 case "ul", "ol", "div", "section":
                     collectLines(from: element, into: &lines)
                     lines.append("")

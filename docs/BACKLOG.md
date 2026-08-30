@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**26 open issues** across iOS, Web, Design, and Infra.
+**25 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -31,7 +31,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 ### Bugs — import & rendering (reported by Fabio 2026-08-30)
 
-Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome) — do FAB-294 first, FAB-295 lands on top of it cheaply.
+Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome). **FAB-294 is done** (see [DONE.md](DONE.md)) — FAB-295 lands on top of it, now cheaply, since `HTMLToMarkdownConverter` has already moved to `Verso/Shared/` and its URL-resolution helpers are ready to be exposed as `internal`.
 
 - [ ] 🟡 **FAB-293** · Markdown tables are not rendered in the reading view  `Todo` `Medium`
 
@@ -55,29 +55,7 @@ Four bugs found while reading a Medium article saved through the Share Extension
   - Dynamic Type at XXL doesn't clip cells (they wrap).
   - New unit tests in `Verso/VersoTests/` covering `MarkdownParser.parse` for: a basic table, alignment row, ragged rows, a pipe line with no delimiter row (must stay a paragraph). Add a `#Preview` sample containing a table to `MarkdownBodyView.swift`.
 
-- [ ] 🟠 **FAB-294** · Share Extension imports page chrome as body text  `Todo` `High`
-
-  **Symptom.** A Medium article imported via the Share Extension contains navigation and UI junk in the body: the tag list (`Member-only story`, `Featured`, `Self Improvement`, `Psychology`, `Self Love`, `Mental Health`, `Books`), `4 min read ·`, and a block of stray toolbar text (`–`, `1`, `Listen`, `Share`, `Press enter or click to view image in full size`). See Fabio's screenshot (red rectangles) attached to the 2026-08-30 report.
-
-  **Root cause.** `ShareViewModel.performSave` (`Verso/ShareExtension/Sources/ShareViewModel.swift:~70`) calls `SwiftSoupParser.parse` directly and nothing else. It never touches `ArticleParserService` or `HTMLToMarkdownConverter`, so the cleanup that already exists for the in-app path never runs on shared articles. Two concrete gaps in `SwiftSoupParser` (`Verso/Shared/SwiftSoupParser.swift`):
-  - `collectLines` appends **every** bare `TextNode` it walks past as its own output line, and its `default:` branch recurses into `button`, `span`, `a`, `figcaption` wrappers. Medium's `<article>` element contains its own header toolbar, so all of it lands in the body in DOM order.
-  - The `doc.select(...).remove()` noise list only covers `script, style, nav, header, footer, aside` and three ARIA roles. It does not remove `button`, `form`, `noscript`, `svg`, `[role=button]`, `[aria-hidden=true]`, or Medium's tag-list and toolbar containers.
-
-  **Decision — do not move the Share Extension onto `ReadabilityParser`.** It would give better extraction, but it spins up a `WKWebView` and evaluates Readability.js, and share extensions run under a hard memory ceiling (~120 MB) with an aggressive watchdog; a jetsam kill there looks to the user like a silent failed save. Keep SwiftSoup (pure parsing, low memory) in the extension and make it cleaner. Revisit only if extraction quality is still unacceptable after this fix.
-
-  **Fix.**
-  1. Widen the removal selector in `extractContentMarkdown` to also drop: `button, form, noscript, svg, iframe, figure figcaption > button, [role=button], [aria-hidden=true], [data-testid*=audio], [data-testid*=headerClap], [data-testid*=headerSocial]`.
-  2. Stop emitting orphan text. In `collectLines`, only append a bare `TextNode` when its parent is an inline-ish element inside a block that is already being emitted — simplest correct version: drop the top-level `TextNode` branch entirely and let `p`, `li`, `h1`–`h6`, `blockquote`, `td`, `th` be the only text-emitting cases. Verify against `SampleArticles/` that no real body text is lost.
-  3. Add a shared noise filter for label-only lines and apply it to the SwiftSoup output. Extend the existing `fullscreenLineFingerprints` set in `HTMLToMarkdownConverter` (`Verso/Sources/Services/ReadabilityParser.swift`) with: `press enter or click to view image in full size`, `member-only story`, `listen`, `share`, `follow`, `sign up`, `sign in`, `featured`. Drop single-line blocks that are only a number, only punctuation (`–`, `·`, `—`), or match `^\d+\s*min read\s*·?$`.
-  4. Run the extension's output through `HTMLToMarkdownConverter.sanitizeMarkdownBody(_:articleTitle:)` before writing the pending JSON — it already does title-echo removal and duplicate-block collapse, and the in-app path gets it for free. `HTMLToMarkdownConverter` currently lives in `Sources/Services/ReadabilityParser.swift` (main-app target only); **move the `HTMLToMarkdownConverter` enum into its own file under `Verso/Shared/` and add it to the ShareExtension target in `Verso/project.yml`,** then regenerate with XcodeGen. Leave `ReadabilityParser` itself in the main target — it needs WebKit.
-
-  **Acceptance.**
-  - Re-import the Medium article from the report; none of the strings in the red rectangles appear in the saved `.md`.
-  - Body text, headings, blockquotes and the author's own em-dashes survive intact.
-  - Re-import 2–3 files from `SampleArticles/` (and one Guardian or Substack article) and diff before/after to confirm no real content was stripped.
-  - Unit tests in `Verso/VersoTests/` feeding saved HTML fixtures through `SwiftSoupParser.parse` and asserting the noise strings are absent and known body sentences are present. Commit the Medium fixture HTML under the test resources.
-
-- [ ] 🟠 **FAB-295** · Imported articles have no images  `Todo` `High` — *do after FAB-294*
+- [ ] 🟠 **FAB-295** · Imported articles have no images  `Todo` `High`
 
   **Symptom.** Articles saved through the Share Extension contain no images at all; the reading view shows text only.
 

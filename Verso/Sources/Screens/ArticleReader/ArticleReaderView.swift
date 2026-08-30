@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct ArticleReaderView: View {
     let article: Article
