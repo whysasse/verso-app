@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**22 open issues** across iOS, Web, Design, and Infra.
+**26 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -28,6 +28,100 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 - **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
+
+### Bugs — import & rendering (reported by Fabio 2026-08-30)
+
+Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome) — do FAB-294 first, FAB-295 lands on top of it cheaply.
+
+- [ ] 🟡 **FAB-293** · Markdown tables are not rendered in the reading view  `Todo` `Medium`
+
+  **Symptom.** A `.md` file dropped straight into the library folder that contains a GFM table renders as one run-on paragraph, e.g. `| Col A | Col B | |---|---| | 1 | 2 |`, instead of a table.
+
+  **Root cause.** `Verso/Sources/Components/Reading/MarkdownBodyView.swift` — the `MarkdownNode` enum has no table case and `MarkdownParser.parse` has no table branch. Pipe rows fall through every branch to the paragraph accumulator (`paragraphBuffer.append(line)`), and `flushParagraph()` joins them with spaces. The delimiter row `|---|---|` is not caught by the horizontal-rule branch either, because that branch requires `line.hasPrefix("---")` and the line starts with `|`.
+
+  **Fix.**
+  1. Add `case table(headers: [[InlineNode]], rows: [[[InlineNode]]], alignments: [TableAlignment])` to `MarkdownNode`, plus a small `enum TableAlignment { case leading, center, trailing }`.
+  2. In `MarkdownParser.parse`, before the paragraph accumulator: when the current line is a pipe row **and** the next line matches a delimiter row (`^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$`), consume the header, the delimiter and every following consecutive pipe row into one `.table` node. Parse the delimiter row for per-column alignment (`:---` leading, `:---:` center, `---:` trailing). A pipe line *without* a following delimiter row must keep its current behaviour (plain paragraph) — this is the loop's guard against false positives. The current `for line in lines` loop needs to become an index-based `while` loop so it can look ahead and consume multiple lines.
+  3. Split cells on unescaped `|` only (`\|` inside a cell is a literal pipe), trim each cell, drop the leading/trailing empty cell produced by outer pipes, and run each cell through the existing `parseInlines`. Pad short rows / truncate long rows to the header's column count so ragged tables don't crash.
+  4. Render in `MarkdownBodyView.blockView` with a SwiftUI `Grid` (iOS 16+, the project's floor): header row in `bodyFont.bold()`, `colors.textPrimary`; a 1pt `colors.border` rule under the header; ~8pt cell padding; column alignment from `TableAlignment`. Wrap the `Grid` in a horizontal `ScrollView` so wide tables scroll instead of squeezing the reading column. Add the same `.padding(.top, 16)` treatment other blocks get via `topSpacing(for:)`.
+  5. Extend `MarkdownNode.plainText` for the new case (join cells with a space) so search indexing and `ArticlePlainText` keep working.
+
+  **Also fix in the same PR:** `SwiftSoupParser.collectLines` (`Verso/Shared/SwiftSoupParser.swift`) has no `table`/`thead`/`tbody`/`tr`/`td`/`th` case, so a table on an imported web page is flattened into loose text lines. Add cases that emit GFM pipe syntax. (Cheap, and without it the renderer fix is only half a feature.)
+
+  **Acceptance.**
+  - A `.md` with a 3-column table, including one with alignment colons and one with an escaped `\|` in a cell, renders as a real table.
+  - A paragraph that merely contains a `|` character still renders as a paragraph.
+  - A table wider than the screen scrolls horizontally; the surrounding article text does not.
+  - Dynamic Type at XXL doesn't clip cells (they wrap).
+  - New unit tests in `Verso/VersoTests/` covering `MarkdownParser.parse` for: a basic table, alignment row, ragged rows, a pipe line with no delimiter row (must stay a paragraph). Add a `#Preview` sample containing a table to `MarkdownBodyView.swift`.
+
+- [ ] 🟠 **FAB-294** · Share Extension imports page chrome as body text  `Todo` `High`
+
+  **Symptom.** A Medium article imported via the Share Extension contains navigation and UI junk in the body: the tag list (`Member-only story`, `Featured`, `Self Improvement`, `Psychology`, `Self Love`, `Mental Health`, `Books`), `4 min read ·`, and a block of stray toolbar text (`–`, `1`, `Listen`, `Share`, `Press enter or click to view image in full size`). See Fabio's screenshot (red rectangles) attached to the 2026-08-30 report.
+
+  **Root cause.** `ShareViewModel.performSave` (`Verso/ShareExtension/Sources/ShareViewModel.swift:~70`) calls `SwiftSoupParser.parse` directly and nothing else. It never touches `ArticleParserService` or `HTMLToMarkdownConverter`, so the cleanup that already exists for the in-app path never runs on shared articles. Two concrete gaps in `SwiftSoupParser` (`Verso/Shared/SwiftSoupParser.swift`):
+  - `collectLines` appends **every** bare `TextNode` it walks past as its own output line, and its `default:` branch recurses into `button`, `span`, `a`, `figcaption` wrappers. Medium's `<article>` element contains its own header toolbar, so all of it lands in the body in DOM order.
+  - The `doc.select(...).remove()` noise list only covers `script, style, nav, header, footer, aside` and three ARIA roles. It does not remove `button`, `form`, `noscript`, `svg`, `[role=button]`, `[aria-hidden=true]`, or Medium's tag-list and toolbar containers.
+
+  **Decision — do not move the Share Extension onto `ReadabilityParser`.** It would give better extraction, but it spins up a `WKWebView` and evaluates Readability.js, and share extensions run under a hard memory ceiling (~120 MB) with an aggressive watchdog; a jetsam kill there looks to the user like a silent failed save. Keep SwiftSoup (pure parsing, low memory) in the extension and make it cleaner. Revisit only if extraction quality is still unacceptable after this fix.
+
+  **Fix.**
+  1. Widen the removal selector in `extractContentMarkdown` to also drop: `button, form, noscript, svg, iframe, figure figcaption > button, [role=button], [aria-hidden=true], [data-testid*=audio], [data-testid*=headerClap], [data-testid*=headerSocial]`.
+  2. Stop emitting orphan text. In `collectLines`, only append a bare `TextNode` when its parent is an inline-ish element inside a block that is already being emitted — simplest correct version: drop the top-level `TextNode` branch entirely and let `p`, `li`, `h1`–`h6`, `blockquote`, `td`, `th` be the only text-emitting cases. Verify against `SampleArticles/` that no real body text is lost.
+  3. Add a shared noise filter for label-only lines and apply it to the SwiftSoup output. Extend the existing `fullscreenLineFingerprints` set in `HTMLToMarkdownConverter` (`Verso/Sources/Services/ReadabilityParser.swift`) with: `press enter or click to view image in full size`, `member-only story`, `listen`, `share`, `follow`, `sign up`, `sign in`, `featured`. Drop single-line blocks that are only a number, only punctuation (`–`, `·`, `—`), or match `^\d+\s*min read\s*·?$`.
+  4. Run the extension's output through `HTMLToMarkdownConverter.sanitizeMarkdownBody(_:articleTitle:)` before writing the pending JSON — it already does title-echo removal and duplicate-block collapse, and the in-app path gets it for free. `HTMLToMarkdownConverter` currently lives in `Sources/Services/ReadabilityParser.swift` (main-app target only); **move the `HTMLToMarkdownConverter` enum into its own file under `Verso/Shared/` and add it to the ShareExtension target in `Verso/project.yml`,** then regenerate with XcodeGen. Leave `ReadabilityParser` itself in the main target — it needs WebKit.
+
+  **Acceptance.**
+  - Re-import the Medium article from the report; none of the strings in the red rectangles appear in the saved `.md`.
+  - Body text, headings, blockquotes and the author's own em-dashes survive intact.
+  - Re-import 2–3 files from `SampleArticles/` (and one Guardian or Substack article) and diff before/after to confirm no real content was stripped.
+  - Unit tests in `Verso/VersoTests/` feeding saved HTML fixtures through `SwiftSoupParser.parse` and asserting the noise strings are absent and known body sentences are present. Commit the Medium fixture HTML under the test resources.
+
+- [ ] 🟠 **FAB-295** · Imported articles have no images  `Todo` `High` — *do after FAB-294*
+
+  **Symptom.** Articles saved through the Share Extension contain no images at all; the reading view shows text only.
+
+  **Root cause.** Not the download or the renderer — both already work. `SwiftSoupParser.collectLines` has no `img` / `picture` / `figure` case, so `<img>` elements hit the `default:` branch, which recurses into children; `<img>` is void, so nothing is emitted. The markdown therefore contains no `![](…)` at all, which means `ArticleMarkdownImageLocalizer.localizeMarkdownRemoteImages` (called from `MarkdownWriter.write` / `.replaceArticle`) finds zero matches and returns early. The in-app Readability path does this correctly via `HTMLToMarkdownConverter.insertMarkdownImages` — the extension just never runs it. `MarkdownBodyView.AsyncImageBlock` already resolves relative `./{stem}.media/…` paths against `baseDirectoryURL`, so rendering needs no change.
+
+  **Fix.**
+  1. Add `case "img"`, `case "picture"` and `case "figure"` to `collectLines` in `Verso/Shared/SwiftSoupParser.swift`, emitting `![alt](url)` on its own line surrounded by blanks. Reuse the URL-resolution logic already written for the Readability path rather than reimplementing it: once FAB-294 has moved `HTMLToMarkdownConverter` into `Verso/Shared/`, expose `resolvedHTTPImageURL(forImgTag:baseURL:)`, `firstHTTPURL(inSrcset:baseURL:)` and `canonicalImageURLString(_:baseURL:)` as `internal` and call them. This matters because Medium/Guardian lazy-load: the real URL lives in `srcset` or `data-src`, not `src`. For `<figure>`, emit the `<img>` line and use `<figcaption>` text as the alt/caption. Skip `data:` URIs, tracking pixels, and images smaller than ~100×100 when `width`/`height` attributes are present (avatars and 1px beacons).
+  2. **Rename downloaded files after the article**, per Fabio's request. In `Verso/Sources/Services/ArticleMarkdownImageLocalizer.swift` the media directory is already `{articleStem}.media/`, but individual files are `UUID().uuidString + ext`. Change to a stable, ordered, filesystem-safe name: `{articleStem}-01.jpg`, `-02.png`, … numbering in document order, zero-padded to 2. Truncate `{articleStem}` to ~80 chars (the article stem can already be 100+ chars and the full path has limits). On a name collision inside the media dir, append `-b`, `-c`. Keep the existing dedupe (`remoteToFilename`) so the same remote URL downloads once and both references point at the same file.
+  3. Verify `ICloudFileWatcher` / the library scan ignore `*.media` directories so the sidecar folders never surface as articles. Fix if they don't.
+  4. Confirm the media folder is deleted alongside the article when an article is deleted, and moved with it on archive (`Archive/`). Add it if missing — orphaned media folders in the user's iCloud Drive are a visible, user-owned-files problem.
+
+  **Acceptance.**
+  - Re-import the Medium article: the hero image and any inline images appear in the reading view.
+  - On disk: `2026-08-30 Article <title>.md` sits beside `2026-08-30 Article <title>.media/` containing `…-01.jpg`, `…-02.jpg`, and the markdown links them as `./<stem>.media/<stem>-01.jpg`.
+  - A Guardian article (`<picture>` + `srcset`) and a Substack article both bring their images across.
+  - Offline / 404 image: the article still saves, the failed image degrades to the placeholder, no crash.
+  - The `.media` folder does not appear as an article in the list.
+  - Unit tests for the naming scheme and for `collectLines` emitting image markdown from `src`, `srcset` and `data-src` fixtures.
+
+- [ ] 🟡 **FAB-296** · Duplicate articles appear in the list despite the duplicate check  `Todo` `Medium`
+
+  **Symptom.** The article list shows the same article twice.
+
+  **Context.** Duplicate detection already exists — `ArticleDuplicateFinder.findDuplicate(of:libraryFolder:)`, wired into both `ShareViewModel.performSave` and `AddArticleView`, with a prompt offering *update existing* / *save a copy* (`DuplicateSaveResolution`). So this is a set of holes in an existing feature, not a missing feature. **Reproduce and identify which hole this is before writing code** — do not fix all four blindly.
+
+  **Candidate causes, in likelihood order.**
+  1. **URL normalization too weak.** `VersoArticleURL.canonicalKey` (`Verso/Shared/VersoArticleURL.swift`) only lowercases scheme/host, strips the fragment and one trailing slash. It keeps the query string, so Medium's share URLs (`?source=friends_link`, `?sk=…`) and any `utm_*` parameters produce a different key for the same article. This is almost certainly what happened here.
+  2. **The check is skipped silently.** `performSave` wraps the whole duplicate check in `if let libraryURL = LibraryBookmarkResolver.resolveLibraryFolderURL()`. When the bookmark is missing or fails to resolve, the extension saves without checking and says nothing. `LibraryBookmarkResolver` also computes `isStale` and then ignores it.
+  3. **Scan scope too narrow.** `ArticleDuplicateFinder.scanDirectory` passes `.skipsSubdirectoryDescendants` and only looks at the library root and `Archive/`. Any article in another subfolder is invisible to the check.
+  4. **No backstop at ingest.** `PendingArticleIngester.writeToDisk` / `upsertCoreData` (`Verso/Sources/Services/PendingArticleIngester.swift`) trust `pending.duplicateResolution`; when it is `nil` they always create a new file and a new `Article` row, with no re-check — even though the app, unlike the extension, always has folder access.
+
+  **Fix.**
+  1. Harden `VersoArticleURL.canonicalKey`: strip a known tracking-parameter set (`utm_*`, `source`, `sk`, `gi`, `ref`, `ref_src`, `fbclid`, `gclid`, `mc_cid`, `mc_eid`, `_branch_match_id`), sort the surviving query items by name, drop an empty query entirely, strip a leading `www.`, and normalize `http` → `https` for comparison purposes only (never rewrite the stored `url:` frontmatter — that is the user's record of where the article came from). Also consider `<link rel="canonical">` from the fetched HTML as a second key when present; if you add it, store it as a separate `canonical_url:` frontmatter field rather than overwriting `url:`.
+  2. Add the missing backstop in `PendingArticleIngester`: when `pending.duplicateResolution == nil`, run `ArticleDuplicateFinder.findDuplicate` against the resolved library folder before writing. On a hit, do **not** silently overwrite — write the article, then surface an in-app prompt (same two options as the extension: *Update existing* / *Keep both*) so the user decides, matching the behaviour Fabio asked for. If a prompt at ingest time is too disruptive, the acceptable fallback is: keep both, and mark the newer one so the list can show a "possible duplicate" affordance. **Ask Fabio which he prefers before implementing this step** — it's a UX decision, not a technical one.
+  3. Drop `.skipsSubdirectoryDescendants` from `scanDirectory` and walk the library recursively, skipping hidden dirs and `*.media` folders. Guard performance: the scan reads only the frontmatter of each file (it already does), so a few thousand files is fine, but add an early `break` once a match is found (already the case) and measure on a large library.
+  4. Make the skipped-check case visible: when `LibraryBookmarkResolver.resolveLibraryFolderURL()` returns nil in the extension, log it and show the user that the library folder isn't reachable rather than saving silently. Honour `isStale` by refreshing the bookmark when possible.
+  5. Add a defensive uniqueness check in `upsertCoreData` before inserting: if an `Article` row already exists with the same `filePath`, update it instead of inserting. This catches double-ingest of the same pending JSON.
+
+  **Acceptance.**
+  - Sharing the same Medium article twice — once as a clean URL, once with `?source=friends_link&sk=…` — triggers the duplicate prompt both times.
+  - Choosing *Update existing* leaves exactly one row in the list and one file on disk, with `added`, `status`, `scroll_position` and `tags` preserved (`MarkdownWriter.replaceArticle` already does this — verify it still holds).
+  - Choosing *Keep both* produces two clearly distinguishable entries.
+  - An article living in a library subfolder is found by the check.
+  - Unit tests for `VersoArticleURL.canonicalKey` covering: tracking params, query ordering, `www.`, `http` vs `https`, trailing slash, fragment. Plus a `ArticleDuplicateFinder` test over a temp directory tree with a nested subfolder.
 
 ### Phase 2 — Experience
 
