@@ -191,10 +191,20 @@ struct SwiftSoupParser {
                 case "hr":
                     lines.append("---")
                     lines.append("")
+                case "table":
+                    // FAB-293: real GFM pipe syntax, not loose lines -- lets the imported
+                    // table round-trip through MarkdownBodyView's table renderer exactly
+                    // like a hand-written .md table would. Table markup is consumed here
+                    // directly (no recursion into <thead>/<tbody>/<tr>), so <td>/<th> below
+                    // is only ever reached for a cell sitting outside a proper <table>.
+                    if let tableLines = tableMarkdownLines(from: element) {
+                        lines.append("")
+                        lines.append(contentsOf: tableLines)
+                        lines.append("")
+                    }
                 case "td", "th":
-                    // No GFM table rendering yet (FAB-293) — keep cell text as a loose
-                    // line rather than losing it outright now that bare text nodes
-                    // are no longer emitted.
+                    // Cell outside a <table> ancestor (malformed markup) -- keep the text
+                    // as a loose line rather than losing it outright.
                     if let text = try? element.text(), !text.isEmpty {
                         lines.append(text)
                     }
@@ -235,6 +245,48 @@ struct SwiftSoupParser {
                 }
             }
         }
+    }
+
+    // MARK: - Tables (FAB-293)
+
+    /// Builds GFM pipe-table lines from an HTML `<table>` element: the first `<tr>` in document
+    /// order is always the header (whether it sits in `<thead>` or, for tables that skip
+    /// `<thead>`/`<tbody>` entirely -- common in scraped article HTML -- is just the first bare
+    /// row), every row after it is a data row. Deliberately just "everything after the first
+    /// row" rather than preferring `<tbody>`'s own rows: HTML5 parsing auto-wraps bare `<tr>`s
+    /// with no `<thead>`/`<tbody>` at all into a single *implicit* `<tbody>` containing every
+    /// row including the header, so "does `<tbody>` have rows" can't distinguish the two shapes
+    /// -- but "first row in document order" always can. Also deliberately index-based, not
+    /// element-identity-based (`!==`): SwiftSoup's `select` can hand back distinct wrapper
+    /// instances for the same underlying node across separate calls, so comparing "is this the
+    /// header row" by reference is unreliable. HTML carries no GFM alignment syntax, so the
+    /// delimiter row is always plain `---` -- per-column alignment (`:---`/`:---:`/`---:`) is a
+    /// `.md`-only feature for hand-written tables (see `MarkdownBodyView.MarkdownParser`).
+    /// Returns `nil` for a table with no discoverable header cells (e.g. an empty or entirely
+    /// malformed `<table>`).
+    private static func tableMarkdownLines(from table: Element) -> [String]? {
+        let allRows = (try? table.select("tr").array()) ?? []
+        guard let headerRow = allRows.first else { return nil }
+
+        let headerCells = (try? headerRow.select("th, td").array()) ?? []
+        guard !headerCells.isEmpty else { return nil }
+
+        let bodyRows = Array(allRows.dropFirst())
+
+        // A literal `|` inside a cell's own text must be escaped, or the emitted line would be
+        // mis-read as having more columns than it does when re-parsed.
+        func cellText(_ element: Element) -> String {
+            ((try? element.text()) ?? "").replacingOccurrences(of: "|", with: "\\|")
+        }
+
+        var result = ["| " + headerCells.map(cellText).joined(separator: " | ") + " |"]
+        result.append("| " + Array(repeating: "---", count: headerCells.count).joined(separator: " | ") + " |")
+        for row in bodyRows {
+            let cells = (try? row.select("th, td").array()) ?? []
+            guard !cells.isEmpty else { continue }
+            result.append("| " + cells.map(cellText).joined(separator: " | ") + " |")
+        }
+        return result
     }
 
     // MARK: - Images (FAB-295)

@@ -1,9 +1,9 @@
 # Component Specs — Verso
 
-**Version:** 1.1
-**Date:** 2026-08-29
+**Version:** 1.2
+**Date:** 2026-08-31
 **Status:** Draft
-**Related:** FAB-87, FAB-292
+**Related:** FAB-87, FAB-292, FAB-293
 
 This document is the developer-handoff view of Verso's UI components. For each component it provides anatomy, exact dimensions, typography, and color rules (tokens per element, per state) in a single place.
 
@@ -390,6 +390,7 @@ Rendered article content. Font family and size are user-controlled.
 - Ordered and unordered lists
 - Images (full-width, aspect fit)
 - Horizontal rules
+- Tables (FAB-293): GFM pipe syntax only — header row + `:---`/`:---:`/`---:` per-column alignment; horizontally scrollable when wider than the reading column
 
 **Dimensions**
 
@@ -399,6 +400,8 @@ Rendered article content. Font family and size are user-controlled.
 | Max width (iPad) | 680pt |
 | Blockquote left border | 3pt |
 | Code block corner radius | `radius/sm` — 10pt |
+| Table cell padding | ~8pt |
+| Table header rule | `border` 1pt, under header row only |
 
 **Typography**
 
@@ -425,6 +428,9 @@ Rendered article content. Font family and size are user-controlled.
 | Code block background | `surface` | All |
 | Code block text | `textPrimary` | All |
 | Horizontal rule | `border` 1pt | All |
+| Table header text | `textPrimary` bold | All |
+| Table body text | `textPrimary` | All |
+| Table header rule | `border` 1pt | All |
 
 ---
 

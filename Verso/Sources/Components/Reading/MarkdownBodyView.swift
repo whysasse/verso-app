@@ -11,6 +11,14 @@ enum MarkdownNode {
     case codeBlock(language: String?, code: String)
     case image(url: String, alt: String)
     case horizontalRule
+    /// GFM pipe table (FAB-293). `headers`/each row in `rows` are one cell per column, already
+    /// run through `parseInlines`; `alignments` has one entry per column, from the delimiter
+    /// row's `:---`/`:---:`/`---:` syntax (default `.leading` when absent).
+    case table(headers: [[InlineNode]], rows: [[[InlineNode]]], alignments: [TableAlignment])
+
+    enum TableAlignment {
+        case leading, center, trailing
+    }
 
     enum InlineNode {
         case text(String)
@@ -44,7 +52,12 @@ struct MarkdownParser {
         }
 
         let lines = markdown.components(separatedBy: "\n")
-        for line in lines {
+        // Index-based (not `for line in lines`) so the table branch below can look ahead at the
+        // next line (delimiter row) and consume a variable number of following rows (FAB-293).
+        var i = 0
+        while i < lines.count {
+            let line = lines[i]
+
             // Code block toggle
             if line.hasPrefix("```") {
                 if inCodeBlock {
@@ -58,11 +71,13 @@ struct MarkdownParser {
                     let lang = String(line.dropFirst(3)).trimmingCharacters(in: .whitespaces)
                     codeLang = lang.isEmpty ? nil : lang
                 }
+                i += 1
                 continue
             }
 
             if inCodeBlock {
                 codeBuffer.append(line)
+                i += 1
                 continue
             }
 
@@ -70,6 +85,7 @@ struct MarkdownParser {
             if line.trimmingCharacters(in: .whitespaces).isEmpty {
                 flushParagraph()
                 orderedIndex = 1
+                i += 1
                 continue
             }
 
@@ -78,6 +94,7 @@ struct MarkdownParser {
             if trimmed.isEmpty && (line.hasPrefix("---") || line.hasPrefix("***") || line.hasPrefix("___")) {
                 flushParagraph()
                 nodes.append(.horizontalRule)
+                i += 1
                 continue
             }
 
@@ -88,6 +105,7 @@ struct MarkdownParser {
                     flushParagraph()
                     let content = String(line.dropFirst(level + 1))
                     nodes.append(.heading(level: level, inlines: parseInlines(content)))
+                    i += 1
                     continue
                 }
             }
@@ -96,6 +114,7 @@ struct MarkdownParser {
             if line.hasPrefix("> ") {
                 flushParagraph()
                 nodes.append(.blockquote(inlines: parseInlines(String(line.dropFirst(2)))))
+                i += 1
                 continue
             }
 
@@ -105,6 +124,7 @@ struct MarkdownParser {
                 let alt = rangeString(line, imageMatch.range(at: 1))
                 let url = rangeString(line, imageMatch.range(at: 2))
                 nodes.append(.image(url: url, alt: alt))
+                i += 1
                 continue
             }
 
@@ -112,6 +132,7 @@ struct MarkdownParser {
             if line.hasPrefix("- ") || line.hasPrefix("* ") || line.hasPrefix("+ ") {
                 flushParagraph()
                 nodes.append(.unorderedListItem(inlines: parseInlines(String(line.dropFirst(2)))))
+                i += 1
                 continue
             }
 
@@ -122,15 +143,93 @@ struct MarkdownParser {
                 let content = rangeString(line, olMatch.range(at: 2))
                 nodes.append(.orderedListItem(index: idx, inlines: parseInlines(content)))
                 orderedIndex = idx + 1
+                i += 1
+                continue
+            }
+
+            // GFM table (FAB-293): the current line is a candidate header row only if the *next*
+            // line is a delimiter row (`|---|---|`, etc.) -- that lookahead is the only thing that
+            // tells a table apart from an ordinary paragraph that merely contains a `|`.
+            if line.contains("|"), i + 1 < lines.count, isTableDelimiterRow(lines[i + 1]) {
+                flushParagraph()
+                let headerCells = splitTableRowCells(line)
+                let alignments = parseTableAlignments(fromDelimiterCells: splitTableRowCells(lines[i + 1]))
+                var dataRows: [[String]] = []
+                var j = i + 2
+                while j < lines.count, lines[j].contains("|") {
+                    dataRows.append(splitTableRowCells(lines[j]))
+                    j += 1
+                }
+                let columnCount = headerCells.count
+                nodes.append(.table(
+                    headers: headerCells.map(parseInlines),
+                    rows: dataRows.map { row in padded(row, to: columnCount).map(parseInlines) },
+                    alignments: padded(alignments, to: columnCount, with: .leading)
+                ))
+                i = j
                 continue
             }
 
             // Paragraph accumulation
             paragraphBuffer.append(line)
+            i += 1
         }
 
         flushParagraph()
         return nodes
+    }
+
+    // MARK: Table parsing (FAB-293)
+
+    private static let tableDelimiterPattern = try! NSRegularExpression(
+        pattern: #"^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$"#
+    )
+
+    private static func isTableDelimiterRow(_ line: String) -> Bool {
+        let range = NSRange(line.startIndex..., in: line)
+        return tableDelimiterPattern.firstMatch(in: line, range: range) != nil
+    }
+
+    /// Splits a table row on unescaped `|` (a literal `\|` in the source is a cell's own pipe
+    /// character, not a separator), trims each cell, and drops a leading/trailing empty cell
+    /// produced by the row's own outer pipes (`| A | B |` vs. `A | B`, both valid GFM).
+    private static func splitTableRowCells(_ line: String) -> [String] {
+        let pipePlaceholder = "\u{E000}" // Unicode Private Use Area -- won't collide with real content
+        let protected = line.replacingOccurrences(of: "\\|", with: pipePlaceholder)
+        var cells = protected.components(separatedBy: "|")
+        if let first = cells.first, first.trimmingCharacters(in: .whitespaces).isEmpty {
+            cells.removeFirst()
+        }
+        if let last = cells.last, last.trimmingCharacters(in: .whitespaces).isEmpty {
+            cells.removeLast()
+        }
+        return cells.map {
+            $0.replacingOccurrences(of: pipePlaceholder, with: "|")
+                .trimmingCharacters(in: .whitespaces)
+        }
+    }
+
+    private static func parseTableAlignments(fromDelimiterCells cells: [String]) -> [MarkdownNode.TableAlignment] {
+        cells.map { cell in
+            switch (cell.hasPrefix(":"), cell.hasSuffix(":")) {
+            case (true, true): return .center
+            case (false, true): return .trailing
+            default: return .leading
+            }
+        }
+    }
+
+    /// Pads a ragged row/alignment list up to `count` with `fill`, or truncates down to it, so a
+    /// malformed table (a row with too few/many cells) can't crash the renderer.
+    private static func padded<T>(_ items: [T], to count: Int, with fill: T) -> [T] {
+        if items.count < count {
+            return items + Array(repeating: fill, count: count - items.count)
+        }
+        return Array(items.prefix(count))
+    }
+
+    private static func padded(_ items: [String], to count: Int) -> [String] {
+        padded(items, to: count, with: "")
     }
 
     // MARK: Inline parsing
@@ -231,6 +330,10 @@ extension MarkdownNode {
         case .codeBlock(_, let code): return code
         case .image(_, let alt): return alt
         case .horizontalRule: return ""
+        case .table(let headers, let rows, _):
+            return ([headers] + rows)
+                .flatMap { row in row.map { cell in cell.map(\.plainText).joined() } }
+                .joined(separator: " ")
         }
     }
 }
@@ -351,9 +454,51 @@ struct MarkdownBodyView: View {
                 Rectangle()
                     .fill(colors.border)
                     .frame(height: 1)
+
+            case .table(let headers, let rows, let alignments):
+                // Horizontal ScrollView so a table wider than the screen scrolls on its own,
+                // rather than squeezing (or overflowing) the reading column (FAB-293).
+                ScrollView(.horizontal, showsIndicators: false) {
+                    Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 0) {
+                        GridRow {
+                            ForEach(Array(headers.enumerated()), id: \.offset) { col, cell in
+                                Text(inlineText(cell))
+                                    .font(bodyFont.bold())
+                                    .foregroundColor(colors.textPrimary)
+                                    .padding(8)
+                                    .gridColumnAlignment(gridAlignment(for: alignments[safe: col] ?? .leading))
+                            }
+                        }
+                        GridRow {
+                            Rectangle()
+                                .fill(colors.border)
+                                .frame(height: 1)
+                                .gridCellColumns(headers.count)
+                        }
+                        ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                            GridRow {
+                                ForEach(Array(row.enumerated()), id: \.offset) { col, cell in
+                                    Text(inlineText(cell))
+                                        .font(bodyFont)
+                                        .foregroundColor(colors.textPrimary)
+                                        .padding(8)
+                                        .gridColumnAlignment(gridAlignment(for: alignments[safe: col] ?? .leading))
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         .padding(.top, topSpacing(for: node, prevNode: prevNode, isListItem: isListItem, prevIsListItem: prevIsListItem))
+    }
+
+    private func gridAlignment(for alignment: MarkdownNode.TableAlignment) -> HorizontalAlignment {
+        switch alignment {
+        case .leading: return .leading
+        case .center: return .center
+        case .trailing: return .trailing
+        }
     }
 
     // MARK: Spacing
@@ -544,6 +689,12 @@ private struct AsyncImageBlock: View {
 
         #### H4 Minor Head
 
+        | Theme | Accent | Notes |
+        | :--- | :---: | ---: |
+        | Paper | Blue | Default |
+        | Sepia | Amber | Warm |
+        | Night | Blue | Dark |
+
         Final paragraph at the end.
         """
 
@@ -562,4 +713,10 @@ private struct AsyncImageBlock: View {
         }
     }
     return PreviewWrapper()
+}
+
+private extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
 }

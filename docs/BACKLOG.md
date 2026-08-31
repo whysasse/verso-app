@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**24 open issues** across iOS, Web, Design, and Infra.
+**23 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -32,28 +32,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 ### Bugs — import & rendering (reported by Fabio 2026-08-30)
 
 Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome). **Both are done** (see [DONE.md](DONE.md)).
-
-- [ ] 🟡 **FAB-293** · Markdown tables are not rendered in the reading view  `Todo` `Medium`
-
-  **Symptom.** A `.md` file dropped straight into the library folder that contains a GFM table renders as one run-on paragraph, e.g. `| Col A | Col B | |---|---| | 1 | 2 |`, instead of a table.
-
-  **Root cause.** `Verso/Sources/Components/Reading/MarkdownBodyView.swift` — the `MarkdownNode` enum has no table case and `MarkdownParser.parse` has no table branch. Pipe rows fall through every branch to the paragraph accumulator (`paragraphBuffer.append(line)`), and `flushParagraph()` joins them with spaces. The delimiter row `|---|---|` is not caught by the horizontal-rule branch either, because that branch requires `line.hasPrefix("---")` and the line starts with `|`.
-
-  **Fix.**
-  1. Add `case table(headers: [[InlineNode]], rows: [[[InlineNode]]], alignments: [TableAlignment])` to `MarkdownNode`, plus a small `enum TableAlignment { case leading, center, trailing }`.
-  2. In `MarkdownParser.parse`, before the paragraph accumulator: when the current line is a pipe row **and** the next line matches a delimiter row (`^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$`), consume the header, the delimiter and every following consecutive pipe row into one `.table` node. Parse the delimiter row for per-column alignment (`:---` leading, `:---:` center, `---:` trailing). A pipe line *without* a following delimiter row must keep its current behaviour (plain paragraph) — this is the loop's guard against false positives. The current `for line in lines` loop needs to become an index-based `while` loop so it can look ahead and consume multiple lines.
-  3. Split cells on unescaped `|` only (`\|` inside a cell is a literal pipe), trim each cell, drop the leading/trailing empty cell produced by outer pipes, and run each cell through the existing `parseInlines`. Pad short rows / truncate long rows to the header's column count so ragged tables don't crash.
-  4. Render in `MarkdownBodyView.blockView` with a SwiftUI `Grid` (iOS 16+, the project's floor): header row in `bodyFont.bold()`, `colors.textPrimary`; a 1pt `colors.border` rule under the header; ~8pt cell padding; column alignment from `TableAlignment`. Wrap the `Grid` in a horizontal `ScrollView` so wide tables scroll instead of squeezing the reading column. Add the same `.padding(.top, 16)` treatment other blocks get via `topSpacing(for:)`.
-  5. Extend `MarkdownNode.plainText` for the new case (join cells with a space) so search indexing and `ArticlePlainText` keep working.
-
-  **Also fix in the same PR:** `SwiftSoupParser.collectLines` (`Verso/Shared/SwiftSoupParser.swift`) has no `table`/`thead`/`tbody`/`tr`/`td`/`th` case, so a table on an imported web page is flattened into loose text lines. Add cases that emit GFM pipe syntax. (Cheap, and without it the renderer fix is only half a feature.)
-
-  **Acceptance.**
-  - A `.md` with a 3-column table, including one with alignment colons and one with an escaped `\|` in a cell, renders as a real table.
-  - A paragraph that merely contains a `|` character still renders as a paragraph.
-  - A table wider than the screen scrolls horizontally; the surrounding article text does not.
-  - Dynamic Type at XXL doesn't clip cells (they wrap).
-  - New unit tests in `Verso/VersoTests/` covering `MarkdownParser.parse` for: a basic table, alignment row, ragged rows, a pipe line with no delimiter row (must stay a paragraph). Add a `#Preview` sample containing a table to `MarkdownBodyView.swift`.
 
 - [ ] 🟡 **FAB-296** · Duplicate articles appear in the list despite the duplicate check  `Todo` `Medium`
 
