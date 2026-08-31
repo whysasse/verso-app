@@ -145,6 +145,40 @@ final class SwiftSoupParserTests: XCTestCase {
         XCTAssertTrue(markdown.contains("Q1"))
         XCTAssertTrue(markdown.contains("$4.2M"))
     }
+
+    /// FAB-300: Guardian's "Explore more on these topics" / Share / "Reuse this content" block,
+    /// reproduced from the real markup Fabio reported (2026-08-31) -- wrapped in
+    /// `data-print-layout="hide"`, which `noiseSelector` now covers.
+    func testGuardianTopicsListDoesNotLeakIntoBody() throws {
+        let article = try SwiftSoupParser.parse(html: Self.guardianLikeHTML, url: sourceURL)
+        let markdown = article.contentMarkdown
+
+        for noise in ["Explore more on these topics", "Autobiography and memoir", "Bereavement", "Reuse this content"] {
+            XCTAssertFalse(
+                markdown.localizedCaseInsensitiveContains(noise),
+                "Expected \"\(noise)\" to be stripped, but it survived: \(markdown)"
+            )
+        }
+        XCTAssertTrue(markdown.contains("Ten years after my husband died in a surfing accident, I have learned things about grief that nobody warned me of."))
+    }
+
+    static let guardianLikeHTML = """
+    <html><body><article>
+        <p>Ten years after my husband died in a surfing accident, I have learned things about grief that nobody warned me of.</p>
+        <div data-print-layout="hide" class="dcr-swayiu">
+            <span class="dcr-1xhbmzr">Explore more on these topics</span>
+            <div class="dcr-2c03t5"><ul class="dcr-p7nd18">
+                <li class="dcr-r721ee"><a href="/books/autobiography-and-memoir" class="dcr-856iwi">Autobiography and memoir</a></li>
+                <li class="dcr-r721ee"><a href="/lifeandstyle/bereavement" class="dcr-856iwi">Bereavement</a></li>
+                <li class="dcr-r721ee"><a href="/tone/features" class="dcr-856iwi">features</a></li>
+            </ul></div>
+            <div class="dcr-313bdz">
+                <button type="button" class="dcr-ncybeu">Share</button>
+                <a href="https://syndication.theguardian.com/?url=x" title="Reuse this content" class="dcr-1c41onw">Reuse this content</a>
+            </div>
+        </div>
+    </article></body></html>
+    """
 }
 
 /// Focused coverage for the noise-line rules added to `HTMLToMarkdownConverter` (FAB-294):
@@ -189,6 +223,30 @@ final class HTMLToMarkdownConverterNoiseTests: XCTestCase {
         let markdown = "The results were surprising — nobody expected this outcome."
         let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
         XCTAssertTrue(result.contains("The results were surprising — nobody expected this outcome."))
+    }
+
+    /// FAB-300: `convert()` (the add-by-URL path, via Readability.js) had no DOM-based noise
+    /// removal at all before this fix -- it relied entirely on Readability's own boilerplate
+    /// heuristics, which don't catch a block like this sitting inside the article content
+    /// container. Same fixture as `SwiftSoupParserTests.testGuardianTopicsListDoesNotLeakIntoBody`,
+    /// exercised through the other import path.
+    func testConvertStripsGuardianTopicsListViaDOMPrePass() {
+        let result = HTMLToMarkdownConverter.convert(SwiftSoupParserTests.guardianLikeHTML, articleTitle: nil, baseURL: nil)
+
+        for noise in ["Explore more on these topics", "Autobiography and memoir", "Bereavement", "Reuse this content"] {
+            XCTAssertFalse(
+                result.localizedCaseInsensitiveContains(noise),
+                "Expected \"\(noise)\" to be stripped, but it survived: \(result)"
+            )
+        }
+        XCTAssertTrue(result.contains("Ten years after my husband died in a surfing accident, I have learned things about grief that nobody warned me of."))
+    }
+
+    /// A malformed fragment must degrade to the pre-FAB-300 behavior (still strip tags via the
+    /// existing regex pipeline) rather than lose all content when the DOM pre-pass can't parse it.
+    func testConvertHandlesUnparseableFragmentGracefully() {
+        let result = HTMLToMarkdownConverter.convert("<p>Unclosed paragraph with a stray < angle bracket.", articleTitle: nil, baseURL: nil)
+        XCTAssertTrue(result.contains("Unclosed paragraph with a stray"))
     }
 }
 

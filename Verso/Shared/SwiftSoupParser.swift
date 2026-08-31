@@ -89,13 +89,10 @@ struct SwiftSoupParser {
         // Remove noise elements before extracting text. Beyond the obvious page-chrome
         // tags, this also drops interactive/toolbar elements (buttons, forms, embedded
         // SVG icons) and known audio/clap/social-share widget containers that Medium
-        // and similar sites nest directly inside <article> (FAB-294).
-        let noiseSelector = "script, style, nav, header, footer, aside, "
-            + "[role=navigation], [role=banner], [role=complementary], "
-            + "button, form, noscript, svg, iframe, figure figcaption > button, "
-            + "[role=button], [aria-hidden=true], "
-            + "[data-testid*=audio], [data-testid*=headerClap], [data-testid*=headerSocial]"
-        try doc.select(noiseSelector).remove()
+        // and similar sites nest directly inside <article> (FAB-294), plus site-specific
+        // "hide on print" widgets like Guardian's topic-tag list (FAB-300). Shared with
+        // `HTMLToMarkdownConverter.convert` -- one selector list for both import paths.
+        try doc.select(HTMLToMarkdownConverter.noiseSelector).remove()
 
         // Prefer semantic content containers
         let contentElement: Element?
