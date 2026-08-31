@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**172 completed issues.**
+**173 completed issues.**
 
 ## iOS
 
@@ -57,6 +57,27 @@
   ## Verified
 
   New/updated unit tests in `Verso/VersoTests/`: `MarkdownWriterTests` (`updateArchived` insert/remove/round-trip, `unarchive` with a `.media` sidecar and a name collision, `buildFrontmatter` archived round-trip through the reader and omission when not archived) and `MarkdownReaderTests` (legacy `status: archived` back-fill, `archived`/`archived_at` round-trip, missing-archived defaults to false) — 18 new tests. Full `VersoTests` suite (67 tests) passes. `xcodebuild build` succeeded for the `Verso` scheme; Share Extension unaffected (it only compiles `Shared/`, untouched by this change). Not verified here: real-device confirmation of the long-press menu and swipe actions across all four states — Fabio's part after the PR.
+
+- [x] 🟠 **FAB-298** · "Related articles" are not related — the similarity scoring is effectively random  `Done` `High`
+  `RelatedArticlesService` scored with unweighted Jaccard similarity over a raw word set, threshold 0.04 — any two English prose articles of a few thousand words clear 4% shared-vocabulary overlap on common words alone, so effectively every article "related" to every other one. Completed 2026-08-31.
+
+  ## Fix — TF-IDF cosine similarity, replacing Jaccard
+
+  * **New `Verso/Sources/Services/RelatedArticlesScoring.swift`**: a pure, Core Data-free scoring engine (`RelatedArticlesDocument` in, `[(key, score)]` out) — directly unit-testable with no managed object context. Builds a document-frequency table across the candidate set, smoothed IDF (`log((N+1)/(df+1)) + 1`), TF-IDF vectors, cosine similarity, then a tag-overlap boost (`final = cosine + 0.15 * (sharedTags / max(tagsA.count, tagsB.count))`, clamped to 1). Title terms count 3x toward a document's term frequency.
+  * Tokenization: `NLLanguageRecognizer.dominantLanguage(for:)` picks the document's language (mirrors `TTSService`'s existing pattern), `NLTagger` with the `.lemma` scheme collapses "scan/scanning/scanner" to one term. **New `RelatedArticlesStopWords.swift`** ships hand-authored en/pt/fr stopword lists (~80-100 words each), replacing the old 60-word English-only list that left thousands of topic-neutral Portuguese/French words unfiltered.
+  * **`RelatedArticlesService.swift` rewritten** as a thin `@MainActor` Core Data wrapper: fetches non-archived candidates (`NSPredicate(format: "archived == NO")` — no such predicate existed before), snapshots them into plain values using `Article.searchableBody` (no file I/O on the main actor), then hands off to `Task.detached(priority: .userInitiated)` — the same pattern `ArticleLibraryService.rebuildCache` already uses — for the file-read fallback (rare) and the actual scoring, off the main actor. Fixes the O(n) main-actor file read the old `loadContent(for:)` did on every article on every reading-view open.
+  * Threshold shipped at `0.18` (middle of the ticket's suggested 0.15–0.25 TF-IDF cosine range) as a named constant — see "Not verified here" below.
+  * **New `#if DEBUG` `RelatedArticlesDebugView.swift`**, reachable from a new DEBUG-only row in `SettingsView`: runs the same scorer over every pair in the real library and lists every score (not threshold-filtered) sorted descending, so the threshold can be calibrated against real data instead of guessed. Not present in a Release build.
+  * `ArticleReaderView.swift`'s call site and its `if !relatedArticles.isEmpty` guard were already correct and needed no changes — the fix is entirely inside the service.
+
+  ## Judgment calls (flagged to Fabio in the PR)
+
+  * No persistent cross-call document-frequency cache tied to `ICloudFileWatcher` (the ticket's step 1 suggestion) — `RelatedArticlesService` is instantiated fresh once per reading-view open, not per scroll/keystroke, so a cache would need a new long-lived owner wired through the app for a computation that's already cheap off-main. Can be added later if a real large library shows otherwise.
+  * The `0.18` threshold could not be calibrated against Fabio's actual library from this session (no access to his on-device data) — the DEBUG screen above is the mitigation; he's expected to report back whether it needs adjusting after trying it.
+
+  ## Verified
+
+  New `Verso/VersoTests/RelatedArticlesScoringTests.swift` (pure, no Core Data needed): two related articles rank together among eight unrelated ones and nothing else clears threshold; no topical neighbor returns empty; a shared tag measurably outranks shared-vocabulary-alone (asserts the exact 0.15 boost); a regression test with ten documents sharing only generic filler vocabulary (but each with distinct, non-overlapping topic content — not identical documents, which would trivially cosine=1 regardless of IDF) confirms the old "everything clears threshold" failure mode can't recur; a pt-BR document doesn't relate to unrelated English documents; ~500 synthetic documents score in ~2.1s off the main thread. 6 new tests; full `VersoTests` suite (73 tests) passes. `xcodegen generate` + `xcodebuild build` succeeded for the `Verso` scheme. **Not verified here**: the `0.18` threshold against Fabio's real library (see judgment calls above) and real-device confirmation that the reading view's Related Articles section now shows genuinely related articles — both Fabio's part after the PR, using the new DEBUG screen.
 
 ### Phase 1 — Foundation
 
