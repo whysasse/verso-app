@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**175 completed issues.**
+**176 completed issues.**
 
 ## iOS
 
@@ -123,6 +123,23 @@
   ## Verified
 
   `xcodebuild build` succeeded for the `Verso` scheme. Full `VersoTests` suite (77 tests) passes — unchanged, since this is a UI-orchestration change entirely reusing already-tested lower-level functions (`MarkdownWriter.archive`/`unarchive`/`delete`/`updateStatus`, all covered by FAB-297's tests). **Not verified here** — needs a real device/simulator and is entirely manual per the ticket's own acceptance criteria: VoiceOver reading the `⋯` button and every item's current-state label correctly, menu legibility across all 4 themes and at XXL Dynamic Type, and updated `docs/printscreens` screenshots — all Fabio's part after the PR.
+
+- [x] 🟡 **FAB-301** · OpenDyslexic reading font never actually loads on-device  `Done` `Medium`
+  Found by Fabio reading a real-device Xcode console log while testing FAB-299 (`FontParser could not open filePath .../Verso.app/Fonts/OpenDyslexic-Regular.ttf: [2: No such file or directory]`, `GSFont: file doesn't exist`). Diagnosed and fixed same session, 2026-08-31.
+
+  ## Root cause
+
+  `Verso/Resources/Info.plist`'s `UIAppFonts` declares `Fonts/OpenDyslexic-Regular.ttf`, but `project.yml` included the whole `Resources/` folder as a plain source group rather than a true folder reference — unlike `Resources/readability` and `../SampleArticles`, which were already explicitly `type: folder` a few lines above it. XcodeGen flattens a plain source group's files into the bundle root, so `OpenDyslexic-Regular.ttf` landed at `Verso.app/OpenDyslexic-Regular.ttf`, never at the `Fonts/` subpath iOS was told to look for — meaning the custom font could never actually register, and Settings' OpenDyslexic option silently fell back to something else instead of rendering in it.
+
+  ## Fix
+
+  Added `Resources/Fonts` as its own `type: folder` source in `project.yml`, mirroring the exact pattern `Resources/readability` already used. Verified directly against the built bundle (not just "it compiles"): `Verso.app/Fonts/OpenDyslexic-Regular.ttf` now exists at the path `Info.plist` declares, confirmed after a full `clean build` too, not just an incremental one.
+
+  A harmless side effect, not a regression: the plain `Resources/` source entry still also copies a flattened, unused duplicate of the font to the bundle root, same as `Readability.js` already does (also duplicated at root, also just unused cruft — `ReadabilityParser.swift` only ever reads the nested copy via `Bundle.main.url(forResource:withExtension:subdirectory:)`). Restructuring `sources:` to eliminate that duplication for every resource wasn't necessary to fix the actual bug and would be a larger, separate change.
+
+  ## Verified
+
+  `xcodegen generate` + `xcodebuild build` succeeded, and `xcodebuild clean build` confirmed the fix survives a full rebuild, not just an incremental one. Full `VersoTests` suite (77 tests) passes — unaffected, this is a build-config-only change with no Swift code touched. **Not verified here**: that OpenDyslexic actually renders correctly on a real device with the font now loading — Fabio's part after the PR, though this is about as close to certain as a fix gets without that final check (the exact missing-file path from the bug report now exists, byte-for-byte, exactly where `Info.plist` said to look).
 
 ### Phase 1 — Foundation
 
