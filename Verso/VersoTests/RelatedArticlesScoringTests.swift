@@ -118,6 +118,59 @@ final class RelatedArticlesScoringTests: XCTestCase {
         XCTAssertTrue(RelatedArticlesScoring.score(current: current, candidates: candidates).isEmpty)
     }
 
+    // MARK: - Real-content regression (grounded in a measured score matrix, not hand-tuned fixtures)
+
+    /// The synthetic fixtures above use deliberately dense, narrow jargon (e.g. "levain",
+    /// "hydration ratio") to make the ranking assertions clean -- useful for testing the
+    /// mechanism, but not evidence the threshold works on Verso's actual content, which reads
+    /// far more like ordinary prose. This test uses the real top-scoring pair (0.24) measured by
+    /// running `RelatedArticlesScoring` over all 91 pairs among the repo's 14 `SampleArticles` --
+    /// the app's own seed content -- which is what caught the shipped 0.18 default being too high
+    /// (only 1 of 91 real pairs cleared it; Related Articles was effectively always empty).
+    func testRealSampleArticlePairClearsThreshold() throws {
+        let slowReading = doc(
+            "the-case-for-slow-reading.md",
+            title: "The Case for Slow Reading",
+            body: """
+            There is a particular kind of exhaustion that comes not from doing too much, but from reading too fast. We skim headlines, swipe through feeds, absorb fragments of thought without ever letting them settle. The irony is that we have access to more written material than any generation in history, and yet many of us feel less informed, less nourished by what we read.
+
+            Slow reading is not a new idea. It has roots in the monastic practice of lectio divina, in which sacred texts were read aloud, repeated, and sat with until meaning emerged. It resurfaces periodically in education, in therapy, in philosophy. But it has rarely felt more urgent than now.
+
+            When you skim a piece of writing, you are doing something more radical than just reading quickly. You are changing your relationship to the text. You approach it as a resource to be mined rather than an experience to be had. You look for signal and discard noise -- but the noise is often where the meaning lives.
+
+            The philosopher Simone Weil wrote that attention is the rarest and purest form of generosity. She was talking about attention to other people, but the same principle applies to the written word. When we give a text our full attention, we are, in a sense, giving the author the gift of being genuinely heard.
+
+            Speed-reading apps and techniques promise to let you consume more content in less time. But this framing treats reading as a delivery mechanism for information, when it is often something else entirely -- a form of thinking that happens in collaboration with the text.
+
+            Slow reading is less a technique than a stance. It begins with permission -- permission to not finish, to reread, to pause and look out the window. It means choosing depth over breadth, at least sometimes. It means sitting with difficulty rather than reaching for your phone when a passage resists you.
+
+            The attention you bring to a text is not separate from the attention you bring to your own life. They are the same faculty, exercised in different arenas. Slow reading is, in the end, a form of practice -- not for reading, but for being present.
+            """,
+            tags: ["reading", "attention", "culture"]
+        )
+        let physicalBook = doc(
+            "the-return-of-the-physical-book.md",
+            title: "The Quiet Comeback of the Physical Book",
+            body: """
+            When e-readers arrived in the late 2000s, the consensus among publishers, technologists, and cultural critics was swift and confident: the physical book was dying. The logic seemed irresistible. Digital books were cheaper, instantly available, and could hold entire libraries in a device the size of a paperback.
+
+            The most frequently cited explanation is comprehension. A growing body of experimental research finds that reading on paper produces better retention and deeper understanding than reading on screen, particularly for complex or nuanced material. Paper readers are more likely to flip back, to pause, to hold the whole structure of a long piece in mind.
+
+            A second explanation is sensory. Physical books have a smell, a weight, a texture. The typography is fixed and intentional. There is no notification badge waiting in the margin. For readers who have spent their days in front of screens, the physicality of a book is itself a form of relief.
+
+            What a bookshop offers is not just books but a curated encounter with books -- the experience of being in a space organized around reading, staffed by people who read, filled with objects that signal that reading is something worth doing. It is a reminder that reading is not just content consumption. It is a practice with a culture, a history, and a community.
+
+            The physical book did not survive because it beat the e-reader on convenience. It survived because it was never just a delivery mechanism for text. It was an object, a ritual, and a way of being in relation to ideas.
+            """,
+            tags: ["books", "publishing", "culture"]
+        )
+
+        let scored = RelatedArticlesScoring.score(current: slowReading, candidates: [physicalBook])
+
+        XCTAssertEqual(scored.first?.key, "the-return-of-the-physical-book.md")
+        XCTAssertGreaterThanOrEqual(scored.first?.score ?? 0, RelatedArticlesScoring.threshold)
+    }
+
     // MARK: - Language-aware tokenization
 
     func testPortugueseArticleDoesNotRelateToUnrelatedEnglishArticles() throws {

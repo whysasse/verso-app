@@ -19,10 +19,18 @@ struct RelatedArticlesDocument {
 /// `RelatedArticlesService` is the only caller and always runs it off the main actor.
 enum RelatedArticlesScoring {
 
-    /// Ship default -- middle of the TF-IDF cosine range (0.15-0.25) the analysis in
-    /// docs/BACKLOG.md FAB-298 expected, pending calibration against a real library via the
-    /// `#if DEBUG` `RelatedArticlesDebugView` screen.
-    static let threshold: Double = 0.18
+    /// Calibrated against the repo's 14 `SampleArticles` (the app's own seed content, and a
+    /// reasonable proxy for the short-essay/long-read material Verso is actually used to read):
+    /// the shipped 0.18 guess (borrowed from generic TF-IDF cosine literature, which skews toward
+    /// longer/more technical documents) turned out too high -- only 1 of 91 real pairs cleared it,
+    /// so Related Articles was effectively always empty. The measured score distribution over
+    /// those 91 pairs tops out at 0.24 (one genuinely on-topic pair, sharing a tag too), with a
+    /// second tier of plausible-but-looser thematic pairs in the 0.10-0.15 band, and a long tail
+    /// below 0.08 of clearly unrelated pairs. 0.10 keeps that second tier -- so an article with a
+    /// real thematic neighbor actually surfaces 1-3 results -- while still excluding the bulk of
+    /// the unrelated tail. Still a measurement from one small sample library, not Fabio's real one
+    /// -- `#if DEBUG` `RelatedArticlesDebugView` remains the way to check and adjust further.
+    static let threshold: Double = 0.10
     static let maxResults = 3
 
     /// Title terms count for this many "copies" of a body term when building a document's term
