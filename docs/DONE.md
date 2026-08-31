@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**174 completed issues.**
+**175 completed issues.**
 
 ## iOS
 
@@ -102,6 +102,27 @@
   ## Verified
 
   New tests in `Verso/VersoTests/SwiftSoupParserTests.swift`: `testGuardianTopicsListDoesNotLeakIntoBody` (Share Extension path) and `testConvertStripsGuardianTopicsListViaDOMPrePass` (add-by-URL path) both use a fixture built from Fabio's real reported HTML, asserting the topic list / Share / "Reuse this content" text is gone and the real paragraph survives; `testConvertHandlesUnparseableFragmentGracefully` covers the parse-failure fallback. 3 new tests; full `VersoTests` suite (77 tests) passes. `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes (the latter rebuilt since `SwiftSoupParser.swift` was touched). **Not verified here**: a real re-save of the reported Guardian article on-device — Fabio's part after the PR.
+
+- [x] 🟡 **FAB-299** · Reading view: replace the Tags and Open-in-browser buttons with an ellipsis menu  `Done` `Medium`
+  Requested by Fabio 2026-08-30, scope confirmed in conversation the same day. Completed 2026-08-31.
+
+  ## What changed
+
+  Reading view top bar `← Back | Title | 🏷 Tags | ↗ Open in browser` → `← Back | Title | ⋯`. Tapping `⋯` opens a menu, in order: **Mark as unread/read** (label follows current state) → **Tags** → **Open in browser** → **Share** (new) → **Archive/Unarchive** → *divider* → **Delete** (destructive, confirmed). Archive, Delete, and Mark-as-unread all dismiss back to the list — confirmed decisions, per the ticket.
+
+  ## Implementation
+
+  * **`ReadingChrome.swift`**: `ReadingTopBar` became generic over a `@ViewBuilder menuContent`, wrapped in `Menu { menuContent() } label: { ⋯ icon }` — replaces the `onOpenExternal`/`onEditTags` closures, stays presentational (all Article-specific logic lives in `ArticleReaderView`, the only caller). Needed an explicit `init` with `menuContent` as the true trailing parameter — the synthesized memberwise init would have put `isVisible` last (declaration order), which silently breaks trailing-closure call sites.
+  * **`ArticleReaderView.swift`**: new `readingMenuContent` view builder plus `closeReader()` (factors out the existing `onRequestClose`/`dismiss()` pattern the back button already used), `toggleReadStatusAndClose()` (sets `status` directly rather than via `advanceStatus`, which refuses to move backwards by design), `archiveAndClose()`/`unarchiveAndClose()` (reader-scoped mirrors of `ArticleListView.archiveArticle`/`unarchiveArticle` from FAB-297 — archiving never touches `status`), and `deleteArticleAndClose()` (deletes the `.md`/`.media` sidecar and the Core Data row in the same transaction — new plumbing, since no single-article delete existed anywhere before this; only bulk delete did). `ShareLink` is the first use of it (or `UIActivityViewController`) anywhere in the codebase.
+  * No `advanceStatus`/`onDisappear` race: `evaluateReadCompletion` (which drives `advanceStatus(to: .read)`) only ever fires from live scroll-metric callbacks, which stop once the menu action isn't a scroll gesture — the `onDisappear` scroll-position write only ever touches `scroll_position`, never `status`.
+
+  ## Copy
+
+  Reused as-is: `L10n.ContextMenu.markAsRead`/`.markAsUnread`/`.addTags`/`.archive`/`.unarchive`/`.delete`. Also reused, but discovered to be pre-authored-and-never-wired (same pattern FAB-297 found with the unarchive strings) — `reading.openExternal.accessibilityLabel` ("Open original article"): the old icon button used a hardcoded, unlocalized "Open in browser" instead of this already-existing key. Similarly, `dialog.deleteArticle.title`/`.message`/`.confirm`/`.cancel` existed but had zero call sites anywhere; **repurposed** `dialog.deleteArticle.title` in place (free, since nothing used it) from a plain "Delete article?" to a parameterized `Delete "{title}"?`, matching how `dialog.bulkDelete.title` is already parameterized by count — satisfies the ticket's "confirmation must name the article" requirement without a near-duplicate key. Two genuinely new keys: `reading.topBar.moreActions` (+ `.hint`) and `reading.menu.share`, authored in `docs/copy/UI_COPY.md` and run through `docs/copy/codegen/generate.py` per the FAB-275 workflow (en/fr-CA/pt-BR, `needs_review` state for the hand-translated locales, same as every other string in this codebase).
+
+  ## Verified
+
+  `xcodebuild build` succeeded for the `Verso` scheme. Full `VersoTests` suite (77 tests) passes — unchanged, since this is a UI-orchestration change entirely reusing already-tested lower-level functions (`MarkdownWriter.archive`/`unarchive`/`delete`/`updateStatus`, all covered by FAB-297's tests). **Not verified here** — needs a real device/simulator and is entirely manual per the ticket's own acceptance criteria: VoiceOver reading the `⋯` button and every item's current-state label correctly, menu legibility across all 4 themes and at XXL Dynamic Type, and updated `docs/printscreens` screenshots — all Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 

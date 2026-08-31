@@ -26,6 +26,7 @@ struct ArticleReaderView: View {
     @State private var scrollSaveTask: Task<Void, Never>?
     @State private var lastPersistedScroll: Double = -1
     @State private var showTagsEditor = false
+    @State private var confirmDelete = false
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var readingPreferences: ReadingPreferencesService
@@ -162,21 +163,11 @@ struct ArticleReaderView: View {
             VStack(spacing: 0) {
                 ReadingTopBar(
                     title: article.title,
-                    onBack: {
-                        if let onRequestClose {
-                            onRequestClose()
-                        } else {
-                            dismiss()
-                        }
-                    },
-                    onOpenExternal: {
-                        if let url = article.url {
-                            UIApplication.shared.open(url)
-                        }
-                    },
-                    onEditTags: { showTagsEditor = true },
+                    onBack: closeReader,
                     isVisible: $isChromeVisible
-                )
+                ) {
+                    readingMenuContent
+                }
                 .padding(.top, safeAreaTop)
                 Spacer()
             }
@@ -224,6 +215,16 @@ struct ArticleReaderView: View {
                 .environmentObject(themeManager)
                 .environmentObject(folderBookmarkService)
                 .environment(\.managedObjectContext, viewContext)
+        }
+        .confirmationDialog(
+            L10n.Dialog.deleteArticleTitle(title: article.title),
+            isPresented: $confirmDelete,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.Dialog.deleteArticleConfirm, role: .destructive, action: deleteArticleAndClose)
+            Button(L10n.Dialog.deleteArticleCancel, role: .cancel) {}
+        } message: {
+            Text(L10n.Dialog.deleteArticleMessage)
         }
         .task {
             if let s = article.scrollPosition?.doubleValue {
@@ -331,6 +332,131 @@ struct ArticleReaderView: View {
         try? viewContext.save() // durably persist the FAB-290 rename even if adoption is the only change this call makes
         let path = article.filePath.trimmingCharacters(in: .whitespacesAndNewlines)
         try? MarkdownWriter.updateStatus(status, for: path)
+    }
+
+    // MARK: - Top bar `⋯` menu (FAB-299)
+
+    @ViewBuilder
+    private var readingMenuContent: some View {
+        Button(action: toggleReadStatusAndClose) {
+            let isRead = article.statusEnum == .read
+            Label(
+                isRead ? L10n.ContextMenu.markAsUnread : L10n.ContextMenu.markAsRead,
+                systemImage: isRead ? "circle" : "checkmark.circle"
+            )
+        }
+        Button {
+            showTagsEditor = true
+        } label: {
+            Label(L10n.ContextMenu.addTags, systemImage: "tag")
+        }
+        if let url = article.url {
+            Button {
+                UIApplication.shared.open(url)
+            } label: {
+                // `openExternalAccessibilityLabel` was pre-authored for this icon button
+                // (`reading.openExternal.accessibilityLabel`) but never wired to any actual
+                // string in code -- the old ReadingChrome button used a hardcoded, unlocalized
+                // "Open in browser". Reused here for both the menu item's visible text and its
+                // implicit accessible name, same pattern as FAB-297's unarchive strings.
+                Label(L10n.Reading.openExternalAccessibilityLabel, systemImage: "arrow.up.right")
+            }
+            ShareLink(item: url) {
+                Label(L10n.Reading.menuShare, systemImage: "square.and.arrow.up")
+            }
+        }
+        if article.archived {
+            Button(action: unarchiveAndClose) {
+                Label(L10n.ContextMenu.unarchive, systemImage: "tray.and.arrow.up")
+            }
+        } else {
+            Button(action: archiveAndClose) {
+                Label(L10n.ContextMenu.archive, systemImage: "archivebox")
+            }
+        }
+        Divider()
+        Button(role: .destructive) {
+            confirmDelete = true
+        } label: {
+            Label(L10n.ContextMenu.delete, systemImage: "trash")
+        }
+    }
+
+    /// Mirrors the back button's own dismissal: `onRequestClose` when embedded in
+    /// `NavigationSplitView` detail (clears selection instead of popping a nonexistent stack
+    /// frame), `dismiss()` otherwise. Archive, Delete, and Mark-as-unread all return to the list
+    /// after acting (confirmed UX decision) since the article is no longer where the reader is
+    /// showing it from.
+    private func closeReader() {
+        if let onRequestClose {
+            onRequestClose()
+        } else {
+            dismiss()
+        }
+    }
+
+    /// Toggles read/unread directly (not via `advanceStatus`, which refuses to move backwards by
+    /// design) and dismisses. Deliberate even for "mark as read": `advanceStatus` already fires
+    /// `.read` at 95% scroll, and dismissing keeps this action's semantics consistent with
+    /// "mark as unread" rather than leaving the reader open for scroll to silently re-advance it
+    /// (moot here since neither direction can be scroll-reverted, but keeps one mental model for
+    /// both directions of this menu item). No race with the `onDisappear` scroll-position write:
+    /// that only ever touches `scroll_position`, never `status`.
+    private func toggleReadStatusAndClose() {
+        if let folderURL = folderBookmarkService.folderURL {
+            adoptIfNeeded(folderURL: folderURL)
+        }
+        let newStatus: Article.Status = article.statusEnum == .read ? .unread : .read
+        article.statusEnum = newStatus
+        try? viewContext.save()
+        try? MarkdownWriter.updateStatus(newStatus, for: article.filePath)
+        closeReader()
+    }
+
+    /// Reader-scoped mirror of `ArticleListView.archiveArticle` (FAB-297) -- archiving never
+    /// touches `status`, read state and archived state are orthogonal.
+    private func archiveAndClose() {
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        do {
+            adoptIfNeeded(folderURL: folderURL)
+            let destination = try MarkdownWriter.archive(filePath: article.filePath, in: folderURL)
+            let archivedAt = Date()
+            try MarkdownWriter.updateArchived(true, archivedAt: archivedAt, for: destination.path)
+            article.filePath = destination.path
+            article.archived = true
+            article.archivedAt = archivedAt
+            try viewContext.save()
+        } catch {
+            // silently ignore — matches ArticleListView.archiveArticle's existing behaviour
+        }
+        closeReader()
+    }
+
+    /// Reader-scoped mirror of `ArticleListView.unarchiveArticle` (FAB-297).
+    private func unarchiveAndClose() {
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        do {
+            adoptIfNeeded(folderURL: folderURL)
+            let destination = try MarkdownWriter.unarchive(filePath: article.filePath, in: folderURL)
+            try MarkdownWriter.updateArchived(false, archivedAt: nil, for: destination.path)
+            article.filePath = destination.path
+            article.archived = false
+            article.archivedAt = nil
+            try viewContext.save()
+        } catch {
+            // silently ignore — matches archiveAndClose's existing behaviour
+        }
+        closeReader()
+    }
+
+    /// Permanently deletes the article's `.md` file (and `.media` sidecar) plus its Core Data
+    /// row in the same transaction, then returns to the list. Only reachable after the
+    /// `.confirmationDialog` above -- there is deliberately no undo.
+    private func deleteArticleAndClose() {
+        try? MarkdownWriter.delete(at: article.filePath)
+        viewContext.delete(article)
+        try? viewContext.save()
+        closeReader()
     }
 
     private func scheduleScrollPersist(fraction: Double) {

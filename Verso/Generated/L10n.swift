@@ -232,9 +232,9 @@ enum L10n {
         static var deleteArticleMessage: String {
             String(localized: "dialog.deleteArticle.message", defaultValue: "This cannot be undone. The file will be permanently removed from your iCloud Drive.", comment: "Dialog message")
         }
-        /// "Delete article?" -- Dialog title
-        static var deleteArticleTitle: String {
-            String(localized: "dialog.deleteArticle.title", defaultValue: "Delete article?", comment: "Dialog title")
+        /// "Delete "{title}"?" -- FAB-299: parameterized by article title (like `dialog.bulkDelete.title` is by count) so the confirmation names the specific article. Was a plain, unparameterized string with zero call sites before this — free to change.
+        static func deleteArticleTitle(title: String) -> String {
+            String(localized: "dialog.deleteArticle.title", defaultValue: "Delete \"\(title)\"?", comment: "FAB-299: parameterized by article title (like `dialog.bulkDelete.title` is by count) so the confirmation names the specific article. Was a plain, unparameterized string with zero call sites before this — free to change.")
         }
     }
     enum Error {
@@ -874,6 +874,10 @@ enum L10n {
         static var immersiveHint: String {
             String(localized: "reading.immersiveHint", defaultValue: "Tap anywhere to reveal controls", comment: "Never shown when VoiceOver is active")
         }
+        /// "Share" -- Opens `ShareLink` for the article's source URL; hidden when the article has no URL
+        static var menuShare: String {
+            String(localized: "reading.menu.share", defaultValue: "Share", comment: "Opens `ShareLink` for the article's source URL; hidden when the article has no URL")
+        }
         /// "Open original article" -- Open-externally button
         static var openExternalAccessibilityLabel: String {
             String(localized: "reading.openExternal.accessibilityLabel", defaultValue: "Open original article", comment: "Open-externally button")
@@ -889,6 +893,14 @@ enum L10n {
         /// "Select an article" -- Added during step 4 view-wiring pass — iPad split view postdates the original audit.
         static var splitViewPlaceholderHeadline: String {
             String(localized: "reading.splitView.placeholder.headline", defaultValue: "Select an article", comment: "Added during step 4 view-wiring pass — iPad split view postdates the original audit.")
+        }
+        /// "More actions" -- `⋯` button accessibility label
+        static var topBarMoreActions: String {
+            String(localized: "reading.topBar.moreActions", defaultValue: "More actions", comment: "`⋯` button accessibility label")
+        }
+        /// "Shows more actions for this article" -- VoiceOver hint
+        static var topBarMoreActionsHint: String {
+            String(localized: "reading.topBar.moreActions.hint", defaultValue: "Shows more actions for this article", comment: "VoiceOver hint")
         }
     }
     enum Settings {

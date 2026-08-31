@@ -100,7 +100,7 @@
       "cancel": "Cancel",
       "confirm": "Delete",
       "message": "This cannot be undone. The file will be permanently removed from your iCloud Drive.",
-      "title": "Delete article?"
+      "title": "Delete \"{title}\"?"
     }
   },
   "error": {
@@ -404,6 +404,9 @@
       "byline": "By {author}"
     },
     "immersiveHint": "Tap anywhere to reveal controls",
+    "menu": {
+      "share": "Share"
+    },
     "openExternal": {
       "accessibilityLabel": "Open original article"
     },
@@ -414,6 +417,12 @@
       "placeholder": {
         "accessibilityLabel": "No article selected",
         "headline": "Select an article"
+      }
+    },
+    "topBar": {
+      "moreActions": {
+        "_label": "More actions",
+        "hint": "Shows more actions for this article"
       }
     }
   },

@@ -57,14 +57,30 @@ struct TTSControlsRow: View {
 
 private let readingChromeIconSize: CGFloat = 20
 
-struct ReadingTopBar: View {
+struct ReadingTopBar<MenuContent: View>: View {
     let title: String
-    var onBack: () -> Void = {}
-    var onOpenExternal: () -> Void = {}
-    var onEditTags: (() -> Void)? = nil
+    var onBack: () -> Void
+    /// FAB-299: the menu's items -- `ArticleReaderView` (the only caller) owns every action, so
+    /// this view stays presentational, matching how the bottom bar's buttons take plain closures.
+    @ViewBuilder var menuContent: () -> MenuContent
     @EnvironmentObject var themeManager: ThemeManager
     @Binding var isVisible: Bool
     private var colors: ThemeColors { themeManager.colors }
+
+    /// Explicit init so `menuContent` -- not `isVisible` -- is the trailing parameter: the
+    /// synthesized memberwise init would put `isVisible` last (declaration order), which breaks
+    /// trailing-closure call sites like `ReadingTopBar(title:isVisible:) { ... }`.
+    init(
+        title: String,
+        onBack: @escaping () -> Void = {},
+        isVisible: Binding<Bool>,
+        @ViewBuilder menuContent: @escaping () -> MenuContent
+    ) {
+        self.title = title
+        self.onBack = onBack
+        self._isVisible = isVisible
+        self.menuContent = menuContent
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -85,29 +101,19 @@ struct ReadingTopBar: View {
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
 
-            if let onEditTags {
-                VersoToolbarIconButton(
-                    systemName: "tag",
-                    accent: colors.accent,
-                    action: onEditTags,
-                    iconPointSize: readingChromeIconSize,
-                    labelWidth: 44,
-                    labelHeight: 44,
-                    accessibilityLabel: "Tags",
-                    accessibilityHint: "Edit tags for this article"
-                )
+            // Not `VersoToolbarIconButton` here -- that view wraps its content in its own
+            // `Button`, which doesn't compose cleanly as a `Menu` label. Same visual metrics
+            // (44x44 hit target, readingChromeIconSize) so the bar's rhythm doesn't shift.
+            Menu {
+                menuContent()
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: readingChromeIconSize))
+                    .foregroundColor(colors.accent)
+                    .frame(width: 44, height: 44)
             }
-
-            VersoToolbarIconButton(
-                systemName: "arrow.up.right",
-                accent: colors.accent,
-                action: onOpenExternal,
-                iconPointSize: readingChromeIconSize,
-                labelWidth: 44,
-                labelHeight: 44,
-                accessibilityLabel: "Open in browser",
-                accessibilityHint: "Opens the original article in your web browser"
-            )
+            .accessibilityLabel(L10n.Reading.topBarMoreActions)
+            .accessibilityHint(L10n.Reading.topBarMoreActionsHint)
         }
         .frame(height: 44)
         .background(colors.background)
@@ -210,7 +216,11 @@ struct ReadingBottomBar: View {
         @State var visible = true
         var body: some View {
             VStack {
-                ReadingTopBar(title: "The Future of Reading", isVisible: $visible)
+                ReadingTopBar(title: "The Future of Reading", isVisible: $visible) {
+                    Button("Mark as read") {}
+                    Button("Tags") {}
+                    Button("Open in browser") {}
+                }
                 Spacer()
                 ReadingBottomBar(scrollProgress: 0.4, isVisible: $visible)
             }
