@@ -158,6 +158,11 @@ struct ArticleListView: View {
                 }
             }
         }
+        // FAB-302: the title/controls live in `headerRow` now (FAB-292), not the nav
+        // bar, so hide the sidebar column's bar entirely — otherwise NavigationSplitView
+        // reserves an empty ~44pt band above `headerRow`. Mirrors ArticleReaderView's
+        // own bar-hiding for its column.
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     // MARK: - Header row (FAB-292)
@@ -483,9 +488,6 @@ private struct ArticleListFetchedBody: View {
             guard let url = folderBookmarkService.folderURL else { return }
             await articleLibraryService.rebuildCache(from: url, context: viewContext)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(themeManager.colors.background, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if isSelecting, !selectedArticleIds.isEmpty {
                 HStack(spacing: VersoSpacing.lg) {

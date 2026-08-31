@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**177 completed issues.**
+**178 completed issues.**
 
 ## iOS
 
@@ -152,6 +152,19 @@
   ## Verified
 
   New `Verso/VersoTests/MarkdownParserTests.swift` (11 tests): basic 3-column table, table amid ordinary paragraphs, alignment colons (all three + default), short-row padding, long-row truncation, escaped `\|` inside a cell, the false-positive guard (a pipe line with no delimiter row stays a paragraph, both standalone and directly after a real table), `plainText` joining. Plus two new `SwiftSoupParserTests`: a `<thead>`/`<tbody>` table round-trips through `MarkdownParser.parse` as a real `.table` node (not just loose lines — supersedes but doesn't replace the older loose-line regression test, which stays as a coarser guard against the text vanishing outright), and a bare-`<tr>` table with no `<thead>`/`<tbody>` correctly treats the first row as the header. 11 new tests; full `VersoTests` suite (89 tests) passes. `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes (the latter rebuilt since `SwiftSoupParser.swift` was touched). **Not verified here**: real-device confirmation that a wide table actually scrolls horizontally without the surrounding article text scrolling, and that XXL Dynamic Type doesn't clip cells — both Fabio's part after the PR.
+
+### Bugs — layout (reported by Fabio 2026-08-31)
+
+- [x] 🟠 **FAB-302** · Empty navigation bar leaves a ~44pt gap above the "Verso" title  `Done` `High`
+  FAB-292 (commit `4befaba`, "feat: redesign article list") moved the title and every control out of the navigation bar and into the in-content `headerRow`, but left `.navigationBarTitleDisplayMode(.inline)` and two `.toolbarBackground(…)` calls behind on `ArticleListFetchedBody` — those modifiers style a nav bar, they don't remove it, so `NavigationSplitView`'s sidebar column kept reserving an empty ~44pt inline bar above `headerRow`. Completed 2026-08-31.
+
+  ## Fix
+
+  In `Verso/Sources/Screens/ArticleList/ArticleListView.swift`: deleted the three now-purposeless modifiers from `ArticleListFetchedBody`, and added `.toolbar(.hidden, for: .navigationBar)` to the `GeometryReader` at the root of `ArticleListView.body` — column-level chrome belongs at the top of the view handed to the sidebar column, not buried inside a child view. No compensating padding added; `headerRow`'s existing `.padding(.top, VersoSpacing.md)` now sits directly below the safe area, per the FAB-292 layout intent. Mirrors `ArticleReaderView`'s existing `.navigationBarHidden(true)` for its own column (left as-is — converting it to the modern API is separate cleanup, out of scope here).
+
+  ## Verified
+
+  `xcodebuild build` succeeded for the `Verso` scheme. **Not verified here**: the actual visual result on a simulator/device (top spacing under the Dynamic Island, all three `headerRow` states, the folder-picker prompt state, iPad sidebar toggle behavior) — Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 
