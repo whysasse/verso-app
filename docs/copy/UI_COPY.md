@@ -228,7 +228,7 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `dialog.deleteArticle.title` | Dialog title | Delete article? | Supprimer l'article? | Excluir artigo? | — |
+| `dialog.deleteArticle.title` | Dialog title | Delete "{title}"? | Supprimer "{title}"? | Excluir "{title}"? | FAB-299: parameterized by article title (like `dialog.bulkDelete.title` is by count) so the confirmation names the specific article. Was a plain, unparameterized string with zero call sites before this — free to change. |
 | `dialog.deleteArticle.message` | Dialog message | This cannot be undone. The file will be permanently removed from your iCloud Drive. | Cette action est irréversible. Le fichier sera définitivement supprimé de ton iCloud Drive. | Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive. | — |
 | `dialog.deleteArticle.confirm` | Destructive button | Delete | Supprimer | Excluir | — |
 | `dialog.deleteArticle.cancel` | Cancel button | Cancel | Annuler | Cancelar | — |
@@ -289,6 +289,16 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `reading.immersiveHint` | Hint pill (first launch only) | Tap anywhere to reveal controls | Touche n'importe où pour afficher les commandes | Toque em qualquer lugar para mostrar os controles | Never shown when VoiceOver is active |
+
+### Top Bar (Reading) — ellipsis menu
+
+> FAB-299: the top bar's Tags and Open-in-browser icon buttons are replaced by a single `⋯` menu (Mark as read/unread, Tags, Open in browser, Share, Archive/Unarchive, Delete). Most of those item labels reuse existing strings: `contextMenu.*` (`markAsRead`/`markAsUnread`/`addTags`/`archive`/`unarchive`/`delete`) plus `reading.openExternal.accessibilityLabel` ("Open original article") — pre-authored but, like the `contextMenu.unarchive` string FAB-297 found, never actually wired to any code; the old icon button used a hardcoded, unlocalized "Open in browser" instead. Only the two rows below are genuinely new. The old `← Back` button's accessibility label predates this doc (hardcoded in `ReadingChrome.swift`, not localized) — out of scope for this ticket, unchanged.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.topBar.moreActions` | `⋯` button accessibility label | More actions | Plus d'actions | Mais ações | — |
+| `reading.topBar.moreActions.hint` | VoiceOver hint | Shows more actions for this article | Affiche plus d'actions pour cet article | Mostra mais ações para este artigo | — |
+| `reading.menu.share` | Menu item label | Share | Partager | Compartilhar | Opens `ShareLink` for the article's source URL; hidden when the article has no URL |
 
 ### Bottom Bar (Reading Controls)
 

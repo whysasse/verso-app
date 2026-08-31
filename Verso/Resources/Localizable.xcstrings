@@ -2583,24 +2583,24 @@
     },
     "dialog.deleteArticle.title": {
       "extractionState": "manual",
-      "comment": "Dialog title",
+      "comment": "FAB-299: parameterized by article title (like `dialog.bulkDelete.title` is by count) so the confirmation names the specific article. Was a plain, unparameterized string with zero call sites before this — free to change.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete article?"
+            "value": "Delete \"%@\"?"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Supprimer l'article?"
+            "value": "Supprimer \"%@\"?"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Excluir artigo?"
+            "value": "Excluir \"%@\"?"
           }
         }
       }
@@ -3249,6 +3249,78 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Toque em qualquer lugar para mostrar os controles"
+          }
+        }
+      }
+    },
+    "reading.topBar.moreActions": {
+      "extractionState": "manual",
+      "comment": "`⋯` button accessibility label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More actions"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Plus d'actions"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mais ações"
+          }
+        }
+      }
+    },
+    "reading.topBar.moreActions.hint": {
+      "extractionState": "manual",
+      "comment": "VoiceOver hint",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shows more actions for this article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Affiche plus d'actions pour cet article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mostra mais ações para este artigo"
+          }
+        }
+      }
+    },
+    "reading.menu.share": {
+      "extractionState": "manual",
+      "comment": "Opens `ShareLink` for the article's source URL; hidden when the article has no URL",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Partager"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Compartilhar"
           }
         }
       }

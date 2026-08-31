@@ -100,7 +100,7 @@
       "cancel": "Annuler",
       "confirm": "Supprimer",
       "message": "Cette action est irréversible. Le fichier sera définitivement supprimé de ton iCloud Drive.",
-      "title": "Supprimer l'article?"
+      "title": "Supprimer \"{title}\"?"
     }
   },
   "error": {
@@ -404,6 +404,9 @@
       "byline": "Par {author}"
     },
     "immersiveHint": "Touche n'importe où pour afficher les commandes",
+    "menu": {
+      "share": "Partager"
+    },
     "openExternal": {
       "accessibilityLabel": "Ouvrir l'article original"
     },
@@ -414,6 +417,12 @@
       "placeholder": {
         "accessibilityLabel": "Aucun article sélectionné",
         "headline": "Sélectionne un article"
+      }
+    },
+    "topBar": {
+      "moreActions": {
+        "_label": "Plus d'actions",
+        "hint": "Affiche plus d'actions pour cet article"
       }
     }
   },

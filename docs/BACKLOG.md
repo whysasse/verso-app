@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**25 open issues** across iOS, Web, Design, and Infra.
+**24 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -80,49 +80,6 @@ Four bugs found while reading a Medium article saved through the Share Extension
   - Choosing *Keep both* produces two clearly distinguishable entries.
   - An article living in a library subfolder is found by the check.
   - Unit tests for `VersoArticleURL.canonicalKey` covering: tracking params, query ordering, `www.`, `http` vs `https`, trailing slash, fragment. Plus a `ArticleDuplicateFinder` test over a temp directory tree with a nested subfolder.
-
-### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
-
-FAB-297 and FAB-298 were found while using the FAB-292 list redesign; FAB-299 is a follow-on enhancement Fabio requested the same day. FAB-299 depends on FAB-297 (it reuses the state-dependent action labels and the `unarchive` writer) — **FAB-297 and FAB-298 are both done** (see [DONE.md](DONE.md)), so FAB-299 is unblocked.
-
-- [ ] 🟡 **FAB-299** · Reading view: replace the Tags and Open-in-browser buttons with an ellipsis menu  `Todo` `Medium`
-
-  **Requested by Fabio 2026-08-30, scope confirmed in conversation the same day.**
-
-  **What changes.** The reading view's top bar is currently `← Back | Title | 🏷 Tags | ↗ Open in browser` (`ReadingTopBar` in `Verso/Sources/Components/Reading/ReadingChrome.swift`). Replace **both** trailing icon buttons with a single `⋯` (`ellipsis`) menu, so the bar becomes `← Back | Title | ⋯`. Nothing is lost — Tags and Open in browser move into the menu — and the menu has room for the actions the reading view is missing today. The bottom bar (reading controls, theme, TTS) is untouched.
-
-  **Menu contents and order** (confirmed with Fabio):
-
-  1. **Mark as unread** / **Mark as read** — label follows current state, same logic FAB-297 introduces for the list. Dismisses back to the list after acting (see below).
-  2. **Tags** — opens the existing `ArticleTagsEditorSheet`, exactly what the 🏷 button does today (`showTagsEditor = true`).
-  3. **Open in browser** — `UIApplication.shared.open(article.url)`, exactly what the ↗ button does today. Hide or disable this item when `article.url` is nil (manually added local files have no source URL).
-  4. **Share** — new. Share the article's source URL via `ShareLink`. Nothing in the codebase uses `ShareLink` or `UIActivityViewController` yet, so this is the first one; use SwiftUI's `ShareLink` (iOS 16+, matches the project floor) rather than wrapping UIKit. Hide when `article.url` is nil.
-  5. **Archive** / **Unarchive** — reuses `MarkdownWriter.archive(filePath:in:)` and the `unarchive` counterpart FAB-297 adds. Dismisses back to the list.
-  6. *divider*
-  7. **Delete** — `role: .destructive`, behind a confirmation (see below). Dismisses back to the list.
-
-  **Behaviour decisions (all confirmed with Fabio — do not re-litigate these during implementation).**
-  - **Delete is confirmed before it runs.** It permanently removes the user's own `.md` (and its `.media` sidecar) from their iCloud Drive with no undo. Use `.confirmationDialog` with a destructive confirm button, naming the article. Do not offer an "undo" toast as a substitute for the dialog.
-  - **Archive and Delete both dismiss to the list.** The article is no longer where the reader is showing it from, so staying put is not an option.
-  - **Mark as unread also dismisses.** This is the non-obvious one, and it is deliberate: `ArticleReaderView.advanceStatus(to:)` is monotonic over `[.unread, .reading, .read]` and fires `.reading` on open and `.read` at full scroll, so marking unread and then remaining in the view would quietly re-mark the article as the user scrolls. Dismissing matches the intent of the action ("I'm done, put it back"). **Note that `advanceStatus` cannot be used to implement this** — it refuses to move backwards by design. Set the status directly and persist it, and make sure the `onDisappear` scroll-position write does not immediately contradict it.
-  - **Mark as read** (from the unread/reading state) may keep the same dismiss-on-act behaviour for consistency; confirm with Fabio if it feels wrong in the build.
-
-  **Implementation notes.**
-  - `ReadingTopBar` currently takes `onOpenExternal` and an optional `onEditTags`. Replace both with a single trailing-content closure or a small `ReadingMenuActions` struct, so `ArticleReaderView` (the only caller, ~line 163) owns the actions and `ReadingChrome` stays presentational. Keep the existing `VersoToolbarIconButton` metrics (44×44 hit target, `readingChromeIconSize` 20) for the `⋯` button so the bar's rhythm doesn't shift.
-  - The menu must respect the chrome's auto-hide: the top bar fades via `isVisible`. Make sure an open menu doesn't get dismissed by the chrome hiding underneath it, and that the chrome doesn't hide while the menu is presented.
-  - **Most action strings already exist and are already localized** in `Verso/Resources/Localizable.xcstrings`: `L10n.ContextMenu.markAsRead`, `.markAsUnread`, `.addTags`, `.archive`, `.unarchive`, `.delete`. Reuse them — do not add parallel keys. **New keys needed:** the Share item label, the delete confirmation title/message/confirm-button, and an accessibility label + hint for the `⋯` button ("More actions" / "Shows more actions for this article"). Author them in `docs/copy/UI_COPY.md` and run the codegen in `docs/copy/codegen` so en / pt-BR / fr-CA all land together, per the FAB-275 workflow.
-  - Delete already exists as `MarkdownWriter.delete(at:)`; make sure the Core Data row is deleted in the same transaction and that the `.media` sidecar goes with it.
-
-  **Acceptance.**
-  - Top bar shows `← Back | Title | ⋯`; the tag and arrow icons are gone and both actions are reachable from the menu.
-  - All seven items behave as specified; state-dependent labels are correct in every status, including archived.
-  - Delete shows a confirmation, and cancelling it leaves the article untouched on disk and in the list.
-  - Archive, Delete and Mark-as-unread each return to the list, and the list reflects the change immediately.
-  - Marking unread does not get silently reverted by scroll progress.
-  - Open in browser and Share are hidden for an article with no source URL, and the menu still looks right with those items absent.
-  - VoiceOver: the `⋯` button is announced meaningfully and every menu item reads its current-state label.
-  - Menu is legible and correctly themed in all themes, and at XXL Dynamic Type.
-  - Screenshots in `docs/printscreens` and any affected specs in `docs/COMPONENT_SPECS.md` updated for the new top bar.
 
 ### Phase 2 — Experience
 

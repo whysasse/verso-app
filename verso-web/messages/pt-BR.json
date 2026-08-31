@@ -100,7 +100,7 @@
       "cancel": "Cancelar",
       "confirm": "Excluir",
       "message": "Esta ação não pode ser desfeita. O arquivo será removido permanentemente do seu iCloud Drive.",
-      "title": "Excluir artigo?"
+      "title": "Excluir \"{title}\"?"
     }
   },
   "error": {
@@ -404,6 +404,9 @@
       "byline": "Por {author}"
     },
     "immersiveHint": "Toque em qualquer lugar para mostrar os controles",
+    "menu": {
+      "share": "Compartilhar"
+    },
     "openExternal": {
       "accessibilityLabel": "Abrir artigo original"
     },
@@ -414,6 +417,12 @@
       "placeholder": {
         "accessibilityLabel": "Nenhum artigo selecionado",
         "headline": "Selecione um artigo"
+      }
+    },
+    "topBar": {
+      "moreActions": {
+        "_label": "Mais ações",
+        "hint": "Mostra mais ações para este artigo"
       }
     }
   },
