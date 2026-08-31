@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**26 open issues** across iOS, Web, Design, and Infra.
+**25 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -83,37 +83,7 @@ Four bugs found while reading a Medium article saved through the Share Extension
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
-FAB-297 and FAB-298 were found while using the FAB-292 list redesign; FAB-299 is a follow-on enhancement Fabio requested the same day. FAB-299 depends on FAB-297 (it reuses the state-dependent action labels and the `unarchive` writer) — **FAB-297 is done** (see [DONE.md](DONE.md)), so FAB-299 is unblocked.
-
-- [ ] 🟠 **FAB-298** · "Related articles" are not related — the similarity scoring is effectively random  `Todo` `High`
-
-  **Symptom.** The Related Articles section at the end of a reading view just lists other articles in the library with no topical relationship to the one being read.
-
-  **Root cause.** `Verso/Sources/Services/RelatedArticlesService.swift` scores with **Jaccard similarity over the set of unique words** (length ≥ 4, minus a hand-written 60-word stoplist) from title + full body, keeps anything scoring **≥ 0.04**, and returns the top 3. That threshold is the headline problem: any two English prose articles of a few thousand words share far more than 4% of their unique-word sets on shared vocabulary alone, so effectively every article passes and the "top 3" is close to arbitrary. Four compounding issues underneath:
-  - **No IDF weighting.** "psychology" and "however" count the same. Relatedness lives almost entirely in *rare* shared terms; an unweighted set intersection throws that signal away.
-  - **Set-based, so term frequency is ignored.** An article that says "scanner" thirty times scores no higher than one that says it once.
-  - **Jaccard's union denominator punishes length mismatch**, so the ranking tracks similar *length* more than similar *subject*.
-  - **The stoplist is 60 English words** in an app localized to pt-BR and fr-CA (FAB-275). `minWordLength >= 4` incidentally removes "the/and/of/to" but leaves thousands of topic-neutral words.
-
-  **Two things not to do.** (1) The hide-when-empty behaviour Fabio asked for **already exists** — `ArticleReaderView.swift:107` wraps the section in `if !relatedArticles.isEmpty`. It never fires because scoring never returns empty. Fix the scoring; do not add a second guard. (2) Do not just raise the 0.04 threshold. With unweighted Jaccard the scores don't rank by relatedness in the first place, so no cutoff makes them right.
-
-  **Fix — replace Jaccard with TF-IDF cosine similarity.** This is the standard, cheap, fully on-device answer, it is roughly a hundred lines, and it directly supplies what is missing: rare shared terms dominate, frequency counts, and length cancels out in the cosine normalization.
-  1. Build a corpus document-frequency table across the library, cache it, and rebuild on library change (the `ICloudFileWatcher` refresh is the natural hook). Score candidates by cosine over TF-IDF vectors, weighting title terms ~2–3× body terms.
-  2. **Read text from `Article.searchableBody`, not from disk.** Today `loadContent` calls `MarkdownReader.read` on *every* article in the library, parsing whole files, every single time a reading view opens — O(n) file reads on the main-actor context, right as the user starts reading. `searchableBody` is already the plain text this needs. Fall back to a file read only when it is nil, and do the scoring off the main actor.
-  3. Tokenize with `NLTagger` using the `.lemma` scheme so "scan / scanning / scanner" collapse to one term, and pick the stopword list from `NLLanguageRecognizer` — ship en, pt, fr lists and delete the hand-rolled 60-word set. (`NLTagger` is iOS 12+, well inside the project's iOS 16 floor.)
-  4. Add a tag-overlap boost: tags are explicit user intent and the strongest signal in the model, currently unused. Something like `final = cosine + 0.15 * (sharedTags / max(tagsA.count, tagsB.count))`, clamped to 1.
-  5. **Calibrate the threshold from real data, not by guessing.** Add a debug-only screen or a unit test that prints the full score matrix over Fabio's actual library, then pick the cutoff that keeps the genuinely related pairs and rejects the rest. TF-IDF cosine typically lands somewhere around 0.15–0.25, but the number must come from the measurement. Keep max 3 results.
-  6. Add a fetch predicate excluding archived articles from the candidate set (there is currently no predicate at all).
-
-  **Follow-up, not this ticket.** If TF-IDF still disappoints — it cannot connect "burnout" to "exhaustion" because it only matches literal terms — the next step is `NLContextualEmbedding` for real multilingual semantic similarity. It needs iOS 17 (the project floor is 16, so it would need an availability branch), an asset download via `requestAssets`, and per-article embedding time. Only worth taking on after step 5 shows TF-IDF isn't enough.
-
-  **Acceptance.**
-  - In a library with two articles on one subject and eight unrelated ones, opening either of the two relates it to the other and to nothing else.
-  - Opening an article with no topical neighbour shows no Related Articles section at all, and the reading view's bottom spacing still looks right without it.
-  - A pt-BR article does not relate to unrelated English articles.
-  - Two articles sharing a user tag rank above two that merely share vocabulary.
-  - Performance: with ~500 articles in the library, opening an article does not hitch — measure it, and keep the scoring off the main thread.
-  - Unit tests over fixture articles asserting the ranking, plus a regression test that the previous failure mode (everything scores above threshold) cannot return.
+FAB-297 and FAB-298 were found while using the FAB-292 list redesign; FAB-299 is a follow-on enhancement Fabio requested the same day. FAB-299 depends on FAB-297 (it reuses the state-dependent action labels and the `unarchive` writer) — **FAB-297 and FAB-298 are both done** (see [DONE.md](DONE.md)), so FAB-299 is unblocked.
 
 - [ ] 🟡 **FAB-299** · Reading view: replace the Tags and Open-in-browser buttons with an ellipsis menu  `Todo` `Medium`
 

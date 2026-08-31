@@ -41,6 +41,10 @@ struct SettingsView: View {
                 aboutSection
                 Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
                 privacySection
+                #if DEBUG
+                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                debugSection
+                #endif
             }
             .frame(maxWidth: 680, alignment: .leading)
             .frame(maxWidth: .infinity)
@@ -205,6 +209,21 @@ struct SettingsView: View {
             .padding(.horizontal, VersoSpacing.md)
         }
     }
+
+    #if DEBUG
+    /// FAB-298 calibration tool -- see `RelatedArticlesDebugView`. Not present in a Release build.
+    private var debugSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader("Debug")
+
+            NavigationLink(destination: RelatedArticlesDebugView()) {
+                SettingsRow(type: .default(label: "Related Articles Debug"), usesButtonChrome: false)
+                    .padding(.horizontal, VersoSpacing.md)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+    #endif
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 0) {

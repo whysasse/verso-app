@@ -148,7 +148,8 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | `Services/ICloudFileWatcher.swift` | Watches iCloud folder for file changes |
 | `Services/ReadingPreferencesService.swift` | Persists font, size, spacing preferences |
 | `Services/LocaleManager.swift` | Explicit UI-language override (FAB-284) — Automatic/English/Français (Canada)/Português (Brasil), writes the standard `AppleLanguages` UserDefaults key |
-| `Services/RelatedArticlesService.swift` | Finds related articles by tag/domain |
+| `Services/RelatedArticlesService.swift` | Core Data-facing wrapper: fetches non-archived candidates, hands off to `RelatedArticlesScoring` off the main actor (FAB-298) |
+| `Services/RelatedArticlesScoring.swift` | Pure TF-IDF cosine similarity engine (+ tag-overlap boost) behind Related Articles, replacing the old unweighted-Jaccard scoring (FAB-298); tokenizes via `NLTagger`/`NLLanguageRecognizer`, stopwords from `RelatedArticlesStopWords.swift` (en/pt/fr) |
 | `Services/TTSService.swift` | Text-to-speech playback |
 | `Services/AnalyticsService.swift` | TelemetryDeck event logging |
 | `Services/ArticleMarkdownImageLocalizer.swift` | Downloads and localizes remote images |

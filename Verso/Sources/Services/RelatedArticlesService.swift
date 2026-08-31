@@ -1,70 +1,78 @@
 import Foundation
 import CoreData
 
+/// Finds articles related to a given one via TF-IDF cosine similarity (FAB-298; see
+/// `RelatedArticlesScoring` for the actual algorithm). This type is the thin Core Data-facing
+/// wrapper: it owns the `viewContext` fetch and the file-read fallback, then hands plain-value
+/// documents to the pure scorer and maps the winning scores back to `Article` objects.
+///
+/// `@MainActor` because `viewContext` is main-thread-confined (see HANDOFF.md's Core Data
+/// threading rule, and `ArticleLibraryService` for the same pattern) -- but the scoring itself,
+/// the expensive part, runs in a detached task off the main actor.
+@MainActor
 final class RelatedArticlesService {
-    private static let threshold: Double = 0.04
-    private static let maxResults = 3
-    private static let minWordLength = 4
 
-    private static let stopWords: Set<String> = [
-        "that", "this", "with", "from", "have", "been", "will", "they",
-        "their", "them", "were", "when", "what", "which", "also", "more",
-        "some", "than", "then", "into", "over", "just", "your", "about",
-        "most", "other", "very", "only", "such", "even", "both", "each",
-        "after", "before", "while", "where", "being", "would", "could",
-        "should", "there", "these", "those", "here", "make", "made",
-        "many", "much", "well", "like", "time", "work", "used", "still"
-    ]
-
+    /// Finds up to 3 related, non-archived articles for `article`, scored by
+    /// `RelatedArticlesScoring`. Returns `[]` when nothing clears the threshold -- callers should
+    /// hide the Related Articles section entirely in that case (already the case in
+    /// `ArticleReaderView`, unchanged by this fix).
     func related(to article: Article, in context: NSManagedObjectContext) async -> [Article] {
         let currentPath = article.filePath
-        let currentContent = article.title + " " + (loadContent(for: article) ?? "")
-        let currentWords = keywords(from: currentContent)
-        guard !currentWords.isEmpty else { return [] }
 
+        // 1. Main-actor Core Data fetch + snapshot into plain values. No file I/O here yet --
+        // `searchableBody` is already the plain text this needs for the common case (FAB-298 fix
+        // item 2: the old implementation re-read every article's file from disk on every open).
         let fetchRequest = NSFetchRequest<Article>(entityName: "Article")
-        let candidates = (try? context.fetch(fetchRequest)) ?? []
+        fetchRequest.predicate = NSPredicate(format: "archived == NO")
+        let candidates = ((try? context.fetch(fetchRequest)) ?? []).filter { $0.filePath != currentPath }
+        guard !candidates.isEmpty else { return [] }
 
-        let scored: [(Article, Double)] = candidates.compactMap { candidate in
-            guard candidate.filePath != currentPath else { return nil }
-            let text = candidate.title + " " + (loadContent(for: candidate) ?? "")
-            let words = keywords(from: text)
-            let score = jaccard(currentWords, words)
-            guard score >= Self.threshold else { return nil }
-            return (candidate, score)
+        var articlesByPath: [String: Article] = [:]
+        var snapshots: [(key: String, title: String, cachedBody: String?, tags: [String])] = []
+        for candidate in candidates {
+            articlesByPath[candidate.filePath] = candidate
+            snapshots.append((
+                key: candidate.filePath,
+                title: candidate.title,
+                cachedBody: candidate.searchableBody,
+                tags: candidate.tagList
+            ))
         }
+        let currentSnapshot = (
+            title: article.title,
+            cachedBody: article.searchableBody,
+            tags: article.tagList
+        )
 
-        return scored
-            .sorted { $0.1 > $1.1 }
-            .prefix(Self.maxResults)
-            .map { $0.0 }
-    }
-
-    private func loadContent(for article: Article) -> String? {
-        guard !article.filePath.isEmpty else { return nil }
-        let url = URL(fileURLWithPath: article.filePath)
-        return try? MarkdownReader.read(fileURL: url).contentMarkdown
-    }
-
-    private func keywords(from text: String) -> Set<String> {
-        let lowercased = text.lowercased()
-        let stripped = lowercased.unicodeScalars.map { char -> Character in
-            if CharacterSet.letters.contains(char) || CharacterSet.whitespaces.contains(char) {
-                return Character(char)
+        // 2. Off the main actor: fall back to a file read only for the rare snapshot missing a
+        // cached body (searchableBody is populated by every ArticleLibraryService.rebuildCache),
+        // then run the actual scoring -- the part that's too expensive to do on the main actor
+        // for a large library.
+        let scored = await Task.detached(priority: .userInitiated) { () -> [(key: String, score: Double)] in
+            func body(forPath path: String, cached: String?) -> String {
+                if let cached { return cached }
+                guard !path.isEmpty else { return "" }
+                return (try? MarkdownReader.read(fileURL: URL(fileURLWithPath: path)).contentMarkdown) ?? ""
             }
-            return " "
-        }
-        let cleaned = String(stripped)
-        let words = cleaned.components(separatedBy: .whitespaces).filter { word in
-            word.count >= Self.minWordLength && !Self.stopWords.contains(word)
-        }
-        return Set(words)
-    }
 
-    private func jaccard(_ a: Set<String>, _ b: Set<String>) -> Double {
-        guard !a.isEmpty, !b.isEmpty else { return 0 }
-        let intersection = Double(a.intersection(b).count)
-        let union = Double(a.union(b).count)
-        return intersection / union
+            let currentDoc = RelatedArticlesDocument(
+                key: currentPath,
+                title: currentSnapshot.title,
+                body: body(forPath: currentPath, cached: currentSnapshot.cachedBody),
+                tags: currentSnapshot.tags
+            )
+            let candidateDocs = snapshots.map { snapshot in
+                RelatedArticlesDocument(
+                    key: snapshot.key,
+                    title: snapshot.title,
+                    body: body(forPath: snapshot.key, cached: snapshot.cachedBody),
+                    tags: snapshot.tags
+                )
+            }
+            return RelatedArticlesScoring.score(current: currentDoc, candidates: candidateDocs)
+        }.value
+
+        // 3. Back on the main actor: map winning keys back to the Article objects fetched in step 1.
+        return scored.compactMap { articlesByPath[$0.key] }
     }
 }
