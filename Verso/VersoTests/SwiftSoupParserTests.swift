@@ -126,8 +126,9 @@ final class SwiftSoupParserTests: XCTestCase {
         XCTAssertTrue(article.contentMarkdown.contains("The meeting ran from 2 – 3pm and covered three topics."))
     }
 
-    /// Table cells have no GFM rendering yet (FAB-293), but must not silently vanish now
-    /// that bare text nodes are no longer emitted by default.
+    /// FAB-293: table cell text must survive at minimum -- superseded by
+    /// `testTableProducesRealGFMPipeSyntax` below (real GFM tables now render, not just loose
+    /// lines), kept as a coarser regression guard against the text vanishing outright.
     func testTableCellTextIsPreservedAsLooseLines() throws {
         let html = """
         <html><body><article>
@@ -144,6 +145,58 @@ final class SwiftSoupParserTests: XCTestCase {
         XCTAssertTrue(markdown.contains("Revenue"))
         XCTAssertTrue(markdown.contains("Q1"))
         XCTAssertTrue(markdown.contains("$4.2M"))
+    }
+
+    /// FAB-293: an HTML `<table>` now becomes real GFM pipe syntax (so it round-trips through
+    /// `MarkdownBodyView`'s table renderer), not just loose lines of cell text.
+    func testTableProducesRealGFMPipeSyntax() throws {
+        let html = """
+        <html><body><article>
+            <p>Results by quarter:</p>
+            <table>
+                <thead><tr><th>Quarter</th><th>Revenue</th></tr></thead>
+                <tbody>
+                    <tr><td>Q1</td><td>$4.2M</td></tr>
+                    <tr><td>Q2</td><td>$5.1M</td></tr>
+                </tbody>
+            </table>
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        let markdown = article.contentMarkdown
+
+        let tableNode = MarkdownParser.parse(markdown).first { node in
+            if case .table = node { return true }
+            return false
+        }
+        guard case .table(let headers, let rows, _) = tableNode else {
+            return XCTFail("expected the imported <table> to round-trip as a real .table node, got: \(markdown)")
+        }
+        XCTAssertEqual(headers.map { $0.map(\.plainText).joined() }, ["Quarter", "Revenue"])
+        XCTAssertEqual(rows.map { $0.map { $0.map(\.plainText).joined() } }, [["Q1", "$4.2M"], ["Q2", "$5.1M"]])
+    }
+
+    /// A table with no `<thead>`/`<tbody>` wrapper -- just bare `<tr>`s under `<table>` -- must
+    /// still work, treating the first row as the header (common shape in scraped article HTML).
+    func testTableWithoutTheadOrTbodyTreatsFirstRowAsHeader() throws {
+        let html = """
+        <html><body><article>
+            <table>
+                <tr><th>A</th><th>B</th></tr>
+                <tr><td>1</td><td>2</td></tr>
+            </table>
+        </article></body></html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
+        let tableNode = MarkdownParser.parse(article.contentMarkdown).first { node in
+            if case .table = node { return true }
+            return false
+        }
+        guard case .table(let headers, let rows, _) = tableNode else {
+            return XCTFail("expected a .table node")
+        }
+        XCTAssertEqual(headers.map { $0.map(\.plainText).joined() }, ["A", "B"])
+        XCTAssertEqual(rows.map { $0.map { $0.map(\.plainText).joined() } }, [["1", "2"]])
     }
 
     /// FAB-300: Guardian's "Explore more on these topics" / Share / "Reuse this content" block,

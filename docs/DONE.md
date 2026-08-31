@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**176 completed issues.**
+**177 completed issues.**
 
 ## iOS
 
@@ -140,6 +140,18 @@
   ## Verified
 
   `xcodegen generate` + `xcodebuild build` succeeded, and `xcodebuild clean build` confirmed the fix survives a full rebuild, not just an incremental one. Full `VersoTests` suite (77 tests) passes — unaffected, this is a build-config-only change with no Swift code touched. **Not verified here**: that OpenDyslexic actually renders correctly on a real device with the font now loading — Fabio's part after the PR, though this is about as close to certain as a fix gets without that final check (the exact missing-file path from the bug report now exists, byte-for-byte, exactly where `Info.plist` said to look).
+
+- [x] 🟡 **FAB-293** · Markdown tables are not rendered in the reading view  `Done` `Medium`
+  A `.md` file with a GFM pipe table rendered as one run-on paragraph — `MarkdownNode`/`MarkdownParser` had no concept of a table at all. Completed 2026-08-31.
+
+  ## Fix
+
+  * **`MarkdownBodyView.swift`**: new `MarkdownNode.table(headers:rows:alignments:)` case + nested `TableAlignment` enum. `MarkdownParser.parse`'s line loop became index-based (`while i < lines.count`) so it can look ahead: right before the paragraph-accumulator fallback, a pipe-containing line followed by a delimiter row (`^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$`) consumes the header, delimiter, and every following pipe row into one `.table` node — a pipe line with no delimiter row falls through unchanged (still a paragraph), which is the false-positive guard. Cells split on unescaped `|` (a literal `\|` is protected first), trimmed, with a leading/trailing empty cell from outer pipes dropped; ragged rows are padded/truncated to the header's column count so a malformed table can't crash. Rendered via a SwiftUI `Grid` wrapped in a horizontal `ScrollView` (wide tables scroll instead of squeezing the reading column) — bold header row, a 1pt border rule under it (`GridRow` + `.gridCellColumns`), ~8pt cell padding, per-column alignment via `.gridColumnAlignment(_:)`. `MarkdownNode.plainText` joins all cells with a space so search indexing keeps working.
+  * **`SwiftSoupParser.swift`** (`collectLines`): new `case "table"` builds real GFM pipe syntax from an HTML `<table>` (the first `<tr>` in document order is always the header, everything after is data — including HTML5's implicit `<tbody>`-wrapping of bare `<tr>`s with no `<thead>`/`<tbody>` at all, which made an earlier "prefer `<tbody>`'s own rows" approach silently include the header as a data row too; caught by a test, not by inspection). HTML has no GFM alignment syntax, so the synthesized delimiter row is always plain `---` — real alignment is a `.md`-only feature for hand-written tables. `<td>`/`<th>` are now only reached for a cell sitting outside a proper `<table>` ancestor (malformed markup).
+
+  ## Verified
+
+  New `Verso/VersoTests/MarkdownParserTests.swift` (11 tests): basic 3-column table, table amid ordinary paragraphs, alignment colons (all three + default), short-row padding, long-row truncation, escaped `\|` inside a cell, the false-positive guard (a pipe line with no delimiter row stays a paragraph, both standalone and directly after a real table), `plainText` joining. Plus two new `SwiftSoupParserTests`: a `<thead>`/`<tbody>` table round-trips through `MarkdownParser.parse` as a real `.table` node (not just loose lines — supersedes but doesn't replace the older loose-line regression test, which stays as a coarser guard against the text vanishing outright), and a bare-`<tr>` table with no `<thead>`/`<tbody>` correctly treats the first row as the header. 11 new tests; full `VersoTests` suite (89 tests) passes. `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes (the latter rebuilt since `SwiftSoupParser.swift` was touched). **Not verified here**: real-device confirmation that a wide table actually scrolls horizontally without the surrounding article text scrolling, and that XXL Dynamic Type doesn't clip cells — both Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 
