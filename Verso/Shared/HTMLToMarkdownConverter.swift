@@ -1,12 +1,39 @@
 import Foundation
+import SwiftSoup
 
 // MARK: - Minimal HTML → Markdown converter (shared use)
 
 enum HTMLToMarkdownConverter {
+    /// Structural noise to drop before any text extraction -- chrome that sits inside the
+    /// content container itself (so it isn't caught by Readability's own boilerplate removal,
+    /// nor by `SwiftSoupParser`'s content-container selection), not just decorative wrappers.
+    /// Single source of truth for both import paths (FAB-300): `SwiftSoupParser`'s own DOM walk
+    /// and this file's `convert()` both select on this, so a gap found in one is fixed in both.
+    ///
+    /// `[data-print-layout="hide"]` (FAB-300): Guardian marks its "Explore more on these topics" /
+    /// Share / "Reuse this content" block this way -- a genuine semantic attribute ("hide in the
+    /// print stylesheet"), unlike Guardian's `dcr-*` classes, which are hashed CSS-in-JS output
+    /// and not safe to select on.
+    static let noiseSelector = "script, style, nav, header, footer, aside, "
+        + "[role=navigation], [role=banner], [role=complementary], "
+        + "button, form, noscript, svg, iframe, figure figcaption > button, "
+        + "[role=button], [aria-hidden=true], "
+        + "[data-testid*=audio], [data-testid*=headerClap], [data-testid*=headerSocial], "
+        + "[data-print-layout=hide]"
+
+    /// Removes `noiseSelector` matches via a real DOM parse, returning the cleaned body's inner
+    /// HTML. Falls back to the original `html` unchanged if parsing fails, so a malformed
+    /// fragment degrades to today's (pre-FAB-300) behavior rather than losing all content.
+    private static func removeStructuralNoise(from html: String, baseURL: URL?) -> String {
+        guard let doc = try? SwiftSoup.parse(html, baseURL?.absoluteString ?? "") else { return html }
+        guard (try? doc.select(noiseSelector).remove()) != nil else { return html }
+        return (try? doc.body()?.html()) ?? html
+    }
+
     /// Very lightweight conversion: strips tags and preserves block structure.
     /// For a richer conversion SwiftSoupParser handles the full traversal.
     static func convert(_ html: String, articleTitle: String? = nil, baseURL: URL? = nil) -> String {
-        var text = html
+        var text = removeStructuralNoise(from: html, baseURL: baseURL)
         text = stripLightboxChrome(from: text)
         text = collapsePictureBlocksToSingleImg(in: text, baseURL: baseURL)
         text = insertMarkdownImages(from: text, baseURL: baseURL)

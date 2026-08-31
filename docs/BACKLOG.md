@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**26 open issues** across iOS, Web, Design, and Infra.
+**25 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -123,27 +123,6 @@ FAB-297 and FAB-298 were found while using the FAB-292 list redesign; FAB-299 is
   - VoiceOver: the `⋯` button is announced meaningfully and every menu item reads its current-state label.
   - Menu is legible and correctly themed in all themes, and at XXL Dynamic Type.
   - Screenshots in `docs/printscreens` and any affected specs in `docs/COMPONENT_SPECS.md` updated for the new top bar.
-
-### Bugs — import & rendering (reported by Fabio 2026-08-31)
-
-- [ ] 🟠 **FAB-300** · Guardian articles keep a trailing topic-tag list as plain text in the body  `Todo` `High`
-
-  **Symptom.** Articles saved from The Guardian end with a list of topic names (e.g. "Christianity", "Religion", "US politics") appended after the article text — no links, just loose words. Reported example: [Jared Huffman: how rising Christian nationalism threatens the founding fathers' vision — "No Prophets"](https://www.theguardian.com/world/2026/aug/26/jared-huffman-rising-christian-nationalism-no-prophets-book). Found while testing FAB-298; not present in the app's own `SampleArticles` fixtures (checked all 14 — none reproduce it), so it needs a real Guardian article to repro against.
-
-  **Likely related to FAB-294/295, not yet verified live.** The Guardian page almost certainly has an "Explore more on these topics" component — a list of `<a>` tags linking to Guardian topic index pages — sitting structurally inside the article/main content container rather than in a `<nav>`/`<aside>`/`role=navigation` wrapper. Two existing pieces of noise-filtering, both added for FAB-294, don't cover this case:
-  - `SwiftSoupParser.noiseSelector` (`Verso/Shared/SwiftSoupParser.swift` ~line 93) only strips structural chrome (`nav, header, footer, aside, [role=navigation], ...`) and a handful of `[data-testid*=...]` widget patterns — nothing matching a Guardian topics-list component.
-  - `HTMLToMarkdownConverter.fullscreenLineFingerprints` (`Verso/Shared/HTMLToMarkdownConverter.swift` ~line 228) is a fixed set of known UI-label strings ("listen", "share", "sign up", …) — it can't catch this because each article's topic tags are different content, not a repeated fixed string.
-
-  Both the Share Extension (`SwiftSoupParser` → `HTMLToMarkdownConverter`) and the in-app add-by-URL flow (`ReadabilityParser` via Mozilla Readability.js → the same `HTMLToMarkdownConverter.convert`) funnel through this shared noise-filtering path, so the leak plausibly affects both import routes equally — not yet confirmed which one Fabio used for the reported article.
-
-  **"No links" is itself a clue.** The topic list keeps its text but loses its `href`s, which points at the HTML→Markdown conversion path (`HTMLToMarkdownConverter.htmlToMarkdown`/`collectLines`) rather than at Readability's boilerplate-removal heuristics — an `<a>` inside whatever block wraps this list is likely being walked for its text content without going through the converter's explicit link-handling case. Worth confirming directly against the live markup before assuming this over the alternative (Readability kept the block, but as plain inline text to begin with).
-
-  **Next step before writing a fix:** get the actual HTML structure of a Guardian "Explore more on these topics" block (save the live page, or capture it via the Share Extension in a debug build and inspect the raw HTML before conversion) — this session couldn't fetch theguardian.com directly to inspect it. Once the real selector/markup is known, the fix is likely either a targeted CSS-selector addition to `noiseSelector` (if the block has a stable class/data-attribute) or a structural check in `collectLines` (e.g. a list of many short `<a>` tags with no surrounding prose, near the end of the content region).
-
-  **Acceptance.**
-  - The reported Guardian article (or an equivalent fixture) imports via both the Share Extension and add-by-URL without the trailing topic list in the body.
-  - A regression test fixture (saved Guardian-style HTML, similar to the existing Medium-style fixtures in `SwiftSoupParserTests`/`HTMLToMarkdownConverterNoiseTests`) covering this specific pattern.
-  - Existing Medium/Guardian-image tests (FAB-294/295) still pass — this fix must not regress the noise removal or image handling those already cover.
 
 ### Phase 2 — Experience
 

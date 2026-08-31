@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**173 completed issues.**
+**174 completed issues.**
 
 ## iOS
 
@@ -83,6 +83,25 @@
   ## Verified
 
   New `Verso/VersoTests/RelatedArticlesScoringTests.swift` (pure, no Core Data needed): two related articles rank together among eight unrelated ones and nothing else clears threshold; no topical neighbor returns empty; a shared tag measurably outranks shared-vocabulary-alone (asserts the exact 0.15 boost); a regression test with ten documents sharing only generic filler vocabulary (but each with distinct, non-overlapping topic content — not identical documents, which would trivially cosine=1 regardless of IDF) confirms the old "everything clears threshold" failure mode can't recur; a pt-BR document doesn't relate to unrelated English documents; a real-content regression test using the actual top-scoring `SampleArticles` pair (excerpted verbatim) that caught the recalibration need in the first place; ~500 synthetic documents score in ~2.1s off the main thread. 7 new tests; full `VersoTests` suite (74 tests) passes. `xcodegen generate` + `xcodebuild build` succeeded for the `Verso` scheme. **Not verified here**: the `0.10` threshold against Fabio's real library (see judgment calls above) and real-device confirmation that the reading view's Related Articles section now shows genuinely related articles — both Fabio's part after the PR, using the new DEBUG screen.
+
+- [x] 🟠 **FAB-300** · Guardian articles keep a trailing topic-tag list as plain text in the body  `Done` `High`
+  Guardian's "Explore more on these topics" / Share / "Reuse this content" block leaked into the saved article body as plain text with no links. Fabio provided the real HTML from the reported article, which settled what FAB-300's original filing left open. Completed 2026-08-31.
+
+  ## Root cause — confirmed against real markup
+
+  The block is wrapped in `<div data-print-layout="hide">` — a genuine semantic attribute ("hide in the print stylesheet"), unlike Guardian's `dcr-*` classes (hashed CSS-in-JS output, not safe to select on). Two import paths, and the bug lived differently in each:
+  - **Share Extension** (`SwiftSoupParser.extractContentMarkdown`) already did real DOM-based noise removal via SwiftSoup, but its selector list didn't include `[data-print-layout="hide"]`.
+  - **Add-by-URL** (`ReadabilityParser` → Mozilla Readability.js → `HTMLToMarkdownConverter.convert`) had **no DOM-based noise removal at all** — `convert()` was a lightweight regex/string HTML stripper ending in a blanket "strip every tag" regex, which is exactly why the topic links vanished (`<a href>` and all other tags stripped identically, keeping only inner text) once Readability.js failed to remove this block itself.
+
+  ## Fix
+
+  * **New shared `HTMLToMarkdownConverter.noiseSelector`**: the existing selector list (chrome tags, ARIA roles, known widget `data-testid`s) plus `[data-print-layout=hide]` — now a single source of truth instead of a private duplicate that had drifted out of sync between the two files.
+  * `SwiftSoupParser.extractContentMarkdown` now references the shared constant instead of its own local copy.
+  * `HTMLToMarkdownConverter.convert` gained a SwiftSoup-based DOM pre-pass (`removeStructuralNoise`): parses the HTML, removes `noiseSelector` matches, serializes the cleaned body back to HTML, then continues through the existing regex pipeline unchanged. Brings real structural noise filtering to the add-by-URL path for the first time — not just a fix for this one Guardian pattern, but the missing mechanism that let it (and potentially similar "hide on print" widgets on other sites) through. Falls back to the original HTML unchanged if parsing fails, so a malformed fragment degrades to pre-fix behavior rather than losing content.
+
+  ## Verified
+
+  New tests in `Verso/VersoTests/SwiftSoupParserTests.swift`: `testGuardianTopicsListDoesNotLeakIntoBody` (Share Extension path) and `testConvertStripsGuardianTopicsListViaDOMPrePass` (add-by-URL path) both use a fixture built from Fabio's real reported HTML, asserting the topic list / Share / "Reuse this content" text is gone and the real paragraph survives; `testConvertHandlesUnparseableFragmentGracefully` covers the parse-failure fallback. 3 new tests; full `VersoTests` suite (77 tests) passes. `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes (the latter rebuilt since `SwiftSoupParser.swift` was touched). **Not verified here**: a real re-save of the reported Guardian article on-device — Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 
