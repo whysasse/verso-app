@@ -13,6 +13,10 @@ struct ParsedArticle {
     let status: Article.Status
     let author: String?
     let siteName: String?
+    /// Whether the article is archived (FAB-297), orthogonal to `status`. Mirrored to frontmatter
+    /// `archived: true` / `archived_at:`.
+    let archived: Bool
+    let archivedAt: Date?
     /// True when this file was adopted from a manually-added/foreign note that had no frontmatter,
     /// or frontmatter with no `title` key -- `title`/`dateAdded`/etc. above are synthesized
     /// defaults, not yet written to disk. `MarkdownWriter.adoptIfNeeded` uses this to know whether
@@ -35,7 +39,9 @@ struct ParsedArticle {
         author: String?,
         siteName: String?,
         needsAdoption: Bool = false,
-        unrecognizedFrontmatterLines: [String] = []
+        unrecognizedFrontmatterLines: [String] = [],
+        archived: Bool = false,
+        archivedAt: Date? = nil
     ) {
         self.id = id
         self.filePath = filePath
@@ -50,5 +56,7 @@ struct ParsedArticle {
         self.siteName = siteName
         self.needsAdoption = needsAdoption
         self.unrecognizedFrontmatterLines = unrecognizedFrontmatterLines
+        self.archived = archived
+        self.archivedAt = archivedAt
     }
 }

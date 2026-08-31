@@ -20,6 +20,11 @@ public class Article: NSManagedObject, Identifiable {
     @NSManaged public var tagsSerialized: String?
     /// Plain text derived from Markdown body for full-text search (cache only).
     @NSManaged public var searchableBody: String?
+    /// Whether the article is archived (FAB-297) -- orthogonal to `status`, mirrored to frontmatter
+    /// `archived: true`. Splitting this out of `Status` means archiving no longer destroys read state.
+    @NSManaged public var archived: Bool
+    /// When the article was archived; mirrored to frontmatter `archived_at:`. `nil` when never archived.
+    @NSManaged public var archivedAt: Date?
 }
 
 extension Article {
@@ -27,7 +32,6 @@ extension Article {
         case unread
         case reading
         case read
-        case archived
     }
 
     var statusEnum: Status {
@@ -48,7 +52,9 @@ extension Article {
         siteName: String? = nil,
         scrollPosition: NSNumber? = nil,
         tagsSerialized: String? = nil,
-        searchableBody: String? = nil
+        searchableBody: String? = nil,
+        archived: Bool = false,
+        archivedAt: Date? = nil
     ) -> Article {
         let article = Article(context: context)
         article.id = id
@@ -63,6 +69,8 @@ extension Article {
         article.scrollPosition = scrollPosition
         article.tagsSerialized = tagsSerialized
         article.searchableBody = searchableBody
+        article.archived = archived
+        article.archivedAt = archivedAt
         return article
     }
 

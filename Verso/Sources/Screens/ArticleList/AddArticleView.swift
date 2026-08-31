@@ -433,7 +433,9 @@ struct AddArticleView: View {
                 siteName: pending.siteName,
                 scrollPosition: refreshed.scrollPosition.map { NSNumber(value: $0) },
                 tagsSerialized: Article.makeTagsSerialized(from: refreshed.tags),
-                searchableBody: ArticlePlainText.fromMarkdown(pending.contentMarkdown)
+                searchableBody: ArticlePlainText.fromMarkdown(pending.contentMarkdown),
+                archived: refreshed.archived,
+                archivedAt: refreshed.archivedAt
             )
             if viewContext.hasChanges {
                 try viewContext.save()
@@ -448,6 +450,8 @@ struct AddArticleView: View {
         existing.source = pending.url.host
         let refreshed = try MarkdownReader.read(fileURL: filePath)
         existing.statusEnum = refreshed.status
+        existing.archived = refreshed.archived
+        existing.archivedAt = refreshed.archivedAt
         if let sp = refreshed.scrollPosition {
             existing.scrollPosition = NSNumber(value: sp)
         } else {

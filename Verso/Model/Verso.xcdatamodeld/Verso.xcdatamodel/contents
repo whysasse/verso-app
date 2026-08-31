@@ -13,5 +13,7 @@
     <attribute name="scrollPosition" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
     <attribute name="tagsSerialized" optional="YES" attributeType="String"/>
     <attribute name="searchableBody" optional="YES" attributeType="String"/>
+    <attribute name="archived" attributeType="Boolean" usesScalarValueType="YES" defaultValueString="NO"/>
+    <attribute name="archivedAt" optional="YES" attributeType="Date"/>
   </entity>
 </model>

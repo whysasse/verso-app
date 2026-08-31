@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**171 completed issues.**
+**172 completed issues.**
 
 ## iOS
 
@@ -40,6 +40,23 @@
   ## Verified
 
   New tests: `SwiftSoupParserImageTests` (bare `<img>`, lazy `data-src`, Guardian-style `<picture>`+`srcset`, figure+figcaption-as-alt, figcaption-noise-not-promoted, figure-fallback-on-non-image-content, tracking-pixel skip, no-dimensions-not-skipped, relative-URL resolution — 8 tests), `ArticleMarkdownImageLocalizerTests` (stem truncation, collision-letter naming — 7 tests), plus 4 new `MarkdownWriterTests` cases for delete/archive carrying or no-oping on the `.media` folder. 57 tests total in `VersoTests`, all passing. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes. Not verified here: an actual live Share Extension import with real images (Medium/Guardian/Substack) — Fabio's part after the PR.
+
+### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
+
+- [x] 🟠 **FAB-297** · Long-press menu shows the wrong read/unread action, and archived articles can't be unarchived  `Done` `High`
+  Archiving an article overwrote whatever read state it had, because `Article.Status` was a flat four-case enum (`unread | reading | read | archived`) — so an archived article was never `.read`, the context menu always offered "Mark as read" regardless of actual read state, and there was no way to unarchive at all. Completed 2026-08-31.
+
+  ## Fix — model split (option (c), decided with Fabio 2026-08-30)
+
+  * `Article.Status` reduced to `unread | reading | read`; added a separate `archived: Bool` (+ `archivedAt: Date?`) to Core Data (`Verso.xcdatamodeld`) and `Article.swift` — a lightweight migration (`NSPersistentContainer`'s default automatic-migration options, unchanged), since the model is a single unversioned `.xcdatamodel`.
+  * Mirrored to frontmatter as `archived: true` / `archived_at:` lines beside `status:`, omitted entirely when `false` (same convention as `scroll_position`/`tags`). `MarkdownReader.read` parses the new lines and back-fills a legacy `status: archived` file to `status: read, archived: true` — lazily, only rewritten on the next write-back, not at read time (same pattern as FAB-290 adoption).
+  * `MarkdownWriter.updateArchived(_:archivedAt:for:)` (new) replaces/removes the two frontmatter lines; `MarkdownWriter.unarchive(filePath:in:)` (new) mirrors `archive(filePath:in:)` — moves the `.md` out of `Archive/` back to the library root, carries the `{stem}.media` sidecar, resolves name collisions via the existing `uniqueFilename`.
+  * `ArticleListView`: `archiveArticle`/`unarchiveArticle` now only touch `archived`/`archivedAt`, never `status` — archiving no longer destroys read state. The four list sections and the top-level fetch predicate filter on `archived` instead of a status value. Context menu and trailing swipe now offer Unarchive for archived rows, using the already-authored, already-localized `L10n.ContextMenu.unarchive` / `L10n.Swipe.unarchive` / `L10n.A11y.archiveAction` / `L10n.A11y.unarchiveAction` strings (previously dead code).
+  * `ArticleCard.displayStatus`, `ArticleLibraryService.rebuildCache`, `PendingArticleIngester`, and `AddArticleView`'s duplicate-update paths all updated to carry `archived`/`archivedAt` alongside `status` wherever Core Data is written from a parsed file.
+
+  ## Verified
+
+  New/updated unit tests in `Verso/VersoTests/`: `MarkdownWriterTests` (`updateArchived` insert/remove/round-trip, `unarchive` with a `.media` sidecar and a name collision, `buildFrontmatter` archived round-trip through the reader and omission when not archived) and `MarkdownReaderTests` (legacy `status: archived` back-fill, `archived`/`archived_at` round-trip, missing-archived defaults to false) — 18 new tests. Full `VersoTests` suite (67 tests) passes. `xcodebuild build` succeeded for the `Verso` scheme; Share Extension unaffected (it only compiles `Shared/`, untouched by this change). Not verified here: real-device confirmation of the long-press menu and swipe actions across all four states — Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 

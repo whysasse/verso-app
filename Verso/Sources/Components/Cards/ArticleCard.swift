@@ -8,11 +8,14 @@ struct ArticleCard: View {
     private var colors: ThemeColors { themeManager.colors }
 
     private var displayStatus: ArticleStatus {
+        // FAB-297: archived is now orthogonal to status (was itself a status case before the
+        // split). Preserves the pre-split visual behavior -- an archived article always showed
+        // a "read"-colored badge regardless of its actual read state.
+        if article.archived { return .read }
         switch article.statusEnum {
         case .unread:    return .unread
         case .reading:   return .reading
         case .read:      return .read
-        case .archived:  return .read
         }
     }
 
