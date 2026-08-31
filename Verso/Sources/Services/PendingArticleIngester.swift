@@ -98,6 +98,8 @@ struct PendingArticleIngester {
                 existing.source = pending.url.host
                 let refreshed = try MarkdownReader.read(fileURL: filePath)
                 existing.statusEnum = refreshed.status
+                existing.archived = refreshed.archived
+                existing.archivedAt = refreshed.archivedAt
                 if let sp = refreshed.scrollPosition {
                     existing.scrollPosition = NSNumber(value: sp)
                 } else {

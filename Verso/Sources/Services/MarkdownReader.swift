@@ -78,6 +78,8 @@ struct MarkdownReader {
         var author: String?
         var siteName: String?
         var scrollPosition: Double?
+        var archived = false
+        var archivedAt: Date?
         // Keys Verso doesn't recognize (e.g. Obsidian's `aliases`, `cssclass`, a personal `tags`
         // scheme), kept verbatim so a later adoption commit can merge them back in rather than
         // silently dropping another tool's fields (FAB-290; see MarkdownWriter.adoptIfNeeded).
@@ -96,11 +98,24 @@ struct MarkdownReader {
                 }
             } else if trimmed.hasPrefix("status:") {
                 let raw = trimmed.dropFirst("status:".count).trimmingCharacters(in: .whitespaces)
-                if let s = Article.Status(rawValue: raw) {
+                if raw == "archived" {
+                    // Legacy pre-FAB-297 value: `archived` used to be a fourth Status case that
+                    // clobbered read state. Back-fill to the split model -- read + archived --
+                    // rather than falling into the "invalid status" branch below. Not rewritten
+                    // to disk here; the next write-back does that (same lazy pattern as FAB-290).
+                    status = .read
+                    archived = true
+                } else if let s = Article.Status(rawValue: raw) {
                     status = s
                 } else {
                     os_log("Invalid status '%@' in %@, defaulting to unread", log: log, type: .default, raw, fileURL.lastPathComponent)
                 }
+            } else if trimmed.hasPrefix("archived:") {
+                let raw = trimmed.dropFirst("archived:".count).trimmingCharacters(in: .whitespaces)
+                archived = archived || (raw == "true")
+            } else if trimmed.hasPrefix("archived_at:") {
+                let raw = trimmed.dropFirst("archived_at:".count).trimmingCharacters(in: .whitespaces)
+                archivedAt = dateFormatter.date(from: raw)
             } else if trimmed.hasPrefix("tags:") {
                 tags = extractTagsArray(from: trimmed)
             } else if trimmed.hasPrefix("added:") {
@@ -168,7 +183,9 @@ struct MarkdownReader {
             author: (authorTrimmed?.isEmpty == false) ? authorTrimmed : nil,
             siteName: (siteTrimmed?.isEmpty == false) ? siteTrimmed : nil,
             needsAdoption: needsAdoption,
-            unrecognizedFrontmatterLines: unrecognizedLines
+            unrecognizedFrontmatterLines: unrecognizedLines,
+            archived: archived,
+            archivedAt: archivedAt
         )
     }
 

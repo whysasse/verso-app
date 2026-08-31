@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**24 open issues** across iOS, Web, Design, and Infra.
+**26 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -80,6 +80,79 @@ Four bugs found while reading a Medium article saved through the Share Extension
   - Choosing *Keep both* produces two clearly distinguishable entries.
   - An article living in a library subfolder is found by the check.
   - Unit tests for `VersoArticleURL.canonicalKey` covering: tracking params, query ordering, `www.`, `http` vs `https`, trailing slash, fragment. Plus a `ArticleDuplicateFinder` test over a temp directory tree with a nested subfolder.
+
+### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
+
+FAB-297 and FAB-298 were found while using the FAB-292 list redesign; FAB-299 is a follow-on enhancement Fabio requested the same day. FAB-299 depends on FAB-297 (it reuses the state-dependent action labels and the `unarchive` writer) — **FAB-297 is done** (see [DONE.md](DONE.md)), so FAB-299 is unblocked.
+
+- [ ] 🟠 **FAB-298** · "Related articles" are not related — the similarity scoring is effectively random  `Todo` `High`
+
+  **Symptom.** The Related Articles section at the end of a reading view just lists other articles in the library with no topical relationship to the one being read.
+
+  **Root cause.** `Verso/Sources/Services/RelatedArticlesService.swift` scores with **Jaccard similarity over the set of unique words** (length ≥ 4, minus a hand-written 60-word stoplist) from title + full body, keeps anything scoring **≥ 0.04**, and returns the top 3. That threshold is the headline problem: any two English prose articles of a few thousand words share far more than 4% of their unique-word sets on shared vocabulary alone, so effectively every article passes and the "top 3" is close to arbitrary. Four compounding issues underneath:
+  - **No IDF weighting.** "psychology" and "however" count the same. Relatedness lives almost entirely in *rare* shared terms; an unweighted set intersection throws that signal away.
+  - **Set-based, so term frequency is ignored.** An article that says "scanner" thirty times scores no higher than one that says it once.
+  - **Jaccard's union denominator punishes length mismatch**, so the ranking tracks similar *length* more than similar *subject*.
+  - **The stoplist is 60 English words** in an app localized to pt-BR and fr-CA (FAB-275). `minWordLength >= 4` incidentally removes "the/and/of/to" but leaves thousands of topic-neutral words.
+
+  **Two things not to do.** (1) The hide-when-empty behaviour Fabio asked for **already exists** — `ArticleReaderView.swift:107` wraps the section in `if !relatedArticles.isEmpty`. It never fires because scoring never returns empty. Fix the scoring; do not add a second guard. (2) Do not just raise the 0.04 threshold. With unweighted Jaccard the scores don't rank by relatedness in the first place, so no cutoff makes them right.
+
+  **Fix — replace Jaccard with TF-IDF cosine similarity.** This is the standard, cheap, fully on-device answer, it is roughly a hundred lines, and it directly supplies what is missing: rare shared terms dominate, frequency counts, and length cancels out in the cosine normalization.
+  1. Build a corpus document-frequency table across the library, cache it, and rebuild on library change (the `ICloudFileWatcher` refresh is the natural hook). Score candidates by cosine over TF-IDF vectors, weighting title terms ~2–3× body terms.
+  2. **Read text from `Article.searchableBody`, not from disk.** Today `loadContent` calls `MarkdownReader.read` on *every* article in the library, parsing whole files, every single time a reading view opens — O(n) file reads on the main-actor context, right as the user starts reading. `searchableBody` is already the plain text this needs. Fall back to a file read only when it is nil, and do the scoring off the main actor.
+  3. Tokenize with `NLTagger` using the `.lemma` scheme so "scan / scanning / scanner" collapse to one term, and pick the stopword list from `NLLanguageRecognizer` — ship en, pt, fr lists and delete the hand-rolled 60-word set. (`NLTagger` is iOS 12+, well inside the project's iOS 16 floor.)
+  4. Add a tag-overlap boost: tags are explicit user intent and the strongest signal in the model, currently unused. Something like `final = cosine + 0.15 * (sharedTags / max(tagsA.count, tagsB.count))`, clamped to 1.
+  5. **Calibrate the threshold from real data, not by guessing.** Add a debug-only screen or a unit test that prints the full score matrix over Fabio's actual library, then pick the cutoff that keeps the genuinely related pairs and rejects the rest. TF-IDF cosine typically lands somewhere around 0.15–0.25, but the number must come from the measurement. Keep max 3 results.
+  6. Add a fetch predicate excluding archived articles from the candidate set (there is currently no predicate at all).
+
+  **Follow-up, not this ticket.** If TF-IDF still disappoints — it cannot connect "burnout" to "exhaustion" because it only matches literal terms — the next step is `NLContextualEmbedding` for real multilingual semantic similarity. It needs iOS 17 (the project floor is 16, so it would need an availability branch), an asset download via `requestAssets`, and per-article embedding time. Only worth taking on after step 5 shows TF-IDF isn't enough.
+
+  **Acceptance.**
+  - In a library with two articles on one subject and eight unrelated ones, opening either of the two relates it to the other and to nothing else.
+  - Opening an article with no topical neighbour shows no Related Articles section at all, and the reading view's bottom spacing still looks right without it.
+  - A pt-BR article does not relate to unrelated English articles.
+  - Two articles sharing a user tag rank above two that merely share vocabulary.
+  - Performance: with ~500 articles in the library, opening an article does not hitch — measure it, and keep the scoring off the main thread.
+  - Unit tests over fixture articles asserting the ranking, plus a regression test that the previous failure mode (everything scores above threshold) cannot return.
+
+- [ ] 🟡 **FAB-299** · Reading view: replace the Tags and Open-in-browser buttons with an ellipsis menu  `Todo` `Medium`
+
+  **Requested by Fabio 2026-08-30, scope confirmed in conversation the same day.**
+
+  **What changes.** The reading view's top bar is currently `← Back | Title | 🏷 Tags | ↗ Open in browser` (`ReadingTopBar` in `Verso/Sources/Components/Reading/ReadingChrome.swift`). Replace **both** trailing icon buttons with a single `⋯` (`ellipsis`) menu, so the bar becomes `← Back | Title | ⋯`. Nothing is lost — Tags and Open in browser move into the menu — and the menu has room for the actions the reading view is missing today. The bottom bar (reading controls, theme, TTS) is untouched.
+
+  **Menu contents and order** (confirmed with Fabio):
+
+  1. **Mark as unread** / **Mark as read** — label follows current state, same logic FAB-297 introduces for the list. Dismisses back to the list after acting (see below).
+  2. **Tags** — opens the existing `ArticleTagsEditorSheet`, exactly what the 🏷 button does today (`showTagsEditor = true`).
+  3. **Open in browser** — `UIApplication.shared.open(article.url)`, exactly what the ↗ button does today. Hide or disable this item when `article.url` is nil (manually added local files have no source URL).
+  4. **Share** — new. Share the article's source URL via `ShareLink`. Nothing in the codebase uses `ShareLink` or `UIActivityViewController` yet, so this is the first one; use SwiftUI's `ShareLink` (iOS 16+, matches the project floor) rather than wrapping UIKit. Hide when `article.url` is nil.
+  5. **Archive** / **Unarchive** — reuses `MarkdownWriter.archive(filePath:in:)` and the `unarchive` counterpart FAB-297 adds. Dismisses back to the list.
+  6. *divider*
+  7. **Delete** — `role: .destructive`, behind a confirmation (see below). Dismisses back to the list.
+
+  **Behaviour decisions (all confirmed with Fabio — do not re-litigate these during implementation).**
+  - **Delete is confirmed before it runs.** It permanently removes the user's own `.md` (and its `.media` sidecar) from their iCloud Drive with no undo. Use `.confirmationDialog` with a destructive confirm button, naming the article. Do not offer an "undo" toast as a substitute for the dialog.
+  - **Archive and Delete both dismiss to the list.** The article is no longer where the reader is showing it from, so staying put is not an option.
+  - **Mark as unread also dismisses.** This is the non-obvious one, and it is deliberate: `ArticleReaderView.advanceStatus(to:)` is monotonic over `[.unread, .reading, .read]` and fires `.reading` on open and `.read` at full scroll, so marking unread and then remaining in the view would quietly re-mark the article as the user scrolls. Dismissing matches the intent of the action ("I'm done, put it back"). **Note that `advanceStatus` cannot be used to implement this** — it refuses to move backwards by design. Set the status directly and persist it, and make sure the `onDisappear` scroll-position write does not immediately contradict it.
+  - **Mark as read** (from the unread/reading state) may keep the same dismiss-on-act behaviour for consistency; confirm with Fabio if it feels wrong in the build.
+
+  **Implementation notes.**
+  - `ReadingTopBar` currently takes `onOpenExternal` and an optional `onEditTags`. Replace both with a single trailing-content closure or a small `ReadingMenuActions` struct, so `ArticleReaderView` (the only caller, ~line 163) owns the actions and `ReadingChrome` stays presentational. Keep the existing `VersoToolbarIconButton` metrics (44×44 hit target, `readingChromeIconSize` 20) for the `⋯` button so the bar's rhythm doesn't shift.
+  - The menu must respect the chrome's auto-hide: the top bar fades via `isVisible`. Make sure an open menu doesn't get dismissed by the chrome hiding underneath it, and that the chrome doesn't hide while the menu is presented.
+  - **Most action strings already exist and are already localized** in `Verso/Resources/Localizable.xcstrings`: `L10n.ContextMenu.markAsRead`, `.markAsUnread`, `.addTags`, `.archive`, `.unarchive`, `.delete`. Reuse them — do not add parallel keys. **New keys needed:** the Share item label, the delete confirmation title/message/confirm-button, and an accessibility label + hint for the `⋯` button ("More actions" / "Shows more actions for this article"). Author them in `docs/copy/UI_COPY.md` and run the codegen in `docs/copy/codegen` so en / pt-BR / fr-CA all land together, per the FAB-275 workflow.
+  - Delete already exists as `MarkdownWriter.delete(at:)`; make sure the Core Data row is deleted in the same transaction and that the `.media` sidecar goes with it.
+
+  **Acceptance.**
+  - Top bar shows `← Back | Title | ⋯`; the tag and arrow icons are gone and both actions are reachable from the menu.
+  - All seven items behave as specified; state-dependent labels are correct in every status, including archived.
+  - Delete shows a confirmation, and cancelling it leaves the article untouched on disk and in the list.
+  - Archive, Delete and Mark-as-unread each return to the list, and the list reflects the change immediately.
+  - Marking unread does not get silently reverted by scroll progress.
+  - Open in browser and Share are hidden for an article with no source URL, and the menu still looks right with those items absent.
+  - VoiceOver: the `⋯` button is announced meaningfully and every menu item reads its current-state label.
+  - Menu is legible and correctly themed in all themes, and at XXL Dynamic Type.
+  - Screenshots in `docs/printscreens` and any affected specs in `docs/COMPONENT_SPECS.md` updated for the new top bar.
 
 ### Phase 2 — Experience
 

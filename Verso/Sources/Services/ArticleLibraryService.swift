@@ -40,6 +40,8 @@ final class ArticleLibraryService: ObservableObject {
                     article.author = parsed.author
                     article.siteName = parsed.siteName
                     article.statusEnum = parsed.status
+                    article.archived = parsed.archived
+                    article.archivedAt = parsed.archivedAt
                     article.searchableBody = ArticlePlainText.fromMarkdown(parsed.contentMarkdown)
                     article.tagsSerialized = Article.makeTagsSerialized(from: parsed.tags)
                     if let sp = parsed.scrollPosition {
@@ -60,7 +62,9 @@ final class ArticleLibraryService: ObservableObject {
                         siteName: parsed.siteName,
                         scrollPosition: parsed.scrollPosition.map { NSNumber(value: $0) },
                         tagsSerialized: Article.makeTagsSerialized(from: parsed.tags),
-                        searchableBody: ArticlePlainText.fromMarkdown(parsed.contentMarkdown)
+                        searchableBody: ArticlePlainText.fromMarkdown(parsed.contentMarkdown),
+                        archived: parsed.archived,
+                        archivedAt: parsed.archivedAt
                     )
                 }
             }

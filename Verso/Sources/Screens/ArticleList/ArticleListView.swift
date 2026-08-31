@@ -61,7 +61,7 @@ struct ArticleListView: View {
     /// excludes archived, same as before -- archived-only tags aren't useful filter targets.
     @FetchRequest(
         sortDescriptors: [],
-        predicate: NSPredicate(format: "status != %@", Article.Status.archived.rawValue),
+        predicate: NSPredicate(format: "archived == NO"),
         animation: .default
     ) private var allArticles: FetchedResults<Article>
 
@@ -392,10 +392,10 @@ private struct ArticleListFetchedBody: View {
         }
     }
 
-    private var continueReadingArticles: [Article] { filteredArticles.filter { $0.statusEnum == .reading } }
-    private var unreadArticles: [Article] { filteredArticles.filter { $0.statusEnum == .unread } }
-    private var readArticles: [Article] { filteredArticles.filter { $0.statusEnum == .read } }
-    private var archivedArticles: [Article] { filteredArticles.filter { $0.statusEnum == .archived } }
+    private var continueReadingArticles: [Article] { filteredArticles.filter { !$0.archived && $0.statusEnum == .reading } }
+    private var unreadArticles: [Article] { filteredArticles.filter { !$0.archived && $0.statusEnum == .unread } }
+    private var readArticles: [Article] { filteredArticles.filter { !$0.archived && $0.statusEnum == .read } }
+    private var archivedArticles: [Article] { filteredArticles.filter { $0.archived } }
 
     /// Empty state when search/date/tags narrow the list but nothing matches any section.
     private var narrowedListShowsMiss: Bool {
@@ -663,7 +663,13 @@ private struct ArticleListFetchedBody: View {
                 } label: {
                     Label(L10n.ContextMenu.addTags, systemImage: "tag")
                 }
-                if article.statusEnum != .archived {
+                if article.archived {
+                    Button {
+                        unarchiveArticle(article)
+                    } label: {
+                        Label(L10n.ContextMenu.unarchive, systemImage: "tray.and.arrow.up")
+                    }
+                } else {
                     Button {
                         archiveArticle(article)
                     } label: {
@@ -672,13 +678,22 @@ private struct ArticleListFetchedBody: View {
                 }
             }
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                if article.statusEnum != .archived {
+                if article.archived {
+                    Button {
+                        unarchiveArticle(article)
+                    } label: {
+                        Label(L10n.Swipe.unarchive, systemImage: "tray.and.arrow.up")
+                    }
+                    .tint(Color(hex: "766655"))
+                    .accessibilityLabel(L10n.A11y.unarchiveAction)
+                } else {
                     Button {
                         archiveArticle(article)
                     } label: {
                         Label(L10n.Swipe.archive, systemImage: "archivebox")
                     }
                     .tint(Color(hex: "766655"))
+                    .accessibilityLabel(L10n.A11y.archiveAction)
                 }
             }
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
@@ -706,20 +721,43 @@ private struct ArticleListFetchedBody: View {
         adoptionNoticeService.notify()
     }
 
+    /// FAB-297: archiving no longer touches `status` -- read state and archived state are
+    /// orthogonal, so the article keeps whatever unread/reading/read it had before archiving.
     private func archiveArticle(_ article: Article) {
         guard let folderURL = folderBookmarkService.folderURL else { return }
         do {
             adoptIfNeeded(article, folderURL: folderURL)
             let destination = try MarkdownWriter.archive(filePath: article.filePath, in: folderURL)
-            try MarkdownWriter.updateStatus(.archived, for: destination.path)
+            let archivedAt = Date()
+            try MarkdownWriter.updateArchived(true, archivedAt: archivedAt, for: destination.path)
             article.filePath = destination.path
-            article.statusEnum = .archived
+            article.archived = true
+            article.archivedAt = archivedAt
             try viewContext.save()
         } catch {
             // silently ignore — matches existing behaviour
         }
     }
 
+    /// Mirror of `archiveArticle`: moves the file back out of `Archive/` and clears the
+    /// `archived`/`archived_at` frontmatter. `status` is untouched, same reasoning as above.
+    private func unarchiveArticle(_ article: Article) {
+        guard let folderURL = folderBookmarkService.folderURL else { return }
+        do {
+            adoptIfNeeded(article, folderURL: folderURL)
+            let destination = try MarkdownWriter.unarchive(filePath: article.filePath, in: folderURL)
+            try MarkdownWriter.updateArchived(false, archivedAt: nil, for: destination.path)
+            article.filePath = destination.path
+            article.archived = false
+            article.archivedAt = nil
+            try viewContext.save()
+        } catch {
+            // silently ignore — matches archiveArticle's existing behaviour
+        }
+    }
+
+    /// Toggles read/unread only -- never touches `archived` (FAB-297: the two are orthogonal, and
+    /// this must not have the side effect the old flat-enum model did of silently un-archiving).
     private func toggleReadStatus(_ article: Article) {
         if let folderURL = folderBookmarkService.folderURL {
             adoptIfNeeded(article, folderURL: folderURL)

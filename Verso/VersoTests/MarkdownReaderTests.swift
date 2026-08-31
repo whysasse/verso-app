@@ -30,6 +30,13 @@ final class MarkdownReaderTests: XCTestCase {
         return url
     }
 
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f
+    }()
+
     // MARK: - No frontmatter at all
 
     func testNoFrontmatterUsesWholeFileAsBodyAndDoesNotThrow() throws {
@@ -164,6 +171,56 @@ final class MarkdownReaderTests: XCTestCase {
         let article = try MarkdownReader.read(fileURL: url)
         XCTAssertFalse(article.needsAdoption)
         XCTAssertTrue(article.unrecognizedFrontmatterLines.isEmpty)
+    }
+
+    // MARK: - archived / archived_at (FAB-297)
+
+    func testLegacyStatusArchivedBackfillsToReadPlusArchived() throws {
+        let content = """
+        ---
+        title: "A Title"
+        status: archived
+        ---
+        Body.
+        """
+        let url = try write(content, name: "note.md")
+        let article = try MarkdownReader.read(fileURL: url)
+        XCTAssertEqual(article.status, .read)
+        XCTAssertTrue(article.archived)
+        // Lazy back-fill (FAB-290 precedent): reading doesn't rewrite the file on disk.
+        XCTAssertEqual(try String(contentsOf: url, encoding: .utf8), content)
+    }
+
+    func testArchivedTrueWithArchivedAtRoundTrips() throws {
+        let content = """
+        ---
+        title: "A Title"
+        status: read
+        archived: true
+        archived_at: 2026-08-30
+        ---
+        Body.
+        """
+        let url = try write(content, name: "note.md")
+        let article = try MarkdownReader.read(fileURL: url)
+        XCTAssertEqual(article.status, .read)
+        XCTAssertTrue(article.archived)
+        let expectedDate = Self.dateFormatter.date(from: "2026-08-30")
+        XCTAssertEqual(article.archivedAt, expectedDate)
+    }
+
+    func testMissingArchivedDefaultsToFalse() throws {
+        let content = """
+        ---
+        title: "A Title"
+        status: unread
+        ---
+        Body.
+        """
+        let url = try write(content, name: "note.md")
+        let article = try MarkdownReader.read(fileURL: url)
+        XCTAssertFalse(article.archived)
+        XCTAssertNil(article.archivedAt)
     }
 
     // MARK: - synthesizedTitle

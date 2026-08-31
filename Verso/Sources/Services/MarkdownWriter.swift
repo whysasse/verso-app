@@ -110,6 +110,15 @@ struct MarkdownWriter {
         // Status
         lines.append("status: \(article.status.rawValue)")
 
+        // Archived (FAB-297): orthogonal to status, omitted entirely when false -- same
+        // omit-when-default convention as scroll_position/tags below.
+        if article.archived {
+            lines.append("archived: true")
+            if let archivedAt = article.archivedAt {
+                lines.append("archived_at: \(dateFormatter.string(from: archivedAt))")
+            }
+        }
+
         if let sp = article.scrollPosition {
             let clamped = min(1, max(0, sp))
             lines.append(String(format: "scroll_position: %.4f", clamped))
@@ -177,6 +186,28 @@ struct MarkdownWriter {
         return destination
     }
 
+    /// Moves the .md file out of an Archive/ subfolder back into the top-level folder (FAB-297),
+    /// carrying its `{stem}.media` sidecar folder along if present, mirroring `archive(filePath:in:)`
+    /// above. Collisions at the destination are resolved the same way any other write does, via
+    /// `uniqueFilename`. Returns the destination URL.
+    @discardableResult
+    static func unarchive(filePath: String, in folderURL: URL) throws -> URL {
+        let fm = FileManager.default
+        let filename = URL(fileURLWithPath: filePath).lastPathComponent
+        let uniqueName = try uniqueFilename(baseName: filename, in: folderURL)
+        let destination = folderURL.appendingPathComponent(uniqueName)
+        try fm.moveItem(atPath: filePath, toPath: destination.path)
+
+        let sourceMediaDir = mediaDirectoryURL(forMarkdownPath: filePath)
+        if fm.fileExists(atPath: sourceMediaDir.path) {
+            let destMediaDir = mediaDirectoryURL(forMarkdownPath: destination.path)
+            // Best-effort, same reasoning as archive()/delete() above -- the article itself
+            // already unarchived successfully.
+            try? fm.moveItem(at: sourceMediaDir, to: destMediaDir)
+        }
+        return destination
+    }
+
     /// Updates the `status:` line in the YAML frontmatter of an existing .md file.
     static func updateStatus(_ status: Article.Status, for filePath: String) throws {
         let url = URL(fileURLWithPath: filePath)
@@ -187,6 +218,39 @@ struct MarkdownWriter {
             let range = NSRange(content.startIndex..., in: content)
             content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: replacement)
         }
+        try content.write(to: url, atomically: true, encoding: .utf8)
+    }
+
+    /// Replaces or removes the `archived:` (+ `archived_at:`) YAML lines (FAB-297). Present only
+    /// when `archived` is true -- same omit-when-default convention `buildFrontmatter` uses.
+    /// Existing lines are stripped unconditionally first, so this handles both re-archiving with a
+    /// fresh date and unarchiving (clearing them) in one pass.
+    static func updateArchived(_ archived: Bool, archivedAt: Date?, for filePath: String) throws {
+        let url = URL(fileURLWithPath: filePath)
+        var content = try String(contentsOf: url, encoding: .utf8)
+
+        for pattern in [#"(?m)^archived:.*\n?"#, #"(?m)^archived_at:.*\n?"#] {
+            guard let regex = try? NSRegularExpression(pattern: pattern) else { continue }
+            let range = NSRange(content.startIndex..., in: content)
+            content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: "")
+        }
+
+        if archived {
+            var insertion = "archived: true"
+            if let archivedAt {
+                insertion += "\narchived_at: \(dateFormatter.string(from: archivedAt))"
+            }
+            let pattern = #"(?m)^(status: \S+)$"#
+            guard let regex = try? NSRegularExpression(pattern: pattern) else {
+                throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 3, userInfo: [NSLocalizedDescriptionKey: "Could not insert archived into frontmatter"]))
+            }
+            let range = NSRange(content.startIndex..., in: content)
+            guard regex.firstMatch(in: content, options: [], range: range) != nil else {
+                throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 3, userInfo: [NSLocalizedDescriptionKey: "Could not insert archived into frontmatter"]))
+            }
+            content = regex.stringByReplacingMatches(in: content, range: range, withTemplate: "$1\n\(insertion)")
+        }
+
         try content.write(to: url, atomically: true, encoding: .utf8)
     }
 
@@ -336,8 +400,8 @@ struct MarkdownWriter {
         }
     }
 
-    /// Overwrites an existing `.md` file. Preserves `added`, `status`, `scroll_position`, and `tags` from disk;
-    /// refreshes title, URL, body, author, and site from `incoming`.
+    /// Overwrites an existing `.md` file. Preserves `added`, `status`, `scroll_position`, `tags`, and
+    /// `archived`/`archived_at` from disk; refreshes title, URL, body, author, and site from `incoming`.
     static func replaceArticle(at fileURL: URL, incoming: ParsedArticle, libraryRoot: URL) async throws {
         try assertReplacePath(fileURL, isWithin: libraryRoot)
         guard !incoming.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -356,7 +420,9 @@ struct MarkdownWriter {
             dateAdded: existing.dateAdded,
             status: existing.status,
             author: incoming.author,
-            siteName: incoming.siteName
+            siteName: incoming.siteName,
+            archived: existing.archived,
+            archivedAt: existing.archivedAt
         )
 
         let processedBody = try await ArticleMarkdownImageLocalizer.localizeMarkdownRemoteImages(

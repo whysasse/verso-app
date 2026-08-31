@@ -220,4 +220,98 @@ final class MarkdownWriterTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: destination.path))
         XCTAssertEqual(destination.lastPathComponent, "Article.md")
     }
+
+    // MARK: - unarchive (FAB-297): mirror of archive, moves out of Archive/
+
+    func testUnarchiveMovesSiblingMediaFolderBackOutOfArchiveSubfolder() throws {
+        let articleURL = try write("---\ntitle: \"A\"\nstatus: unread\narchived: true\n---\nBody.", name: "Article.md")
+        _ = try makeMediaFolder(forArticleNamed: "Article.md")
+        let archived = try MarkdownWriter.archive(filePath: articleURL.path, in: tempDir)
+
+        let destination = try MarkdownWriter.unarchive(filePath: archived.path, in: tempDir)
+
+        XCTAssertEqual(destination.deletingLastPathComponent().path, tempDir.path)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: destination.path))
+        let mediaDir = tempDir.appendingPathComponent("Article.media", isDirectory: true)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: mediaDir.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: mediaDir.appendingPathComponent("Article-01.jpg").path))
+    }
+
+    func testUnarchiveResolvesNameCollisionAtDestination() throws {
+        let articleURL = try write("---\ntitle: \"A\"\nstatus: unread\n---\nArchived body.", name: "Article.md")
+        let archived = try MarkdownWriter.archive(filePath: articleURL.path, in: tempDir)
+        // A different file already occupies "Article.md" back at the library root.
+        try write("---\ntitle: \"A\"\nstatus: unread\n---\nUnrelated existing article.", name: "Article.md")
+
+        let destination = try MarkdownWriter.unarchive(filePath: archived.path, in: tempDir)
+
+        XCTAssertEqual(destination.lastPathComponent, "Article (2).md")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: tempDir.appendingPathComponent("Article.md").path))
+    }
+
+    // MARK: - updateArchived (FAB-297): archived/archived_at frontmatter round-trip
+
+    func testUpdateArchivedInsertsLinesAfterStatus() throws {
+        let url = try write("---\ntitle: \"A\"\nstatus: read\n---\nBody.", name: "a.md")
+        let date = Self.dateFormatter.date(from: "2026-08-30")!
+
+        try MarkdownWriter.updateArchived(true, archivedAt: date, for: url.path)
+
+        let content = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(content.contains("status: read\narchived: true\narchived_at: 2026-08-30"))
+    }
+
+    func testUpdateArchivedFalseRemovesExistingLines() throws {
+        let url = try write("---\ntitle: \"A\"\nstatus: read\narchived: true\narchived_at: 2026-08-30\n---\nBody.", name: "a.md")
+
+        try MarkdownWriter.updateArchived(false, archivedAt: nil, for: url.path)
+
+        let content = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertFalse(content.contains("archived:"))
+        XCTAssertFalse(content.contains("archived_at:"))
+        XCTAssertTrue(content.contains("status: read"))
+    }
+
+    func testBuildFrontmatterArchivedRoundTripsThroughReader() throws {
+        let archivedAt = Self.dateFormatter.date(from: "2026-08-30")!
+        let article = ParsedArticle(
+            id: UUID(), filePath: tempDir.appendingPathComponent("a.md"), title: "A Title", url: nil,
+            contentMarkdown: "Body.", tags: nil, scrollPosition: nil, dateAdded: Date(),
+            status: .read, author: nil, siteName: nil, archived: true, archivedAt: archivedAt
+        )
+        let content = MarkdownWriter.buildFrontmatter(for: article) + article.contentMarkdown
+        let url = try write(content, name: "a.md")
+
+        let reread = try MarkdownReader.read(fileURL: url)
+
+        XCTAssertEqual(reread.status, .read)
+        XCTAssertTrue(reread.archived)
+        XCTAssertEqual(reread.archivedAt, archivedAt)
+    }
+
+    func testBuildFrontmatterOmitsArchivedLinesWhenNotArchived() throws {
+        let article = ParsedArticle(
+            id: UUID(), filePath: tempDir.appendingPathComponent("a.md"), title: "A Title", url: nil,
+            contentMarkdown: "Body.", tags: nil, scrollPosition: nil, dateAdded: Date(),
+            status: .unread, author: nil, siteName: nil
+        )
+        let frontmatter = MarkdownWriter.buildFrontmatter(for: article)
+        XCTAssertFalse(frontmatter.contains("archived"))
+    }
+
+    func testUpdateArchivedRoundTripsTrueFalseTrue() throws {
+        let url = try write("---\ntitle: \"A\"\nstatus: unread\n---\nBody.", name: "a.md")
+
+        try MarkdownWriter.updateArchived(true, archivedAt: nil, for: url.path)
+        var reread = try MarkdownReader.read(fileURL: url)
+        XCTAssertTrue(reread.archived)
+
+        try MarkdownWriter.updateArchived(false, archivedAt: nil, for: url.path)
+        reread = try MarkdownReader.read(fileURL: url)
+        XCTAssertFalse(reread.archived)
+
+        try MarkdownWriter.updateArchived(true, archivedAt: nil, for: url.path)
+        reread = try MarkdownReader.read(fileURL: url)
+        XCTAssertTrue(reread.archived)
+    }
 }
