@@ -200,10 +200,71 @@ final class MarkdownParserTests: XCTestCase {
         """
         let nodes = MarkdownParser.parse(markdown)
 
-        guard case .paragraph(_, let firstRaw) = nodes[0] else { return XCTFail("expected paragraph") }
-        XCTAssertEqual(firstRaw, "Line one of the paragraph\nline two of the paragraph.")
+        guard case .paragraph(_, let firstSource) = nodes[0] else { return XCTFail("expected paragraph") }
+        XCTAssertEqual(firstSource.rawText, "Line one of the paragraph\nline two of the paragraph.")
+        XCTAssertEqual(firstSource.lineRange, 0...1)
+        XCTAssertEqual(firstSource.contentOffset, 0)
 
-        guard case .paragraph(_, let secondRaw) = nodes[1] else { return XCTFail("expected paragraph") }
-        XCTAssertEqual(secondRaw, "A second paragraph.")
+        guard case .paragraph(_, let secondSource) = nodes[1] else { return XCTFail("expected paragraph") }
+        XCTAssertEqual(secondSource.rawText, "A second paragraph.")
+        XCTAssertEqual(secondSource.lineRange, 3...3)
+        XCTAssertEqual(secondSource.contentOffset, 0)
+    }
+
+    // MARK: - BlockSource: line ranges and contentOffset (FAB-303 step 1)
+
+    func testHeadingSourceLineRangeAndContentOffset() throws {
+        let nodes = MarkdownParser.parse("### A heading")
+
+        guard case .heading(_, _, let source) = nodes[0] else { return XCTFail("expected heading") }
+        XCTAssertEqual(source.lineRange, 0...0)
+        XCTAssertEqual(source.rawText, "### A heading")
+        XCTAssertEqual(source.contentOffset, 4) // "### " -- level 3 + 1
+    }
+
+    func testHeadingContentOffsetScalesWithLevel() throws {
+        for level in 1...4 {
+            let prefix = String(repeating: "#", count: level)
+            let nodes = MarkdownParser.parse("\(prefix) Title")
+            guard case .heading(let parsedLevel, _, let source) = nodes[0] else {
+                return XCTFail("expected heading at level \(level)")
+            }
+            XCTAssertEqual(parsedLevel, level)
+            XCTAssertEqual(source.contentOffset, level + 1, "level \(level)")
+        }
+    }
+
+    func testBlockquoteSourceLineRangeAndContentOffset() throws {
+        let nodes = MarkdownParser.parse("> A quoted line")
+
+        guard case .blockquote(_, let source) = nodes[0] else { return XCTFail("expected blockquote") }
+        XCTAssertEqual(source.lineRange, 0...0)
+        XCTAssertEqual(source.rawText, "> A quoted line")
+        XCTAssertEqual(source.contentOffset, 2) // "> "
+    }
+
+    func testUnorderedListItemContentOffsetForEachMarker() throws {
+        for marker in ["-", "*", "+"] {
+            let nodes = MarkdownParser.parse("\(marker) An item")
+            guard case .unorderedListItem(_, let source) = nodes[0] else {
+                return XCTFail("expected unordered list item for marker \(marker)")
+            }
+            XCTAssertEqual(source.contentOffset, 2, "marker \(marker)") // "- " / "* " / "+ "
+        }
+    }
+
+    func testOrderedListItemContentOffsetGrowsWithDigitCount() throws {
+        let nodes = MarkdownParser.parse("""
+        1. First
+        10. Tenth
+        """)
+
+        guard case .orderedListItem(_, _, let firstSource) = nodes[0] else { return XCTFail("expected item 1") }
+        XCTAssertEqual(firstSource.lineRange, 0...0)
+        XCTAssertEqual(firstSource.contentOffset, 3) // "1. "
+
+        guard case .orderedListItem(_, _, let tenthSource) = nodes[1] else { return XCTFail("expected item 10") }
+        XCTAssertEqual(tenthSource.lineRange, 1...1)
+        XCTAssertEqual(tenthSource.contentOffset, 4) // "10. " -- two-digit index widens the prefix
     }
 }

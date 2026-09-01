@@ -9,11 +9,15 @@ import UIKit
 struct HighlightableParagraphText: UIViewRepresentable {
     let inlines: [MarkdownNode.InlineNode]
     let rawText: String
+    /// FAB-303 step 1: the paragraph's source line range, reported back through
+    /// `onHighlightAction` so the caller can splice by exact line index instead of re-locating
+    /// this paragraph in the full document by searching for its text.
+    let lineRange: ClosedRange<Int>
     let fontFamily: String
     let fontSize: CGFloat
     let lineSpacingValue: CGFloat
     let colors: ThemeColors
-    var onHighlightAction: ((_ oldRawText: String, _ newRawText: String) -> Void)?
+    var onHighlightAction: ((_ lineRange: ClosedRange<Int>, _ newRawText: String) -> Void)?
 
     func makeUIView(context: Context) -> HighlightableUITextView {
         let view = HighlightableUITextView()
@@ -29,6 +33,7 @@ struct HighlightableParagraphText: UIViewRepresentable {
 
     func updateUIView(_ uiView: HighlightableUITextView, context: Context) {
         uiView.rawText = rawText
+        uiView.lineRange = lineRange
         uiView.onHighlightAction = onHighlightAction
         uiView.attributedText = Self.buildAttributedString(
             inlines: inlines,
@@ -143,7 +148,10 @@ private extension UIFont {
 /// the one custom action on top.
 final class HighlightableUITextView: UITextView {
     var rawText: String = ""
-    var onHighlightAction: ((_ oldRawText: String, _ newRawText: String) -> Void)?
+    /// FAB-303 step 1: this paragraph's source line range, reported alongside a change instead of
+    /// its old raw text -- see `MarkdownBodyView.onHighlightAction`.
+    var lineRange: ClosedRange<Int> = 0...0
+    var onHighlightAction: ((_ lineRange: ClosedRange<Int>, _ newRawText: String) -> Void)?
 
     override func buildMenu(with builder: UIMenuBuilder) {
         super.buildMenu(with: builder)
@@ -182,8 +190,7 @@ final class HighlightableUITextView: UITextView {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
-        let oldRawText = rawText
         selectedRange = NSRange(location: selectedRange.location, length: 0)
-        onHighlightAction?(oldRawText, newRawText)
+        onHighlightAction?(lineRange, newRawText)
     }
 }
