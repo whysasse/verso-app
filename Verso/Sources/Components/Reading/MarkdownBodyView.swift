@@ -523,6 +523,57 @@ extension MarkdownNode.InlineNode {
     }
 }
 
+/// FAB-303 step 4: a paragraph's `inlines`/`source`, tagged with its index in the *flat* `nodes`
+/// array it came from -- needed to look up its immediate predecessor (for spacing) and to match
+/// against `MarkdownBodyView.highlightedParagraphIndex` (also flat-index-based, unchanged, so TTS
+/// wiring in `ArticleReaderView` didn't need to change for this step).
+///
+/// `internal` (not `private`) so `groupIntoRenderUnits` is directly unit-testable via
+/// `@testable import` -- unlike everything downstream of it in this step, which needs a real
+/// `UITextView`/device to verify. Not `Equatable` (neither is `MarkdownNode` itself); tests match
+/// against it with `if case`/`guard case`, same convention `MarkdownParserTests` already uses.
+struct MarkdownRegionParagraph {
+    let nodeIndex: Int
+    let inlines: [MarkdownNode.InlineNode]
+    let source: MarkdownNode.BlockSource
+}
+
+/// One thing `MarkdownBodyView.body` renders: either a run of one-or-more consecutive `.paragraph`
+/// nodes sharing a single `HighlightableParagraphText` (FAB-303 step 4 -- iOS can't extend a
+/// native text selection across two `UIView`s, so cross-paragraph selection needs the paragraphs
+/// to share one `UITextView`), or any other node, unchanged from before this step.
+enum MarkdownRenderUnit {
+    case paragraphRegion([MarkdownRegionParagraph])
+    case single(nodeIndex: Int, node: MarkdownNode)
+}
+
+/// FAB-303 step 4: groups a flat node list into render units. A region breaks at every non-
+/// paragraph node -- heading, list item, blockquote, image, code block, table, rule -- exactly
+/// where regions already implicitly end (those keep rendering individually, unchanged, deferred
+/// to a follow-up per `docs/BACKLOG.md`'s FAB-303 checklist). Pure and free of any view/UIKit
+/// dependency, so it's unit-tested directly -- unlike everything downstream of it in this step.
+func groupIntoRenderUnits(_ nodes: [MarkdownNode]) -> [MarkdownRenderUnit] {
+    var units: [MarkdownRenderUnit] = []
+    var currentRegion: [MarkdownRegionParagraph] = []
+
+    func flushRegion() {
+        guard !currentRegion.isEmpty else { return }
+        units.append(.paragraphRegion(currentRegion))
+        currentRegion = []
+    }
+
+    for (index, node) in nodes.enumerated() {
+        if case .paragraph(let inlines, let source) = node {
+            currentRegion.append(MarkdownRegionParagraph(nodeIndex: index, inlines: inlines, source: source))
+        } else {
+            flushRegion()
+            units.append(.single(nodeIndex: index, node: node))
+        }
+    }
+    flushRegion()
+    return units
+}
+
 struct MarkdownBodyView: View {
     let nodes: [MarkdownNode]
     let fontFamily: String
@@ -546,9 +597,43 @@ struct MarkdownBodyView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(nodes.enumerated()), id: \.offset) { index, node in
-                blockView(for: node, index: index)
+            ForEach(Array(groupIntoRenderUnits(nodes).enumerated()), id: \.offset) { _, unit in
+                unitView(for: unit)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func unitView(for unit: MarkdownRenderUnit) -> some View {
+        switch unit {
+        case .single(let nodeIndex, let node):
+            blockView(for: node, index: nodeIndex)
+
+        case .paragraphRegion(let paragraphs):
+            let firstIndex = paragraphs[0].nodeIndex
+            let prevNode: MarkdownNode? = firstIndex > 0 ? nodes[firstIndex - 1] : nil
+            // A region is always made of paragraphs, which only ever hit `topSpacing`'s `default`
+            // case (16pt) regardless of what precedes them -- true today for a lone paragraph and
+            // still true for a merged region, since only the region's first paragraph is adjacent
+            // to whatever came before it.
+            let topPadding: CGFloat = prevNode == nil ? 0 : 16
+            // Which paragraph *within this region* (not the flat node index) TTS is narrating, if
+            // any and if it's actually in this region.
+            let activeIndexInRegion = highlightedParagraphIndex.flatMap { activeNodeIndex in
+                paragraphs.firstIndex { $0.nodeIndex == activeNodeIndex }
+            }
+
+            HighlightableParagraphText(
+                paragraphs: paragraphs.map { (inlines: $0.inlines, source: $0.source) },
+                activeParagraphIndex: activeIndexInRegion,
+                fontFamily: fontFamily,
+                fontSize: fontSize,
+                lineSpacingValue: lineSpacingValue,
+                colors: colors,
+                onHighlightAction: onHighlightAction
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, topPadding)
         }
     }
 
@@ -570,28 +655,13 @@ struct MarkdownBodyView: View {
 
         Group {
             switch node {
-            case .paragraph(let inlines, let source):
-                // FAB-54: selectable (unlike every other block type here, which stays plain `Text`)
-                // so the user can select a run of text and highlight it. Bridges to UIKit because
-                // SwiftUI `Text` has no selection-change hook and doesn't honor a per-run background
-                // color on `AttributedString` — both are needed to show/manage a highlight in place.
-                HighlightableParagraphText(
-                    inlines: inlines,
-                    rawText: source.rawText,
-                    lineRange: source.lineRange,
-                    contentOffset: source.contentOffset,
-                    fontFamily: fontFamily,
-                    fontSize: fontSize,
-                    lineSpacingValue: lineSpacingValue,
-                    colors: colors,
-                    onHighlightAction: onHighlightAction
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    highlightedParagraphIndex == index
-                        ? colors.accent.opacity(0.15)
-                        : Color.clear
-                )
+            case .paragraph:
+                // FAB-303 step 4: paragraphs are grouped into regions and rendered via
+                // `unitView`/`HighlightableParagraphText` before `blockView` is ever reached --
+                // this case is unreachable in practice. `EmptyView()` rather than `fatalError()`
+                // so a bug in that grouping invariant fails quietly (a missing paragraph) rather
+                // than crashing the whole reading view.
+                EmptyView()
 
             case .heading(let level, let inlines, _):
                 Text(inlineText(inlines))
