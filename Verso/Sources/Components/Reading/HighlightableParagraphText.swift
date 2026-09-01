@@ -13,6 +13,10 @@ struct HighlightableParagraphText: UIViewRepresentable {
     /// `onHighlightAction` so the caller can splice by exact line index instead of re-locating
     /// this paragraph in the full document by searching for its text.
     let lineRange: ClosedRange<Int>
+    /// FAB-303 step 2: `MarkdownNode.BlockSource.contentOffset` -- added to an `InlineNode`'s own
+    /// `sourceRange` to get that run's exact offset within `rawText`. Tagged onto each run as
+    /// `.versoSourceOffset` in `buildAttributedString`.
+    let contentOffset: Int
     let fontFamily: String
     let fontSize: CGFloat
     let lineSpacingValue: CGFloat
@@ -37,6 +41,7 @@ struct HighlightableParagraphText: UIViewRepresentable {
         uiView.onHighlightAction = onHighlightAction
         uiView.attributedText = Self.buildAttributedString(
             inlines: inlines,
+            contentOffset: contentOffset,
             fontFamily: fontFamily,
             fontSize: fontSize,
             lineSpacingValue: lineSpacingValue,
@@ -54,11 +59,13 @@ struct HighlightableParagraphText: UIViewRepresentable {
 
     /// UIKit counterpart to `MarkdownBodyView.textForInline` -- same visual mapping (font weight/
     /// style, link color+underline), but as `NSAttributedString` rather than SwiftUI's
-    /// `AttributedString`, since only the UIKit type supports `.backgroundColor` per run, and
-    /// carries a custom `.versoHighlightIndex` attribute so the text view's menu-building logic can
-    /// tell *which* highlight (in source order) a tap/selection landed on.
+    /// `AttributedString`, since only the UIKit type supports `.backgroundColor` per run. Also
+    /// carries two custom attributes the text view's menu-building logic reads back: `.versoHighlightIndex`
+    /// (source-order index of a `.highlight` run, for remove) and `.versoSourceOffset` (that run's
+    /// exact raw-file offset, for add -- FAB-303 step 2).
     static func buildAttributedString(
         inlines: [MarkdownNode.InlineNode],
+        contentOffset: Int,
         fontFamily: String,
         fontSize: CGFloat,
         lineSpacingValue: CGFloat,
@@ -74,11 +81,12 @@ struct HighlightableParagraphText: UIViewRepresentable {
         let result = NSMutableAttributedString()
         var highlightIndex = 0
 
-        func append(_ text: String, font: UIFont, color: UIColor, extra: [NSAttributedString.Key: Any] = [:]) {
+        func append(_ text: String, sourceRange: Range<Int>, font: UIFont, color: UIColor, extra: [NSAttributedString.Key: Any] = [:]) {
             var attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: color,
                 .paragraphStyle: paragraphStyle,
+                .versoSourceOffset: contentOffset + sourceRange.lowerBound,
             ]
             attributes.merge(extra) { _, new in new }
             result.append(NSAttributedString(string: text, attributes: attributes))
@@ -87,27 +95,28 @@ struct HighlightableParagraphText: UIViewRepresentable {
         let textColor = UIColor(colors.textPrimary)
         for inline in inlines {
             switch inline {
-            case .text(let s):
-                append(s, font: baseFont, color: textColor)
-            case .bold(let s):
-                append(s, font: baseFont.withSymbolicTraits(.traitBold), color: textColor)
-            case .italic(let s):
-                append(s, font: baseFont.withSymbolicTraits(.traitItalic), color: textColor)
-            case .boldItalic(let s):
-                append(s, font: baseFont.withSymbolicTraits([.traitBold, .traitItalic]), color: textColor)
-            case .code(let s):
+            case .text(let s, let range):
+                append(s, sourceRange: range, font: baseFont, color: textColor)
+            case .bold(let s, let range):
+                append(s, sourceRange: range, font: baseFont.withSymbolicTraits(.traitBold), color: textColor)
+            case .italic(let s, let range):
+                append(s, sourceRange: range, font: baseFont.withSymbolicTraits(.traitItalic), color: textColor)
+            case .boldItalic(let s, let range):
+                append(s, sourceRange: range, font: baseFont.withSymbolicTraits([.traitBold, .traitItalic]), color: textColor)
+            case .code(let s, let range):
                 let codeFont = UIFont(name: "SFMono-Regular", size: max(12, fontSize - 2))
                     ?? .monospacedSystemFont(ofSize: max(12, fontSize - 2), weight: .regular)
-                append(s, font: codeFont, color: UIColor(colors.accent))
-            case .link(let text, let url):
+                append(s, sourceRange: range, font: codeFont, color: UIColor(colors.accent))
+            case .link(let text, let url, let range):
                 var extra: [NSAttributedString.Key: Any] = [.underlineStyle: NSUnderlineStyle.single.rawValue]
                 if let resolved = URL(string: url) {
                     extra[.link] = resolved
                 }
-                append(text, font: baseFont, color: UIColor(colors.accent), extra: extra)
-            case .highlight(let s):
+                append(text, sourceRange: range, font: baseFont, color: UIColor(colors.accent), extra: extra)
+            case .highlight(let s, let range):
                 append(
                     s,
+                    sourceRange: range,
                     font: baseFont,
                     color: textColor,
                     extra: [
@@ -129,6 +138,12 @@ extension NSAttributedString.Key {
     /// `buildMenu(with:)` know *which* existing highlight a selection landed on without re-matching
     /// text.
     static let versoHighlightIndex = NSAttributedString.Key("versoHighlightIndex")
+
+    /// FAB-303 step 2: the exact raw-file (UTF-16) offset where this run's rendered content starts
+    /// -- `MarkdownNode.BlockSource.contentOffset + InlineNode.sourceRange.lowerBound`. Lets
+    /// `buildMenu(with:)` convert a selection directly to a raw position instead of re-finding the
+    /// rendered text in the raw source.
+    static let versoSourceOffset = NSAttributedString.Key("versoSourceOffset")
 }
 
 /// UIKit counterpart to `UIFont.withSymbolicTraits` that falls back to the original font rather
@@ -155,13 +170,9 @@ final class HighlightableUITextView: UITextView {
 
     override func buildMenu(with builder: UIMenuBuilder) {
         super.buildMenu(with: builder)
-        guard let attrText = attributedText,
-              selectedRange.length > 0,
-              let range = Range(selectedRange, in: attrText.string) else {
-            return
-        }
-        let selectedText = String(attrText.string[range])
-        let existingHighlightIndex = attrText.attribute(
+        guard attributedText != nil, selectedRange.length > 0 else { return }
+
+        let existingHighlightIndex = attributedText?.attribute(
             .versoHighlightIndex,
             at: selectedRange.location,
             effectiveRange: nil
@@ -174,17 +185,47 @@ final class HighlightableUITextView: UITextView {
             }
         } else {
             action = UIAction(title: L10n.Reading.highlightAdd) { [weak self] _ in
-                self?.applyHighlightChange { ArticleHighlighter.addHighlight(selecting: selectedText, in: $0) }
+                self?.applyAddHighlight()
             }
         }
         builder.insertSibling(UIMenu(title: "", options: .displayInline, children: [action]), afterMenu: .standardEdit)
     }
 
+    /// The `.versoSourceOffset` tagged at `location`, plus the full run (`effectiveRange`) it
+    /// applies to -- so callers can tell whether two locations fall inside the *same* run.
+    private func sourceOffset(at location: Int) -> (offset: Int, runRange: NSRange)? {
+        guard let attrText = attributedText else { return nil }
+        var effectiveRange = NSRange()
+        guard let offset = attrText.attribute(.versoSourceOffset, at: location, effectiveRange: &effectiveRange) as? Int else {
+            return nil
+        }
+        return (offset, effectiveRange)
+    }
+
+    /// FAB-303 step 2: converts the current selection to an exact raw offset range and wraps it --
+    /// only when both ends of the selection landed in the *same* tagged run (an ordinary sentence
+    /// with no internal formatting is almost always one contiguous run, so this covers the common
+    /// case). A selection crossing from one run into a differently-formatted one still declines,
+    /// same as before this step -- wrapping across a run boundary would split a delimiter like
+    /// `**`, which needs FAB-303 step 3's "snap outward" logic to handle safely, not this function.
+    private func applyAddHighlight() {
+        let start = selectedRange.location
+        let end = selectedRange.location + selectedRange.length - 1 // last selected character
+        guard let (startOffset, startRun) = sourceOffset(at: start),
+              let (_, endRun) = sourceOffset(at: end),
+              startRun == endRun else {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
+        let rawStart = startOffset + (start - startRun.location)
+        let rawEnd = startOffset + (selectedRange.location + selectedRange.length - startRun.location)
+        applyHighlightChange { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) }
+    }
+
     /// Runs `transform` against the current `rawText`; on success, reports the change upstream and
-    /// clears the selection (the edit menu doesn't auto-dismiss otherwise). On failure (`nil` --
-    /// e.g. the selection crossed a formatting boundary `ArticleHighlighter` declined to touch), a
+    /// clears the selection (the edit menu doesn't auto-dismiss otherwise). On failure (`nil`), a
     /// single error haptic is the only feedback -- no blocking alert for what's meant to be a quiet,
-    /// no-op decline. See `ArticleHighlighter.addHighlight`.
+    /// no-op decline.
     private func applyHighlightChange(_ transform: (String) -> String?) {
         guard let newRawText = transform(rawText) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
