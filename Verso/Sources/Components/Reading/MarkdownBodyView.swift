@@ -49,26 +49,62 @@ enum MarkdownNode {
     }
 
     enum InlineNode {
-        /// FAB-303 step 2: every case's `sourceRange` is the UTF-16 offset range of this node's
-        /// *rendered content only* (markdown delimiters like `**`/`` ` ``/`[`/`]` excluded) within
-        /// the string `parseInlines` was given -- `text` for a paragraph, `content` for a heading/
-        /// list-item/blockquote (see `MarkdownNode.BlockSource`). Add the block's own
-        /// `contentOffset` to get the exact raw-file offset, no searching required -- this is what
-        /// lets a `HighlightableParagraphText` selection convert directly to a raw source position
-        /// instead of FAB-54's whitespace-tolerant regex re-search. See `.versoSourceOffset` in
-        /// `HighlightableParagraphText.swift`, where this is actually consumed.
-        case text(String, sourceRange: Range<Int>)
-        case bold(String, sourceRange: Range<Int>)
-        case italic(String, sourceRange: Range<Int>)
-        case boldItalic(String, sourceRange: Range<Int>)
-        case code(String, sourceRange: Range<Int>)
-        case link(text: String, url: String, sourceRange: Range<Int>)
-        /// FAB-54: `==text==` (Obsidian/CommonMark-extension convention). Rendered with a
-        /// background wash in the reading view's selectable paragraph text
-        /// (`HighlightableParagraphText`) -- SwiftUI `Text` doesn't support per-run background
-        /// color on `AttributedString`, so this case falls back to plain, unstyled text wherever
-        /// it appears outside a paragraph (headings, list items, table cells, etc.).
-        case highlight(String, sourceRange: Range<Int>)
+        /// FAB-303 step 3: where a node's raw content came from, *and* -- new this step -- its
+        /// full raw span including markdown delimiters (`**`/`` ` ``/`[...]`/etc). `contentRange`
+        /// is what step 2 shipped as a bare `sourceRange`: add a block's `contentOffset` to get the
+        /// node's exact raw-file position, no searching required. `fullRange` is what snap-outward
+        /// needs: when a selection boundary lands strictly inside a delimited run, the highlight
+        /// wraps `fullRange` instead of `contentRange`, so it wraps *around* `**word**` rather than
+        /// slicing through its delimiters. For `.text`, the two are identical (nothing to skip).
+        struct SourceSpan {
+            let contentRange: Range<Int>
+            let fullRange: Range<Int>
+
+            /// Shifts both ranges by `offset` -- used when a `.highlight`'s inner content is
+            /// re-parsed independently (offsets 0-based within just that substring) and needs to
+            /// be rebased onto the outer string's coordinate space.
+            func shifted(by offset: Int) -> SourceSpan {
+                SourceSpan(
+                    contentRange: (contentRange.lowerBound + offset)..<(contentRange.upperBound + offset),
+                    fullRange: (fullRange.lowerBound + offset)..<(fullRange.upperBound + offset)
+                )
+            }
+        }
+
+        case text(String, source: SourceSpan)
+        case bold(String, source: SourceSpan)
+        case italic(String, source: SourceSpan)
+        case boldItalic(String, source: SourceSpan)
+        case code(String, source: SourceSpan)
+        case link(text: String, url: String, source: SourceSpan)
+        /// `==text==` (Obsidian/CommonMark-extension convention). Rendered with a background wash
+        /// in the reading view's selectable paragraph text (`HighlightableParagraphText`) --
+        /// SwiftUI `Text` doesn't support per-run background color on `AttributedString`, so this
+        /// case falls back to plain (but still recursively styled) text wherever it appears outside
+        /// a paragraph (headings, list items, table cells, etc.).
+        ///
+        /// FAB-303 step 3: recursive (`[InlineNode]`, not a bare `String`) -- `==**bold** text==`
+        /// needs to render "bold" as actual bold inside the highlight wash, not literal asterisks,
+        /// which starts mattering the moment snap-outward can produce a highlight that wraps
+        /// formatted content. `source.contentRange` covers the *whole* inner content, not any one
+        /// nested node.
+        case highlight([InlineNode], source: SourceSpan)
+
+        /// Recursively shifts this node's (and, for `.highlight`, every nested node's) `source`
+        /// span by `offset`. See `SourceSpan.shifted(by:)` and the recursive `.highlight` parsing
+        /// in `MarkdownParser.parseInlines`, the only caller.
+        func shifted(by offset: Int) -> InlineNode {
+            switch self {
+            case .text(let s, let source): return .text(s, source: source.shifted(by: offset))
+            case .bold(let s, let source): return .bold(s, source: source.shifted(by: offset))
+            case .italic(let s, let source): return .italic(s, source: source.shifted(by: offset))
+            case .boldItalic(let s, let source): return .boldItalic(s, source: source.shifted(by: offset))
+            case .code(let s, let source): return .code(s, source: source.shifted(by: offset))
+            case .link(let text, let url, let source): return .link(text: text, url: url, source: source.shifted(by: offset))
+            case .highlight(let nested, let source):
+                return .highlight(nested.map { $0.shifted(by: offset) }, source: source.shifted(by: offset))
+            }
+        }
     }
 }
 
@@ -339,7 +375,11 @@ struct MarkdownParser {
             guard let matchRange = earliestRange, let pattern = earliestPattern else {
                 // No more patterns — emit remaining as plain text
                 let length = remaining.utf16.count
-                result.append(.text(remaining, sourceRange: consumedUTF16..<(consumedUTF16 + length)))
+                let span = MarkdownNode.InlineNode.SourceSpan(
+                    contentRange: consumedUTF16..<(consumedUTF16 + length),
+                    fullRange: consumedUTF16..<(consumedUTF16 + length)
+                )
+                result.append(.text(remaining, source: span))
                 break
             }
 
@@ -347,7 +387,11 @@ struct MarkdownParser {
             let prefix = String(remaining[remaining.startIndex..<matchRange.lowerBound])
             if !prefix.isEmpty {
                 let length = prefix.utf16.count
-                result.append(.text(prefix, sourceRange: consumedUTF16..<(consumedUTF16 + length)))
+                let span = MarkdownNode.InlineNode.SourceSpan(
+                    contentRange: consumedUTF16..<(consumedUTF16 + length),
+                    fullRange: consumedUTF16..<(consumedUTF16 + length)
+                )
+                result.append(.text(prefix, source: span))
                 consumedUTF16 += length
             }
 
@@ -370,7 +414,7 @@ struct MarkdownParser {
     private struct InlinePattern {
         let regex: String
         /// (full matched string including delimiters, that match's absolute UTF-16 start offset)
-        /// -> the node, with its own `sourceRange` narrowed to the content span within the match.
+        /// -> the node, with its own `source` span narrowed to the content within the match.
         let makeNode: (String, Int) -> MarkdownNode.InlineNode
     }
 
@@ -382,24 +426,31 @@ struct MarkdownParser {
     private static let inlinePatterns: [InlinePattern] = [
         // Bold+italic must come before bold and italic
         InlinePattern(regex: #"\*{3}(.+?)\*{3}|_{3}(.+?)_{3}"#) { match, matchStart in
-            let (content, range) = extractFirstGroup(match, prefixLen: 3, matchStart: matchStart)
-            return .boldItalic(content, sourceRange: range)
+            let (content, span) = extractFirstGroup(match, prefixLen: 3, matchStart: matchStart)
+            return .boldItalic(content, source: span)
         },
         InlinePattern(regex: highlightMarkerPattern) { match, matchStart in
-            let (content, range) = extractFirstGroup(match, prefixLen: 2, matchStart: matchStart)
-            return .highlight(content, sourceRange: range)
+            // FAB-303 step 3: recursive -- the inner content between `==...==` is itself run back
+            // through `parseInlines` so `==**bold** text==` renders "bold" as actual bold, not
+            // literal asterisks. That recursive call reports offsets 0-based within just the
+            // inner content, so they're rebased onto the outer string via `.shifted(by:)` before
+            // being folded into the result -- same technique `flushParagraph` (step 1) uses for a
+            // paragraph's own `contentOffset`, one level deeper.
+            let (content, span) = extractFirstGroup(match, prefixLen: 2, matchStart: matchStart)
+            let nested = parseInlines(content).map { $0.shifted(by: span.contentRange.lowerBound) }
+            return .highlight(nested, source: span)
         },
         InlinePattern(regex: #"\*{2}(.+?)\*{2}|_{2}(.+?)_{2}"#) { match, matchStart in
-            let (content, range) = extractFirstGroup(match, prefixLen: 2, matchStart: matchStart)
-            return .bold(content, sourceRange: range)
+            let (content, span) = extractFirstGroup(match, prefixLen: 2, matchStart: matchStart)
+            return .bold(content, source: span)
         },
         InlinePattern(regex: #"\*(.+?)\*|_(.+?)_"#) { match, matchStart in
-            let (content, range) = extractFirstGroup(match, prefixLen: 1, matchStart: matchStart)
-            return .italic(content, sourceRange: range)
+            let (content, span) = extractFirstGroup(match, prefixLen: 1, matchStart: matchStart)
+            return .italic(content, source: span)
         },
         InlinePattern(regex: #"`([^`]+)`"#) { match, matchStart in
-            let (content, range) = extractFirstGroup(match, prefixLen: 1, matchStart: matchStart)
-            return .code(content, sourceRange: range)
+            let (content, span) = extractFirstGroup(match, prefixLen: 1, matchStart: matchStart)
+            return .code(content, source: span)
         },
         InlinePattern(regex: #"\[([^\]]+)\]\(([^)]+)\)"#) { match, matchStart in
             // Extract link text and URL using NSRegularExpression
@@ -407,20 +458,30 @@ struct MarkdownParser {
             let nsMatch = pattern.firstMatch(in: match, range: NSRange(match.startIndex..., in: match))!
             let text = rangeString(match, nsMatch.range(at: 1))
             let url = rangeString(match, nsMatch.range(at: 2))
-            // Content (the link label) starts right after the opening "[".
+            // Content (the link label) starts right after the opening "[". Unlike every other
+            // pattern here, a link's delimiters aren't symmetric (`[` vs `](url)`, whose width
+            // depends on the URL's own length), so its full range is computed explicitly rather
+            // than through `extractFirstGroup`'s shared prefix/suffix-stripping logic.
             let contentStart = matchStart + 1
-            let range = contentStart..<(contentStart + text.utf16.count)
-            return .link(text: text, url: url, sourceRange: range)
+            let span = MarkdownNode.InlineNode.SourceSpan(
+                contentRange: contentStart..<(contentStart + text.utf16.count),
+                fullRange: matchStart..<(matchStart + match.utf16.count)
+            )
+            return .link(text: text, url: url, source: span)
         },
     ]
 
-    /// Strips `prefixLen` characters from each end of `match` (its markdown delimiters) and
-    /// computes the resulting content's absolute `sourceRange`, given `matchStart` -- the full
-    /// match's own absolute offset (delimiters included).
-    private static func extractFirstGroup(_ match: String, prefixLen: Int, matchStart: Int) -> (String, Range<Int>) {
+    /// Strips `prefixLen` characters from each end of `match` (its markdown delimiters -- assumed
+    /// symmetric, e.g. `**`/`` ` ``/`==`) and computes the resulting content's `SourceSpan`, given
+    /// `matchStart` -- the full match's own absolute offset (delimiters included).
+    private static func extractFirstGroup(_ match: String, prefixLen: Int, matchStart: Int) -> (String, MarkdownNode.InlineNode.SourceSpan) {
         let inner = String(match.dropFirst(prefixLen).dropLast(prefixLen))
         let contentStart = matchStart + prefixLen
-        return (inner, contentStart..<(contentStart + inner.utf16.count))
+        let span = MarkdownNode.InlineNode.SourceSpan(
+            contentRange: contentStart..<(contentStart + inner.utf16.count),
+            fullRange: matchStart..<(matchStart + match.utf16.count)
+        )
+        return (inner, span)
     }
 
     private static let imagePattern = try! NSRegularExpression(pattern: #"!\[([^\]]*)\]\(([^)]+)\)"#)
@@ -455,8 +516,9 @@ extension MarkdownNode {
 extension MarkdownNode.InlineNode {
     var plainText: String {
         switch self {
-        case .text(let s, _), .bold(let s, _), .italic(let s, _), .boldItalic(let s, _), .code(let s, _), .highlight(let s, _): return s
+        case .text(let s, _), .bold(let s, _), .italic(let s, _), .boldItalic(let s, _), .code(let s, _): return s
         case .link(let text, _, _): return text
+        case .highlight(let inlines, _): return inlines.map(\.plainText).joined()
         }
     }
 }
@@ -706,12 +768,12 @@ struct MarkdownBodyView: View {
                 a.link = resolved
             }
             return a
-        case .highlight(let s, _):
-            // Falls back to plain text outside a paragraph (headings, list items, table cells) —
-            // SwiftUI `Text` can't paint a per-run background, so there's nothing meaningful to
-            // style here; `HighlightableParagraphText` is what actually renders the highlight wash
-            // for paragraphs, the only place FAB-54 targets.
-            return AttributedString(s)
+        case .highlight(let inlines, _):
+            // Falls back to plain (but still recursively styled) text outside a paragraph
+            // (headings, list items, table cells) — SwiftUI `Text` can't paint a per-run
+            // background, so there's no wash to add here; `HighlightableParagraphText` is what
+            // actually renders it for paragraphs, the only place FAB-54 targets.
+            return inlines.reduce(AttributedString("")) { result, inline in result + textForInline(inline) }
         }
     }
 }

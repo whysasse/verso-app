@@ -14,8 +14,8 @@ struct HighlightableParagraphText: UIViewRepresentable {
     /// this paragraph in the full document by searching for its text.
     let lineRange: ClosedRange<Int>
     /// FAB-303 step 2: `MarkdownNode.BlockSource.contentOffset` -- added to an `InlineNode`'s own
-    /// `sourceRange` to get that run's exact offset within `rawText`. Tagged onto each run as
-    /// `.versoSourceOffset` in `buildAttributedString`.
+    /// `source.contentRange` to get that run's exact offset within `rawText`. Tagged onto each run
+    /// as `.versoSourceOffset` in `buildAttributedString`.
     let contentOffset: Int
     let fontFamily: String
     let fontSize: CGFloat
@@ -60,9 +60,11 @@ struct HighlightableParagraphText: UIViewRepresentable {
     /// UIKit counterpart to `MarkdownBodyView.textForInline` -- same visual mapping (font weight/
     /// style, link color+underline), but as `NSAttributedString` rather than SwiftUI's
     /// `AttributedString`, since only the UIKit type supports `.backgroundColor` per run. Also
-    /// carries two custom attributes the text view's menu-building logic reads back: `.versoHighlightIndex`
-    /// (source-order index of a `.highlight` run, for remove) and `.versoSourceOffset` (that run's
-    /// exact raw-file offset, for add -- FAB-303 step 2).
+    /// carries the custom attributes the text view's menu-building logic reads back:
+    /// `.versoHighlightIndex` (source-order index of a `.highlight` run, for remove),
+    /// `.versoSourceOffset` (a run's exact raw-file content offset, for an exact same-run wrap --
+    /// FAB-303 step 2), `.versoRunKind` and `.versoFullSourceRange` (which kind of run this is and
+    /// its full raw span including delimiters, for snap-outward -- FAB-303 step 3).
     static func buildAttributedString(
         inlines: [MarkdownNode.InlineNode],
         contentOffset: Int,
@@ -74,61 +76,95 @@ struct HighlightableParagraphText: UIViewRepresentable {
         let baseFont: UIFont = fontFamily.isEmpty
             ? .systemFont(ofSize: fontSize)
             : (UIFont(name: fontFamily, size: fontSize) ?? .systemFont(ofSize: fontSize))
+        let codeFont = UIFont(name: "SFMono-Regular", size: max(12, fontSize - 2))
+            ?? .monospacedSystemFont(ofSize: max(12, fontSize - 2), weight: .regular)
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = lineSpacingValue
 
         let result = NSMutableAttributedString()
         var highlightIndex = 0
+        let textColor = UIColor(colors.textPrimary)
+        let accentColor = UIColor(colors.accent)
 
-        func append(_ text: String, sourceRange: Range<Int>, font: UIFont, color: UIColor, extra: [NSAttributedString.Key: Any] = [:]) {
+        /// `insideHighlight`, when non-nil, means this run is nested inside a `.highlight` node --
+        /// every run inside the *same* highlight shares one `versoHighlightIndex` (so "Remove
+        /// Highlight" removes the whole thing regardless of which nested word was tapped) and one
+        /// `versoRunKind` of `.highlight` (so a selection boundary landing anywhere inside an
+        /// existing highlight is treated uniformly, deferring FAB-303 step 3's "merge" case rather
+        /// than mis-handling it as an ordinary bold/italic/etc. run).
+        func append(
+            _ text: String,
+            source: MarkdownNode.InlineNode.SourceSpan,
+            kind: VersoInlineRunKind,
+            font: UIFont,
+            color: UIColor,
+            extra: [NSAttributedString.Key: Any] = [:],
+            insideHighlight: (index: Int, fullRange: Range<Int>)? = nil
+        ) {
+            let effectiveKind = insideHighlight != nil ? .highlight : kind
+            let effectiveFullRange = insideHighlight?.fullRange ?? (contentOffset + source.fullRange.lowerBound)..<(contentOffset + source.fullRange.upperBound)
             var attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: color,
                 .paragraphStyle: paragraphStyle,
-                .versoSourceOffset: contentOffset + sourceRange.lowerBound,
+                .versoSourceOffset: contentOffset + source.contentRange.lowerBound,
+                .versoRunKind: effectiveKind,
+                .versoFullSourceRange: effectiveFullRange,
             ]
+            if let insideHighlight {
+                attributes[.backgroundColor] = UIColor(VersoHighlightColor.wash)
+                attributes[.versoHighlightIndex] = insideHighlight.index
+            }
             attributes.merge(extra) { _, new in new }
             result.append(NSAttributedString(string: text, attributes: attributes))
         }
 
-        let textColor = UIColor(colors.textPrimary)
-        for inline in inlines {
+        /// Renders one inline node, recursing into `.highlight`'s nested content. `insideHighlight`
+        /// carries the enclosing highlight's index/full-range down through recursion so nested
+        /// runs (e.g. a bold word inside a highlight) still tag as part of that one highlight.
+        func appendInline(_ inline: MarkdownNode.InlineNode, insideHighlight: (index: Int, fullRange: Range<Int>)?) {
             switch inline {
-            case .text(let s, let range):
-                append(s, sourceRange: range, font: baseFont, color: textColor)
-            case .bold(let s, let range):
-                append(s, sourceRange: range, font: baseFont.withSymbolicTraits(.traitBold), color: textColor)
-            case .italic(let s, let range):
-                append(s, sourceRange: range, font: baseFont.withSymbolicTraits(.traitItalic), color: textColor)
-            case .boldItalic(let s, let range):
-                append(s, sourceRange: range, font: baseFont.withSymbolicTraits([.traitBold, .traitItalic]), color: textColor)
-            case .code(let s, let range):
-                let codeFont = UIFont(name: "SFMono-Regular", size: max(12, fontSize - 2))
-                    ?? .monospacedSystemFont(ofSize: max(12, fontSize - 2), weight: .regular)
-                append(s, sourceRange: range, font: codeFont, color: UIColor(colors.accent))
-            case .link(let text, let url, let range):
+            case .text(let s, let source):
+                append(s, source: source, kind: .text, font: baseFont, color: textColor, insideHighlight: insideHighlight)
+            case .bold(let s, let source):
+                append(s, source: source, kind: .bold, font: baseFont.withSymbolicTraits(.traitBold), color: textColor, insideHighlight: insideHighlight)
+            case .italic(let s, let source):
+                append(s, source: source, kind: .italic, font: baseFont.withSymbolicTraits(.traitItalic), color: textColor, insideHighlight: insideHighlight)
+            case .boldItalic(let s, let source):
+                append(s, source: source, kind: .boldItalic, font: baseFont.withSymbolicTraits([.traitBold, .traitItalic]), color: textColor, insideHighlight: insideHighlight)
+            case .code(let s, let source):
+                append(s, source: source, kind: .code, font: codeFont, color: accentColor, insideHighlight: insideHighlight)
+            case .link(let text, let url, let source):
                 var extra: [NSAttributedString.Key: Any] = [.underlineStyle: NSUnderlineStyle.single.rawValue]
                 if let resolved = URL(string: url) {
                     extra[.link] = resolved
                 }
-                append(text, sourceRange: range, font: baseFont, color: UIColor(colors.accent), extra: extra)
-            case .highlight(let s, let range):
-                append(
-                    s,
-                    sourceRange: range,
-                    font: baseFont,
-                    color: textColor,
-                    extra: [
-                        .backgroundColor: UIColor(VersoHighlightColor.wash),
-                        .versoHighlightIndex: highlightIndex,
-                    ]
-                )
+                append(text, source: source, kind: .link, font: baseFont, color: accentColor, extra: extra, insideHighlight: insideHighlight)
+            case .highlight(let nested, let source):
+                let index = highlightIndex
                 highlightIndex += 1
+                let fullRange = (contentOffset + source.fullRange.lowerBound)..<(contentOffset + source.fullRange.upperBound)
+                for inner in nested {
+                    appendInline(inner, insideHighlight: (index, fullRange))
+                }
             }
+        }
+
+        for inline in inlines {
+            appendInline(inline, insideHighlight: nil)
         }
         return result
     }
+}
+
+/// FAB-303 step 3: which `InlineNode` case a rendered run came from, tagged as `.versoRunKind` so
+/// the text view's snap-outward logic (`HighlightableUITextView.applyAddHighlight`) knows whether
+/// a selection boundary landing inside a run needs to snap to that run's full (delimiter-included)
+/// edge, or can wrap the exact position (`.text`), or must decline (`.code`, entirely within one
+/// run; `.highlight`, deferred to a future "merge with existing highlight" step).
+enum VersoInlineRunKind {
+    case text, bold, italic, boldItalic, code, link, highlight
 }
 
 extension NSAttributedString.Key {
@@ -136,14 +172,25 @@ extension NSAttributedString.Key {
     /// paragraph -- matches the order `MarkdownParser.parseInlines` encounters `==...==` markers in,
     /// which is the same order `ArticleHighlighter.removeHighlight(at:in:)` expects. Lets
     /// `buildMenu(with:)` know *which* existing highlight a selection landed on without re-matching
-    /// text.
+    /// text. Shared across every run nested inside one highlight (FAB-303 step 3's recursive
+    /// `.highlight([InlineNode])`), not just a single flat run.
     static let versoHighlightIndex = NSAttributedString.Key("versoHighlightIndex")
 
     /// FAB-303 step 2: the exact raw-file (UTF-16) offset where this run's rendered content starts
-    /// -- `MarkdownNode.BlockSource.contentOffset + InlineNode.sourceRange.lowerBound`. Lets
-    /// `buildMenu(with:)` convert a selection directly to a raw position instead of re-finding the
-    /// rendered text in the raw source.
+    /// -- `MarkdownNode.BlockSource.contentOffset + InlineNode.source.contentRange.lowerBound`.
+    /// Lets `buildMenu(with:)` convert a selection directly to a raw position for the exact
+    /// same-position case, with no searching.
     static let versoSourceOffset = NSAttributedString.Key("versoSourceOffset")
+
+    /// FAB-303 step 3: which kind of run this is (`VersoInlineRunKind`) -- lets snap-outward tell
+    /// a plain-text run (always wrap exactly) apart from a delimited one (snap to its edge instead
+    /// of splitting `**`/`` ` ``/etc.) apart from code/highlight (decline in specific cases).
+    static let versoRunKind = NSAttributedString.Key("versoRunKind")
+
+    /// FAB-303 step 3: this run's full raw span (`Range<Int>`, UTF-16), delimiters included -- the
+    /// whole `**word**`/`` `code` ``/`[text](url)`, not just its rendered content. What a selection
+    /// boundary snaps outward *to* when it lands strictly inside a delimited run.
+    static let versoFullSourceRange = NSAttributedString.Key("versoFullSourceRange")
 }
 
 /// UIKit counterpart to `UIFont.withSymbolicTraits` that falls back to the original font rather
@@ -191,34 +238,84 @@ final class HighlightableUITextView: UITextView {
         builder.insertSibling(UIMenu(title: "", options: .displayInline, children: [action]), afterMenu: .standardEdit)
     }
 
-    /// The `.versoSourceOffset` tagged at `location`, plus the full run (`effectiveRange`) it
-    /// applies to -- so callers can tell whether two locations fall inside the *same* run.
-    private func sourceOffset(at location: Int) -> (offset: Int, runRange: NSRange)? {
-        guard let attrText = attributedText else { return nil }
-        var effectiveRange = NSRange()
-        guard let offset = attrText.attribute(.versoSourceOffset, at: location, effectiveRange: &effectiveRange) as? Int else {
-            return nil
-        }
-        return (offset, effectiveRange)
+    /// Everything `applyAddHighlight` needs about the run at one selection boundary.
+    private struct RunInfo {
+        let kind: VersoInlineRunKind
+        /// This run's exact raw content-start offset (`.versoSourceOffset`).
+        let contentOffset: Int
+        /// This run's full raw span, delimiters included (`.versoFullSourceRange`).
+        let fullRange: Range<Int>
+        /// The rendered `NSRange` this info applies over -- comparing two `RunInfo`s'
+        /// `runRange` is how callers tell whether two positions fall inside the *same* run.
+        let runRange: NSRange
     }
 
-    /// FAB-303 step 2: converts the current selection to an exact raw offset range and wraps it --
-    /// only when both ends of the selection landed in the *same* tagged run (an ordinary sentence
-    /// with no internal formatting is almost always one contiguous run, so this covers the common
-    /// case). A selection crossing from one run into a differently-formatted one still declines,
-    /// same as before this step -- wrapping across a run boundary would split a delimiter like
-    /// `**`, which needs FAB-303 step 3's "snap outward" logic to handle safely, not this function.
+    private func runInfo(at location: Int) -> RunInfo? {
+        guard let attrText = attributedText else { return nil }
+        var effectiveRange = NSRange()
+        let attrs = attrText.attributes(at: location, effectiveRange: &effectiveRange)
+        guard let kind = attrs[.versoRunKind] as? VersoInlineRunKind,
+              let offset = attrs[.versoSourceOffset] as? Int,
+              let fullRange = attrs[.versoFullSourceRange] as? Range<Int> else {
+            return nil
+        }
+        return RunInfo(kind: kind, contentOffset: offset, fullRange: fullRange, runRange: effectiveRange)
+    }
+
+    /// FAB-303 step 3: converts the selection's *start* boundary to an exact raw offset.
+    ///
+    /// A markdown delimiter (`**`, `` ` ``, `[`/`]`, etc.) is never itself a rendered character --
+    /// it's stripped entirely during parsing. That means *any* rendered position inside a
+    /// delimited run's span, even exactly at that run's own first character, still sits inside the
+    /// delimiters from the raw file's point of view: there is no "safely outside" rendered
+    /// position to fall back to short of the run's full (delimiter-included) span. So only `.text`
+    /// (which has no delimiters at all) ever uses the exact content-relative position; every other
+    /// kind always snaps to `fullRange.lowerBound`, regardless of exactly where inside it the
+    /// selection starts.
+    private func snappedRawStart(_ position: Int, info: RunInfo) -> Int {
+        guard info.kind == .text else { return info.fullRange.lowerBound }
+        return info.contentOffset + (position - info.runRange.location)
+    }
+
+    /// Same reasoning as `snappedRawStart`, for the selection's *end* boundary (exclusive -- one
+    /// past the last selected character), snapping to `fullRange.upperBound` for any non-text kind.
+    private func snappedRawEnd(_ exclusiveEnd: Int, info: RunInfo) -> Int {
+        guard info.kind == .text else { return info.fullRange.upperBound }
+        return info.contentOffset + (exclusiveEnd - info.runRange.location)
+    }
+
+    /// FAB-303 step 3: converts the current selection to an exact raw offset range -- snapping
+    /// each boundary outward to its enclosing run's edge when it lands strictly inside a delimited
+    /// run (bold/italic/bold-italic/link/code), rather than only handling the exact-same-run case
+    /// FAB-303 step 2 shipped. Declines when the whole selection sits inside one inline-code run
+    /// (nothing safe to wrap -- `==` is literal inside backticks) or when either boundary lands
+    /// inside an *existing* highlight (merging with it is a deliberately deferred follow-up, not
+    /// this step -- see `docs/BACKLOG.md`'s FAB-303 checklist).
     private func applyAddHighlight() {
         let start = selectedRange.location
-        let end = selectedRange.location + selectedRange.length - 1 // last selected character
-        guard let (startOffset, startRun) = sourceOffset(at: start),
-              let (_, endRun) = sourceOffset(at: end),
-              startRun == endRun else {
+        let end = selectedRange.location + selectedRange.length // exclusive
+        guard let startInfo = runInfo(at: start), let endInfo = runInfo(at: end - 1) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
-        let rawStart = startOffset + (start - startRun.location)
-        let rawEnd = startOffset + (selectedRange.location + selectedRange.length - startRun.location)
+
+        let sameRun = startInfo.runRange == endInfo.runRange
+        if sameRun, startInfo.kind == .code {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
+        if startInfo.kind == .highlight || endInfo.kind == .highlight {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
+
+        let rawStart = snappedRawStart(start, info: startInfo)
+        let rawEnd = snappedRawEnd(end, info: endInfo)
+
+        guard rawStart < rawEnd else {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
         applyHighlightChange { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) }
     }
 
