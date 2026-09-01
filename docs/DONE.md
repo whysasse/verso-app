@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**178 completed issues.**
+**179 completed issues.**
 
 ## iOS
 
@@ -152,6 +152,20 @@
   ## Verified
 
   New `Verso/VersoTests/MarkdownParserTests.swift` (11 tests): basic 3-column table, table amid ordinary paragraphs, alignment colons (all three + default), short-row padding, long-row truncation, escaped `\|` inside a cell, the false-positive guard (a pipe line with no delimiter row stays a paragraph, both standalone and directly after a real table), `plainText` joining. Plus two new `SwiftSoupParserTests`: a `<thead>`/`<tbody>` table round-trips through `MarkdownParser.parse` as a real `.table` node (not just loose lines — supersedes but doesn't replace the older loose-line regression test, which stays as a coarser guard against the text vanishing outright), and a bare-`<tr>` table with no `<thead>`/`<tbody>` correctly treats the first row as the header. 11 new tests; full `VersoTests` suite (89 tests) passes. `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes (the latter rebuilt since `SwiftSoupParser.swift` was touched). **Not verified here**: real-device confirmation that a wide table actually scrolls horizontally without the surrounding article text scrolling, and that XXL Dynamic Type doesn't clip cells — both Fabio's part after the PR.
+
+- [x] 🟡 **FAB-296** · Duplicate articles appear in the list despite the duplicate check  `Done` `Medium`
+  Fabio saw the same article twice in the list. Duplicate detection already existed (`ArticleDuplicateFinder`, wired into the Share Extension and in-app Add Article, with an Update/Save-copy prompt), so this was a set of holes in an existing feature, not a missing one. Read every file the report named and found **all four candidate causes were real, simultaneous gaps**, not competing hypotheses — fixed all four. Completed 2026-08-31.
+
+  ## Fix
+
+  * **`VersoArticleURL.canonicalKey`** (weak URL matching): now strips a known tracking-parameter set (`utm_*`, `source`, `sk`, `gi`, `ref`, `ref_src`, `fbclid`, `gclid`, `mc_cid`, `mc_eid`, `_branch_match_id`), sorts the remaining query items by name, drops an empty query entirely, strips a leading `www.` host label, and normalizes `http` → `https` — comparison only, the stored `url:` frontmatter is never rewritten. An unrecognized query parameter (e.g. `?page=2`) still counts as a different article.
+  * **`ArticleDuplicateFinder.scanDirectory`** (scan scope too narrow): dropped `.skipsSubdirectoryDescendants` and made the scan recursive across the whole library tree, pruning `*.media` sidecar folders via `enumerator.skipDescendants()` (they only ever hold downloaded images, never `.md` files). This also made the separate explicit `Archive/` scan in `findDuplicate` redundant — removed it, since the recursive scan already covers `Archive/` as part of the tree.
+  * **`LibraryBookmarkResolver.resolveLibraryFolderURL()`** (check skipped silently): now logs via `OSLog` on every `nil` return (missing/unresolvable bookmark) instead of failing silently, and — mirroring `FolderBookmarkService.restore()`'s existing pattern — refreshes and re-persists the bookmark when `isStale` is true, so a stale bookmark self-heals instead of degrading on every subsequent share. *Scoped out deliberately*: a new user-facing "library folder unreachable" screen in the Share Extension — the ingest backstop below already catches the practical consequence (a missed duplicate), so a new `ShareState` case plus new localized copy in three locales wasn't needed for a failure mode that no longer loses or duplicates data.
+  * **`PendingArticleIngester`** (no backstop at ingest): when `pending.duplicateResolution == nil`, now runs `ArticleDuplicateFinder.findDuplicate` against the resolved library folder before writing — the main app has full folder access here even when the extension didn't. **UX call, asked and answered by Fabio**: on a match, keep both articles (no interrupting prompt at an arbitrary launch/foreground moment) but tag the new one `"Possible Duplicate"`, surfaced via the existing tag filter/side panel — no new UI component. Also fixed the new-`Article`-row branch of `upsertCoreData`, which never set `tagsSerialized` at all (previously dead code, since `tags` was always `nil` on this path) — needed so the flag is visible immediately rather than after the next full cache rebuild. Added the defensive uniqueness check the report called for: an existing `Article` row with the same `filePath` is updated in place instead of a duplicate row being inserted, guarding double-ingest of one pending JSON. New analytics value `duplicate_resolution: "backstop_flagged"` on the existing `article.saved` event.
+
+  ## Verified
+
+  New `Verso/VersoTests/VersoArticleURLTests.swift` (10 tests: UTM/tracking params, unrecognized params kept, query ordering, `www.`, `http`→`https`, trailing slash, root slash, fragment, combined noise) and `ArticleDuplicateFinderTests.swift` (6 tests: library root, `Archive/`, a nested subfolder, `.media` folders not descended into, tracking-parameter normalization end-to-end, no-match returns nil) — all pass. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes (the latter rebuilt since `LibraryBookmarkResolver.swift` in `Shared/` was touched). Full `VersoTests` suite (105 tests) passes. **Not verified here**: an actual live Share Extension save against a real Medium URL with tracking params, confirming the prompt fires end-to-end — needs network access and a real device/simulator run, Fabio's part after the PR.
 
 ### Bugs — layout (reported by Fabio 2026-08-31)
 
