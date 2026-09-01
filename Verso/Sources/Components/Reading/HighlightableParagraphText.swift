@@ -4,19 +4,19 @@ import UIKit
 /// FAB-54: selectable paragraph text, bridged to UIKit because neither piece this feature needs
 /// exists in SwiftUI's `Text`: a selection-change hook to build a custom "Highlight" menu action,
 /// or per-run background color on an `AttributedString` to actually paint the highlight once it
-/// exists. Used only for `.paragraph` nodes (`MarkdownBodyView`'s `blockView`) — every other block
-/// type keeps rendering as plain `Text`, unchanged.
+/// exists. Used only for `.paragraph` regions (`MarkdownBodyView`'s `unitView`) — every other
+/// block type keeps rendering as plain `Text`, unchanged.
+///
+/// FAB-303 step 4: renders one or more *consecutive* paragraphs sharing a single `UITextView`, not
+/// just one -- iOS can't extend a native text selection across two separate `UIView`s, so
+/// selecting text that spans a paragraph break needs the paragraphs to share one view. Headings,
+/// list items, and blockquotes aren't part of a region yet (deferred follow-up; see
+/// `docs/BACKLOG.md`'s FAB-303 checklist) -- they keep rendering individually.
 struct HighlightableParagraphText: UIViewRepresentable {
-    let inlines: [MarkdownNode.InlineNode]
-    let rawText: String
-    /// FAB-303 step 1: the paragraph's source line range, reported back through
-    /// `onHighlightAction` so the caller can splice by exact line index instead of re-locating
-    /// this paragraph in the full document by searching for its text.
-    let lineRange: ClosedRange<Int>
-    /// FAB-303 step 2: `MarkdownNode.BlockSource.contentOffset` -- added to an `InlineNode`'s own
-    /// `source.contentRange` to get that run's exact offset within `rawText`. Tagged onto each run
-    /// as `.versoSourceOffset` in `buildAttributedString`.
-    let contentOffset: Int
+    let paragraphs: [(inlines: [MarkdownNode.InlineNode], source: MarkdownNode.BlockSource)]
+    /// Index *within `paragraphs`* (not the flat node index `MarkdownBodyView.highlightedParagraphIndex`
+    /// uses) of the paragraph TTS is currently narrating, if any and if it falls inside this region.
+    let activeParagraphIndex: Int?
     let fontFamily: String
     let fontSize: CGFloat
     let lineSpacingValue: CGFloat
@@ -36,12 +36,11 @@ struct HighlightableParagraphText: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: HighlightableUITextView, context: Context) {
-        uiView.rawText = rawText
-        uiView.lineRange = lineRange
+        uiView.paragraphSources = paragraphs.map { $0.source }
         uiView.onHighlightAction = onHighlightAction
         uiView.attributedText = Self.buildAttributedString(
-            inlines: inlines,
-            contentOffset: contentOffset,
+            paragraphs: paragraphs,
+            activeParagraphIndex: activeParagraphIndex,
             fontFamily: fontFamily,
             fontSize: fontSize,
             lineSpacingValue: lineSpacingValue,
@@ -64,10 +63,13 @@ struct HighlightableParagraphText: UIViewRepresentable {
     /// `.versoHighlightIndex` (source-order index of a `.highlight` run, for remove),
     /// `.versoSourceOffset` (a run's exact raw-file content offset, for an exact same-run wrap --
     /// FAB-303 step 2), `.versoRunKind` and `.versoFullSourceRange` (which kind of run this is and
-    /// its full raw span including delimiters, for snap-outward -- FAB-303 step 3).
+    /// its full raw span including delimiters, for snap-outward -- FAB-303 step 3), and
+    /// `.versoParagraphIndex` (which paragraph in `paragraphs` a run belongs to -- FAB-303 step 4,
+    /// so a selection spanning more than one paragraph can be told apart from one that doesn't;
+    /// actually *writing* a highlight across paragraphs is still step 5, not this one).
     static func buildAttributedString(
-        inlines: [MarkdownNode.InlineNode],
-        contentOffset: Int,
+        paragraphs: [(inlines: [MarkdownNode.InlineNode], source: MarkdownNode.BlockSource)],
+        activeParagraphIndex: Int?,
         fontFamily: String,
         fontSize: CGFloat,
         lineSpacingValue: CGFloat,
@@ -79,80 +81,120 @@ struct HighlightableParagraphText: UIViewRepresentable {
         let codeFont = UIFont(name: "SFMono-Regular", size: max(12, fontSize - 2))
             ?? .monospacedSystemFont(ofSize: max(12, fontSize - 2), weight: .regular)
 
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = lineSpacingValue
-
         let result = NSMutableAttributedString()
-        var highlightIndex = 0
         let textColor = UIColor(colors.textPrimary)
         let accentColor = UIColor(colors.accent)
+        // FAB-303 step 4: the TTS "currently narrating paragraph" wash used to be a SwiftUI
+        // `.background()` on the whole (single-paragraph) view; a region can hold several
+        // paragraphs sharing one view, so it's now a background-color attribute scoped to just the
+        // active paragraph's own range instead. An actual highlight's own background (set below,
+        // via `extra`, which always wins the attribute merge) still paints over this, same visual
+        // precedence the single-paragraph version already had.
+        let ttsWashColor = UIColor(colors.accent).withAlphaComponent(0.15)
 
-        /// `insideHighlight`, when non-nil, means this run is nested inside a `.highlight` node --
-        /// every run inside the *same* highlight shares one `versoHighlightIndex` (so "Remove
-        /// Highlight" removes the whole thing regardless of which nested word was tapped) and one
-        /// `versoRunKind` of `.highlight` (so a selection boundary landing anywhere inside an
-        /// existing highlight is treated uniformly, deferring FAB-303 step 3's "merge" case rather
-        /// than mis-handling it as an ordinary bold/italic/etc. run).
-        func append(
-            _ text: String,
-            source: MarkdownNode.InlineNode.SourceSpan,
-            kind: VersoInlineRunKind,
-            font: UIFont,
-            color: UIColor,
-            extra: [NSAttributedString.Key: Any] = [:],
-            insideHighlight: (index: Int, fullRange: Range<Int>)? = nil
-        ) {
-            let effectiveKind = insideHighlight != nil ? .highlight : kind
-            let effectiveFullRange = insideHighlight?.fullRange ?? (contentOffset + source.fullRange.lowerBound)..<(contentOffset + source.fullRange.upperBound)
-            var attributes: [NSAttributedString.Key: Any] = [
-                .font: font,
-                .foregroundColor: color,
-                .paragraphStyle: paragraphStyle,
-                .versoSourceOffset: contentOffset + source.contentRange.lowerBound,
-                .versoRunKind: effectiveKind,
-                .versoFullSourceRange: effectiveFullRange,
-            ]
-            if let insideHighlight {
-                attributes[.backgroundColor] = UIColor(VersoHighlightColor.wash)
-                attributes[.versoHighlightIndex] = insideHighlight.index
+        for (paragraphIndex, paragraph) in paragraphs.enumerated() {
+            // FAB-303 step 4: reset *per paragraph*, not shared across the region -- `.versoHighlightIndex`
+            // has to match `ArticleHighlighter.removeHighlight(at:in:)`'s expectation of "the Nth
+            // `==...==` match within *this one paragraph's own* rawText", not a running count
+            // across every paragraph sharing this view.
+            var highlightIndex = 0
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = lineSpacingValue
+            if paragraphIndex > 0 {
+                // Matches `MarkdownBodyView.topSpacing`'s existing default-case spacing between
+                // paragraphs (16pt) -- reused, not a new number. `paragraphSpacingBefore` (not
+                // `.after` on the previous one) so it only ever affects this paragraph's own
+                // layout, regardless of what follows the region as a whole.
+                paragraphStyle.paragraphSpacingBefore = 16
             }
-            attributes.merge(extra) { _, new in new }
-            result.append(NSAttributedString(string: text, attributes: attributes))
-        }
+            let contentOffset = paragraph.source.contentOffset
+            let isActiveParagraph = activeParagraphIndex == paragraphIndex
 
-        /// Renders one inline node, recursing into `.highlight`'s nested content. `insideHighlight`
-        /// carries the enclosing highlight's index/full-range down through recursion so nested
-        /// runs (e.g. a bold word inside a highlight) still tag as part of that one highlight.
-        func appendInline(_ inline: MarkdownNode.InlineNode, insideHighlight: (index: Int, fullRange: Range<Int>)?) {
-            switch inline {
-            case .text(let s, let source):
-                append(s, source: source, kind: .text, font: baseFont, color: textColor, insideHighlight: insideHighlight)
-            case .bold(let s, let source):
-                append(s, source: source, kind: .bold, font: baseFont.withSymbolicTraits(.traitBold), color: textColor, insideHighlight: insideHighlight)
-            case .italic(let s, let source):
-                append(s, source: source, kind: .italic, font: baseFont.withSymbolicTraits(.traitItalic), color: textColor, insideHighlight: insideHighlight)
-            case .boldItalic(let s, let source):
-                append(s, source: source, kind: .boldItalic, font: baseFont.withSymbolicTraits([.traitBold, .traitItalic]), color: textColor, insideHighlight: insideHighlight)
-            case .code(let s, let source):
-                append(s, source: source, kind: .code, font: codeFont, color: accentColor, insideHighlight: insideHighlight)
-            case .link(let text, let url, let source):
-                var extra: [NSAttributedString.Key: Any] = [.underlineStyle: NSUnderlineStyle.single.rawValue]
-                if let resolved = URL(string: url) {
-                    extra[.link] = resolved
+            /// `insideHighlight`, when non-nil, means this run is nested inside a `.highlight`
+            /// node -- every run inside the *same* highlight shares one `versoHighlightIndex` (so
+            /// "Remove Highlight" removes the whole thing regardless of which nested word was
+            /// tapped) and one `versoRunKind` of `.highlight` (so a selection boundary landing
+            /// anywhere inside an existing highlight is treated uniformly, deferring FAB-303 step
+            /// 3's "merge" case rather than mis-handling it as an ordinary bold/italic/etc. run).
+            func append(
+                _ text: String,
+                source: MarkdownNode.InlineNode.SourceSpan,
+                kind: VersoInlineRunKind,
+                font: UIFont,
+                color: UIColor,
+                extra: [NSAttributedString.Key: Any] = [:],
+                insideHighlight: (index: Int, fullRange: Range<Int>)? = nil
+            ) {
+                let effectiveKind = insideHighlight != nil ? .highlight : kind
+                let effectiveFullRange = insideHighlight?.fullRange ?? (contentOffset + source.fullRange.lowerBound)..<(contentOffset + source.fullRange.upperBound)
+                var attributes: [NSAttributedString.Key: Any] = [
+                    .font: font,
+                    .foregroundColor: color,
+                    .paragraphStyle: paragraphStyle,
+                    .versoSourceOffset: contentOffset + source.contentRange.lowerBound,
+                    .versoRunKind: effectiveKind,
+                    .versoFullSourceRange: effectiveFullRange,
+                    .versoParagraphIndex: paragraphIndex,
+                ]
+                if isActiveParagraph {
+                    attributes[.backgroundColor] = ttsWashColor
                 }
-                append(text, source: source, kind: .link, font: baseFont, color: accentColor, extra: extra, insideHighlight: insideHighlight)
-            case .highlight(let nested, let source):
-                let index = highlightIndex
-                highlightIndex += 1
-                let fullRange = (contentOffset + source.fullRange.lowerBound)..<(contentOffset + source.fullRange.upperBound)
-                for inner in nested {
-                    appendInline(inner, insideHighlight: (index, fullRange))
+                if let insideHighlight {
+                    attributes[.backgroundColor] = UIColor(VersoHighlightColor.wash)
+                    attributes[.versoHighlightIndex] = insideHighlight.index
+                }
+                attributes.merge(extra) { _, new in new }
+                result.append(NSAttributedString(string: text, attributes: attributes))
+            }
+
+            /// Renders one inline node, recursing into `.highlight`'s nested content.
+            /// `insideHighlight` carries the enclosing highlight's index/full-range down through
+            /// recursion so nested runs (e.g. a bold word inside a highlight) still tag as part of
+            /// that one highlight.
+            func appendInline(_ inline: MarkdownNode.InlineNode, insideHighlight: (index: Int, fullRange: Range<Int>)?) {
+                switch inline {
+                case .text(let s, let source):
+                    append(s, source: source, kind: .text, font: baseFont, color: textColor, insideHighlight: insideHighlight)
+                case .bold(let s, let source):
+                    append(s, source: source, kind: .bold, font: baseFont.withSymbolicTraits(.traitBold), color: textColor, insideHighlight: insideHighlight)
+                case .italic(let s, let source):
+                    append(s, source: source, kind: .italic, font: baseFont.withSymbolicTraits(.traitItalic), color: textColor, insideHighlight: insideHighlight)
+                case .boldItalic(let s, let source):
+                    append(s, source: source, kind: .boldItalic, font: baseFont.withSymbolicTraits([.traitBold, .traitItalic]), color: textColor, insideHighlight: insideHighlight)
+                case .code(let s, let source):
+                    append(s, source: source, kind: .code, font: codeFont, color: accentColor, insideHighlight: insideHighlight)
+                case .link(let text, let url, let source):
+                    var extra: [NSAttributedString.Key: Any] = [.underlineStyle: NSUnderlineStyle.single.rawValue]
+                    if let resolved = URL(string: url) {
+                        extra[.link] = resolved
+                    }
+                    append(text, source: source, kind: .link, font: baseFont, color: accentColor, extra: extra, insideHighlight: insideHighlight)
+                case .highlight(let nested, let source):
+                    let index = highlightIndex
+                    highlightIndex += 1
+                    let fullRange = (contentOffset + source.fullRange.lowerBound)..<(contentOffset + source.fullRange.upperBound)
+                    for inner in nested {
+                        appendInline(inner, insideHighlight: (index, fullRange))
+                    }
                 }
             }
-        }
 
-        for inline in inlines {
-            appendInline(inline, insideHighlight: nil)
+            for inline in paragraph.inlines {
+                appendInline(inline, insideHighlight: nil)
+            }
+
+            // A literal newline between paragraphs *within this region* -- not just visual, but
+            // what makes `paragraphSpacingBefore` above actually apply to the next paragraph:
+            // `NSParagraphStyle` spacing is scoped per TextKit paragraph, and TextKit paragraphs
+            // are delimited by `\n`. Tagged with the trailing paragraph's own `versoParagraphIndex`
+            // so a selection landing exactly on it (e.g. double-tapping right at a paragraph
+            // break) still resolves to a real paragraph rather than an untagged gap.
+            if paragraphIndex < paragraphs.count - 1 {
+                result.append(NSAttributedString(string: "\n", attributes: [
+                    .versoParagraphIndex: paragraphIndex,
+                    .paragraphStyle: paragraphStyle,
+                ]))
+            }
         }
         return result
     }
@@ -191,6 +233,14 @@ extension NSAttributedString.Key {
     /// whole `**word**`/`` `code` ``/`[text](url)`, not just its rendered content. What a selection
     /// boundary snaps outward *to* when it lands strictly inside a delimited run.
     static let versoFullSourceRange = NSAttributedString.Key("versoFullSourceRange")
+
+    /// FAB-303 step 4: which paragraph (0-based index into the `paragraphs` array a region was
+    /// built from -- *not* the flat `MarkdownNode` index) a run belongs to. A region can share one
+    /// `UITextView` across several paragraphs, so `applyAddHighlight` needs this to tell "selection
+    /// stays within one paragraph" (proceeds, same as before this step) from "selection spans more
+    /// than one" (declines -- writing a highlight across paragraphs safely is step 5's job, not
+    /// this one; see `docs/BACKLOG.md`'s FAB-303 checklist).
+    static let versoParagraphIndex = NSAttributedString.Key("versoParagraphIndex")
 }
 
 /// UIKit counterpart to `UIFont.withSymbolicTraits` that falls back to the original font rather
@@ -209,10 +259,10 @@ private extension UIFont {
 /// (via the `.link` attribute in `buildAttributedString`) tappable links for free; this only adds
 /// the one custom action on top.
 final class HighlightableUITextView: UITextView {
-    var rawText: String = ""
-    /// FAB-303 step 1: this paragraph's source line range, reported alongside a change instead of
-    /// its old raw text -- see `MarkdownBodyView.onHighlightAction`.
-    var lineRange: ClosedRange<Int> = 0...0
+    /// FAB-303 step 4: one entry per paragraph in this region, in the same order as
+    /// `.versoParagraphIndex` tags them -- replaces step 1-3's single `rawText`/`lineRange`
+    /// (a region can now hold more than one paragraph sharing this view).
+    var paragraphSources: [MarkdownNode.BlockSource] = []
     var onHighlightAction: ((_ lineRange: ClosedRange<Int>, _ newRawText: String) -> Void)?
 
     override func buildMenu(with builder: UIMenuBuilder) {
@@ -228,7 +278,7 @@ final class HighlightableUITextView: UITextView {
         let action: UIAction
         if let index = existingHighlightIndex {
             action = UIAction(title: L10n.Reading.highlightRemove) { [weak self] _ in
-                self?.applyHighlightChange { ArticleHighlighter.removeHighlight(at: index, in: $0) }
+                self?.applyRemoveHighlight(at: index)
             }
         } else {
             action = UIAction(title: L10n.Reading.highlightAdd) { [weak self] _ in
@@ -248,6 +298,8 @@ final class HighlightableUITextView: UITextView {
         /// The rendered `NSRange` this info applies over -- comparing two `RunInfo`s'
         /// `runRange` is how callers tell whether two positions fall inside the *same* run.
         let runRange: NSRange
+        /// FAB-303 step 4: which paragraph in `paragraphSources` this run belongs to.
+        let paragraphIndex: Int
     }
 
     private func runInfo(at location: Int) -> RunInfo? {
@@ -256,10 +308,11 @@ final class HighlightableUITextView: UITextView {
         let attrs = attrText.attributes(at: location, effectiveRange: &effectiveRange)
         guard let kind = attrs[.versoRunKind] as? VersoInlineRunKind,
               let offset = attrs[.versoSourceOffset] as? Int,
-              let fullRange = attrs[.versoFullSourceRange] as? Range<Int> else {
+              let fullRange = attrs[.versoFullSourceRange] as? Range<Int>,
+              let paragraphIndex = attrs[.versoParagraphIndex] as? Int else {
             return nil
         }
-        return RunInfo(kind: kind, contentOffset: offset, fullRange: fullRange, runRange: effectiveRange)
+        return RunInfo(kind: kind, contentOffset: offset, fullRange: fullRange, runRange: effectiveRange, paragraphIndex: paragraphIndex)
     }
 
     /// FAB-303 step 3: converts the selection's *start* boundary to an exact raw offset.
@@ -288,13 +341,22 @@ final class HighlightableUITextView: UITextView {
     /// each boundary outward to its enclosing run's edge when it lands strictly inside a delimited
     /// run (bold/italic/bold-italic/link/code), rather than only handling the exact-same-run case
     /// FAB-303 step 2 shipped. Declines when the whole selection sits inside one inline-code run
-    /// (nothing safe to wrap -- `==` is literal inside backticks) or when either boundary lands
+    /// (nothing safe to wrap -- `==` is literal inside backticks), when either boundary lands
     /// inside an *existing* highlight (merging with it is a deliberately deferred follow-up, not
-    /// this step -- see `docs/BACKLOG.md`'s FAB-303 checklist).
+    /// this step), or -- new in FAB-303 step 4, now that a region can span more than one paragraph
+    /// -- when the two boundaries land in *different* paragraphs (a highlight spanning a paragraph
+    /// break needs one `==…==` pair per paragraph, which is step 5's job, not this one). See
+    /// `docs/BACKLOG.md`'s FAB-303 checklist for all of the above.
     private func applyAddHighlight() {
         let start = selectedRange.location
         let end = selectedRange.location + selectedRange.length // exclusive
         guard let startInfo = runInfo(at: start), let endInfo = runInfo(at: end - 1) else {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
+
+        guard startInfo.paragraphIndex == endInfo.paragraphIndex,
+              paragraphSources.indices.contains(startInfo.paragraphIndex) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
@@ -316,19 +378,34 @@ final class HighlightableUITextView: UITextView {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
-        applyHighlightChange { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) }
+        let source = paragraphSources[startInfo.paragraphIndex]
+        applyHighlightChange(source: source) { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) }
     }
 
-    /// Runs `transform` against the current `rawText`; on success, reports the change upstream and
+    /// FAB-303 step 4: `existingHighlightIndex` (from `.versoHighlightIndex`, looked up at the
+    /// selection's own start) already identifies *which* highlight and, via its tagged runs,
+    /// which paragraph it lives in -- looked up the same way `applyAddHighlight` looks up any
+    /// other run's paragraph, so remove works the same regardless of how many paragraphs share
+    /// this region.
+    private func applyRemoveHighlight(at index: Int) {
+        guard let info = runInfo(at: selectedRange.location), paragraphSources.indices.contains(info.paragraphIndex) else {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
+        let source = paragraphSources[info.paragraphIndex]
+        applyHighlightChange(source: source) { ArticleHighlighter.removeHighlight(at: index, in: $0) }
+    }
+
+    /// Runs `transform` against `source.rawText`; on success, reports the change upstream and
     /// clears the selection (the edit menu doesn't auto-dismiss otherwise). On failure (`nil`), a
     /// single error haptic is the only feedback -- no blocking alert for what's meant to be a quiet,
     /// no-op decline.
-    private func applyHighlightChange(_ transform: (String) -> String?) {
-        guard let newRawText = transform(rawText) else {
+    private func applyHighlightChange(source: MarkdownNode.BlockSource, _ transform: (String) -> String?) {
+        guard let newRawText = transform(source.rawText) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
         selectedRange = NSRange(location: selectedRange.location, length: 0)
-        onHighlightAction?(lineRange, newRawText)
+        onHighlightAction?(source.lineRange, newRawText)
     }
 }
