@@ -341,12 +341,12 @@ final class HighlightableUITextView: UITextView {
     /// each boundary outward to its enclosing run's edge when it lands strictly inside a delimited
     /// run (bold/italic/bold-italic/link/code), rather than only handling the exact-same-run case
     /// FAB-303 step 2 shipped. Declines when the whole selection sits inside one inline-code run
-    /// (nothing safe to wrap -- `==` is literal inside backticks), when either boundary lands
-    /// inside an *existing* highlight (merging with it is a deliberately deferred follow-up, not
-    /// this step), or -- new in FAB-303 step 4, now that a region can span more than one paragraph
-    /// -- when the two boundaries land in *different* paragraphs (a highlight spanning a paragraph
-    /// break needs one `==…==` pair per paragraph, which is step 5's job, not this one). See
-    /// `docs/BACKLOG.md`'s FAB-303 checklist for all of the above.
+    /// (nothing safe to wrap -- `==` is literal inside backticks), or when either boundary lands
+    /// inside an *existing* highlight (merging with it is a deliberately deferred follow-up -- see
+    /// `docs/BACKLOG.md`'s FAB-303 checklist). When the two boundaries land in the *same* paragraph
+    /// this wraps one `==…==` pair directly; when they land in different paragraphs (possible since
+    /// FAB-303 step 4 merged consecutive paragraphs into one selectable region), FAB-303 step 5's
+    /// `ArticleHighlighter.crossParagraphHighlightRanges` computes one pair per paragraph touched.
     private func applyAddHighlight() {
         let start = selectedRange.location
         let end = selectedRange.location + selectedRange.length // exclusive
@@ -354,15 +354,8 @@ final class HighlightableUITextView: UITextView {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
-
-        guard startInfo.paragraphIndex == endInfo.paragraphIndex,
-              paragraphSources.indices.contains(startInfo.paragraphIndex) else {
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
-            return
-        }
-
-        let sameRun = startInfo.runRange == endInfo.runRange
-        if sameRun, startInfo.kind == .code {
+        guard paragraphSources.indices.contains(startInfo.paragraphIndex),
+              paragraphSources.indices.contains(endInfo.paragraphIndex) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
@@ -371,41 +364,78 @@ final class HighlightableUITextView: UITextView {
             return
         }
 
+        if startInfo.paragraphIndex == endInfo.paragraphIndex {
+            let sameRun = startInfo.runRange == endInfo.runRange
+            if sameRun, startInfo.kind == .code {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                return
+            }
+            let rawStart = snappedRawStart(start, info: startInfo)
+            let rawEnd = snappedRawEnd(end, info: endInfo)
+            guard rawStart < rawEnd else {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                return
+            }
+            let source = paragraphSources[startInfo.paragraphIndex]
+            applyHighlightChanges([(source, { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) })])
+            return
+        }
+
+        // FAB-303 step 5: the selection spans more than one paragraph -- one `==…==` pair per
+        // paragraph touched, tail of the first through head of the last.
         let rawStart = snappedRawStart(start, info: startInfo)
         let rawEnd = snappedRawEnd(end, info: endInfo)
-
-        guard rawStart < rawEnd else {
+        guard let ranges = ArticleHighlighter.crossParagraphHighlightRanges(
+            fromParagraphIndex: startInfo.paragraphIndex,
+            rawStart: rawStart,
+            toParagraphIndex: endInfo.paragraphIndex,
+            rawEnd: rawEnd,
+            paragraphs: paragraphSources
+        ) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
-        let source = paragraphSources[startInfo.paragraphIndex]
-        applyHighlightChange(source: source) { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) }
+        let edits = ranges.map { paragraphIndex, rawRange in
+            (paragraphSources[paragraphIndex], { (text: String) in ArticleHighlighter.addHighlight(atRawOffsetRange: rawRange, in: text) })
+        }
+        applyHighlightChanges(edits)
     }
 
     /// FAB-303 step 4: `existingHighlightIndex` (from `.versoHighlightIndex`, looked up at the
     /// selection's own start) already identifies *which* highlight and, via its tagged runs,
-    /// which paragraph it lives in -- looked up the same way `applyAddHighlight` looks up any
-    /// other run's paragraph, so remove works the same regardless of how many paragraphs share
-    /// this region.
+    /// which paragraph it lives in. FAB-303 step 5: that one piece might be only part of a bigger
+    /// highlight that was written as several `==…==` pairs across a paragraph break --
+    /// `ArticleHighlighter.chainedHighlightPieces` finds every linked piece so removing any one of
+    /// them removes all of them, matching what looks like one continuous highlight on screen.
     private func applyRemoveHighlight(at index: Int) {
         guard let info = runInfo(at: selectedRange.location), paragraphSources.indices.contains(info.paragraphIndex) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
-        let source = paragraphSources[info.paragraphIndex]
-        applyHighlightChange(source: source) { ArticleHighlighter.removeHighlight(at: index, in: $0) }
+        let pieces = ArticleHighlighter.chainedHighlightPieces(startingAt: (info.paragraphIndex, index), in: paragraphSources)
+        let edits = pieces.map { paragraphIndex, highlightIndex in
+            (paragraphSources[paragraphIndex], { (text: String) in ArticleHighlighter.removeHighlight(at: highlightIndex, in: text) })
+        }
+        applyHighlightChanges(edits)
     }
 
-    /// Runs `transform` against `source.rawText`; on success, reports the change upstream and
-    /// clears the selection (the edit menu doesn't auto-dismiss otherwise). On failure (`nil`), a
-    /// single error haptic is the only feedback -- no blocking alert for what's meant to be a quiet,
-    /// no-op decline.
-    private func applyHighlightChange(source: MarkdownNode.BlockSource, _ transform: (String) -> String?) {
-        guard let newRawText = transform(source.rawText) else {
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
-            return
+    /// Runs each edit's transform against its own `source.rawText`; only if *every* one succeeds
+    /// does it report all the changes upstream and clear the selection (the edit menu doesn't
+    /// auto-dismiss otherwise). If any single transform fails (`nil`), the whole batch is declined
+    /// with one error haptic -- no partial writes, same quiet no-op every other decline in this
+    /// feature uses.
+    private func applyHighlightChanges(_ edits: [(source: MarkdownNode.BlockSource, transform: (String) -> String?)]) {
+        var changes: [(source: MarkdownNode.BlockSource, newRawText: String)] = []
+        for edit in edits {
+            guard let newRawText = edit.transform(edit.source.rawText) else {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                return
+            }
+            changes.append((edit.source, newRawText))
         }
         selectedRange = NSRange(location: selectedRange.location, length: 0)
-        onHighlightAction?(source.lineRange, newRawText)
+        for change in changes {
+            onHighlightAction?(change.source.lineRange, change.newRawText)
+        }
     }
 }
