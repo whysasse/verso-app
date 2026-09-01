@@ -55,10 +55,10 @@ final class MarkdownParserTests: XCTestCase {
         let nodes = MarkdownParser.parse(markdown)
 
         XCTAssertEqual(nodes.count, 3)
-        guard case .paragraph(let before) = nodes[0] else { return XCTFail("expected leading paragraph") }
+        guard case .paragraph(let before, _) = nodes[0] else { return XCTFail("expected leading paragraph") }
         XCTAssertEqual(cellText(before), "Before the table.")
         guard case .table = nodes[1] else { return XCTFail("expected table") }
-        guard case .paragraph(let after) = nodes[2] else { return XCTFail("expected trailing paragraph") }
+        guard case .paragraph(let after, _) = nodes[2] else { return XCTFail("expected trailing paragraph") }
         XCTAssertEqual(cellText(after), "After the table.")
     }
 
@@ -133,7 +133,7 @@ final class MarkdownParserTests: XCTestCase {
         let nodes = MarkdownParser.parse(markdown)
 
         XCTAssertEqual(nodes.count, 1)
-        guard case .paragraph(let inlines) = nodes[0] else { return XCTFail("expected a plain paragraph, not a table") }
+        guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected a plain paragraph, not a table") }
         XCTAssertEqual(cellText(inlines), markdown)
     }
 
@@ -149,7 +149,7 @@ final class MarkdownParserTests: XCTestCase {
 
         XCTAssertEqual(nodes.count, 2)
         guard case .table = nodes[0] else { return XCTFail("expected table first") }
-        guard case .paragraph(let inlines) = nodes[1] else { return XCTFail("expected trailing paragraph") }
+        guard case .paragraph(let inlines, _) = nodes[1] else { return XCTFail("expected trailing paragraph") }
         XCTAssertTrue(cellText(inlines).contains("Not a table"))
     }
 
@@ -164,5 +164,46 @@ final class MarkdownParserTests: XCTestCase {
         let nodes = MarkdownParser.parse(markdown)
         guard case .table = nodes.first else { return XCTFail("expected table") }
         XCTAssertEqual(nodes[0].plainText, "A B 1 2")
+    }
+
+    // MARK: - Highlight markers (FAB-54)
+
+    func testHighlightMarkerParsesAsHighlightInlineNode() throws {
+        let nodes = MarkdownParser.parse("Some ==highlighted text== in a sentence.")
+
+        guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected paragraph") }
+        let highlights = inlines.compactMap { inline -> String? in
+            if case .highlight(let s) = inline { return s }
+            return nil
+        }
+        XCTAssertEqual(highlights, ["highlighted text"])
+        XCTAssertEqual(cellText(inlines), "Some highlighted text in a sentence.")
+    }
+
+    func testMultipleHighlightMarkersInOneParagraphParseInOrder() throws {
+        let nodes = MarkdownParser.parse("==First== normal ==second== more.")
+
+        guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected paragraph") }
+        let highlights = inlines.compactMap { inline -> String? in
+            if case .highlight(let s) = inline { return s }
+            return nil
+        }
+        XCTAssertEqual(highlights, ["First", "second"])
+    }
+
+    func testParagraphRawTextPreservesOriginalSourceLines() throws {
+        let markdown = """
+        Line one of the paragraph
+        line two of the paragraph.
+
+        A second paragraph.
+        """
+        let nodes = MarkdownParser.parse(markdown)
+
+        guard case .paragraph(_, let firstRaw) = nodes[0] else { return XCTFail("expected paragraph") }
+        XCTAssertEqual(firstRaw, "Line one of the paragraph\nline two of the paragraph.")
+
+        guard case .paragraph(_, let secondRaw) = nodes[1] else { return XCTFail("expected paragraph") }
+        XCTAssertEqual(secondRaw, "A second paragraph.")
     }
 }

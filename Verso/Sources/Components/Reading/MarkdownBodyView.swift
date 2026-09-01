@@ -3,7 +3,11 @@ import SwiftUI
 // MARK: - Data Model
 
 enum MarkdownNode {
-    case paragraph(inlines: [InlineNode])
+    /// `rawText` (FAB-54) is the paragraph's original source lines joined by `\n` -- as opposed to
+    /// the space-joined, trimmed string used to build `inlines` for rendering -- so a highlight
+    /// action can locate an exact, unambiguous span of the real file content. See
+    /// `ArticleHighlighter`.
+    case paragraph(inlines: [InlineNode], rawText: String)
     case heading(level: Int, inlines: [InlineNode])
     case unorderedListItem(inlines: [InlineNode])
     case orderedListItem(index: Int, inlines: [InlineNode])
@@ -27,6 +31,12 @@ enum MarkdownNode {
         case boldItalic(String)
         case code(String)
         case link(text: String, url: String)
+        /// FAB-54: `==text==` (Obsidian/CommonMark-extension convention). Rendered with a
+        /// background wash in the reading view's selectable paragraph text
+        /// (`HighlightableParagraphText`) -- SwiftUI `Text` doesn't support per-run background
+        /// color on `AttributedString`, so this case falls back to plain, unstyled text wherever
+        /// it appears outside a paragraph (headings, list items, table cells, etc.).
+        case highlight(String)
     }
 }
 
@@ -46,7 +56,10 @@ struct MarkdownParser {
                 .joined(separator: " ")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             if !text.isEmpty {
-                nodes.append(.paragraph(inlines: parseInlines(text)))
+                // Not trimmed, unlike `text` above -- `rawText` must stay byte-for-byte identical
+                // to the source so `ArticleHighlighter` can splice it back in exactly (FAB-54).
+                let rawText = paragraphBuffer.joined(separator: "\n")
+                nodes.append(.paragraph(inlines: parseInlines(text), rawText: rawText))
             }
             paragraphBuffer = []
         }
@@ -280,10 +293,18 @@ struct MarkdownParser {
         let makeNode: (String) -> MarkdownNode.InlineNode
     }
 
+    /// FAB-54: `==text==` marker pattern -- exposed so `ArticleHighlighter` (`Services/`) can reuse
+    /// the exact same regex when counting/removing existing highlights, rather than risking a
+    /// second, hand-copied pattern drifting out of sync with this one.
+    static let highlightMarkerPattern = #"==(.+?)=="#
+
     private static let inlinePatterns: [InlinePattern] = [
         // Bold+italic must come before bold and italic
         InlinePattern(regex: #"\*{3}(.+?)\*{3}|_{3}(.+?)_{3}"#) { match in
             .boldItalic(extractFirstGroup(match, prefixLen: 3))
+        },
+        InlinePattern(regex: highlightMarkerPattern) { match in
+            .highlight(extractFirstGroup(match, prefixLen: 2))
         },
         InlinePattern(regex: #"\*{2}(.+?)\*{2}|_{2}(.+?)_{2}"#) { match in
             .bold(extractFirstGroup(match, prefixLen: 2))
@@ -323,7 +344,7 @@ struct MarkdownParser {
 extension MarkdownNode {
     var plainText: String {
         switch self {
-        case .paragraph(let inlines), .heading(_, let inlines),
+        case .paragraph(let inlines, _), .heading(_, let inlines),
              .unorderedListItem(let inlines), .orderedListItem(_, let inlines),
              .blockquote(let inlines):
             return inlines.map(\.plainText).joined()
@@ -341,7 +362,7 @@ extension MarkdownNode {
 extension MarkdownNode.InlineNode {
     var plainText: String {
         switch self {
-        case .text(let s), .bold(let s), .italic(let s), .boldItalic(let s), .code(let s): return s
+        case .text(let s), .bold(let s), .italic(let s), .boldItalic(let s), .code(let s), .highlight(let s): return s
         case .link(let text, _): return text
         }
     }
@@ -356,6 +377,11 @@ struct MarkdownBodyView: View {
     var highlightedParagraphIndex: Int? = nil
     /// Directory of the article file — used to resolve relative image paths (e.g. `./Article.media/img.jpg`).
     var baseDirectoryURL: URL? = nil
+    /// FAB-54: called with (old paragraph rawText, new paragraph rawText) whenever the user adds or
+    /// removes a highlight in a paragraph, so the caller can splice the change into the full
+    /// article body and persist it. `nil` (the default) disables highlighting entirely — used by
+    /// every preview/consumer that doesn't need it.
+    var onHighlightAction: ((_ oldRawText: String, _ newRawText: String) -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -383,17 +409,26 @@ struct MarkdownBodyView: View {
 
         Group {
             switch node {
-            case .paragraph(let inlines):
-                Text(inlineText(inlines))
-                    .font(bodyFont)
-                    .lineSpacing(lineSpacingValue)
-                    .foregroundColor(colors.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        highlightedParagraphIndex == index
-                            ? colors.accent.opacity(0.15)
-                            : Color.clear
-                    )
+            case .paragraph(let inlines, let rawText):
+                // FAB-54: selectable (unlike every other block type here, which stays plain `Text`)
+                // so the user can select a run of text and highlight it. Bridges to UIKit because
+                // SwiftUI `Text` has no selection-change hook and doesn't honor a per-run background
+                // color on `AttributedString` — both are needed to show/manage a highlight in place.
+                HighlightableParagraphText(
+                    inlines: inlines,
+                    rawText: rawText,
+                    fontFamily: fontFamily,
+                    fontSize: fontSize,
+                    lineSpacingValue: lineSpacingValue,
+                    colors: colors,
+                    onHighlightAction: onHighlightAction
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    highlightedParagraphIndex == index
+                        ? colors.accent.opacity(0.15)
+                        : Color.clear
+                )
 
             case .heading(let level, let inlines):
                 Text(inlineText(inlines))
@@ -570,6 +605,12 @@ struct MarkdownBodyView: View {
                 a.link = resolved
             }
             return a
+        case .highlight(let s):
+            // Falls back to plain text outside a paragraph (headings, list items, table cells) —
+            // SwiftUI `Text` can't paint a per-run background, so there's nothing meaningful to
+            // style here; `HighlightableParagraphText` is what actually renders the highlight wash
+            // for paragraphs, the only place FAB-54 targets.
+            return AttributedString(s)
         }
     }
 }

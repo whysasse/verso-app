@@ -283,9 +283,24 @@ struct ArticleReaderView: View {
                 lineSpacingValue: lineSpacingValue,
                 colors: colors,
                 highlightedParagraphIndex: isTTSActive ? ttsParagraphs[safe: ttsService.currentParagraphIndex]?.index : nil,
-                baseDirectoryURL: article.filePath.isEmpty ? nil : URL(fileURLWithPath: article.filePath).deletingLastPathComponent()
+                baseDirectoryURL: article.filePath.isEmpty ? nil : URL(fileURLWithPath: article.filePath).deletingLastPathComponent(),
+                onHighlightAction: applyHighlightChange
             )
         }
+    }
+
+    /// FAB-54: splices one paragraph's updated raw text back into the full in-memory article body
+    /// and persists it. `oldRawText` is matched literally (first occurrence) against `parsedContent`
+    /// -- exact, not heuristic, since `MarkdownParser` reconstructs `rawText` from precisely the
+    /// source lines it consumed for that paragraph. A duplicate paragraph elsewhere in the article
+    /// with byte-identical text could target the wrong occurrence; accepted as a known, narrow edge
+    /// case rather than tracking full source line ranges through the parser for this MVP.
+    private func applyHighlightChange(oldRawText: String, newRawText: String) {
+        guard let range = parsedContent.range(of: oldRawText) else { return }
+        let updated = parsedContent.replacingCharacters(in: range, with: newRawText)
+        parsedContent = updated
+        guard !article.filePath.isEmpty else { return }
+        try? MarkdownWriter.updateBody(updated, for: article.filePath)
     }
 
     private func loadContent() {

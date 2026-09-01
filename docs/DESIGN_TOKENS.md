@@ -1,7 +1,7 @@
 # Design Tokens — Verso
 
-**Version:** 1.1  
-**Date:** 2026-05-02  
+**Version:** 1.2  
+**Date:** 2026-09-01  
 **Status:** Draft
 
 This file is the authoritative token registry for Verso's design system. Every token listed here has a corresponding Swift identifier — names match exactly. When values or intent conflict with another doc, this file wins.
@@ -267,7 +267,29 @@ These tokens are fixed across all themes. They represent a meaningful lifecycle 
 
 ---
 
-## 4. Spacing Tokens
+## 4. Color Tokens — Reading (Theme-Independent)
+
+### `highlight` (FAB-54)
+
+**Role:** Background wash behind text the user has highlighted while reading.  
+**Use for:** The reading view's text-highlight background only.  
+**Don't use for:** Anything interactive — `highlight` deliberately reads as "highlighter ink," not as a link or button. Not theme-tinted like `accent`/`accentSurface`: it's the same wash across all four themes, matching how highlighting behaves in every reading app rather than shifting with the palette.  
+**WCAG:** `textPrimary` over `highlight` blended onto `background` must be ≥ 4.5:1 in all four themes — computed, not eyeballed, since this is a background wash under body text.
+
+| Theme | Contrast (textPrimary on highlight-over-background) |
+|-------|-------------------------------------------------------|
+| Paper | 11.49:1 |
+| Sepia | 11.88:1 |
+| Night | 6.20:1 |
+| Ink   | 7.03:1 |
+
+| Value |
+|-------|
+| `#F5C842` @ 30% opacity |
+
+---
+
+## 5. Spacing Tokens
 
 Base unit: 8pt. All values are multiples of 4 (with `xxs` as the minimum). Spacing scales proportionally with Dynamic Type — use `@ScaledMetric` in SwiftUI.
 
@@ -284,7 +306,7 @@ Base unit: 8pt. All values are multiples of 4 (with `xxs` as the minimum). Spaci
 
 ---
 
-## 5. Corner Radius Tokens
+## 6. Corner Radius Tokens
 
 All components use named radius tokens. Ad-hoc values are not permitted.
 
@@ -297,7 +319,7 @@ All components use named radius tokens. Ad-hoc values are not permitted.
 
 ---
 
-## 6. Typography Tokens
+## 7. Typography Tokens
 
 Typography tokens follow a two-namespace structure: `type.reading.*` for inside the reading view (uses user's chosen font), and `type.ui.*` for all other screens (always San Francisco).
 
@@ -335,9 +357,10 @@ Font family: San Francisco (system), always — regardless of user's reading fon
 
 ---
 
-## 7. Document History
+## 8. Document History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2 | 2026-09-01 | Added `highlight` token (FAB-54, reading-view text highlighting): `#F5C842` @ 30% opacity, theme-independent. Added to Swift as `VersoHighlightColor.wash` (not a `ThemeColors` role, since it deliberately doesn't vary by theme). New §4 "Color Tokens — Reading (Theme-Independent)"; renumbered §§5–8 accordingly. |
 | 1.1 | 2026-05-02 | Added `accentSurface` token (15%-opacity accent tint, for chip/chip-like selected-state backgrounds). Added to Swift `ThemeColors` struct. |
 | 1.0 | 2026-04-22 | Initial token registry. Consolidates color tokens from DESIGN_SYSTEM_FOUNDATIONS.md §2, spacing from §7, radius from §8, and typography from §3. Values authoritative from DESIGN_SYSTEM_FOUNDATIONS.md v1.6. |

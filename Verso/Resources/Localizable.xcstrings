@@ -3325,6 +3325,54 @@
         }
       }
     },
+    "reading.highlight.add": {
+      "extractionState": "manual",
+      "comment": "Edit-menu item label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Highlight"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Surligner"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Destacar"
+          }
+        }
+      }
+    },
+    "reading.highlight.remove": {
+      "extractionState": "manual",
+      "comment": "Edit-menu item label",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove Highlight"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Supprimer le surlignage"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Remover destaque"
+          }
+        }
+      }
+    },
     "reading.controls.decreaseFontSize": {
       "extractionState": "manual",
       "comment": "Icon button accessibility label",

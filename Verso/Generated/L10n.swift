@@ -870,6 +870,14 @@ enum L10n {
         static func headerByline(author: String) -> String {
             String(localized: "reading.header.byline", defaultValue: "By \(author)", comment: "Added during step 4 view-wiring pass — missed in the original audit. `{author}` is the article's author name as-is (not translated); falls back to `publicationFallback` (source name, also not translated) when author is unavailable, with no 'By'/'Par'/'Por' prefix in that case.")
         }
+        /// "Highlight" -- Edit-menu item label
+        static var highlightAdd: String {
+            String(localized: "reading.highlight.add", defaultValue: "Highlight", comment: "Edit-menu item label")
+        }
+        /// "Remove Highlight" -- Edit-menu item label
+        static var highlightRemove: String {
+            String(localized: "reading.highlight.remove", defaultValue: "Remove Highlight", comment: "Edit-menu item label")
+        }
         /// "Tap anywhere to reveal controls" -- Never shown when VoiceOver is active
         static var immersiveHint: String {
             String(localized: "reading.immersiveHint", defaultValue: "Tap anywhere to reveal controls", comment: "Never shown when VoiceOver is active")

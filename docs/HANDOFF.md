@@ -1,6 +1,6 @@
 # Verso — Developer Handoff
 
-**Version:** 1.3 | **Date:** 2026-08-03 | **Status:** Ready for development
+**Version:** 1.4 | **Date:** 2026-09-01 | **Status:** Ready for development
 
 This is the AI entry point for implementation. Read this file first, then fetch the linked docs only for the specific domain you're working in.
 
@@ -79,6 +79,8 @@ enum VersoTheme: String { case paper, sepia, night, ink }
 **SemanticColors** (theme-dependent, same file):
 `error` · `warning` · `success`
 
+**`VersoHighlightColor.wash`** (FAB-54, same file): the reading-view text-highlight background. Deliberately **not** one of `ThemeColors`' 9 roles — a single value across all four themes, not theme-tinted.
+
 ### Article Status (`Verso/Sources/Design/Colors.swift`)
 
 ```swift
@@ -155,6 +157,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | `Services/ArticleMarkdownImageLocalizer.swift` | Downloads and localizes remote images |
 | `Services/PendingArticleIngester.swift` | Ingests articles queued by Share Extension |
 | `Services/ArticlePlainText.swift` | Converts articles to plain text |
+| `Services/ArticleHighlighter.swift` | Pure raw-text matching/wrapping behind reading-view highlights (FAB-54) — locates a rendered selection in the raw `.md` source and wraps/unwraps `==text==` markers; UIKit-free and unit-tested independently of `HighlightableParagraphText` |
 | `Services/DebugSeedService.swift` | Seeds test data for debugging |
 | `Services/ParsedArticle.swift` | Data model for parsed article content |
 
