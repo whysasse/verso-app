@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**21 open issues** across iOS, Web, Design, and Infra.
+**22 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,7 +25,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
-- **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01 (see [DONE.md](DONE.md)). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
+- **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01 (see [DONE.md](DONE.md)); its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) is being shipped incrementally — Step 1 of 5 done 2026-09-01, Steps 2–5 remain (see FAB-303's own checklist below). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
 
@@ -114,6 +114,92 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   ## Notes
 
   Sub-tasks will be broken out when this phase begins. No architectural changes to data layer or sync are expected.
+
+- [ ] 🟡 **FAB-303** · [Phase 3] Highlighting v2: cross-block selection, formatting-aware spans, headings/lists/quotes  `In Progress` `Medium`
+  Lifts the five scope limits [FAB-54](DONE.md) shipped with on 2026-09-01: no selecting across paragraphs, a graceful decline whenever the selection crosses bold/italic/code/a link, no highlighting of headings, list items, blockquotes or table cells, and a first-occurrence splice that can target the wrong duplicate paragraph. Scope, formatting behavior and remove behavior agreed with Fabio 2026-09-01. **Parent issue — implemented incrementally, one step at a time, rather than as one PR** (this is a near-rewrite of reading-view text rendering; too large and too risky to land and verify in a single shot). Steps below get checked off as they ship; use `Refs #303` (not `Closes`) in each step's PR body so this stays open until Step 5 lands.
+
+  - [x] **Step 1 — source line ranges on every block node.** Shipped 2026-09-01 (`feat/fab-303-step1-source-line-ranges`). Scoped to exactly the five block types Step 4 below names as the future cross-block "text region" (paragraph, heading, unordered/ordered list item, blockquote) — `codeBlock`/`image`/`horizontalRule`/`table` don't get a `BlockSource`, since nothing consumes it for those. `contentOffset` is UTF-16-based (matching this file's existing `NSRange` conventions) and computed generically as line length minus already-extracted content length, not hardcoded per syntax. The stated immediate payoff shipped too: `ArticleReaderView.applyHighlightChange` now splices by exact line index instead of `parsedContent.range(of: oldRawText)`, retiring the duplicate-paragraph-text edge case outright rather than leaving it for later.
+  - [ ] Step 2 — per-run source offsets
+  - [ ] Step 3 — formatting-aware wrapping
+  - [ ] Step 4 — text regions (cross-block selection)
+  - [ ] Step 5 — cross-block write and remove
+
+  ## The constraint everything else follows from
+
+  Highlights are `==text==` markers in the article's own `.md` body, so every change here has to stay valid for Obsidian and any other Markdown reader. What that permits:
+
+  * `## The ==quiet== revolution` — valid ✅
+  * `- a ==highlighted== list item` — valid ✅
+  * `> a ==quoted== bit` — valid ✅
+  * `==**bold text** and more==` — valid; `==` behaves like emphasis and nests ✅
+  * A fenced code block or inline `` `code` `` — `==` is **literal** inside both and would corrupt the code ❌ stays excluded
+  * A link's `(url)`, an image path, YAML frontmatter — never touched ❌
+  * **One `==…==` pair can never span a blank line.** A blank line closes the inline context, so a highlight covering three paragraphs must be written as three separate pairs, one per block. This is not a workaround — it is what an Obsidian user does by hand.
+
+  ## Decisions (Fabio, 2026-09-01)
+
+  * **Scope B** — block types *and* cross-block selection, via merged text views. Table cells out of scope.
+  * **Snap outward** on formatting boundaries — a selection ending inside `**bold text**` highlights the whole run rather than splitting it. The highlight can come out slightly larger than the selection; the `.md` stays clean.
+  * **Remove Highlight clears the whole visual highlight** — every contiguous marker pair it's made of, across blocks. The user sees one highlight, so one action clears it.
+
+  ## Step 1 — Source line ranges on every block node ✅ Done 2026-09-01
+
+  No user-visible change; everything below depends on it. `MarkdownParser.parse` already walks lines by index, so recording each node's `(startLine, endLine)` is nearly free. Replaced `.paragraph`'s ad-hoc `rawText` with a uniform `MarkdownNode.BlockSource` carried by paragraph, heading, both list-item cases, and blockquote: source line range (`ClosedRange<Int>`), raw source text, and a `contentOffset` — where the block's content begins inside its raw line (0 for a paragraph, `level + 1` for a heading, 2 for `- `/`> `, digit-count-dependent for an ordered item). `contentOffset` is what will keep a marker from ever landing in front of a block's own syntax, once Step 2/3 actually consume it — it isn't read by anything yet.
+
+  Shipped payoff, not just plumbing: `ArticleReaderView.applyHighlightChange` now replaces exact line indices instead of doing `parsedContent.range(of: oldRawText)`, which retires the duplicate-paragraph edge case outright. (This step's own PR isn't in `docs/DONE.md` — FAB-303 is a parent issue and stays open here, same convention as FAB-150, until Step 5 lands.)
+
+  ## Step 2 — Per-run source offsets (the real fix for the formatting limit)
+
+  Today `ArticleHighlighter` takes the *rendered* selected text and re-finds it in the raw source with a whitespace-tolerant regex. That search is why a selection crossing bold declines: rendered `bold text` and source `**bold text**` don't literally match. Fixing it by adding more matching rules would be treating the symptom.
+
+  Instead, make `parseInlines` return each `InlineNode` with the source range it came from, and have `HighlightableParagraphText.buildAttributedString` tag each run with a `.versoSourceOffset` attribute. A selection's `NSRange` then converts to an exact raw offset — run content start + offset within run — with no searching at all. This deletes `literalRange(of:in:)`, the `highlightRoundTrips` re-parse guard, and the whitespace-tolerance hack; all three exist only because the mapping was being guessed.
+
+  ## Step 3 — Formatting-aware wrapping
+
+  With exact offsets, marker placement becomes a decision rather than a search:
+
+  * Boundary inside a plain-text run → wrap exactly there.
+  * Boundary strictly inside a bold/italic/bold-italic/link run → **snap outward** to that run's edge. Never split an emphasis run; never place a marker inside a link's `(url)`.
+  * Selection lying **entirely** inside one inline-code run → nothing safe to wrap, keep declining (with feedback, see Copy below). A selection that merely *contains* a code run is fine: ``==a `x` b==``.
+  * Selection overlapping or directly adjacent to an existing highlight → strip those markers and emit **one merged pair**. Guarantees the parser can never be handed `==a ==b== c==`.
+  * `InlineNode.highlight` becomes recursive — `.highlight([InlineNode])` instead of `.highlight(String)` — so `==**bold** x==` renders as bold inside the wash. Obsidian already renders it that way; Verso currently shows literal asterisks, which will start mattering the moment snap-outward exists.
+
+  ## Step 4 — Text regions: one text view per run of consecutive text blocks
+
+  This is the cross-paragraph fix and the bulk of the work. iOS cannot extend a native selection across two views, and today every paragraph is its own `UITextView`. So: group consecutive `.paragraph` / `.heading` / `.unorderedListItem` / `.orderedListItem` / `.blockquote` nodes into a **text region**, and render each region as a single `HighlightableParagraphText`. `.image`, `.codeBlock`, `.table` and `.horizontalRule` end a region and keep rendering exactly as they do now. Selection then flows across every block inside a region, which in practice is most articles end to end.
+
+  What moves out of SwiftUI layout and into TextKit attributes:
+
+  * Inter-block spacing → `NSParagraphStyle.paragraphSpacingBefore` per block, reusing the existing numbers from `topSpacing` (24 before a heading, 16 default, 6 between sibling list items).
+  * Bullets and numbers → a literal `•\u{2003}` / `3.\u{2003}` prefix plus `headIndent` / `firstLineHeadIndent`, tagged non-highlightable so a marker can never land in the bullet.
+  * Heading fonts → `VersoTypography.Reading` mapped to `UIFont`; the custom-font fallback in `withSymbolicTraits` already handles families with no bold face.
+  * TTS paragraph wash (`highlightedParagraphIndex`) → a background-colour attribute over that block's range, instead of a `.background()` on the view.
+  * **Blockquote's 3pt accent bar is the one real visual risk.** In TextKit it needs either a text-layout-fragment draw override or a downgrade to indent-only. Decide during implementation against a side-by-side with the current build — do not assume.
+
+  Also needs re-verification, not assumption: `sizeThatFits` is doing much more work now that a region is many blocks tall, and Dynamic Type reflow within a region has never been exercised.
+
+  ## Step 5 — Cross-block write and remove
+
+  * **Write:** a selection spanning blocks becomes one `==…==` pair per block — tail of the first, whole middle blocks, head of the last. Any block in the range that can't take markers (code block, table, rule) is skipped rather than aborting the whole action.
+  * **Remove:** `removeHighlight(at:in:)` goes from index-based to range-based. Collect every `.highlight` run the selection touches, walk outward while neighbouring runs are contiguous (only whitespace or a block boundary between them), unwrap them all.
+
+  ## Out of scope (deliberate)
+
+  * **Table cells.** Each cell would need its own text view inside the horizontal `ScrollView`/`Grid`, and cross-cell selection still wouldn't work. Rare in saved articles — file separately if it comes up in practice.
+  * **Selection across an image, code block or table.** Those break a region by design. Highlighting "around" a code block yields two highlights, one per side. Correct, and it matches the file format.
+  * **One text view for the entire article.** Rejected: images would become `NSTextAttachment`s (async load, resize on rotation and Dynamic Type), tables essentially cannot be represented, and scroll-position saving plus TTS would both need rework — large risk for a small gain over per-region.
+  * **Multiple highlight colors, cross-article Highlights view.** Still out — those need a real data model, not inline markers.
+
+  ## Copy
+
+  Existing `reading.highlight.add` / `reading.highlight.remove` keys carry over. One new key only if the inline-code decline (Step 3) gets a brief message instead of today's silent error haptic — decide with Fabio during implementation.
+
+  ## Verification
+
+  * `ArticleHighlighterTests` — offset mapping, snap-outward at each run type, merge of overlapping and adjacent highlights, inline-code decline, per-block splitting across 2/3/N blocks, remove-whole-contiguous-run.
+  * `MarkdownParserTests` — source line ranges, `contentOffset` per block type, recursive `.highlight` content, nested formatting inside a highlight.
+  * Round-trip: parse → highlight → write → re-read → parse yields the same node tree. Plus a fixture asserting no case ever produces a literal `==` in the rendered output.
+  * **On device (Fabio) — where the risk actually lives.** Side-by-side against the current build on all 4 themes: block spacing, bullet and number indentation, the blockquote bar, heading sizes, Dynamic Type at the largest sizes, selection handles across a whole region, TTS wash landing on the right block, and **VoiceOver** — a merged region is one accessibility element by default, so it needs explicit per-block accessibility elements or paragraph-by-paragraph navigation regresses.
 
 
 ### Phase 4 — XcodeGen: iPad orientations + multitasking-related plist flags

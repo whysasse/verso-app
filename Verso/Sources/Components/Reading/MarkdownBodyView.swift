@@ -3,15 +3,34 @@ import SwiftUI
 // MARK: - Data Model
 
 enum MarkdownNode {
-    /// `rawText` (FAB-54) is the paragraph's original source lines joined by `\n` -- as opposed to
-    /// the space-joined, trimmed string used to build `inlines` for rendering -- so a highlight
-    /// action can locate an exact, unambiguous span of the real file content. See
-    /// `ArticleHighlighter`.
-    case paragraph(inlines: [InlineNode], rawText: String)
-    case heading(level: Int, inlines: [InlineNode])
-    case unorderedListItem(inlines: [InlineNode])
-    case orderedListItem(index: Int, inlines: [InlineNode])
-    case blockquote(inlines: [InlineNode])
+    /// FAB-303 step 1: where a block's content actually came from in the source file, carried by
+    /// every "text" block type (paragraph, heading, list item, blockquote — the set FAB-303's
+    /// later steps merge into cross-block selectable "text regions"). `codeBlock`/`image`/
+    /// `horizontalRule`/`table` don't carry this — nothing consumes it for those yet.
+    struct BlockSource {
+        /// 0-based, inclusive source line span this block was parsed from. Single-line for
+        /// heading/list-item/blockquote; can span multiple lines for a paragraph.
+        let lineRange: ClosedRange<Int>
+        /// Those lines joined by `\n`, byte-for-byte identical to source (not trimmed/collapsed)
+        /// -- so a highlight action can splice it back in exactly. Supersedes `.paragraph`'s
+        /// FAB-54 `rawText` field, now generalized to every case listed above.
+        let rawText: String
+        /// UTF-16 offset (matching this file's `NSRange` conventions) from the start of
+        /// `rawText`'s first line to where the block's actual content begins -- e.g. 2 for
+        /// `"- "`/`"> "`, `level + 1` for a heading's `"#"..."####" + " "`, 0 for a paragraph
+        /// (no prefix at all). Computed generically as the line's length minus its already-
+        /// extracted content's length, rather than hardcoded per syntax, so it can't drift out
+        /// of sync with the parsing logic that produces it. Not consumed by anything yet --
+        /// FAB-303 step 2/3's job -- computed now while every block type's exact prefix syntax
+        /// is already in hand.
+        let contentOffset: Int
+    }
+
+    case paragraph(inlines: [InlineNode], source: BlockSource)
+    case heading(level: Int, inlines: [InlineNode], source: BlockSource)
+    case unorderedListItem(inlines: [InlineNode], source: BlockSource)
+    case orderedListItem(index: Int, inlines: [InlineNode], source: BlockSource)
+    case blockquote(inlines: [InlineNode], source: BlockSource)
     case codeBlock(language: String?, code: String)
     case image(url: String, alt: String)
     case horizontalRule
@@ -46,6 +65,10 @@ struct MarkdownParser {
     static func parse(_ markdown: String) -> [MarkdownNode] {
         var nodes: [MarkdownNode] = []
         var paragraphBuffer: [String] = []
+        // FAB-303 step 1: the source line index where the current paragraph's first line was
+        // appended -- nil whenever `paragraphBuffer` is empty. Lets `flushParagraph` report an
+        // exact `lineRange` instead of the paragraph having no idea where it came from.
+        var paragraphStartLine: Int? = nil
         var codeBuffer: [String] = []
         var codeLang: String? = nil
         var inCodeBlock = false
@@ -55,13 +78,31 @@ struct MarkdownParser {
             let text = paragraphBuffer
                 .joined(separator: " ")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-            if !text.isEmpty {
+            if !text.isEmpty, let startLine = paragraphStartLine {
                 // Not trimmed, unlike `text` above -- `rawText` must stay byte-for-byte identical
                 // to the source so `ArticleHighlighter` can splice it back in exactly (FAB-54).
                 let rawText = paragraphBuffer.joined(separator: "\n")
-                nodes.append(.paragraph(inlines: parseInlines(text), rawText: rawText))
+                let source = MarkdownNode.BlockSource(
+                    lineRange: startLine...(startLine + paragraphBuffer.count - 1),
+                    rawText: rawText,
+                    contentOffset: 0 // A paragraph has no syntax prefix to skip past.
+                )
+                nodes.append(.paragraph(inlines: parseInlines(text), source: source))
             }
             paragraphBuffer = []
+            paragraphStartLine = nil
+        }
+
+        // FAB-303 step 1: `BlockSource` for a single-line block (heading/list-item/blockquote)
+        // whose `content` is `line` minus a fixed-syntax prefix. UTF-16 count, matching this
+        // file's `NSRange` conventions elsewhere -- computed from the lengths already in hand
+        // rather than a hardcoded prefix width, so it can't drift out of sync with parsing.
+        func singleLineSource(line: String, at index: Int, content: String) -> MarkdownNode.BlockSource {
+            MarkdownNode.BlockSource(
+                lineRange: index...index,
+                rawText: line,
+                contentOffset: line.utf16.count - content.utf16.count
+            )
         }
 
         let lines = markdown.components(separatedBy: "\n")
@@ -117,7 +158,8 @@ struct MarkdownParser {
                 if level <= 4, line.count > level, line[line.index(line.startIndex, offsetBy: level)] == " " {
                     flushParagraph()
                     let content = String(line.dropFirst(level + 1))
-                    nodes.append(.heading(level: level, inlines: parseInlines(content)))
+                    let source = singleLineSource(line: line, at: i, content: content)
+                    nodes.append(.heading(level: level, inlines: parseInlines(content), source: source))
                     i += 1
                     continue
                 }
@@ -126,7 +168,9 @@ struct MarkdownParser {
             // Blockquote
             if line.hasPrefix("> ") {
                 flushParagraph()
-                nodes.append(.blockquote(inlines: parseInlines(String(line.dropFirst(2)))))
+                let content = String(line.dropFirst(2))
+                let source = singleLineSource(line: line, at: i, content: content)
+                nodes.append(.blockquote(inlines: parseInlines(content), source: source))
                 i += 1
                 continue
             }
@@ -144,7 +188,9 @@ struct MarkdownParser {
             // Unordered list
             if line.hasPrefix("- ") || line.hasPrefix("* ") || line.hasPrefix("+ ") {
                 flushParagraph()
-                nodes.append(.unorderedListItem(inlines: parseInlines(String(line.dropFirst(2)))))
+                let content = String(line.dropFirst(2))
+                let source = singleLineSource(line: line, at: i, content: content)
+                nodes.append(.unorderedListItem(inlines: parseInlines(content), source: source))
                 i += 1
                 continue
             }
@@ -154,7 +200,8 @@ struct MarkdownParser {
                 flushParagraph()
                 let idx = Int(rangeString(line, olMatch.range(at: 1))) ?? orderedIndex
                 let content = rangeString(line, olMatch.range(at: 2))
-                nodes.append(.orderedListItem(index: idx, inlines: parseInlines(content)))
+                let source = singleLineSource(line: line, at: i, content: content)
+                nodes.append(.orderedListItem(index: idx, inlines: parseInlines(content), source: source))
                 orderedIndex = idx + 1
                 i += 1
                 continue
@@ -184,6 +231,9 @@ struct MarkdownParser {
             }
 
             // Paragraph accumulation
+            if paragraphBuffer.isEmpty {
+                paragraphStartLine = i
+            }
             paragraphBuffer.append(line)
             i += 1
         }
@@ -344,9 +394,9 @@ struct MarkdownParser {
 extension MarkdownNode {
     var plainText: String {
         switch self {
-        case .paragraph(let inlines, _), .heading(_, let inlines),
-             .unorderedListItem(let inlines), .orderedListItem(_, let inlines),
-             .blockquote(let inlines):
+        case .paragraph(let inlines, _), .heading(_, let inlines, _),
+             .unorderedListItem(let inlines, _), .orderedListItem(_, let inlines, _),
+             .blockquote(let inlines, _):
             return inlines.map(\.plainText).joined()
         case .codeBlock(_, let code): return code
         case .image(_, let alt): return alt
@@ -377,11 +427,17 @@ struct MarkdownBodyView: View {
     var highlightedParagraphIndex: Int? = nil
     /// Directory of the article file — used to resolve relative image paths (e.g. `./Article.media/img.jpg`).
     var baseDirectoryURL: URL? = nil
-    /// FAB-54: called with (old paragraph rawText, new paragraph rawText) whenever the user adds or
-    /// removes a highlight in a paragraph, so the caller can splice the change into the full
-    /// article body and persist it. `nil` (the default) disables highlighting entirely — used by
-    /// every preview/consumer that doesn't need it.
-    var onHighlightAction: ((_ oldRawText: String, _ newRawText: String) -> Void)? = nil
+    /// Called with (the paragraph's source line range, its new raw text) whenever the user adds or
+    /// removes a highlight, so the caller can splice the change into the full article body and
+    /// persist it. `nil` (the default) disables highlighting entirely — used by every preview/
+    /// consumer that doesn't need it.
+    ///
+    /// FAB-303 step 1: `lineRange` (from `MarkdownNode.BlockSource`) replaces FAB-54's original
+    /// `oldRawText` — the caller used to relocate the paragraph in the full document via
+    /// `parsedContent.range(of: oldRawText)`, a literal text search that targeted the wrong
+    /// paragraph when its exact text repeated elsewhere in the article. An exact line range can't
+    /// have that ambiguity.
+    var onHighlightAction: ((_ lineRange: ClosedRange<Int>, _ newRawText: String) -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -409,14 +465,15 @@ struct MarkdownBodyView: View {
 
         Group {
             switch node {
-            case .paragraph(let inlines, let rawText):
+            case .paragraph(let inlines, let source):
                 // FAB-54: selectable (unlike every other block type here, which stays plain `Text`)
                 // so the user can select a run of text and highlight it. Bridges to UIKit because
                 // SwiftUI `Text` has no selection-change hook and doesn't honor a per-run background
                 // color on `AttributedString` — both are needed to show/manage a highlight in place.
                 HighlightableParagraphText(
                     inlines: inlines,
-                    rawText: rawText,
+                    rawText: source.rawText,
+                    lineRange: source.lineRange,
                     fontFamily: fontFamily,
                     fontSize: fontSize,
                     lineSpacingValue: lineSpacingValue,
@@ -430,13 +487,13 @@ struct MarkdownBodyView: View {
                         : Color.clear
                 )
 
-            case .heading(let level, let inlines):
+            case .heading(let level, let inlines, _):
                 Text(inlineText(inlines))
                     .font(headingFont(level: level))
                     .foregroundColor(colors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-            case .unorderedListItem(let inlines):
+            case .unorderedListItem(let inlines, _):
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text("•")
                         .font(bodyFont)
@@ -448,7 +505,7 @@ struct MarkdownBodyView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            case .orderedListItem(let idx, let inlines):
+            case .orderedListItem(let idx, let inlines, _):
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text("\(idx).")
                         .font(bodyFont)
@@ -461,7 +518,7 @@ struct MarkdownBodyView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            case .blockquote(let inlines):
+            case .blockquote(let inlines, _):
                 HStack(spacing: 12) {
                     Rectangle()
                         .fill(colors.accent)

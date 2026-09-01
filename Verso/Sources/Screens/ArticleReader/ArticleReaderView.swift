@@ -289,15 +289,19 @@ struct ArticleReaderView: View {
         }
     }
 
-    /// FAB-54: splices one paragraph's updated raw text back into the full in-memory article body
-    /// and persists it. `oldRawText` is matched literally (first occurrence) against `parsedContent`
-    /// -- exact, not heuristic, since `MarkdownParser` reconstructs `rawText` from precisely the
-    /// source lines it consumed for that paragraph. A duplicate paragraph elsewhere in the article
-    /// with byte-identical text could target the wrong occurrence; accepted as a known, narrow edge
-    /// case rather than tracking full source line ranges through the parser for this MVP.
-    private func applyHighlightChange(oldRawText: String, newRawText: String) {
-        guard let range = parsedContent.range(of: oldRawText) else { return }
-        let updated = parsedContent.replacingCharacters(in: range, with: newRawText)
+    /// Splices one paragraph's updated raw text back into the full in-memory article body and
+    /// persists it, replacing exactly the source lines `lineRange` names.
+    ///
+    /// FAB-303 step 1: replaces FAB-54's original literal-text splice
+    /// (`parsedContent.range(of: oldRawText)`), which targeted the wrong paragraph whenever its
+    /// exact text repeated elsewhere in the article -- an exact line range can't have that
+    /// ambiguity, since `MarkdownParser` reports precisely which source lines it consumed for
+    /// this paragraph.
+    private func applyHighlightChange(lineRange: ClosedRange<Int>, newRawText: String) {
+        var lines = parsedContent.components(separatedBy: "\n")
+        guard lineRange.lowerBound >= 0, lineRange.upperBound < lines.count else { return }
+        lines.replaceSubrange(lineRange, with: newRawText.components(separatedBy: "\n"))
+        let updated = lines.joined(separator: "\n")
         parsedContent = updated
         guard !article.filePath.isEmpty else { return }
         try? MarkdownWriter.updateBody(updated, for: article.filePath)
