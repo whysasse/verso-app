@@ -173,7 +173,7 @@ final class MarkdownParserTests: XCTestCase {
 
         guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected paragraph") }
         let highlights = inlines.compactMap { inline -> String? in
-            if case .highlight(let s, _) = inline { return s }
+            if case .highlight(let inner, _) = inline { return inner.map(\.plainText).joined() }
             return nil
         }
         XCTAssertEqual(highlights, ["highlighted text"])
@@ -185,7 +185,7 @@ final class MarkdownParserTests: XCTestCase {
 
         guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected paragraph") }
         let highlights = inlines.compactMap { inline -> String? in
-            if case .highlight(let s, _) = inline { return s }
+            if case .highlight(let inner, _) = inline { return inner.map(\.plainText).joined() }
             return nil
         }
         XCTAssertEqual(highlights, ["First", "second"])
@@ -268,14 +268,15 @@ final class MarkdownParserTests: XCTestCase {
         XCTAssertEqual(tenthSource.contentOffset, 4) // "10. " -- two-digit index widens the prefix
     }
 
-    // MARK: - InlineNode.sourceRange (FAB-303 step 2)
+    // MARK: - InlineNode.source (FAB-303 steps 2–3)
 
-    /// Extracts the raw substring `contentOffset + sourceRange` points to, given a paragraph's
-    /// `BlockSource` -- the actual end-to-end contract this step exists for: no searching, just
-    /// arithmetic on already-known offsets.
-    private func rawSubstring(_ source: MarkdownNode.BlockSource, _ sourceRange: Range<Int>) -> String {
-        let start = source.contentOffset + sourceRange.lowerBound
-        let end = source.contentOffset + sourceRange.upperBound
+    /// Extracts the raw substring `contentOffset + aRange` points to, given a paragraph's
+    /// `BlockSource` -- the actual end-to-end contract these steps exist for: no searching, just
+    /// arithmetic on already-known offsets. Pass `.contentRange` (rendered content only) or
+    /// `.fullRange` (delimiters included) from a node's `SourceSpan`.
+    private func rawSubstring(_ source: MarkdownNode.BlockSource, _ aRange: Range<Int>) -> String {
+        let start = source.contentOffset + aRange.lowerBound
+        let end = source.contentOffset + aRange.upperBound
         let nsRange = NSRange(location: start, length: end - start)
         guard let range = Range(nsRange, in: source.rawText) else { return "" }
         return String(source.rawText[range])
@@ -284,60 +285,88 @@ final class MarkdownParserTests: XCTestCase {
     func testPlainTextSourceRangeCoversTheWholeContent() throws {
         let nodes = MarkdownParser.parse("Hello there")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .text(let s, let range) = inlines[0] else { return XCTFail("expected a single text run") }
+        guard case .text(let s, let span) = inlines[0] else { return XCTFail("expected a single text run") }
         XCTAssertEqual(s, "Hello there")
-        XCTAssertEqual(rawSubstring(source, range), "Hello there")
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "Hello there")
+        // No delimiters to skip -- content and full range are identical for plain text.
+        XCTAssertEqual(span.contentRange, span.fullRange)
     }
 
-    func testBoldSourceRangeExcludesDelimiters() throws {
+    func testBoldSourceSpanExcludesDelimitersFromContentButNotFromFullRange() throws {
         let nodes = MarkdownParser.parse("a **bold** word")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .bold(let s, let range) = inlines[1] else { return XCTFail("expected the bold run") }
+        guard case .bold(let s, let span) = inlines[1] else { return XCTFail("expected the bold run") }
         XCTAssertEqual(s, "bold")
-        // Points at "bold" inside "**bold**", not at the "**" delimiters either side of it.
-        XCTAssertEqual(rawSubstring(source, range), "bold")
+        // contentRange points at "bold" alone; fullRange widens to include the "**" either side.
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "bold")
+        XCTAssertEqual(rawSubstring(source, span.fullRange), "**bold**")
     }
 
-    func testItalicSourceRangeExcludesDelimiters() throws {
+    func testItalicSourceSpanExcludesDelimitersFromContentButNotFromFullRange() throws {
         let nodes = MarkdownParser.parse("a _italic_ word")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .italic(let s, let range) = inlines[1] else { return XCTFail("expected the italic run") }
+        guard case .italic(let s, let span) = inlines[1] else { return XCTFail("expected the italic run") }
         XCTAssertEqual(s, "italic")
-        XCTAssertEqual(rawSubstring(source, range), "italic")
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "italic")
+        XCTAssertEqual(rawSubstring(source, span.fullRange), "_italic_")
     }
 
-    func testBoldItalicSourceRangeExcludesDelimiters() throws {
+    func testBoldItalicSourceSpanExcludesDelimitersFromContentButNotFromFullRange() throws {
         let nodes = MarkdownParser.parse("a ***both*** word")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .boldItalic(let s, let range) = inlines[1] else { return XCTFail("expected the bold-italic run") }
+        guard case .boldItalic(let s, let span) = inlines[1] else { return XCTFail("expected the bold-italic run") }
         XCTAssertEqual(s, "both")
-        XCTAssertEqual(rawSubstring(source, range), "both")
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "both")
+        XCTAssertEqual(rawSubstring(source, span.fullRange), "***both***")
     }
 
-    func testCodeSourceRangeExcludesBackticks() throws {
+    func testCodeSourceSpanExcludesBackticksFromContentButNotFromFullRange() throws {
         let nodes = MarkdownParser.parse("a `code` word")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .code(let s, let range) = inlines[1] else { return XCTFail("expected the code run") }
+        guard case .code(let s, let span) = inlines[1] else { return XCTFail("expected the code run") }
         XCTAssertEqual(s, "code")
-        XCTAssertEqual(rawSubstring(source, range), "code")
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "code")
+        XCTAssertEqual(rawSubstring(source, span.fullRange), "`code`")
     }
 
-    func testLinkSourceRangeCoversOnlyTheLabel() throws {
+    func testLinkSourceSpanHasAnAsymmetricFullRange() throws {
         let nodes = MarkdownParser.parse("see [this link](https://example.com) here")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .link(let text, let url, let range) = inlines[1] else { return XCTFail("expected the link run") }
+        guard case .link(let text, let url, let span) = inlines[1] else { return XCTFail("expected the link run") }
         XCTAssertEqual(text, "this link")
         XCTAssertEqual(url, "https://example.com")
-        // Range covers just the label, not the "[", "](url)" wrapper.
-        XCTAssertEqual(rawSubstring(source, range), "this link")
+        // contentRange covers just the label; fullRange covers the whole "[label](url)" -- widths
+        // differ (1-char "[" prefix vs. a "](url)" suffix as long as the URL itself), unlike every
+        // other delimited type here, which is why this needs its own dedicated computation.
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "this link")
+        XCTAssertEqual(rawSubstring(source, span.fullRange), "[this link](https://example.com)")
     }
 
-    func testHighlightSourceRangeExcludesMarkers() throws {
+    func testHighlightSourceSpanExcludesMarkersFromContentButNotFromFullRange() throws {
         let nodes = MarkdownParser.parse("a ==highlighted== word")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
-        guard case .highlight(let s, let range) = inlines[1] else { return XCTFail("expected the highlight run") }
-        XCTAssertEqual(s, "highlighted")
-        XCTAssertEqual(rawSubstring(source, range), "highlighted")
+        guard case .highlight(let inner, let span) = inlines[1] else { return XCTFail("expected the highlight run") }
+        XCTAssertEqual(inner.map(\.plainText).joined(), "highlighted")
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "highlighted")
+        XCTAssertEqual(rawSubstring(source, span.fullRange), "==highlighted==")
+    }
+
+    func testHighlightContentIsRecursivelyParsed() throws {
+        // FAB-303 step 3: `==**bold** text==` must render "bold" as an actual bold run inside the
+        // highlight, not literal asterisks -- the scenario snap-outward makes newly reachable.
+        let nodes = MarkdownParser.parse("==**bold** text==")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .highlight(let inner, _) = inlines[0] else { return XCTFail("expected a highlight") }
+        XCTAssertEqual(inner.count, 2)
+        guard case .bold(let boldText, let boldSpan) = inner[0] else { return XCTFail("expected nested bold") }
+        XCTAssertEqual(boldText, "bold")
+        guard case .text(let trailingText, _) = inner[1] else { return XCTFail("expected trailing text") }
+        XCTAssertEqual(trailingText, " text")
+        // The nested bold's offsets are rebased onto the *outer* raw string -- not 0-based within
+        // just the highlight's own inner content -- so they still resolve correctly via the
+        // paragraph's rawText, exactly like any other (non-nested) inline node's offsets do.
+        XCTAssertEqual(rawSubstring(source, boldSpan.contentRange), "bold")
+        XCTAssertEqual(rawSubstring(source, boldSpan.fullRange), "**bold**")
     }
 
     func testMultipleRunsInOneParagraphHaveNonOverlappingSequentialOffsets() throws {
@@ -345,16 +374,17 @@ final class MarkdownParserTests: XCTestCase {
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
         XCTAssertEqual(inlines.count, 3)
 
-        guard case .text(_, let firstRange) = inlines[0] else { return XCTFail("expected leading text") }
-        guard case .bold(_, let boldRange) = inlines[1] else { return XCTFail("expected bold") }
-        guard case .text(_, let lastRange) = inlines[2] else { return XCTFail("expected trailing text") }
+        guard case .text(_, let firstSpan) = inlines[0] else { return XCTFail("expected leading text") }
+        guard case .bold(_, let boldSpan) = inlines[1] else { return XCTFail("expected bold") }
+        guard case .text(_, let lastSpan) = inlines[2] else { return XCTFail("expected trailing text") }
 
-        XCTAssertEqual(rawSubstring(source, firstRange), "plain ")
-        XCTAssertEqual(rawSubstring(source, boldRange), "bold")
-        XCTAssertEqual(rawSubstring(source, lastRange), " plain again")
-        // Strictly increasing, no overlap.
-        XCTAssertLessThanOrEqual(firstRange.upperBound, boldRange.lowerBound)
-        XCTAssertLessThanOrEqual(boldRange.upperBound, lastRange.lowerBound)
+        XCTAssertEqual(rawSubstring(source, firstSpan.contentRange), "plain ")
+        XCTAssertEqual(rawSubstring(source, boldSpan.contentRange), "bold")
+        XCTAssertEqual(rawSubstring(source, lastSpan.contentRange), " plain again")
+        // Strictly increasing, no overlap -- using each node's full (not just content) range,
+        // since that's the span that actually claims raw characters exclusively.
+        XCTAssertLessThanOrEqual(firstSpan.fullRange.upperBound, boldSpan.fullRange.lowerBound)
+        XCTAssertLessThanOrEqual(boldSpan.fullRange.upperBound, lastSpan.fullRange.lowerBound)
     }
 
     func testParagraphWithLeadingWhitespaceGetsANonZeroContentOffset() throws {
@@ -364,8 +394,8 @@ final class MarkdownParserTests: XCTestCase {
         let nodes = MarkdownParser.parse("   Hello there")
         guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
         XCTAssertEqual(source.contentOffset, 3)
-        guard case .text(let s, let range) = inlines[0] else { return XCTFail("expected text run") }
+        guard case .text(let s, let span) = inlines[0] else { return XCTFail("expected text run") }
         XCTAssertEqual(s, "Hello there")
-        XCTAssertEqual(rawSubstring(source, range), "Hello there")
+        XCTAssertEqual(rawSubstring(source, span.contentRange), "Hello there")
     }
 }
