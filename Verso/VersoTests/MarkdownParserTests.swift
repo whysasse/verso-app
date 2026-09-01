@@ -173,7 +173,7 @@ final class MarkdownParserTests: XCTestCase {
 
         guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected paragraph") }
         let highlights = inlines.compactMap { inline -> String? in
-            if case .highlight(let s) = inline { return s }
+            if case .highlight(let s, _) = inline { return s }
             return nil
         }
         XCTAssertEqual(highlights, ["highlighted text"])
@@ -185,7 +185,7 @@ final class MarkdownParserTests: XCTestCase {
 
         guard case .paragraph(let inlines, _) = nodes[0] else { return XCTFail("expected paragraph") }
         let highlights = inlines.compactMap { inline -> String? in
-            if case .highlight(let s) = inline { return s }
+            if case .highlight(let s, _) = inline { return s }
             return nil
         }
         XCTAssertEqual(highlights, ["First", "second"])
@@ -266,5 +266,106 @@ final class MarkdownParserTests: XCTestCase {
         guard case .orderedListItem(_, _, let tenthSource) = nodes[1] else { return XCTFail("expected item 10") }
         XCTAssertEqual(tenthSource.lineRange, 1...1)
         XCTAssertEqual(tenthSource.contentOffset, 4) // "10. " -- two-digit index widens the prefix
+    }
+
+    // MARK: - InlineNode.sourceRange (FAB-303 step 2)
+
+    /// Extracts the raw substring `contentOffset + sourceRange` points to, given a paragraph's
+    /// `BlockSource` -- the actual end-to-end contract this step exists for: no searching, just
+    /// arithmetic on already-known offsets.
+    private func rawSubstring(_ source: MarkdownNode.BlockSource, _ sourceRange: Range<Int>) -> String {
+        let start = source.contentOffset + sourceRange.lowerBound
+        let end = source.contentOffset + sourceRange.upperBound
+        let nsRange = NSRange(location: start, length: end - start)
+        guard let range = Range(nsRange, in: source.rawText) else { return "" }
+        return String(source.rawText[range])
+    }
+
+    func testPlainTextSourceRangeCoversTheWholeContent() throws {
+        let nodes = MarkdownParser.parse("Hello there")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .text(let s, let range) = inlines[0] else { return XCTFail("expected a single text run") }
+        XCTAssertEqual(s, "Hello there")
+        XCTAssertEqual(rawSubstring(source, range), "Hello there")
+    }
+
+    func testBoldSourceRangeExcludesDelimiters() throws {
+        let nodes = MarkdownParser.parse("a **bold** word")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .bold(let s, let range) = inlines[1] else { return XCTFail("expected the bold run") }
+        XCTAssertEqual(s, "bold")
+        // Points at "bold" inside "**bold**", not at the "**" delimiters either side of it.
+        XCTAssertEqual(rawSubstring(source, range), "bold")
+    }
+
+    func testItalicSourceRangeExcludesDelimiters() throws {
+        let nodes = MarkdownParser.parse("a _italic_ word")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .italic(let s, let range) = inlines[1] else { return XCTFail("expected the italic run") }
+        XCTAssertEqual(s, "italic")
+        XCTAssertEqual(rawSubstring(source, range), "italic")
+    }
+
+    func testBoldItalicSourceRangeExcludesDelimiters() throws {
+        let nodes = MarkdownParser.parse("a ***both*** word")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .boldItalic(let s, let range) = inlines[1] else { return XCTFail("expected the bold-italic run") }
+        XCTAssertEqual(s, "both")
+        XCTAssertEqual(rawSubstring(source, range), "both")
+    }
+
+    func testCodeSourceRangeExcludesBackticks() throws {
+        let nodes = MarkdownParser.parse("a `code` word")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .code(let s, let range) = inlines[1] else { return XCTFail("expected the code run") }
+        XCTAssertEqual(s, "code")
+        XCTAssertEqual(rawSubstring(source, range), "code")
+    }
+
+    func testLinkSourceRangeCoversOnlyTheLabel() throws {
+        let nodes = MarkdownParser.parse("see [this link](https://example.com) here")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .link(let text, let url, let range) = inlines[1] else { return XCTFail("expected the link run") }
+        XCTAssertEqual(text, "this link")
+        XCTAssertEqual(url, "https://example.com")
+        // Range covers just the label, not the "[", "](url)" wrapper.
+        XCTAssertEqual(rawSubstring(source, range), "this link")
+    }
+
+    func testHighlightSourceRangeExcludesMarkers() throws {
+        let nodes = MarkdownParser.parse("a ==highlighted== word")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        guard case .highlight(let s, let range) = inlines[1] else { return XCTFail("expected the highlight run") }
+        XCTAssertEqual(s, "highlighted")
+        XCTAssertEqual(rawSubstring(source, range), "highlighted")
+    }
+
+    func testMultipleRunsInOneParagraphHaveNonOverlappingSequentialOffsets() throws {
+        let nodes = MarkdownParser.parse("plain **bold** plain again")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        XCTAssertEqual(inlines.count, 3)
+
+        guard case .text(_, let firstRange) = inlines[0] else { return XCTFail("expected leading text") }
+        guard case .bold(_, let boldRange) = inlines[1] else { return XCTFail("expected bold") }
+        guard case .text(_, let lastRange) = inlines[2] else { return XCTFail("expected trailing text") }
+
+        XCTAssertEqual(rawSubstring(source, firstRange), "plain ")
+        XCTAssertEqual(rawSubstring(source, boldRange), "bold")
+        XCTAssertEqual(rawSubstring(source, lastRange), " plain again")
+        // Strictly increasing, no overlap.
+        XCTAssertLessThanOrEqual(firstRange.upperBound, boldRange.lowerBound)
+        XCTAssertLessThanOrEqual(boldRange.upperBound, lastRange.lowerBound)
+    }
+
+    func testParagraphWithLeadingWhitespaceGetsANonZeroContentOffset() throws {
+        // Markdown that survived with stray leading spaces on its only line (not the common case
+        // -- HTML-imported paragraphs never have this -- but `contentOffset` must reflect it
+        // exactly, not assume zero, once per-character precision matters (FAB-303 step 2).
+        let nodes = MarkdownParser.parse("   Hello there")
+        guard case .paragraph(let inlines, let source) = nodes[0] else { return XCTFail("expected paragraph") }
+        XCTAssertEqual(source.contentOffset, 3)
+        guard case .text(let s, let range) = inlines[0] else { return XCTFail("expected text run") }
+        XCTAssertEqual(s, "Hello there")
+        XCTAssertEqual(rawSubstring(source, range), "Hello there")
     }
 }

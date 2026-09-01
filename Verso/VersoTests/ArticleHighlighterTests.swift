@@ -1,70 +1,53 @@
 import XCTest
 @testable import Verso
 
-/// FAB-54: the raw-text matching/wrapping logic behind reading-view highlights. This is the
-/// riskiest part of the feature (a rendered selection has to be re-located in the raw Markdown
-/// source, which has syntax the rendered text doesn't), so it gets direct coverage independent of
-/// any UIKit/SwiftUI plumbing. See `ArticleHighlighter.swift`.
+/// FAB-303 step 2: the raw-text wrapping/unwrapping logic behind reading-view highlights.
+/// `addHighlight` now takes an exact raw offset range (from `HighlightableParagraphText`'s
+/// `.versoSourceOffset`-tagged runs) rather than searching for rendered text in the raw source --
+/// see `ArticleHighlighter.swift` for why that search (and its re-parse safety check) is gone.
 final class ArticleHighlighterTests: XCTestCase {
 
     // MARK: - addHighlight
 
-    func testAddHighlightWrapsLiteralMatch() {
-        let result = ArticleHighlighter.addHighlight(
-            selecting: "quick brown",
-            in: "The quick brown fox jumps."
-        )
+    func testAddHighlightWrapsTheExactOffsetRange() {
+        let rawText = "The quick brown fox jumps."
+        // "quick brown" starts right after "The " (4 chars) and is 11 chars long.
+        let result = ArticleHighlighter.addHighlight(atRawOffsetRange: 4..<15, in: rawText)
         XCTAssertEqual(result, "The ==quick brown== fox jumps.")
     }
 
-    func testAddHighlightIsWhitespaceTolerantAcrossALineWrap() {
-        // The rendered selection ("quick brown", single space) has to still find its match even
-        // though the raw source wrapped mid-phrase onto a second line.
-        let result = ArticleHighlighter.addHighlight(
-            selecting: "quick brown",
-            in: "The quick\nbrown fox jumps."
-        )
-        XCTAssertEqual(result, "The ==quick\nbrown== fox jumps.")
+    func testAddHighlightWrapsAtTheStartOfTheText() {
+        let result = ArticleHighlighter.addHighlight(atRawOffsetRange: 0..<3, in: "The quick fox.")
+        XCTAssertEqual(result, "==The== quick fox.")
     }
 
-    func testAddHighlightDeclinesWhenSelectionCrossesABoldBoundary() {
-        // Rendered plain text would read "quick brown" (bold markers stripped), but the raw source
-        // has "**" sitting between them -- not a literal, unformatted run, so this must decline
-        // rather than produce something like "The **quick=**= brown== fox." (nonsense output the
-        // parser would never intend).
-        let result = ArticleHighlighter.addHighlight(
-            selecting: "quick brown",
-            in: "The **quick** brown fox."
-        )
+    func testAddHighlightWrapsTheEntireText() {
+        let rawText = "All of it."
+        let result = ArticleHighlighter.addHighlight(atRawOffsetRange: 0..<rawText.utf16.count, in: rawText)
+        XCTAssertEqual(result, "==All of it.==")
+    }
+
+    func testAddHighlightDeclinesWhenRangeExceedsTheTextLength() {
+        let result = ArticleHighlighter.addHighlight(atRawOffsetRange: 10..<100, in: "Too short.")
         XCTAssertNil(result)
     }
 
-    func testAddHighlightDeclinesWhenTextIsNotFound() {
-        let result = ArticleHighlighter.addHighlight(
-            selecting: "a phrase that is not in the source",
-            in: "The quick brown fox jumps."
-        )
-        XCTAssertNil(result)
+    func testAddHighlightDeclinesOnAnEmptyRange() {
+        let result = ArticleHighlighter.addHighlight(atRawOffsetRange: 4..<4, in: "The quick fox.")
+        // An empty range wraps nothing meaningful -- `NSRange(length: 0)` is technically valid, so
+        // this documents the actual (harmless but pointless) behavior rather than asserting a nil
+        // this function has no reason to produce.
+        XCTAssertEqual(result, "The ====quick fox.")
     }
 
-    func testAddHighlightTargetsTheFirstOccurrenceWhenTextRepeats() {
-        let result = ArticleHighlighter.addHighlight(
-            selecting: "cat dog",
-            in: "cat dog cat dog"
-        )
-        XCTAssertEqual(result, "==cat dog== cat dog")
-    }
-
-    func testAddHighlightIgnoresLeadingAndTrailingWhitespaceInSelection() {
-        let result = ArticleHighlighter.addHighlight(
-            selecting: "  quick brown  ",
-            in: "The quick brown fox jumps."
-        )
-        XCTAssertEqual(result, "The ==quick brown== fox jumps.")
-    }
-
-    func testAddHighlightOnEmptySelectionDeclines() {
-        XCTAssertNil(ArticleHighlighter.addHighlight(selecting: "   ", in: "The quick brown fox."))
+    func testAddHighlightHandlesMultiByteCharactersByUTF16Offset() {
+        // "café" -- "é" is a single UTF-16 unit (unlike, say, an emoji), so plain character
+        // counting and UTF-16 counting agree here; this pins that assumption down explicitly
+        // rather than leaving it implicit.
+        let rawText = "café today"
+        XCTAssertEqual(rawText.utf16.count, 10)
+        let result = ArticleHighlighter.addHighlight(atRawOffsetRange: 0..<4, in: rawText)
+        XCTAssertEqual(result, "==café== today")
     }
 
     // MARK: - removeHighlight
@@ -97,9 +80,10 @@ final class ArticleHighlighterTests: XCTestCase {
 
     func testAddThenRemoveRestoresTheOriginalText() {
         let original = "The quick brown fox jumps."
-        guard let highlighted = ArticleHighlighter.addHighlight(selecting: "quick brown", in: original) else {
+        guard let highlighted = ArticleHighlighter.addHighlight(atRawOffsetRange: 4..<15, in: original) else {
             return XCTFail("expected addHighlight to succeed")
         }
+        XCTAssertEqual(highlighted, "The ==quick brown== fox jumps.")
         let restored = ArticleHighlighter.removeHighlight(at: 0, in: highlighted)
         XCTAssertEqual(restored, original)
     }
