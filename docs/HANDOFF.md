@@ -157,7 +157,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | `Services/ArticleMarkdownImageLocalizer.swift` | Downloads and localizes remote images |
 | `Services/PendingArticleIngester.swift` | Ingests articles queued by Share Extension |
 | `Services/ArticlePlainText.swift` | Converts articles to plain text |
-| `Services/ArticleHighlighter.swift` | Pure raw-text matching/wrapping behind reading-view highlights (FAB-54) — locates a rendered selection in the raw `.md` source and wraps/unwraps `==text==` markers; UIKit-free and unit-tested independently of `HighlightableParagraphText` |
+| `Services/ArticleHighlighter.swift` | Pure raw-text matching/wrapping behind reading-view highlights (FAB-54) — locates a rendered selection in the raw `.md` source and wraps/unwraps `==text==` markers; UIKit-free and unit-tested independently of `HighlightableRegionText` |
 | `Services/DebugSeedService.swift` | Seeds test data for debugging |
 | `Services/ParsedArticle.swift` | Data model for parsed article content |
 

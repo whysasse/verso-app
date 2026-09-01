@@ -6,7 +6,7 @@ import Foundation
 /// in any editor, matching Verso's file-first philosophy (docs/OBSIDIAN_INTEGRATION.md) -- rather
 /// than frontmatter offsets, which would silently misplace on any edit made outside Verso.
 ///
-/// FAB-303 step 2: `HighlightableParagraphText` tags every rendered run with the exact raw offset
+/// FAB-303 step 2: `HighlightableRegionText` tags every rendered run with the exact raw offset
 /// it came from (`.versoSourceOffset`), so a selection converts to a raw position directly --
 /// no searching. (FAB-54 originally re-found the *rendered* selected text inside the raw source
 /// with a whitespace-tolerant regex, then re-parsed the result to check it landed somewhere sane;
@@ -54,82 +54,95 @@ enum ArticleHighlighter {
     /// deliberately has no dependency in the other direction.
     private static var markerPattern: String { MarkdownParser.highlightMarkerPattern }
 
-    // MARK: - FAB-303 step 5: cross-paragraph write
+    // MARK: - FAB-303 step 5: cross-block write
 
-    /// A selection whose two ends land in *different* paragraphs of the same region can't be
-    /// wrapped with one `addHighlight(atRawOffsetRange:in:)` call -- one `==...==` pair can never
-    /// span the blank line between two paragraphs (see `docs/BACKLOG.md`'s FAB-303 "constraint
-    /// everything else follows from"). This computes one wrap range per paragraph instead: the
-    /// *tail* of the first paragraph (from `rawStart` to its own content end), *all* of every
-    /// paragraph strictly between, and the *head* of the last paragraph (from its own content start
-    /// to `rawEnd`). `rawStart`/`rawEnd` are expected to already be resolved, safe raw offsets --
-    /// e.g. from `HighlightableUITextView`'s existing snap-outward logic -- this function only
-    /// decides *how many pairs* and *where each one goes*, not whether a boundary is safe to wrap at
-    /// all. Pure and UIKit-free, unlike the view code that will call it, so it's directly testable.
+    /// A selection whose two ends land in *different* blocks of the same region can't be wrapped
+    /// with one `addHighlight(atRawOffsetRange:in:)` call -- one `==...==` pair can never span the
+    /// blank line between two blocks (see `docs/BACKLOG.md`'s FAB-303 "constraint everything else
+    /// follows from"). This computes one wrap range per block instead: the *tail* of the first
+    /// block (from `rawStart` to its own content end), *all* of every block strictly between, and
+    /// the *head* of the last block (from its own content start to `rawEnd`). `rawStart`/`rawEnd`
+    /// are expected to already be resolved, safe raw offsets -- e.g. from `HighlightableUITextView`'s
+    /// existing snap-outward logic -- this function only decides *how many pairs* and *where each
+    /// one goes*, not whether a boundary is safe to wrap at all. Pure and UIKit-free, unlike the
+    /// view code that will call it, so it's directly testable. Block-kind-agnostic -- works the same
+    /// whether the blocks touched are paragraphs, headings, list items, or blockquotes, since it
+    /// only ever reads a block's `BlockSource`, not its kind.
     ///
-    /// Returns `nil` if the paragraph indices are out of order or out of range, or if any computed
-    /// range ends up empty or inverted (nothing safe to wrap in that paragraph) -- the caller
-    /// declines the whole action rather than writing a partial set of highlights.
-    static func crossParagraphHighlightRanges(
-        fromParagraphIndex startIndex: Int,
+    /// Returns `nil` if the block indices are out of order or out of range, or if any computed
+    /// range ends up empty or inverted (nothing safe to wrap in that block) -- the caller declines
+    /// the whole action rather than writing a partial set of highlights.
+    static func crossBlockHighlightRanges(
+        fromBlockIndex startIndex: Int,
         rawStart: Int,
-        toParagraphIndex endIndex: Int,
+        toBlockIndex endIndex: Int,
         rawEnd: Int,
-        paragraphs: [MarkdownNode.BlockSource]
-    ) -> [(paragraphIndex: Int, rawRange: Range<Int>)]? {
+        blocks: [MarkdownNode.BlockSource]
+    ) -> [(blockIndex: Int, rawRange: Range<Int>)]? {
         guard startIndex < endIndex,
-              paragraphs.indices.contains(startIndex),
-              paragraphs.indices.contains(endIndex) else {
+              blocks.indices.contains(startIndex),
+              blocks.indices.contains(endIndex) else {
             return nil
         }
 
-        var result: [(paragraphIndex: Int, rawRange: Range<Int>)] = []
-        for paragraphIndex in startIndex...endIndex {
+        var result: [(blockIndex: Int, rawRange: Range<Int>)] = []
+        for blockIndex in startIndex...endIndex {
             let range: Range<Int>
-            if paragraphIndex == startIndex {
-                range = rawStart..<fullContentRange(of: paragraphs[paragraphIndex]).upperBound
-            } else if paragraphIndex == endIndex {
-                range = fullContentRange(of: paragraphs[paragraphIndex]).lowerBound..<rawEnd
+            if blockIndex == startIndex {
+                range = rawStart..<fullContentRange(of: blocks[blockIndex]).upperBound
+            } else if blockIndex == endIndex {
+                range = fullContentRange(of: blocks[blockIndex]).lowerBound..<rawEnd
             } else {
-                range = fullContentRange(of: paragraphs[paragraphIndex])
+                range = fullContentRange(of: blocks[blockIndex])
             }
             guard range.lowerBound < range.upperBound else { return nil }
-            result.append((paragraphIndex, range))
+            result.append((blockIndex, range))
         }
         return result
     }
 
-    /// This paragraph's own content bounds (UTF-16, same coordinate space as `.versoSourceOffset`/
-    /// `.versoFullSourceRange`) -- `rawText` with leading/trailing whitespace excluded. The leading
-    /// bound is just `contentOffset` (already exactly this, per `MarkdownParser.flushParagraph`);
-    /// the trailing bound mirrors that same file's leading-trim computation, just from the other
-    /// end, so it's provably the same trim rule rather than a fresh assumption.
+    /// This block's own content bounds (UTF-16, same coordinate space as `.versoSourceOffset`/
+    /// `.versoFullSourceRange`) -- `rawText` with any leading syntax (a heading's `"## "`, a list
+    /// item's `"- "`/`"1. "`, a blockquote's `"> "`) *and* leading/trailing whitespace excluded. The
+    /// leading bound is just `contentOffset` -- already exactly this for every block type, per
+    /// `MarkdownParser.flushParagraph`/`singleLineSource` (FAB-303 step 1 made this generic across
+    /// all five "text block" kinds specifically so callers like this one wouldn't need to special-
+    /// case any of them). The trailing bound mirrors that same file's leading-trim computation, just
+    /// from the other end, so it's provably the same trim rule rather than a fresh assumption.
     private static func fullContentRange(of source: MarkdownNode.BlockSource) -> Range<Int> {
         let trailingTrim = source.rawText.reversed().prefix(while: { $0.isWhitespace }).count
         return source.contentOffset..<(source.rawText.utf16.count - trailingTrim)
     }
 
-    // MARK: - FAB-303 step 5: chained (cross-paragraph) remove
+    // MARK: - FAB-303 step 5: chained (cross-block) remove
 
-    /// Whether paragraph `rawText`'s *first* inline node is a highlight -- i.e. its content begins
-    /// directly with `==` -- and if so, that highlight's 0-based index within this one paragraph
+    /// Whether `source`'s block *first* inline node is a highlight -- i.e. its content begins
+    /// directly with `==` -- and if so, that highlight's 0-based index within this one block
     /// (always `0`, since it's the first node `MarkdownParser.parseInlines` encounters). `nil` when
-    /// the paragraph doesn't start with a highlight, including when it has no content at all.
+    /// the block doesn't start with a highlight, including when it has no content at all.
     ///
-    /// Re-parses `rawText` (trimmed the same way `MarkdownParser.flushParagraph` trims it before
-    /// parsing in the first place) rather than requiring the caller to already have the parsed
-    /// `[InlineNode]` -- cheap for one paragraph's worth of text, and only called on a Remove
-    /// Highlight tap, not on every render.
-    static func leadingHighlightIndex(in rawText: String) -> Int? {
-        guard case .highlight = trimmedInlines(of: rawText).first else { return nil }
+    /// Re-parses just `source`'s own content (via `fullContentRange`, above -- syntax prefix and
+    /// surrounding whitespace excluded) rather than requiring the caller to already have the parsed
+    /// `[InlineNode]` -- cheap for one block's worth of text, and only called on a Remove Highlight
+    /// tap, not on every render.
+    ///
+    /// FAB-303 headings/lists/blockquotes follow-up: originally this whitespace-trimmed `rawText`
+    /// directly, which is only correct for a paragraph -- a heading/list-item/blockquote's `rawText`
+    /// carries its own syntax prefix (`"## "`, `"- "`, `"> "`), which whitespace-trimming doesn't
+    /// remove, so re-parsing it would have folded that literal prefix into a leading `.text` node
+    /// and made "does this block start with a highlight" wrong for every non-paragraph block. Fixed
+    /// by slicing on `contentOffset` (via `fullContentRange`) instead, which already excludes any
+    /// such prefix for every block kind.
+    static func leadingHighlightIndex(in source: MarkdownNode.BlockSource) -> Int? {
+        guard case .highlight = blockContentInlines(of: source).first else { return nil }
         return 0
     }
 
-    /// Same as `leadingHighlightIndex`, for whether the paragraph's *last* inline node is a
-    /// highlight -- its index is however many highlights precede it, which (since it's the last
-    /// node) is just "this paragraph's total highlight count, minus one."
-    static func trailingHighlightIndex(in rawText: String) -> Int? {
-        let nodes = trimmedInlines(of: rawText)
+    /// Same as `leadingHighlightIndex`, for whether the block's *last* inline node is a highlight --
+    /// its index is however many highlights precede it, which (since it's the last node) is just
+    /// "this block's total highlight count, minus one."
+    static func trailingHighlightIndex(in source: MarkdownNode.BlockSource) -> Int? {
+        let nodes = blockContentInlines(of: source)
         guard case .highlight = nodes.last else { return nil }
         let highlightCount = nodes.reduce(into: 0) { count, node in
             if case .highlight = node { count += 1 }
@@ -137,44 +150,49 @@ enum ArticleHighlighter {
         return highlightCount - 1
     }
 
-    private static func trimmedInlines(of rawText: String) -> [MarkdownNode.InlineNode] {
-        MarkdownParser.parseInlines(rawText.trimmingCharacters(in: .whitespacesAndNewlines))
+    private static func blockContentInlines(of source: MarkdownNode.BlockSource) -> [MarkdownNode.InlineNode] {
+        let contentRange = fullContentRange(of: source)
+        let nsRange = NSRange(location: contentRange.lowerBound, length: contentRange.count)
+        guard let range = Range(nsRange, in: source.rawText) else { return [] }
+        return MarkdownParser.parseInlines(String(source.rawText[range]))
     }
 
     /// From the one highlight piece the user actually tapped (`start`), walks outward through
-    /// `paragraphs` in both directions while each neighbor genuinely chains onto it: the current
-    /// piece is its own paragraph's leading (or trailing) highlight, *and* the paragraph right
-    /// before (or after) it has a highlight ending (or starting) exactly at its own edge. When both
-    /// hold, nothing but the paragraph break itself sits between the two pieces -- from the reader's
-    /// point of view it's one continuous highlight, not two, so Remove Highlight has to take out
-    /// every linked piece in one action (Fabio's decision, 2026-09-01), regardless of which piece
-    /// was tapped. Returns every linked `(paragraphIndex, highlightIndex)` piece, in paragraph
-    /// order; when nothing chains, that's just `[start]`.
+    /// `blocks` in both directions while each neighbor genuinely chains onto it: the current piece
+    /// is its own block's leading (or trailing) highlight, *and* the block right before (or after)
+    /// it has a highlight ending (or starting) exactly at its own edge. When both hold, nothing but
+    /// the block break itself sits between the two pieces -- from the reader's point of view it's
+    /// one continuous highlight, not two, so Remove Highlight has to take out every linked piece in
+    /// one action (Fabio's decision, 2026-09-01), regardless of which piece was tapped. Works the
+    /// same across a mix of block kinds -- a highlight can chain from a paragraph's tail into a list
+    /// item's head, for instance -- since it only reads each block's `BlockSource`. Returns every
+    /// linked `(blockIndex, highlightIndex)` piece, in block order; when nothing chains, that's just
+    /// `[start]`.
     static func chainedHighlightPieces(
-        startingAt start: (paragraphIndex: Int, highlightIndex: Int),
-        in paragraphs: [MarkdownNode.BlockSource]
-    ) -> [(paragraphIndex: Int, highlightIndex: Int)] {
-        guard paragraphs.indices.contains(start.paragraphIndex) else { return [start] }
-        var pieces: [(paragraphIndex: Int, highlightIndex: Int)] = [start]
+        startingAt start: (blockIndex: Int, highlightIndex: Int),
+        in blocks: [MarkdownNode.BlockSource]
+    ) -> [(blockIndex: Int, highlightIndex: Int)] {
+        guard blocks.indices.contains(start.blockIndex) else { return [start] }
+        var pieces: [(blockIndex: Int, highlightIndex: Int)] = [start]
 
-        var paragraphIndex = start.paragraphIndex
+        var blockIndex = start.blockIndex
         var highlightIndex = start.highlightIndex
-        while leadingHighlightIndex(in: paragraphs[paragraphIndex].rawText) == highlightIndex,
-              paragraphIndex > 0 {
-            guard let previousIndex = trailingHighlightIndex(in: paragraphs[paragraphIndex - 1].rawText) else { break }
-            paragraphIndex -= 1
+        while leadingHighlightIndex(in: blocks[blockIndex]) == highlightIndex,
+              blockIndex > 0 {
+            guard let previousIndex = trailingHighlightIndex(in: blocks[blockIndex - 1]) else { break }
+            blockIndex -= 1
             highlightIndex = previousIndex
-            pieces.insert((paragraphIndex, highlightIndex), at: 0)
+            pieces.insert((blockIndex, highlightIndex), at: 0)
         }
 
-        paragraphIndex = start.paragraphIndex
+        blockIndex = start.blockIndex
         highlightIndex = start.highlightIndex
-        while trailingHighlightIndex(in: paragraphs[paragraphIndex].rawText) == highlightIndex,
-              paragraphIndex + 1 < paragraphs.count {
-            guard let nextIndex = leadingHighlightIndex(in: paragraphs[paragraphIndex + 1].rawText) else { break }
-            paragraphIndex += 1
+        while trailingHighlightIndex(in: blocks[blockIndex]) == highlightIndex,
+              blockIndex + 1 < blocks.count {
+            guard let nextIndex = leadingHighlightIndex(in: blocks[blockIndex + 1]) else { break }
+            blockIndex += 1
             highlightIndex = nextIndex
-            pieces.append((paragraphIndex, highlightIndex))
+            pieces.append((blockIndex, highlightIndex))
         }
 
         return pieces

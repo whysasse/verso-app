@@ -42,7 +42,7 @@ The design system and all screen designs are **complete**. Implementation is act
   - Inputs (`SearchBar`, `FilterChip`, `FilterChipBar`, `VersoTextField`)
   - Indicators (`StatusBadge`)
   - Buttons (`VersoButton`)
-  - Reading (`MarkdownBodyView`, `HighlightableParagraphText`, `ReadingChrome`, `ReadingControls`, `ArticleHeader`, `ScrollProgress`, `RelatedArticlesSection`, `ImmersiveHintPill`)
+  - Reading (`MarkdownBodyView`, `HighlightableRegionText`, `ReadingChrome`, `ReadingControls`, `ArticleHeader`, `ScrollProgress`, `RelatedArticlesSection`, `ImmersiveHintPill`)
   - Settings (`ThemeSelector`, `SettingsRow`)
 - **Live data wiring** — Screens read from Core Data via `@FetchRequest` against `ArticleLibraryService` (e.g. `ArticleListView`); no mock data remains
 - **iCloud Drive folder picker** — End-to-end via `FolderBookmarkService` and security-scoped bookmarks (FAB-44, FAB-99)
