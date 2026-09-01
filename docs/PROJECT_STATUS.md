@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Date:** 2026-08-29 | **PRD Version:** 1.7
+**Date:** 2026-09-01 | **PRD Version:** 1.7
 
 ---
 
@@ -42,7 +42,7 @@ The design system and all screen designs are **complete**. Implementation is act
   - Inputs (`SearchBar`, `FilterChip`, `FilterChipBar`, `VersoTextField`)
   - Indicators (`StatusBadge`)
   - Buttons (`VersoButton`)
-  - Reading (`MarkdownBodyView`, `ReadingChrome`, `ReadingControls`, `ArticleHeader`, `ScrollProgress`, `RelatedArticlesSection`, `ImmersiveHintPill`)
+  - Reading (`MarkdownBodyView`, `HighlightableParagraphText`, `ReadingChrome`, `ReadingControls`, `ArticleHeader`, `ScrollProgress`, `RelatedArticlesSection`, `ImmersiveHintPill`)
   - Settings (`ThemeSelector`, `SettingsRow`)
 - **Live data wiring** — Screens read from Core Data via `@FetchRequest` against `ArticleLibraryService` (e.g. `ArticleListView`); no mock data remains
 - **iCloud Drive folder picker** — End-to-end via `FolderBookmarkService` and security-scoped bookmarks (FAB-44, FAB-99)
@@ -56,7 +56,7 @@ Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of rec
 
 - **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) closed 2026-08-26: a real-file smoke test surfaced a second bug (native-array imports always landed as `.unread`), fixed and reverified against Fabio's real export (86 read / 395 unread, matching the source data) — see `docs/DONE.md`. FAB-150 (App Store release checklist): signing, privacy manifest, the CI release path, and Store & compliance metadata (subtitle, description, keywords, screenshots, privacy nutrition labels, age rating, App Review notes) are all done — Fabio reviewed and entered everything into App Store Connect 2026-08-25, see `docs/APP_STORE_LISTING.md`. Only the final binary submission itself remains.
 - **Phase B — localization (FAB-275).** Done 2026-08-25 — all 8 steps complete (see `docs/DONE.md`): FR-CA/PT-BR translated and linguistically QA'd, App Store metadata localized and pasted into App Store Connect, Québec Bill 96 posture decided (risk-accepted, not legally confirmed). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this area.
-- **Phase C (after launch) — polish backlog.** Highlighting (FAB-54), RSVP reading mode (FAB-277), VoiceOver progress announcement (FAB-278) — each needs a UX decision from Fabio before implementation.
+- **Phase C (after launch) — polish backlog.** Highlighting (FAB-54) done 2026-09-01 — see `docs/DONE.md`. RSVP reading mode (FAB-277) and VoiceOver progress announcement (FAB-278) still need a UX decision from Fabio before implementation.
 - **Phase 4 (deferred, excluded from this sequencing): iPad support** (FAB-131, FAB-154 → FAB-162).
 - First TestFlight round (FAB-285–288, 2026-08-23): fixed onboarding tour navigation, live file sync on foreground, stale status badges, and the "All" filter count including archived articles — all four caught during Fabio's own TestFlight testing.
 

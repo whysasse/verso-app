@@ -403,6 +403,10 @@
     "header": {
       "byline": "Par {author}"
     },
+    "highlight": {
+      "add": "Surligner",
+      "remove": "Supprimer le surlignage"
+    },
     "immersiveHint": "Touche n'importe où pour afficher les commandes",
     "menu": {
       "share": "Partager"

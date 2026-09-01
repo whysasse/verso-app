@@ -190,6 +190,20 @@ enum ArticleStatus: String, CaseIterable {
     }
 }
 
+/// FAB-54: the reading-view text-highlight background wash. Deliberately **not** one of
+/// `ThemeColors`' 9 per-theme roles and **not** theme-tinted like `accentSurface` -- a highlight
+/// should read as a single consistent "highlighter" color the way it does in every reading app,
+/// distinct from `accent` (already means links/interactive controls) and from the TTS
+/// "currently narrating" indicator (`accent.opacity(0.15)`, `ArticleReaderView`'s
+/// `highlightedParagraphIndex`).
+///
+/// `#F5C842` @ 30% opacity, computed (not eyeballed) against each theme's `textPrimary`-on-
+/// `background` per `docs/DESIGN_TOKENS.md`'s WCAG rule: Paper 11.49:1, Sepia 11.88:1,
+/// Night 6.20:1, Ink 7.03:1 -- all comfortably clear of the 4.5:1 minimum.
+enum VersoHighlightColor {
+    static let wash = Color(hex: "F5C842").opacity(0.30)
+}
+
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

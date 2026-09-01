@@ -300,6 +300,15 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | `reading.topBar.moreActions.hint` | VoiceOver hint | Shows more actions for this article | Affiche plus d'actions pour cet article | Mostra mais ações para este artigo | — |
 | `reading.menu.share` | Menu item label | Share | Partager | Compartilhar | Opens `ShareLink` for the article's source URL; hidden when the article has no URL |
 
+### Text Selection Menu (FAB-54)
+
+> New for FAB-54 (text highlighting). Appears in the system edit menu when the user selects body text in the reading view — `Highlight` when the selection isn't already highlighted, `Remove Highlight` when it is. fr-CA/pt-BR are hand-translated, `needs_review` state — same convention as every other hand-translated string in this codebase (see `docs/LOCALIZATION.md`).
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.highlight.add` | Edit-menu item label | Highlight | Surligner | Destacar | — |
+| `reading.highlight.remove` | Edit-menu item label | Remove Highlight | Supprimer le surlignage | Remover destaque | — |
+
 ### Bottom Bar (Reading Controls)
 
 | Key | Location | en | fr-CA | pt-BR | Notes |

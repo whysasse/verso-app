@@ -283,6 +283,26 @@ struct MarkdownWriter {
         throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 1, userInfo: [NSLocalizedDescriptionKey: "Could not insert scroll_position into frontmatter"]))
     }
 
+    /// Replaces everything after the frontmatter's closing `---` with `newBody`, leaving the
+    /// frontmatter block itself untouched. Unlike every other updater in this file (each rewrites
+    /// exactly one YAML line), this is the first one that replaces the body -- used by FAB-54's
+    /// highlight insertion/removal, which edits `.md` content, not frontmatter. Mirrors the same
+    /// line-boundary `---` detection `MarkdownReader`'s private `extractFrontmatter` already uses,
+    /// so a file this can update is exactly a file `MarkdownReader` can read frontmatter from.
+    static func updateBody(_ newBody: String, for filePath: String) throws {
+        let url = URL(fileURLWithPath: filePath)
+        let content = try String(contentsOf: url, encoding: .utf8)
+        let normalized = content.hasPrefix("---") ? content : "---\n" + content
+        let lines = normalized.components(separatedBy: "\n")
+        guard lines.first == "---",
+              let closingIndex = lines.indices.dropFirst().first(where: { lines[$0] == "---" }) else {
+            throw MarkdownWriterError.fileWriteFailed(NSError(domain: "MarkdownWriter", code: 5, userInfo: [NSLocalizedDescriptionKey: "Could not locate frontmatter to update body"]))
+        }
+        let frontmatterBlock = lines[0...closingIndex].joined(separator: "\n")
+        let updated = frontmatterBlock + "\n" + newBody.trimmingCharacters(in: .whitespacesAndNewlines) + "\n"
+        try updated.write(to: url, atomically: true, encoding: .utf8)
+    }
+
     /// Replaces or inserts the `tags:` YAML line (JSON-array style, same as new articles).
     static func updateTags(_ tags: [String], for filePath: String) throws {
         let url = URL(fileURLWithPath: filePath)

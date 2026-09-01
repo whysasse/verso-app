@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**179 completed issues.**
+**180 completed issues.**
 
 ## iOS
 
@@ -762,6 +762,31 @@
 
 
 ### Phase 2 — Experience
+
+- [x] 🔵 **FAB-54** · [PHASE 3] Implement highlighting  `Done` `Low`
+  Select text in the reading view and highlight it, stored as `==text==` inline markers in the article's `.md` body (the Obsidian/CommonMark-extension convention — plain, portable, no proprietary format). The backlog entry was thin and left the storage format as an open question; before implementing, found the real blocker wasn't the storage format but that the reading view had **no text selection at all** — every paragraph rendered as one non-selectable SwiftUI `Text`. Put both the scope call and the storage-format question to Fabio directly rather than guessing; he chose to build a real (scoped-down) version this session, inline markers over frontmatter offsets. Completed 2026-09-01.
+
+  ## What shipped
+
+  * **New `highlight` design token** (`docs/DESIGN_TOKENS.md` §4, `Colors.swift`'s `VersoHighlightColor.wash`): `#F5C842` @ 30% opacity, deliberately **not** one of `ThemeColors`' 9 per-theme roles and not theme-tinted like `accentSurface` — a highlight should read as "highlighter ink," not shift with the palette the way `accent` does. WCAG contrast computed (not eyeballed) for `textPrimary` over the wash on each theme's `background`: Paper 11.49:1, Sepia 11.88:1, Night 6.20:1, Ink 7.03:1 — all clear of the 4.5:1 minimum.
+  * **`MarkdownBodyView.swift`**: new `InlineNode.highlight(String)` parses `==text==` (added to the existing `inlinePatterns` table, same mechanism as bold/italic/code). `MarkdownNode.paragraph` gained a `rawText` field — the paragraph's original source lines joined by `\n` (as opposed to the space-joined, trimmed text used for rendering) — so a highlight action can locate an exact, unambiguous span of the real file content rather than a synthesized rendering string.
+  * **New `HighlightableParagraphText.swift`**: a `UIViewRepresentable` wrapping a `UITextView` subclass (`isSelectable = true, isEditable = false`), used only for `.paragraph` nodes — every other block type keeps rendering as plain `Text`, unchanged. Bridges to UIKit because SwiftUI `Text` has neither a selection-change hook to build a custom menu action, nor per-run background-color support on `AttributedString` (both needed to show/manage a highlight). `buildMenu(with:)` inserts "Highlight" into the system edit menu when there's a selection, or "Remove Highlight" when the selection lands inside an existing highlighted run (detected via a custom `.versoHighlightIndex` attribute tagged onto each highlighted run at build time, in source order).
+  * **New `ArticleHighlighter.swift`**: the pure, UIKit-free raw-text matching/wrapping logic. `addHighlight` builds a whitespace-tolerant regex from the selected text (so a soft line-wrap inside the raw source still matches) and searches it literally in the paragraph's `rawText`; a selection that crossed a bold/italic/code/link boundary won't literally match and is declined gracefully (verified by actually re-parsing the wrapped result and confirming it produced a real `.highlight` node with the expected content — checking the real parser's output, rather than hand-enumerating boundary rules). `removeHighlight(at:in:)` unwraps by source-order index, sidestepping re-matching entirely for removal.
+  * **`MarkdownWriter.updateBody(_:for:)`**: new — replaces everything after the frontmatter's closing `---` while leaving the frontmatter block untouched. Every other updater in this file rewrites exactly one YAML line; this is the first one that replaces the body.
+  * **`ArticleReaderView.swift`**: wires the highlight callback — splices a paragraph's updated `rawText` back into the full in-memory article body (first-occurrence literal match, exact since `rawText` is reconstructed from precisely the source lines the parser consumed) and persists via `MarkdownWriter.updateBody`.
+  * **Copy**: two new keys, `reading.highlight.add`/`reading.highlight.remove`, added to `docs/copy/UI_COPY.md` and run through the codegen pipeline — `needs_review` state for fr-CA/pt-BR, same convention as every other hand-translated string here.
+
+  ## Explicit scope limits (by design, not oversight)
+
+  * Selecting **within one paragraph at a time** only — not across paragraph boundaries.
+  * Selecting text that overlaps bold/italic/code/link formatting declines gracefully (a single error haptic, no blocking alert) rather than corrupting the file — a real fix needs the parser to track per-character source ranges, a follow-up if it turns out to matter in practice.
+  * No highlighting on headings, list items, blockquotes, or table cells — paragraphs only.
+  * One highlight color; no cross-article "Highlights" list/summary view.
+  * A paragraph whose exact text repeats elsewhere in the article could have a highlight land on the wrong occurrence (first-occurrence matching) — narrow, accepted edge case.
+
+  ## Verified
+
+  New `Verso/VersoTests/ArticleHighlighterTests.swift` (12 tests: literal match, whitespace-tolerant match across a line wrap, decline on a bold-boundary crossing, decline when not found, first-occurrence targeting, leading/trailing whitespace trimmed, empty-selection decline, remove by index at various positions, out-of-range decline, no-highlights decline, add-then-remove round-trip) and 3 new `MarkdownParserTests` cases (single highlight marker, multiple markers in order, `rawText` preserves original source lines). Found and fixed one real bug this way: the round-trip verification in `ArticleHighlighter` was checking the un-collapsed raw candidate (which can contain a literal `\n` for a hand-wrapped paragraph) against a regex whose `.` doesn't cross newlines by default — rejecting a highlight that would actually render fine once reopened, since `MarkdownParser.flushParagraph` always collapses a paragraph's lines to single spaces before real rendering ever sees it. Fixed by normalizing newlines before the verification check, matching what real rendering will actually see. Full `VersoTests` suite (120 tests) passes. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes. **Not verified here** — this is the one where "compiles" and "actually works" are furthest apart all year: a `UITextView` bridged into SwiftUI needs on-device confirmation that selection visually matches the theme (handle color, font, line spacing identical to the old `Text` rendering), the edit menu shows "Highlight" cleanly, Dynamic Type still reflows, VoiceOver still reads paragraphs sensibly, and the highlight wash actually looks right against all 4 themes on a real screen — all Fabio's part after the PR.
 
 - [x] 🟡 **FAB-292** · Redesign article list: icon-first header + grouped-by-progress body  `Done` `Medium`
   Replaced the article list's four stacked control rows (search bar, tag-filter icon button, date-range row, status `FilterChipBar`) with one icon-first header row sharing "Verso"'s line, and replaced the status filter chips with always-visible, collapsible list sections. Design: [Verso Article List](https://claude.ai/code/artifact/ba753f85-c837-42a0-b11c-78c91e13d238) (settled 2026-08-29 design review). Completed 2026-08-29.

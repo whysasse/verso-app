@@ -15,6 +15,11 @@
   --color-status-reading: #D4A353;
   --color-status-read: #5AAF7A;
 
+  /* Reading (FAB-54): text-highlight background wash. Not theme-tinted like
+     --color-accent-surface -- same value across all four themes. Not yet consumed by any web
+     component (iOS-only for now); kept in sync per docs/DESIGN_TOKENS.md's token-parity rule. */
+  --color-highlight: rgba(245, 200, 66, 0.30);
+
   /* Spacing */
   --spacing-xxs: 4px;
   --spacing-xs: 8px;

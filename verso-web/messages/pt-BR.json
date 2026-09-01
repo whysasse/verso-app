@@ -403,6 +403,10 @@
     "header": {
       "byline": "Por {author}"
     },
+    "highlight": {
+      "add": "Destacar",
+      "remove": "Remover destaque"
+    },
     "immersiveHint": "Toque em qualquer lugar para mostrar os controles",
     "menu": {
       "share": "Compartilhar"
