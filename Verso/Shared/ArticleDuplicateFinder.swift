@@ -7,29 +7,36 @@ struct ArticleDuplicateMatch: Equatable {
 }
 
 /// Scans library Markdown files for `url:` frontmatter matching `sourceURL` (canonical comparison).
+/// FAB-296: scans the whole library tree recursively, not just the root and `Archive/`.
 enum ArticleDuplicateFinder {
 
-    /// Returns the first `.md` in the library root or `Archive/` whose frontmatter `url:` matches `sourceURL`.
+    /// Returns the first `.md` anywhere under `libraryFolder` (root, `Archive/`, or any nested
+    /// subfolder — FAB-296) whose frontmatter `url:` matches `sourceURL`.
     static func findDuplicate(of sourceURL: URL, libraryFolder: URL) -> ArticleDuplicateMatch? {
         let key = VersoArticleURL.canonicalKey(for: sourceURL)
-        if let m = scanDirectory(libraryFolder, sourceKey: key) { return m }
-        let archive = libraryFolder.appendingPathComponent("Archive", isDirectory: true)
-        var isDir: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: archive.path, isDirectory: &isDir), isDir.boolValue else {
-            return nil
-        }
-        return scanDirectory(archive, sourceKey: key)
+        return scanDirectory(libraryFolder, sourceKey: key)
     }
 
+    /// Recursive (FAB-296: was `.skipsSubdirectoryDescendants`, so an article in any subfolder
+    /// besides the library root was invisible to the check). `.media` sidecar folders never
+    /// contain `.md` files — only downloaded images — so they're pruned rather than descended.
     private static func scanDirectory(_ directoryURL: URL, sourceKey: String) -> ArticleDuplicateMatch? {
         let fm = FileManager.default
         guard let enumerator = fm.enumerator(
             at: directoryURL,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
         ) else { return nil }
 
-        for case let fileURL as URL in enumerator where fileURL.pathExtension.lowercased() == "md" {
+        for case let fileURL as URL in enumerator {
+            let isDirectory = (try? fileURL.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
+            if isDirectory {
+                if fileURL.pathExtension.lowercased() == "media" {
+                    enumerator.skipDescendants()
+                }
+                continue
+            }
+            guard fileURL.pathExtension.lowercased() == "md" else { continue }
             guard let parsed = readFrontmatterURLAndTitle(fileURL: fileURL),
                   let fileURLFromYAML = parsed.url,
                   VersoArticleURL.canonicalKey(for: fileURLFromYAML) == sourceKey else { continue }

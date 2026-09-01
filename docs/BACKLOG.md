@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**23 open issues** across iOS, Web, Design, and Infra.
+**22 open issues** across iOS, Web, Design, and Infra.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -28,36 +28,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 - **Phase C — post-launch polish.** FAB-54 (highlighting), FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) — all need a UX decision from Fabio before implementation starts.
 
 ## iOS
-
-### Bugs — import & rendering (reported by Fabio 2026-08-30)
-
-Four bugs found while reading a Medium article saved through the Share Extension, plus one hand-placed `.md` file. **FAB-294 and FAB-295 share a root cause** (`SwiftSoupParser.collectLines` is the only converter the Share Extension uses, and it handles neither `<img>` nor page chrome). **Both are done** (see [DONE.md](DONE.md)).
-
-- [ ] 🟡 **FAB-296** · Duplicate articles appear in the list despite the duplicate check  `Todo` `Medium`
-
-  **Symptom.** The article list shows the same article twice.
-
-  **Context.** Duplicate detection already exists — `ArticleDuplicateFinder.findDuplicate(of:libraryFolder:)`, wired into both `ShareViewModel.performSave` and `AddArticleView`, with a prompt offering *update existing* / *save a copy* (`DuplicateSaveResolution`). So this is a set of holes in an existing feature, not a missing feature. **Reproduce and identify which hole this is before writing code** — do not fix all four blindly.
-
-  **Candidate causes, in likelihood order.**
-  1. **URL normalization too weak.** `VersoArticleURL.canonicalKey` (`Verso/Shared/VersoArticleURL.swift`) only lowercases scheme/host, strips the fragment and one trailing slash. It keeps the query string, so Medium's share URLs (`?source=friends_link`, `?sk=…`) and any `utm_*` parameters produce a different key for the same article. This is almost certainly what happened here.
-  2. **The check is skipped silently.** `performSave` wraps the whole duplicate check in `if let libraryURL = LibraryBookmarkResolver.resolveLibraryFolderURL()`. When the bookmark is missing or fails to resolve, the extension saves without checking and says nothing. `LibraryBookmarkResolver` also computes `isStale` and then ignores it.
-  3. **Scan scope too narrow.** `ArticleDuplicateFinder.scanDirectory` passes `.skipsSubdirectoryDescendants` and only looks at the library root and `Archive/`. Any article in another subfolder is invisible to the check.
-  4. **No backstop at ingest.** `PendingArticleIngester.writeToDisk` / `upsertCoreData` (`Verso/Sources/Services/PendingArticleIngester.swift`) trust `pending.duplicateResolution`; when it is `nil` they always create a new file and a new `Article` row, with no re-check — even though the app, unlike the extension, always has folder access.
-
-  **Fix.**
-  1. Harden `VersoArticleURL.canonicalKey`: strip a known tracking-parameter set (`utm_*`, `source`, `sk`, `gi`, `ref`, `ref_src`, `fbclid`, `gclid`, `mc_cid`, `mc_eid`, `_branch_match_id`), sort the surviving query items by name, drop an empty query entirely, strip a leading `www.`, and normalize `http` → `https` for comparison purposes only (never rewrite the stored `url:` frontmatter — that is the user's record of where the article came from). Also consider `<link rel="canonical">` from the fetched HTML as a second key when present; if you add it, store it as a separate `canonical_url:` frontmatter field rather than overwriting `url:`.
-  2. Add the missing backstop in `PendingArticleIngester`: when `pending.duplicateResolution == nil`, run `ArticleDuplicateFinder.findDuplicate` against the resolved library folder before writing. On a hit, do **not** silently overwrite — write the article, then surface an in-app prompt (same two options as the extension: *Update existing* / *Keep both*) so the user decides, matching the behaviour Fabio asked for. If a prompt at ingest time is too disruptive, the acceptable fallback is: keep both, and mark the newer one so the list can show a "possible duplicate" affordance. **Ask Fabio which he prefers before implementing this step** — it's a UX decision, not a technical one.
-  3. Drop `.skipsSubdirectoryDescendants` from `scanDirectory` and walk the library recursively, skipping hidden dirs and `*.media` folders. Guard performance: the scan reads only the frontmatter of each file (it already does), so a few thousand files is fine, but add an early `break` once a match is found (already the case) and measure on a large library.
-  4. Make the skipped-check case visible: when `LibraryBookmarkResolver.resolveLibraryFolderURL()` returns nil in the extension, log it and show the user that the library folder isn't reachable rather than saving silently. Honour `isStale` by refreshing the bookmark when possible.
-  5. Add a defensive uniqueness check in `upsertCoreData` before inserting: if an `Article` row already exists with the same `filePath`, update it instead of inserting. This catches double-ingest of the same pending JSON.
-
-  **Acceptance.**
-  - Sharing the same Medium article twice — once as a clean URL, once with `?source=friends_link&sk=…` — triggers the duplicate prompt both times.
-  - Choosing *Update existing* leaves exactly one row in the list and one file on disk, with `added`, `status`, `scroll_position` and `tags` preserved (`MarkdownWriter.replaceArticle` already does this — verify it still holds).
-  - Choosing *Keep both* produces two clearly distinguishable entries.
-  - An article living in a library subfolder is found by the check.
-  - Unit tests for `VersoArticleURL.canonicalKey` covering: tracking params, query ordering, `www.`, `http` vs `https`, trailing slash, fragment. Plus a `ArticleDuplicateFinder` test over a temp directory tree with a nested subfolder.
 
 ### Phase 2 — Experience
 

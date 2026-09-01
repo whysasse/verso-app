@@ -39,14 +39,29 @@ struct PendingArticleIngester {
             do {
                 let data = try Data(contentsOf: fileURL)
                 let pending = try JSONDecoder().decode(PendingArticle.self, from: data)
-                let writtenURL = try await writeToDisk(pending: pending, folderURL: folderURL)
-                try upsertCoreData(pending: pending, filePath: writtenURL, context: context)
+
+                // FAB-296: ingest-time backstop. `duplicateResolution == nil` means the Share
+                // Extension's own check either found nothing or never ran (e.g. a missing/stale
+                // library bookmark at share time — see LibraryBookmarkResolver). The main app
+                // normally has full folder access here, so re-check before writing. Per Fabio:
+                // keep both articles rather than interrupt with a prompt at an arbitrary
+                // launch/foreground moment — just flag the new one so it surfaces via the
+                // existing tag filter.
+                var backstopTags: [String]?
+                if pending.duplicateResolution == nil,
+                   let match = ArticleDuplicateFinder.findDuplicate(of: pending.url, libraryFolder: folderURL) {
+                    backstopTags = ["Possible Duplicate"]
+                    logger.info("Ingest-time duplicate backstop matched existing file: \(match.fileURL.lastPathComponent, privacy: .public) — keeping both, flagged")
+                }
+
+                let writtenURL = try await writeToDisk(pending: pending, folderURL: folderURL, tags: backstopTags)
+                try upsertCoreData(pending: pending, filePath: writtenURL, tags: backstopTags, context: context)
                 try FileManager.default.removeItem(at: fileURL)
                 let duplicateResolutionKey: String = {
                     switch pending.duplicateResolution {
                     case .some(.replaceExisting): return "update"
                     case .some(.saveCopy): return "copy"
-                    case .none: return "none"
+                    case .none: return backstopTags == nil ? "none" : "backstop_flagged"
                     }
                 }()
                 AnalyticsService.shared.track(
@@ -62,14 +77,14 @@ struct PendingArticleIngester {
 
     // MARK: - Private
 
-    private func writeToDisk(pending: PendingArticle, folderURL: URL) async throws -> URL {
+    private func writeToDisk(pending: PendingArticle, folderURL: URL, tags: [String]?) async throws -> URL {
         let parsed = ParsedArticle(
             id: pending.id,
             filePath: folderURL, // placeholder; MarkdownWriter uses directory for new writes only
             title: pending.title,
             url: pending.url,
             contentMarkdown: pending.contentMarkdown,
-            tags: nil,
+            tags: tags,
             scrollPosition: nil,
             dateAdded: pending.dateAdded,
             status: .unread,
@@ -84,7 +99,7 @@ struct PendingArticleIngester {
         return try await MarkdownWriter.write(article: parsed, to: folderURL)
     }
 
-    private func upsertCoreData(pending: PendingArticle, filePath: URL, context: NSManagedObjectContext) throws {
+    private func upsertCoreData(pending: PendingArticle, filePath: URL, tags: [String]?, context: NSManagedObjectContext) throws {
         if case .replaceExisting(let pathStr) = pending.duplicateResolution {
             let request = NSFetchRequest<Article>(entityName: "Article")
             request.predicate = NSPredicate(format: "filePath == %@", pathStr)
@@ -111,6 +126,24 @@ struct PendingArticleIngester {
             }
         }
 
+        // FAB-296: guard double-ingest of the same pending JSON (e.g. a prior run that wrote
+        // the file and upserted Core Data but was interrupted before deleting the pending JSON)
+        // from inserting a second `Article` row for the same file.
+        let existingRequest = NSFetchRequest<Article>(entityName: "Article")
+        existingRequest.predicate = NSPredicate(format: "filePath == %@", filePath.path)
+        existingRequest.fetchLimit = 1
+        if let existing = try context.fetch(existingRequest).first {
+            existing.title = pending.title
+            existing.url = pending.url
+            existing.author = pending.author
+            existing.siteName = pending.siteName
+            existing.searchableBody = ArticlePlainText.fromMarkdown(pending.contentMarkdown)
+            existing.source = pending.url.host
+            existing.tagsSerialized = Article.makeTagsSerialized(from: tags)
+            try context.save()
+            return
+        }
+
         let article = Article(context: context)
         article.id = pending.id
         article.title = pending.title
@@ -122,6 +155,10 @@ struct PendingArticleIngester {
         article.siteName = pending.siteName
         article.searchableBody = ArticlePlainText.fromMarkdown(pending.contentMarkdown)
         article.source = pending.url.host
+        // FAB-296: previously never set on the fresh-insert path (dead until now, since `tags`
+        // was always nil here) — needed now so a backstop-flagged article's tag is visible
+        // immediately via the tag filter, not just after the next full cache rebuild.
+        article.tagsSerialized = Article.makeTagsSerialized(from: tags)
         try context.save()
     }
 }
