@@ -41,7 +41,7 @@ struct HighlightableRegionText: UIViewRepresentable {
     func updateUIView(_ uiView: HighlightableUITextView, context: Context) {
         uiView.blockSources = blocks.map(\.source)
         uiView.onHighlightAction = onHighlightAction
-        uiView.attributedText = Self.buildAttributedString(
+        let (attributedString, blockquoteRanges) = Self.buildAttributedString(
             blocks: blocks,
             activeBlockIndex: activeBlockIndex,
             fontFamily: fontFamily,
@@ -49,6 +49,13 @@ struct HighlightableRegionText: UIViewRepresentable {
             lineSpacingValue: lineSpacingValue,
             colors: colors
         )
+        uiView.attributedText = attributedString
+        // FAB-303 blockquote accent bar: the bar is drawn directly by the text view (TextKit has
+        // no attribute for "colored rectangle beside these lines"), so it needs the blockquote
+        // ranges and the current accent color as plain state, not baked into the attributed string.
+        uiView.blockquoteRanges = blockquoteRanges
+        uiView.blockquoteAccentColor = UIColor(colors.accent)
+        uiView.setNeedsDisplay()
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: HighlightableUITextView, context: Context) -> CGSize? {
@@ -69,6 +76,10 @@ struct HighlightableRegionText: UIViewRepresentable {
     /// its full raw span including delimiters, for snap-outward -- FAB-303 step 3), and
     /// `.versoBlockIndex` (which block in `blocks` a run belongs to -- FAB-303 step 4, so a
     /// selection spanning more than one block can be told apart from one that doesn't).
+    ///
+    /// Also returns the `NSRange` of each `.blockquote` block's content within the built string --
+    /// `HighlightableUITextView.draw(_:)` uses these to draw the colored accent bar (FAB-303), a
+    /// property of on-screen geometry that has no `NSAttributedString` attribute equivalent.
     static func buildAttributedString(
         blocks: [MarkdownRegionBlock],
         activeBlockIndex: Int?,
@@ -76,13 +87,14 @@ struct HighlightableRegionText: UIViewRepresentable {
         fontSize: CGFloat,
         lineSpacingValue: CGFloat,
         colors: ThemeColors
-    ) -> NSAttributedString {
+    ) -> (NSAttributedString, blockquoteRanges: [NSRange]) {
         let codeFont = UIFont(name: "SFMono-Regular", size: max(12, fontSize - 2))
             ?? .monospacedSystemFont(ofSize: max(12, fontSize - 2), weight: .regular)
         let accentColor = UIColor(colors.accent)
         let markerColor = UIColor(colors.textSecondary)
 
         let result = NSMutableAttributedString()
+        var blockquoteRanges: [NSRange] = []
         // FAB-303 step 4: the TTS "currently narrating paragraph" wash used to be a SwiftUI
         // `.background()` on the whole (single-block) view; a region can hold several blocks
         // sharing one view, so it's now a background-color attribute scoped to just the active
@@ -97,6 +109,10 @@ struct HighlightableRegionText: UIViewRepresentable {
             // `==...==` match within *this one block's own* rawText", not a running count across
             // every block sharing this view.
             var highlightIndex = 0
+            // FAB-303 blockquote accent bar: where this block's own content starts in `result` --
+            // recorded so a `.blockquote` block's full range can be captured once its content (and
+            // only its content, not the inter-block "\n" that follows) has been appended below.
+            let blockStartLocation = result.length
             let blockFont = baseFont(for: block.kind, family: fontFamily, bodySize: fontSize)
             let blockTextColor = textColor(for: block.kind, colors: colors)
 
@@ -222,6 +238,10 @@ struct HighlightableRegionText: UIViewRepresentable {
                 appendInline(inline, insideHighlight: nil)
             }
 
+            if case .blockquote = block.kind {
+                blockquoteRanges.append(NSRange(location: blockStartLocation, length: result.length - blockStartLocation))
+            }
+
             // A literal newline between blocks *within this region* -- not just visual, but what
             // makes `paragraphSpacingBefore` above actually apply to the next block: `NSParagraphStyle`
             // spacing is scoped per TextKit paragraph, and TextKit paragraphs are delimited by `\n`.
@@ -232,7 +252,7 @@ struct HighlightableRegionText: UIViewRepresentable {
                 ]))
             }
         }
-        return result
+        return (result, blockquoteRanges)
     }
 
     /// FAB-303 headings/lists/blockquotes follow-up: this block's own base font -- a heading's own
@@ -285,10 +305,9 @@ struct HighlightableRegionText: UIViewRepresentable {
     /// already used (an `HStack` with an 8pt gap for lists, a 3pt `Rectangle` + 12pt gap for a
     /// blockquote), approximated for TextKit's indent model since the two don't translate 1:1.
     ///
-    /// Blockquote is deliberately downgraded to indent-only (no colored accent bar) this session --
-    /// `docs/BACKLOG.md`'s FAB-303 checklist already flagged the bar as needing a real device to get
-    /// right via a custom TextKit draw override, "do not assume." The 15pt indent matches the
-    /// original bar (3pt) + gap (12pt) so text still lines up in the same place even without it.
+    /// The blockquote's 15pt indent reserves exactly the room the original bar (3pt) + gap (12pt)
+    /// took -- `HighlightableUITextView.draw(_:)` draws the bar itself into that reserved space,
+    /// since TextKit has no attribute for "colored rectangle beside these lines."
     private static func indentAndPrefix(for kind: MarkdownRegionBlockKind) -> (indent: CGFloat, prefix: String?) {
         switch kind {
         case .unorderedListItem:
@@ -368,6 +387,36 @@ final class HighlightableUITextView: UITextView {
     /// list items, and blockquotes.
     var blockSources: [MarkdownNode.BlockSource] = []
     var onHighlightAction: ((_ lineRange: ClosedRange<Int>, _ newRawText: String) -> Void)?
+
+    /// FAB-303 blockquote accent bar: the `NSRange` (within `attributedText`) of each `.blockquote`
+    /// block's content -- set by `HighlightableRegionText.updateUIView` alongside `attributedText`
+    /// itself, since `buildAttributedString` computes both from the same source data in one pass.
+    var blockquoteRanges: [NSRange] = []
+    /// The current theme's accent color, for the bar -- this view has no access to `ThemeColors`
+    /// on its own (only `HighlightableRegionText`, the SwiftUI wrapper, does).
+    var blockquoteAccentColor: UIColor?
+
+    /// Draws the blockquote accent bar: a 3pt-wide rectangle at the region's leading edge, spanning
+    /// the full on-screen height of each blockquote block's (possibly multi-line, if the quote
+    /// wraps) content -- ported 1:1 from the deleted SwiftUI layout this replaced
+    /// (`HStack(spacing: 12) { Rectangle().fill(colors.accent).frame(width: 3); Text(...) }`).
+    /// TextKit has no attribute for "colored rectangle beside these lines", so this is a direct
+    /// draw override rather than something baked into `attributedText` -- the standard TextKit
+    /// technique for a blockquote/pull-quote bar. `indentAndPrefix`'s 15pt blockquote indent
+    /// already reserves this exact space (3pt bar + 12pt gap), so the bar's text neighbor never
+    /// needs adjusting here.
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        guard !blockquoteRanges.isEmpty, let accentColor = blockquoteAccentColor else { return }
+        accentColor.setFill()
+        for range in blockquoteRanges {
+            let glyphRange = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+            guard glyphRange.length > 0 else { continue }
+            let bounds = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+            let barRect = CGRect(x: 0, y: bounds.minY, width: 3, height: bounds.height)
+            UIRectFill(barRect)
+        }
+    }
 
     override func buildMenu(with builder: UIMenuBuilder) {
         super.buildMenu(with: builder)
