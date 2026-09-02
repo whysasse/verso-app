@@ -88,6 +88,89 @@ final class ArticleHighlighterTests: XCTestCase {
         XCTAssertEqual(restored, original)
     }
 
+    // MARK: - FAB-303: addOrMergeHighlight
+
+    func testAddOrMergeHighlightBehavesLikePlainAddWhenNothingTouches() {
+        let rawText = "The quick brown fox jumps."
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 4..<15, in: rawText)
+        XCTAssertEqual(result, "The ==quick brown== fox jumps.")
+    }
+
+    func testAddOrMergeHighlightMergesWhenExtendingIntoAnExistingHighlight() {
+        // "Some ==highlighted== text after." -- selecting "me " (plain text) through the end of the
+        // existing highlight (already-snapped bound, matching what the caller would actually pass).
+        let rawText = "Some ==highlighted== text after."
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 2..<20, in: rawText)
+        XCTAssertEqual(result, "So==me highlighted== text after.")
+    }
+
+    func testAddOrMergeHighlightMergesWhenExtendingOutOfAnExistingHighlight() {
+        // Same source, selecting from the start of the existing highlight (already-snapped) out
+        // through "text" (plain text after it).
+        let rawText = "Some ==highlighted== text after."
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 5..<25, in: rawText)
+        XCTAssertEqual(result, "Some ==highlighted text== after.")
+    }
+
+    /// The bug this feature closes: a selection that starts and ends in plain text, with an
+    /// *entire* existing highlight sitting inside it, never touches the old decline check's two
+    /// boundary positions at all -- without this fix it would fall through to a plain wrap and nest
+    /// a fresh `==...==` around text that already contains one.
+    func testAddOrMergeHighlightMergesAHighlightFullyEnclosedInTheMiddle() {
+        let rawText = "Before ==middle== after."
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 3..<22, in: rawText)
+        XCTAssertEqual(result, "Bef==ore middle afte==r.")
+    }
+
+    func testAddOrMergeHighlightMergesADirectlyAdjacentHighlightWithNoGap() {
+        // "==first==second text" -- selecting "second" (plain text starting exactly where the
+        // highlight ends, zero gap) merges with it, per Fabio's original decision that "overlapping
+        // or directly adjacent" both count.
+        let rawText = "==first==second text"
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 9..<15, in: rawText)
+        XCTAssertEqual(result, "==firstsecond== text")
+    }
+
+    func testAddOrMergeHighlightMergesTwoSeparateHighlightsTouchedByOneSelection() {
+        let rawText = "==one== and ==two== end."
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 0..<19, in: rawText)
+        XCTAssertEqual(result, "==one and two== end.")
+    }
+
+    func testAddOrMergeHighlightWalksThroughAChainOfThreeAdjacentHighlights() {
+        // "==a====b====c==" -- three highlights, each touching the next with zero gap. Touching
+        // only the middle one ("==b==", offsets 5..<10) still absorbs all three, transitively.
+        let rawText = "==a====b====c=="
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 5..<10, in: rawText)
+        XCTAssertEqual(result, "==abc==")
+    }
+
+    func testAddOrMergeHighlightDoesNotMergeAcrossARealGap() {
+        // A one-character gap (the space at offset 10) between the selection and the existing
+        // highlight is enough to keep them separate -- only zero-gap adjacency merges.
+        let rawText = "Start here ==highlighted== and more text."
+        let result = ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: 0..<10, in: rawText)
+        XCTAssertEqual(result, "==Start here== ==highlighted== and more text.")
+    }
+
+    // MARK: - FAB-303: rangeTouchesExistingHighlight
+
+    func testRangeTouchesExistingHighlightIsTrueForAnOverlap() {
+        XCTAssertTrue(ArticleHighlighter.rangeTouchesExistingHighlight(3..<12, in: "Before ==middle== after."))
+    }
+
+    func testRangeTouchesExistingHighlightIsTrueForZeroGapAdjacency() {
+        XCTAssertTrue(ArticleHighlighter.rangeTouchesExistingHighlight(9..<15, in: "==first==second text"))
+    }
+
+    func testRangeTouchesExistingHighlightIsFalseAcrossARealGap() {
+        XCTAssertFalse(ArticleHighlighter.rangeTouchesExistingHighlight(0..<10, in: "Start here ==highlighted== and more text."))
+    }
+
+    func testRangeTouchesExistingHighlightIsFalseWhenThereAreNoHighlights() {
+        XCTAssertFalse(ArticleHighlighter.rangeTouchesExistingHighlight(0..<5, in: "No highlights in here at all."))
+    }
+
     // MARK: - FAB-303 step 5: crossBlockHighlightRanges
 
     /// Builds a `BlockSource` the way `MarkdownParser.flushParagraph` would for a single-line,

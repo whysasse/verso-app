@@ -54,6 +54,83 @@ enum ArticleHighlighter {
     /// deliberately has no dependency in the other direction.
     private static var markerPattern: String { MarkdownParser.highlightMarkerPattern }
 
+    // MARK: - FAB-303: merge with an existing highlight
+
+    /// Wraps `range` fresh, first absorbing (and stripping the markers of) every existing
+    /// `==...==` highlight that overlaps or is directly adjacent to it -- so extending a selection
+    /// into, out of, or across an existing highlight produces one bigger highlight instead of a
+    /// broken or nested one. Identical to `addHighlight(atRawOffsetRange:in:)` when nothing touches
+    /// `range` at all -- this supersedes that function as the same-block call in
+    /// `HighlightableUITextView.applyAddHighlight`, not a separate branch alongside it.
+    ///
+    /// Why this was needed, not just "nice to have": the old decline-on-touch check only ever
+    /// looked at a selection's two *boundary* positions. A selection that starts and ends in
+    /// ordinary text but fully *encloses* an existing highlight in the middle never touched either
+    /// boundary, so it fell through to a plain wrap -- nesting a fresh `==...==` around text that
+    /// already contained one, corrupting the file. Expanding to cover every touched highlight
+    /// (however it's touched -- at an edge or fully enclosed) before wrapping closes that path,
+    /// since a merge has to find all of them anyway.
+    ///
+    /// Works transitively: if the expanded range now touches *another* highlight it didn't
+    /// originally reach, that one gets absorbed too, so a chain of mutually-adjacent highlights
+    /// merges in one action. Returns `nil` if `range` doesn't fall within `rawText`.
+    static func addOrMergeHighlight(atRawOffsetRange range: Range<Int>, in rawText: String) -> String? {
+        let highlightRanges = existingHighlightRanges(in: rawText)
+
+        var unionStart = range.lowerBound
+        var unionEnd = range.upperBound
+        var expanded = true
+        while expanded {
+            expanded = false
+            for highlightRange in highlightRanges where rangesTouch(highlightRange, unionStart..<unionEnd) {
+                if highlightRange.lowerBound < unionStart {
+                    unionStart = highlightRange.lowerBound
+                    expanded = true
+                }
+                if highlightRange.upperBound > unionEnd {
+                    unionEnd = highlightRange.upperBound
+                    expanded = true
+                }
+            }
+        }
+
+        let nsRange = NSRange(location: unionStart, length: unionEnd - unionStart)
+        guard let sliceRange = Range(nsRange, in: rawText) else { return nil }
+        let content = String(rawText[sliceRange])
+        let stripped = content.replacingOccurrences(of: markerPattern, with: "$1", options: .regularExpression)
+        return rawText.replacingCharacters(in: sliceRange, with: "==\(stripped)==")
+    }
+
+    /// Whether any existing `==...==` marker in `rawText` overlaps or is directly adjacent to
+    /// `range`. A same-block write always merges instead (`addOrMergeHighlight`, above), but a
+    /// cross-block write can't -- actually merging across a block break needs finding every touched
+    /// piece across blocks and re-verifying each one's boundaries after stripping, the same order of
+    /// complexity as merging itself, which is why it's deliberately not attempted here (see
+    /// `docs/BACKLOG.md`'s FAB-303 checklist). So a cross-block write uses this to decline instead
+    /// of silently wrapping over -- and corrupting -- an existing highlight it doesn't know how to
+    /// merge with.
+    static func rangeTouchesExistingHighlight(_ range: Range<Int>, in rawText: String) -> Bool {
+        existingHighlightRanges(in: rawText).contains { rangesTouch($0, range) }
+    }
+
+    /// Every existing `==...==` match in `rawText` as a raw UTF-16 range, delimiters included --
+    /// the same coordinate space as `.versoFullSourceRange` and everything else in this file.
+    private static func existingHighlightRanges(in rawText: String) -> [Range<Int>] {
+        guard let regex = try? NSRegularExpression(pattern: markerPattern) else { return [] }
+        let nsRange = NSRange(rawText.startIndex..., in: rawText)
+        return regex.matches(in: rawText, range: nsRange).compactMap { match in
+            guard match.range.location != NSNotFound else { return nil }
+            return match.range.location..<(match.range.location + match.range.length)
+        }
+    }
+
+    /// Whether `a` and `b` overlap *or* touch with zero gap between them (one ending exactly where
+    /// the other begins) -- both count as "adjacent" per Fabio's original decision (2026-09-01):
+    /// "Selection overlapping or directly adjacent to an existing highlight" merges.
+    private static func rangesTouch(_ a: Range<Int>, _ b: Range<Int>) -> Bool {
+        a.lowerBound <= b.upperBound && b.lowerBound <= a.upperBound
+    }
+
     // MARK: - FAB-303 step 5: cross-block write
 
     /// A selection whose two ends land in *different* blocks of the same region can't be wrapped
