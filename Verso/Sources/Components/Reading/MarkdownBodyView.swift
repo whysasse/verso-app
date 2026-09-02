@@ -78,10 +78,11 @@ enum MarkdownNode {
         case code(String, source: SourceSpan)
         case link(text: String, url: String, source: SourceSpan)
         /// `==text==` (Obsidian/CommonMark-extension convention). Rendered with a background wash
-        /// in the reading view's selectable paragraph text (`HighlightableParagraphText`) --
-        /// SwiftUI `Text` doesn't support per-run background color on `AttributedString`, so this
-        /// case falls back to plain (but still recursively styled) text wherever it appears outside
-        /// a paragraph (headings, list items, table cells, etc.).
+        /// in the reading view's selectable region text (`HighlightableRegionText`) -- SwiftUI
+        /// `Text` doesn't support per-run background color on `AttributedString`, so this case
+        /// falls back to plain (but still recursively styled) text wherever it appears outside a
+        /// merged region -- table cells, in practice, since every other "text block" kind
+        /// (paragraph, heading, either list-item kind, blockquote) is part of a region.
         ///
         /// FAB-303 step 3: recursive (`[InlineNode]`, not a bare `String`) -- `==**bold** text==`
         /// needs to render "bold" as actual bold inside the highlight wash, not literal asterisks,
@@ -523,7 +524,29 @@ extension MarkdownNode.InlineNode {
     }
 }
 
-/// FAB-303 step 4: a paragraph's `inlines`/`source`, tagged with its index in the *flat* `nodes`
+/// FAB-303: which "text block" kind a `MarkdownRegionBlock` was built from -- everything a merged,
+/// selectable region can hold. Originally regions only ever held `.paragraph`; the headings/lists/
+/// blockquotes follow-up (`docs/BACKLOG.md`'s FAB-303 checklist) brought the other four in.
+/// `unorderedListItem`/`orderedListItem` are distinguished (rather than one shared case) because
+/// `HighlightableRegionText` needs the ordered item's own `index` to render its number prefix.
+enum MarkdownRegionBlockKind {
+    case paragraph
+    case heading(level: Int)
+    case unorderedListItem
+    case orderedListItem(index: Int)
+    case blockquote
+
+    /// Whether this kind is either list-item case -- used by `regionBlockSpacing` to reproduce
+    /// `topSpacing`'s "6pt between sibling list items, 16pt otherwise" rule.
+    var isListItem: Bool {
+        switch self {
+        case .unorderedListItem, .orderedListItem: return true
+        case .paragraph, .heading, .blockquote: return false
+        }
+    }
+}
+
+/// FAB-303 step 4: a block's `kind`/`inlines`/`source`, tagged with its index in the *flat* `nodes`
 /// array it came from -- needed to look up its immediate predecessor (for spacing) and to match
 /// against `MarkdownBodyView.highlightedParagraphIndex` (also flat-index-based, unchanged, so TTS
 /// wiring in `ArticleReaderView` didn't need to change for this step).
@@ -532,46 +555,72 @@ extension MarkdownNode.InlineNode {
 /// `@testable import` -- unlike everything downstream of it in this step, which needs a real
 /// `UITextView`/device to verify. Not `Equatable` (neither is `MarkdownNode` itself); tests match
 /// against it with `if case`/`guard case`, same convention `MarkdownParserTests` already uses.
-struct MarkdownRegionParagraph {
+struct MarkdownRegionBlock {
     let nodeIndex: Int
+    let kind: MarkdownRegionBlockKind
     let inlines: [MarkdownNode.InlineNode]
     let source: MarkdownNode.BlockSource
 }
 
-/// One thing `MarkdownBodyView.body` renders: either a run of one-or-more consecutive `.paragraph`
-/// nodes sharing a single `HighlightableParagraphText` (FAB-303 step 4 -- iOS can't extend a
-/// native text selection across two `UIView`s, so cross-paragraph selection needs the paragraphs
-/// to share one `UITextView`), or any other node, unchanged from before this step.
+/// One thing `MarkdownBodyView.body` renders: either a run of one-or-more consecutive "text block"
+/// nodes (paragraph, heading, either list-item kind, blockquote) sharing a single
+/// `HighlightableRegionText` (FAB-303 step 4 -- iOS can't extend a native text selection across two
+/// `UIView`s, so cross-block selection needs the blocks to share one `UITextView`), or any other
+/// node (image, code block, table, horizontal rule), which still renders individually.
 enum MarkdownRenderUnit {
-    case paragraphRegion([MarkdownRegionParagraph])
+    case textRegion([MarkdownRegionBlock])
     case single(nodeIndex: Int, node: MarkdownNode)
 }
 
-/// FAB-303 step 4: groups a flat node list into render units. A region breaks at every non-
-/// paragraph node -- heading, list item, blockquote, image, code block, table, rule -- exactly
-/// where regions already implicitly end (those keep rendering individually, unchanged, deferred
-/// to a follow-up per `docs/BACKLOG.md`'s FAB-303 checklist). Pure and free of any view/UIKit
-/// dependency, so it's unit-tested directly -- unlike everything downstream of it in this step.
+/// FAB-303: groups a flat node list into render units. A region breaks only at image, code block,
+/// table, or horizontal rule -- every other node type (paragraph, heading, either list-item kind,
+/// blockquote) merges into the region it's adjacent to. Pure and free of any view/UIKit dependency,
+/// so it's unit-tested directly -- unlike everything downstream of it in this step.
 func groupIntoRenderUnits(_ nodes: [MarkdownNode]) -> [MarkdownRenderUnit] {
     var units: [MarkdownRenderUnit] = []
-    var currentRegion: [MarkdownRegionParagraph] = []
+    var currentRegion: [MarkdownRegionBlock] = []
 
     func flushRegion() {
         guard !currentRegion.isEmpty else { return }
-        units.append(.paragraphRegion(currentRegion))
+        units.append(.textRegion(currentRegion))
         currentRegion = []
     }
 
     for (index, node) in nodes.enumerated() {
-        if case .paragraph(let inlines, let source) = node {
-            currentRegion.append(MarkdownRegionParagraph(nodeIndex: index, inlines: inlines, source: source))
-        } else {
+        switch node {
+        case .paragraph(let inlines, let source):
+            currentRegion.append(MarkdownRegionBlock(nodeIndex: index, kind: .paragraph, inlines: inlines, source: source))
+        case .heading(let level, let inlines, let source):
+            currentRegion.append(MarkdownRegionBlock(nodeIndex: index, kind: .heading(level: level), inlines: inlines, source: source))
+        case .unorderedListItem(let inlines, let source):
+            currentRegion.append(MarkdownRegionBlock(nodeIndex: index, kind: .unorderedListItem, inlines: inlines, source: source))
+        case .orderedListItem(let itemIndex, let inlines, let source):
+            currentRegion.append(MarkdownRegionBlock(nodeIndex: index, kind: .orderedListItem(index: itemIndex), inlines: inlines, source: source))
+        case .blockquote(let inlines, let source):
+            currentRegion.append(MarkdownRegionBlock(nodeIndex: index, kind: .blockquote, inlines: inlines, source: source))
+        case .codeBlock, .image, .horizontalRule, .table:
             flushRegion()
             units.append(.single(nodeIndex: index, node: node))
         }
     }
     flushRegion()
     return units
+}
+
+/// FAB-303 headings/lists/blockquotes follow-up: the same spacing rule `topSpacing` (below) already
+/// applies between fully separate blocks, restated in terms of `MarkdownRegionBlockKind` so it can
+/// also govern spacing *within* a merged region, between two blocks now sharing one `UITextView` --
+/// same numbers, same two special cases (24pt before a heading; 6pt between two consecutive list
+/// items of either kind), everything else 16pt. `hasPrevious: false` (nothing precedes at all,
+/// either in the flat node list or within this region) always means 0. Duplicates `topSpacing`'s
+/// three numbers rather than sharing an implementation with it, matching how `HighlightableRegionText`
+/// already cross-references (rather than reuses) `topSpacing`'s default 16pt case -- `topSpacing`
+/// itself stays untouched, at zero risk to already-working single-block rendering.
+func regionBlockSpacing(for kind: MarkdownRegionBlockKind, hasPrevious: Bool, previousIsListItem: Bool) -> CGFloat {
+    guard hasPrevious else { return 0 }
+    if case .heading = kind { return 24 }
+    if kind.isListItem { return previousIsListItem ? 6 : 16 }
+    return 16
 }
 
 struct MarkdownBodyView: View {
@@ -609,23 +658,22 @@ struct MarkdownBodyView: View {
         case .single(let nodeIndex, let node):
             blockView(for: node, index: nodeIndex)
 
-        case .paragraphRegion(let paragraphs):
-            let firstIndex = paragraphs[0].nodeIndex
-            let prevNode: MarkdownNode? = firstIndex > 0 ? nodes[firstIndex - 1] : nil
-            // A region is always made of paragraphs, which only ever hit `topSpacing`'s `default`
-            // case (16pt) regardless of what precedes them -- true today for a lone paragraph and
-            // still true for a merged region, since only the region's first paragraph is adjacent
-            // to whatever came before it.
-            let topPadding: CGFloat = prevNode == nil ? 0 : 16
-            // Which paragraph *within this region* (not the flat node index) TTS is narrating, if
-            // any and if it's actually in this region.
+        case .textRegion(let blocks):
+            let firstIndex = blocks[0].nodeIndex
+            // FAB-303 headings/lists/blockquotes follow-up: `previousIsListItem` is always `false`
+            // here -- if the node right before this region's first block *were* a list item, it
+            // would have been merged into this same region instead (`groupIntoRenderUnits` never
+            // leaves a list item unmerged), so a region can never immediately follow one.
+            let topPadding = regionBlockSpacing(for: blocks[0].kind, hasPrevious: firstIndex > 0, previousIsListItem: false)
+            // Which block *within this region* (not the flat node index) TTS is narrating, if any
+            // and if it's actually in this region.
             let activeIndexInRegion = highlightedParagraphIndex.flatMap { activeNodeIndex in
-                paragraphs.firstIndex { $0.nodeIndex == activeNodeIndex }
+                blocks.firstIndex { $0.nodeIndex == activeNodeIndex }
             }
 
-            HighlightableParagraphText(
-                paragraphs: paragraphs.map { (inlines: $0.inlines, source: $0.source) },
-                activeParagraphIndex: activeIndexInRegion,
+            HighlightableRegionText(
+                blocks: blocks,
+                activeBlockIndex: activeIndexInRegion,
                 fontFamily: fontFamily,
                 fontSize: fontSize,
                 lineSpacingValue: lineSpacingValue,
@@ -655,56 +703,15 @@ struct MarkdownBodyView: View {
 
         Group {
             switch node {
-            case .paragraph:
-                // FAB-303 step 4: paragraphs are grouped into regions and rendered via
-                // `unitView`/`HighlightableParagraphText` before `blockView` is ever reached --
-                // this case is unreachable in practice. `EmptyView()` rather than `fatalError()`
-                // so a bug in that grouping invariant fails quietly (a missing paragraph) rather
-                // than crashing the whole reading view.
+            case .paragraph, .heading, .unorderedListItem, .orderedListItem, .blockquote:
+                // FAB-303: every "text block" kind is grouped into a region and rendered via
+                // `unitView`/`HighlightableRegionText` before `blockView` is ever reached -- these
+                // five cases are unreachable in practice (originally just `.paragraph`; the
+                // headings/lists/blockquotes follow-up brought the other four into the same
+                // unreachable bucket, per `docs/BACKLOG.md`'s FAB-303 checklist). `EmptyView()`
+                // rather than `fatalError()` so a bug in that grouping invariant fails quietly (a
+                // missing block) rather than crashing the whole reading view.
                 EmptyView()
-
-            case .heading(let level, let inlines, _):
-                Text(inlineText(inlines))
-                    .font(headingFont(level: level))
-                    .foregroundColor(colors.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-            case .unorderedListItem(let inlines, _):
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text("•")
-                        .font(bodyFont)
-                        .foregroundColor(colors.textSecondary)
-                    Text(inlineText(inlines))
-                        .font(bodyFont)
-                        .lineSpacing(lineSpacingValue)
-                        .foregroundColor(colors.textPrimary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            case .orderedListItem(let idx, let inlines, _):
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text("\(idx).")
-                        .font(bodyFont)
-                        .foregroundColor(colors.textSecondary)
-                        .frame(minWidth: 24, alignment: .trailing)
-                    Text(inlineText(inlines))
-                        .font(bodyFont)
-                        .lineSpacing(lineSpacingValue)
-                        .foregroundColor(colors.textPrimary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            case .blockquote(let inlines, _):
-                HStack(spacing: 12) {
-                    Rectangle()
-                        .fill(colors.accent)
-                        .frame(width: 3)
-                    Text(inlineText(inlines))
-                        .font(bodyFont.italic())
-                        .lineSpacing(lineSpacingValue)
-                        .foregroundColor(colors.textSecondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
 
             case .codeBlock(_, let code):
                 Text(code)
@@ -791,16 +798,6 @@ struct MarkdownBodyView: View {
             : .custom(fontFamily, size: fontSize)
     }
 
-    private func headingFont(level: Int) -> Font {
-        let t = VersoTypography.Reading(fontFamily: fontFamily)
-        switch level {
-        case 1: return t.h1
-        case 2: return t.h2
-        case 3: return t.h3
-        default: return t.h4
-        }
-    }
-
     // MARK: Inline text rendering
 
     private func inlineText(_ inlines: [MarkdownNode.InlineNode]) -> AttributedString {
@@ -839,10 +836,10 @@ struct MarkdownBodyView: View {
             }
             return a
         case .highlight(let inlines, _):
-            // Falls back to plain (but still recursively styled) text outside a paragraph
-            // (headings, list items, table cells) — SwiftUI `Text` can't paint a per-run
-            // background, so there's no wash to add here; `HighlightableParagraphText` is what
-            // actually renders it for paragraphs, the only place FAB-54 targets.
+            // Falls back to plain (but still recursively styled) text outside a merged region --
+            // table cells, in practice — SwiftUI `Text` can't paint a per-run background, so
+            // there's no wash to add here; `HighlightableRegionText` is what actually renders it
+            // for every other "text block" kind.
             return inlines.reduce(AttributedString("")) { result, inline in result + textForInline(inline) }
         }
     }
