@@ -443,14 +443,18 @@ final class HighlightableUITextView: UITextView {
 
     /// FAB-303 step 3: converts the current selection to an exact raw offset range -- snapping
     /// each boundary outward to its enclosing run's edge when it lands strictly inside a delimited
-    /// run (bold/italic/bold-italic/link/code), rather than only handling the exact-same-run case
-    /// FAB-303 step 2 shipped. Declines when the whole selection sits inside one inline-code run
-    /// (nothing safe to wrap -- `==` is literal inside backticks), or when either boundary lands
-    /// inside an *existing* highlight (merging with it is a deliberately deferred follow-up -- see
-    /// `docs/BACKLOG.md`'s FAB-303 checklist). When the two boundaries land in the *same* block this
-    /// wraps one `==…==` pair directly; when they land in different blocks (possible since regions
-    /// can merge several blocks, originally just paragraphs, now also headings/lists/blockquotes),
-    /// `ArticleHighlighter.crossBlockHighlightRanges` computes one pair per block touched.
+    /// run (bold/italic/bold-italic/link/code/highlight), rather than only handling the exact-same-
+    /// run case FAB-303 step 2 shipped. Declines when the whole selection sits inside one inline-
+    /// code run (nothing safe to wrap -- `==` is literal inside backticks). When the two boundaries
+    /// land in the *same* block, a boundary touching an *existing* highlight no longer declines --
+    /// `ArticleHighlighter.addOrMergeHighlight` merges into it instead (the "merge" follow-up
+    /// named in `docs/BACKLOG.md`'s FAB-303 checklist), snapping through the highlight's own full
+    /// range the same way it already snaps through any other delimited run. When the boundaries
+    /// land in *different* blocks (possible since regions can merge several blocks, originally
+    /// just paragraphs, now also headings/lists/blockquotes), merging isn't attempted -- still
+    /// declines if either boundary or any block in between touches an existing highlight, same as
+    /// before -- and `ArticleHighlighter.crossBlockHighlightRanges` computes one pair per block
+    /// touched.
     private func applyAddHighlight() {
         let start = selectedRange.location
         let end = selectedRange.location + selectedRange.length // exclusive
@@ -460,10 +464,6 @@ final class HighlightableUITextView: UITextView {
         }
         guard blockSources.indices.contains(startInfo.blockIndex),
               blockSources.indices.contains(endInfo.blockIndex) else {
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
-            return
-        }
-        if startInfo.kind == .highlight || endInfo.kind == .highlight {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
         }
@@ -481,12 +481,20 @@ final class HighlightableUITextView: UITextView {
                 return
             }
             let source = blockSources[startInfo.blockIndex]
-            applyHighlightChanges([(source, { ArticleHighlighter.addHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) })])
+            applyHighlightChanges([(source, { ArticleHighlighter.addOrMergeHighlight(atRawOffsetRange: rawStart..<rawEnd, in: $0) })])
             return
         }
 
-        // The selection spans more than one block -- one `==…==` pair per block touched, tail of
-        // the first through head of the last.
+        // Cross-block: merging with an existing highlight here would need finding every touched
+        // piece across blocks and re-verifying each one's boundaries after stripping -- the same
+        // order of complexity as the same-block merge above, deliberately not attempted this
+        // session (see docs/BACKLOG.md's FAB-303 checklist). So this still declines whenever either
+        // boundary, or any block the write would touch, has an existing highlight in the way,
+        // rather than silently wrapping over -- and corrupting -- it.
+        if startInfo.kind == .highlight || endInfo.kind == .highlight {
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            return
+        }
         let rawStart = snappedRawStart(start, info: startInfo)
         let rawEnd = snappedRawEnd(end, info: endInfo)
         guard let ranges = ArticleHighlighter.crossBlockHighlightRanges(
@@ -498,6 +506,12 @@ final class HighlightableUITextView: UITextView {
         ) else {
             UINotificationFeedbackGenerator().notificationOccurred(.error)
             return
+        }
+        for (blockIndex, rawRange) in ranges {
+            if ArticleHighlighter.rangeTouchesExistingHighlight(rawRange, in: blockSources[blockIndex].rawText) {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                return
+            }
         }
         let edits = ranges.map { blockIndex, rawRange in
             (blockSources[blockIndex], { (text: String) in ArticleHighlighter.addHighlight(atRawOffsetRange: rawRange, in: text) })
