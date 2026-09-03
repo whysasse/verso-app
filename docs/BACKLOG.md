@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**52 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (theme-switch blank screen), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass).
+**51 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (theme-switch blank screen, fixed 2026-09-03 — see [DONE.md](DONE.md)), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass).
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,13 +25,13 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
-- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 is a live bug (theme switch across the light/dark boundary blanks the screen) and should be confirmed and fixed before anything else. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
+- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (theme switch across the light/dark boundary blanking the screen) is fixed — see [DONE.md](DONE.md); Fabio's real-build confirmation of the repro matrix is still outstanding. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
 
   **Sequencing, agreed with Fabio 2026-09-03** (supersedes the single-line "Pre-submission set" this replaced — that line put FAB-309 before FAB-311, which contradicted FAB-309's own "Related" note that FAB-311's `BodySize` work should land first; this ordering follows the note).
 
   *Pre-submission — fix or ship before the final binary submission (FAB-150):*
 
-  1. **FAB-304** — theme-switch blank screen (called out above as fix-first; isolated nav fix, no dependencies)
+  1. ~~**FAB-304** — theme-switch blank screen~~ **Done 2026-09-03**, see [DONE.md](DONE.md). Fabio's real-build confirmation of the repro matrix (below) is still outstanding.
   2. **FAB-315 + FAB-332** — one PR: duplicate image captions + publisher title/chrome parsing, same converter and test suite
   3. **FAB-330** — "0 read" → "N% read" caption. **Needs a decision:** add the missing `%` now, or fold in FAB-278's percent→time-remaining redesign first? Default: minimal `%` fix now, defer FAB-278.
   4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
@@ -97,46 +97,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   ## Depends on
 
   Close or hand off after core Phase 2 issues are done.
-
-### Bugs — found 2026-09-01
-
-- [ ] 🔴 **FAB-304** · Switching theme from Settings across the light/dark boundary blanks the screen  `Todo` `Urgent`
-  ## Symptom
-
-  Reported by Fabio 2026-09-01. In Settings, switching **Ink → Sepia** leaves the screen blank, filled with the Sepia background. No content, and (to be confirmed) no back button.
-
-  ## Diagnosis (high confidence, not yet reproduced by Claude)
-
-  The Settings screen is still *pushed*, but its content no longer renders. What's visible is the window background: [`VersoApp.swift`](<Verso/Sources/App/VersoApp.swift>)'s `.onChange(of: themeManager.currentTheme) { applyWindowBackground() }` repaints `UIWindow.backgroundColor` to the new theme, and `ContentView`'s ZStack does the same — so a blank screen in exactly the *new* theme's colour is what an empty view hierarchy looks like.
-
-  Three things line up:
-
-  1. [`ContentView.swift`](<Verso/Sources/App/ContentView.swift>) applies `.preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)`. Ink → Sepia crosses dark → light, so this flips, which propagates a `userInterfaceStyle` trait change to the window and forces SwiftUI to rebuild the hosting hierarchy — far more disruptive than an ordinary `@Published` re-render.
-  2. The push is declared in a fragile place. `showSettings` is `@State` in `ArticleListView` (line 52), but `.navigationDestination(isPresented: $showSettings)` is registered at line 537 — inside `ArticleListFetchedBody`, attached to its `List`, inside a subtree carrying `.id(listFetchIdentity)` (line 123), inside the sidebar column of `NavigationSplitView`.
-  3. When that subtree is torn down and rebuilt, the destination registration goes with it while `showSettings` survives in the parent, still `true`. The stack keeps a pushed entry whose destination builder no longer resolves → nothing renders. `ArticleListView`'s `.toolbar(.hidden, for: .navigationBar)` (line 165) is why there is likely no back button to escape with.
-
-  ## Confirm first (2 minutes)
-
-  This matrix discriminates between "the `preferredColorScheme` flip is the trigger" and "the destination placement is the whole story":
-
-  | From → to | Crosses light/dark | Prediction |
-  |---|---|---|
-  | Ink → Night | no | no bug |
-  | Paper → Sepia | no | no bug |
-  | Ink → Paper | yes | bug |
-  | Sepia → Night | yes | bug |
-
-  Also: change theme from the **reader's** theme sheet instead. That lives in the detail column and doesn't touch this destination, so it should survive. And note whether the blank screen has a back button — no back button supports the pushed-but-empty-destination diagnosis; a book-icon placeholder instead would mean the split view re-collapsed and the diagnosis needs revisiting.
-
-  ## Fix
-
-  Move `.navigationDestination(isPresented: $showSettings)` out of `ArticleListFetchedBody` and up into `ArticleListView`, next to the state it reads — around line 165, where `.toolbar(.hidden, for: .navigationBar)` already sits. Same column, same stack, but on a stable ancestor that nothing re-keys. A `navigationDestination` should not live inside a lazy container that can be rebuilt.
-
-  **Do not simply delete the `.preferredColorScheme` line.** It is what makes system-drawn chrome — menus, keyboard, alerts, the Settings toggle, selection handles — follow the theme, which is exactly the problem [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md) §6.11 flags for Night and Ink. Removing it trades this bug for a worse one.
-
-  ## Related hazard while in there
-
-  `listFetchIdentity` is `"\(searchText)|\(datePreset.rawValue)"`, so that subtree is destroyed **on every keystroke in search**. The comment at line 100 shows this was already hit once (the header was moved out to keep keyboard focus), but three `.sheet`s and this `navigationDestination` are all still inside it with their state owned by the parent. Sheets are more robust than pushes so it may never bite, but it is the same shape.
 
 ### Bugs — found 2026-09-03 (Ink theme + onboarding pass)
 
