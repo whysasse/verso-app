@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**22 open issues** across iOS, Web, Design, and Infra.
+**52 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (theme-switch blank screen), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass).
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,6 +25,32 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
+- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 is a live bug (theme switch across the light/dark boundary blanks the screen) and should be confirmed and fixed before anything else. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
+
+  **Sequencing, agreed with Fabio 2026-09-03** (supersedes the single-line "Pre-submission set" this replaced — that line put FAB-309 before FAB-311, which contradicted FAB-309's own "Related" note that FAB-311's `BodySize` work should land first; this ordering follows the note).
+
+  *Pre-submission — fix or ship before the final binary submission (FAB-150):*
+
+  1. **FAB-304** — theme-switch blank screen (called out above as fix-first; isolated nav fix, no dependencies)
+  2. **FAB-315 + FAB-332** — one PR: duplicate image captions + publisher title/chrome parsing, same converter and test suite
+  3. **FAB-330** — "0 read" → "N% read" caption. **Needs a decision:** add the missing `%` now, or fold in FAB-278's percent→time-remaining redesign first? Default: minimal `%` fix now, defer FAB-278.
+  4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
+  5. **FAB-305** — white-on-accent contrast; adds the `VersoButtonStyle` disabled variant FAB-328 later depends on
+  6. **FAB-306** — onboarding theme-picker label contrast (same contrast family as #5, different file)
+  7. **FAB-312** — bundle OpenDyslexic-Bold + fix weight fallback; self-contained
+  8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
+  9. **FAB-307** — immersive chrome hit-testing + VoiceOver auto-hide (same `ReadingChrome`/`ReadingTopBar` files as #8)
+  10. **FAB-308** — localize the 7 hardcoded reading-chrome strings (same files again, do while open)
+  11. **FAB-309** — Dynamic Type: rebuild `VersoTypography.UI` + hardcoded-size fixes + layout audit; after #8 so the scales compose. The largest single item here — treat as its own multi-step arc.
+  12. **FAB-333** — reading measure collapse w/ OpenDyslexic & max size; stacks on top of #11
+  13. **FAB-310** — remaining touch targets (font stepper already covered by #8)
+  14. *(pulled out of FAB-322)* **"Add Article: no escape while saving"** — a hung parse currently traps the user with no cancel; real stuck-state bug despite the rest of FAB-322 being Low/Backlog
+  15. **FAB-320** — bulk-select destructive color + selection count; self-contained
+  16. **FAB-319** — filters "Clear all" + empty-state CTA; biggest UX/activation win in this bucket, done last here since most involved
+
+  *Post-launch polish — Backlog-status, fine to defer:*
+
+  FAB-313 (fold into FAB-329) → FAB-323 (share extension theming) → FAB-325 (hardcoded colors/swipe tints/dividers — **needs a decision** on whether `ArticleStatus.color` badges should be theme-independent or theme-aware, and raise `border` contrast toward 3:1 *before* fixing the divider bug or it makes dividers disappear) → FAB-329 (incl. FAB-313; after FAB-309, since the selection-dot scaling problem follows from it) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → FAB-326 (unify five close/dismiss patterns; overlaps with and follows FAB-311) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; depends on FAB-305's disabled variant, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -71,6 +97,547 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   ## Depends on
 
   Close or hand off after core Phase 2 issues are done.
+
+### Bugs — found 2026-09-01
+
+- [ ] 🔴 **FAB-304** · Switching theme from Settings across the light/dark boundary blanks the screen  `Todo` `Urgent`
+  ## Symptom
+
+  Reported by Fabio 2026-09-01. In Settings, switching **Ink → Sepia** leaves the screen blank, filled with the Sepia background. No content, and (to be confirmed) no back button.
+
+  ## Diagnosis (high confidence, not yet reproduced by Claude)
+
+  The Settings screen is still *pushed*, but its content no longer renders. What's visible is the window background: [`VersoApp.swift`](<Verso/Sources/App/VersoApp.swift>)'s `.onChange(of: themeManager.currentTheme) { applyWindowBackground() }` repaints `UIWindow.backgroundColor` to the new theme, and `ContentView`'s ZStack does the same — so a blank screen in exactly the *new* theme's colour is what an empty view hierarchy looks like.
+
+  Three things line up:
+
+  1. [`ContentView.swift`](<Verso/Sources/App/ContentView.swift>) applies `.preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)`. Ink → Sepia crosses dark → light, so this flips, which propagates a `userInterfaceStyle` trait change to the window and forces SwiftUI to rebuild the hosting hierarchy — far more disruptive than an ordinary `@Published` re-render.
+  2. The push is declared in a fragile place. `showSettings` is `@State` in `ArticleListView` (line 52), but `.navigationDestination(isPresented: $showSettings)` is registered at line 537 — inside `ArticleListFetchedBody`, attached to its `List`, inside a subtree carrying `.id(listFetchIdentity)` (line 123), inside the sidebar column of `NavigationSplitView`.
+  3. When that subtree is torn down and rebuilt, the destination registration goes with it while `showSettings` survives in the parent, still `true`. The stack keeps a pushed entry whose destination builder no longer resolves → nothing renders. `ArticleListView`'s `.toolbar(.hidden, for: .navigationBar)` (line 165) is why there is likely no back button to escape with.
+
+  ## Confirm first (2 minutes)
+
+  This matrix discriminates between "the `preferredColorScheme` flip is the trigger" and "the destination placement is the whole story":
+
+  | From → to | Crosses light/dark | Prediction |
+  |---|---|---|
+  | Ink → Night | no | no bug |
+  | Paper → Sepia | no | no bug |
+  | Ink → Paper | yes | bug |
+  | Sepia → Night | yes | bug |
+
+  Also: change theme from the **reader's** theme sheet instead. That lives in the detail column and doesn't touch this destination, so it should survive. And note whether the blank screen has a back button — no back button supports the pushed-but-empty-destination diagnosis; a book-icon placeholder instead would mean the split view re-collapsed and the diagnosis needs revisiting.
+
+  ## Fix
+
+  Move `.navigationDestination(isPresented: $showSettings)` out of `ArticleListFetchedBody` and up into `ArticleListView`, next to the state it reads — around line 165, where `.toolbar(.hidden, for: .navigationBar)` already sits. Same column, same stack, but on a stable ancestor that nothing re-keys. A `navigationDestination` should not live inside a lazy container that can be rebuilt.
+
+  **Do not simply delete the `.preferredColorScheme` line.** It is what makes system-drawn chrome — menus, keyboard, alerts, the Settings toggle, selection handles — follow the theme, which is exactly the problem [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md) §6.11 flags for Night and Ink. Removing it trades this bug for a worse one.
+
+  ## Related hazard while in there
+
+  `listFetchIdentity` is `"\(searchText)|\(datePreset.rawValue)"`, so that subtree is destroyed **on every keystroke in search**. The comment at line 100 shows this was already hit once (the header was moved out to keep keyboard focus), but three `.sheet`s and this `navigationDestination` are all still inside it with their state owned by the parent. Sheets are more robust than pushes so it may never bite, but it is the same shape.
+
+### Bugs — found 2026-09-03 (Ink theme + onboarding pass)
+
+- [ ] 🔴 **FAB-330** · "Continue Reading" progress caption reads "0 read" instead of "0% read"  `Todo` `Urgent`
+  ## Symptom
+
+  Seen 2026-09-03 in the Ink theme. Cards in Continue Reading show `0 read`, `20 read`, `3 read` where the value is a **percentage**. As rendered it parses as a count — of articles, minutes, or something else — and "0 read" on an article the section claims you are in the middle of is actively contradictory.
+
+  ## Cause
+
+  `L10n.Home.sectionContinueReadingProgressCaption(count:)` is fed `Int((progressFraction * 100).rounded())` by `ArticleCard`, but the string has no percent marker. Check `UI_COPY.md` and the three locale strings — this needs a `%` (or the localized equivalent; French uses a space before it) in all three, not just English.
+
+  ## Fix
+
+  Correct the string in all locales and add the percent to the VoiceOver value too. Related: FAB-278 already covers changing the reading-progress announcement from percent to time-remaining, so decide whether this caption should say "20% read" or "8 min left" before translating it three times.
+
+- [ ] 🟠 **FAB-331** · Articles at 0% fill up "Continue Reading"  `Todo` `High`
+  ## Symptom
+
+  Seen 2026-09-03: four of five Continue Reading cards show 0% progress. The section is meant to be "things you started".
+
+  ## Cause
+
+  `ArticleReaderView`'s `.task` calls `advanceStatus(to: .reading)` on open, unconditionally. Opening an article and immediately going back sets `.reading` permanently, and `continueReadingArticles` filters on `statusEnum == .reading` with no progress floor. Every accidental tap lands in Continue Reading forever.
+
+  ## Fix
+
+  Two candidate rules, needs a product decision:
+
+  * Only promote to `.reading` once the user has actually read something — a scroll fraction floor (say > 2–3%), or a dwell time.
+  * Or keep the status as-is but filter the section on `scrollPosition > 0`, so `.reading`-with-no-progress articles fall back into Unread.
+
+  The first is truer to the data model; the second is a one-line change. Either way the section should not show an entry at 0%.
+
+- [ ] 🔴 **FAB-332** · Publisher chrome and title suffixes survive into the reader  `Todo` `Urgent`
+  ## Symptom
+
+  Seen 2026-09-03 on a CNN article. Two separate content-quality defects on the same screen:
+
+  1. **A social share bar renders as the first body paragraph** — "Facebook Tweet Email Link Threads Link Copied!" — followed by the dateline "Ramsgate, England" as its own paragraph. The reader's best screen opens with publisher chrome.
+  2. **The title keeps its publisher suffix** — "God save the drag kings of England | CNN" — in the H1, the top bar, *and* the article card. Every article from a site that appends " | Publisher" or " - Publisher" to `<title>` carries it.
+
+  ## Fix
+
+  1. Extend `HTMLToMarkdownConverter.isNoiseLine` (FAB-294's screen) to catch share-bar runs: short lines that are mostly a sequence of platform names, and the "Link Copied!" affordance text. Worth checking whether SwiftSoup can drop these structurally by class/role before falling back to text heuristics.
+  2. Strip a trailing ` | <site>` / ` - <site>` / ` — <site>` from the title when the tail matches the article's `siteName` or host. Do it once at parse time so the card, the bar and the H1 all benefit.
+
+  Same family as **FAB-315** (duplicate image captions) — all three are publisher-shaped parsing gaps and all three deserve fixture tests in `HTMLToMarkdownConverterTests` / `SwiftSoupParserTests`.
+
+- [ ] 🟠 **FAB-333** · The reading measure collapses with OpenDyslexic and at the largest in-app size  `Todo` `High`
+  ## Symptom
+
+  Seen 2026-09-03, both in Ink:
+
+  * **OpenDyslexic at 18pt** reflows the body to roughly 25–30 characters per line — four or five words. OpenDyslexic is far wider than Georgia or New York at the same point size, and nothing compensates.
+  * **Georgia at the maximum in-app size (26pt)** gives roughly 28–32 characters per line.
+
+  Both are well below the 45–75 character range that makes long-form reading comfortable, and this is the app's core screen.
+
+  ## Cause
+
+  The reading column is `.frame(maxWidth: 680)` with a hardcoded `.padding(.horizontal, 40)`. On a 393pt screen that leaves ~313pt regardless of font family or size, and there is no margin control — [accessibility-specs.md](accessibility-specs.md) §2.1 specified one in the reading bar and it was never built (see FAB-318).
+
+  ## Fix
+
+  Options, in rough order of effort:
+
+  * Narrow the horizontal padding as font size increases, so the measure degrades more gracefully at the top of the scale.
+  * Give OpenDyslexic its own size mapping — its 18pt is visually much larger than Georgia's, so the `BodySize` scale (FAB-311) should be per-family, not absolute.
+  * Ship the margins control the spec called for.
+
+  **Note this is the in-app size scale, not system Dynamic Type** — FAB-309 is still untested and will stack on top of this.
+
+### Design critique 2026-09-01 — contrast & accessibility
+
+Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
+
+- [ ] 🔴 **FAB-305** · White-on-accent fails WCAG AA in Night and Ink  `Todo` `Urgent`
+  ## Scope
+
+  Critique §3.1. `VersoButtonStyle.primary` hardcodes `.foregroundColor(.white)` on a `theme.accent` fill. Accent is light in both dark themes:
+
+  | Theme | Accent | White label |
+  |---|---|---|
+  | Paper | `#766655` | 5.52:1 ✅ |
+  | Sepia | `#825A37` | 6.06:1 ✅ |
+  | Night | `#C4A97D` | **2.25:1** ❌ (fails even the 3:1 non-text floor) |
+  | Ink | `#7B9FD4` | **2.71:1** ❌ |
+
+  Same pattern in three places: every `.primary` button, the `+` add-article glyph in the list header (white `plus` on a 32pt accent circle), and the active-filter count badge (11pt **bold** white on an accent capsule — the worst case).
+
+  ## Fix
+
+  The correct pattern already exists in the codebase. `FolderPickerPrompt` uses `.foregroundColor(themeManager.colors.background)` on its accent pill, which inverts per theme: Paper 4.87 / Sepia 4.98 / Night 7.71 / Ink 6.82 — passes everywhere. Apply it to `VersoButtonStyle.primary`, the add glyph and the filter badge.
+
+  ## Confirmed visually 2026-09-03 (Ink)
+
+  No longer a computation. In the Ink theme the `+` add-article button is a filled `#7B9FD4` circle whose white `+` visibly dissolves into the fill, while the search / filter / overflow glyphs beside it — accent on background, 6.82:1 — read crisply. **The primary action is the least legible control in the header.** Same on every onboarding CTA: on the analytics consent screen the outlined secondary ("No thanks", 6.82:1) is easier to read than the filled primary ("Sure, why not", 2.71:1), which is the whole problem in one screenshot.
+
+  ## Also add
+
+  `VersoButtonStyle` has no `disabled` variant, so every caller improvises with `.opacity(0.5)`. That collapses the label to **1.55:1** in Paper (seen in Add Article's Save and onboarding's Continue). Add a real disabled case: muted fill with `textSecondary` text, not a global opacity multiplier. Critique §4.3, §5.8.
+
+- [ ] 🔴 **FAB-306** · Onboarding theme-picker card labels fail contrast in 8 of 16 states  `Todo` `Urgent`
+  ## Scope
+
+  Critique §4.2. `ThemePreviewCard` colours its label with **the card's own theme's** `accent` (selected) or `textSecondary` (unselected), painted on the **currently active theme's** background. Half the combinations fail 4.5:1 at 13pt; worst is the Night card at **1.85:1** while the user is on Sepia.
+
+  | Current | Card | Selected | Unselected |
+  |---|---|---|---|
+  | Paper | Night / Ink | 1.99 / 2.39 ❌ | 3.06 / 3.30 ❌ |
+  | Sepia | Night / Ink | 1.85 / 2.23 ❌ | 2.85 / 3.08 ❌ |
+  | Night | Paper / Sepia | 3.15 / 2.87 ❌ | 3.12 / 2.84 ❌ |
+  | Ink | Paper / Sepia | 3.34 / 3.05 ❌ | 3.31 / 3.02 ❌ |
+
+  ## Confirmed visually 2026-09-03
+
+  With Ink active, the "Paper" and "Sepia" card labels are visibly muddier than "Night" — they are drawn in their own themes' `textSecondary` (`#6E675F`, `#755E40`) on Ink's near-black background, computed at 3.31 and 3.02.
+
+  Worth recording separately: **the onboarding cards themselves are the best component in the app.** Four miniature pages showing a real text-on-background relationship, and the only place all four themes are instantly distinguishable. That is the argument for FAB-324.
+
+  ## Fix
+
+  The label sits *outside* the card, on the app background, so it must use the current theme's colours — `colors.textSecondary` / `colors.accent`, which is what `ThemeSelector` in Settings already does correctly. The card's *interior* preview correctly uses that theme's own colours and stays as-is.
+
+- [ ] 🟠 **FAB-307** · Immersive chrome: hidden bars stay hit-testable, and VoiceOver decisions were never implemented  `Todo` `High`
+  ## Scope
+
+  Critique §3.7, §3.8. Two related gaps in the same code.
+
+  **Hit testing.** `ReadingTopBar` hides via `.opacity(isVisible ? 1 : 0)`, which in SwiftUI does **not** disable hit testing. The bar is layered above the ScrollView carrying the tap-to-reveal gesture, so in immersive mode a tap on the top-left ~44×44pt should hit the invisible Back button and dismiss the article instead of revealing the chrome. **Repro:** open an article → tap to enter immersive → tap top-left corner. The bottom bar collapses to `height: 0` so it is less exposed, but has the same pattern.
+
+  **VoiceOver.** `UIAccessibility.isVoiceOverRunning` appears **nowhere in the codebase**. [accessibility-specs.md](accessibility-specs.md) §5.3 signed off three decisions that were never built: suppress chrome auto-hide while VoiceOver is running, observe `voiceOverStatusDidChangeNotification`, and gate the `hasShownImmersiveHint` flag write on `!isVoiceOverRunning`.
+
+  ## Fix
+
+  One change covers both: hit testing off when hidden, and never hidden while VoiceOver is on. The implementation did get one thing right already — visibility via `.opacity()` rather than `isHidden`, per the spec, so elements stay in the accessibility tree.
+
+  Also unhandled anywhere: `reduceTransparency`, `differentiateWithoutColor`. `accessibilityReduceMotion` is handled correctly, once, in the reader.
+
+- [ ] 🟠 **FAB-308** · Localize the reading chrome's accessibility strings  `Todo` `High`
+  ## Scope
+
+  Critique §3.6. After FAB-275 and FAB-284, [`ReadingChrome.swift`](<Verso/Sources/Components/Reading/ReadingChrome.swift>) still has seven hardcoded English strings: `"Back"`, `"Returns to the article list"`, `"Font and spacing"`, `"Adjust reading font size and line spacing"`, `"Listen to article"` / `"Stop listening"`, `"Reads the article aloud"`, `"Reading theme"`, `"Change paper, sepia, night, or ink theme"`.
+
+  A French or Portuguese user running VoiceOver gets an English reading toolbar. Everything else in the file goes through `L10n`, so this is oversight rather than decision.
+
+  Also: `SearchBar`'s default `placeholder: String = "Search titles..."`. Every caller currently passes an `L10n` string so it does not ship today, but it is a loaded gun for the next caller — make it non-optional or default to an `L10n` value.
+
+- [ ] 🔴 **FAB-309** · The app does not support Dynamic Type at all  `Todo` `Urgent`
+  ## Symptom
+
+  Confirmed 2026-09-03 by screenshots at a large accessibility text size, against a default-size control in the same theme.
+
+  **Nothing built from `VersoTypography` responds to the user's system text size.** Comparing Settings at default vs. large: "GENERAL", "Language", "Automatic", "English", "Français (Canada)", "Português (Brasil)", "READING", "Font" — all pixel-identical. The whole article list is identical too: same titles, same wrapping, same source lines, while the system overflow menu rendered on top of it is three times bigger.
+
+  The **only** things that scale are the font-picker rows, and they scale badly: "OpenDyslexic" wraps mid-word to "OpenDysle / xic" and blows out of its row, and the Georgia and New York previews truncate to "The quick brown…".
+
+  ## Cause — and a correction
+
+  An earlier pass of [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md) §3.5 asserted that *"SwiftUI's `Font.system(size:)` **does** scale with Dynamic Type, so this is not 'Dynamic Type is broken'"*, and scoped this issue as a truncation audit. **That was wrong.** `Font.system(size:)` is a fixed-size font and does not scale; `Font.system(.body)` and the other text styles do. `Font.custom(_:size:)`, by contrast, *does* scale relative to body by default since iOS 14.
+
+  That single distinction explains everything in the screenshots. Every token in `VersoTypography.UI` is a literal `.system(size:)` — `screenTitle` 34, `listTitle` 17, `listSubtitle` 15, `button` 17, `caption` 13, `input` 17 — so every screen built from them is frozen. The font-picker rows are the sole exception because they use `.custom(name, size:)`, which scales.
+
+  **`SettingsRow.fontRow` contains its own control group, which makes this trivial to verify:**
+
+  ```swift
+  .font(name.isEmpty ? .system(size: 17, weight: .semibold) : .custom(name, size: 17).weight(.semibold))
+  ```
+
+  Georgia, New York and OpenDyslexic take the `.custom` branch; the "System" row takes `.system(size:)`. At a large text size, screenshot that list scrolled to show all four — the first three should be huge and "System" should stay small. That is the whole bug in one image.
+
+  ## Why this is Urgent
+
+  [accessibility-specs.md](accessibility-specs.md) §4.1 calls Dynamic Type *"mandatory, not optional"* and §4.3 says *"Use `UIFont.preferredFont(forTextStyle:)` — never hard-coded point sizes,"* with a per-element mapping table that was never implemented. This is a reading app: readers who enlarge system text are close to its core audience, and right now the app ignores that setting everywhere except one screen where it breaks the layout.
+
+  ## Fix
+
+  1. Rebuild `VersoTypography.UI` on text styles, per the spec's §4.3 table: `screenTitle` → `.largeTitle`, `listTitle` → `.headline`, `listSubtitle` → `.subheadline`, `button` → `.headline`, `caption` → `.caption`, `input` → `.body`. Where a specific size is genuinely needed, use `.custom(_:size:relativeTo:)` or `@ScaledMetric` rather than a bare literal.
+  2. Fix the places that also hardcode sizes outside the tokens: `EmptyState` (20/15pt), `ArticleHeader` (15/13pt), `ThemeChip` (11pt), `ReadingTopBar` title (17pt), the filter badge (11pt).
+  3. **Then** run the layout audit, which is where the original scope of this issue starts being useful:
+     - [ ] `SettingsRow.fontRow` — name wraps and overflows today; the preview is `.lineLimit(1)`
+     - [ ] `SettingsRow.folderRow` — label and path share one line, path capped at one line, no layout priority
+     - [ ] `ThemeChip` — fixed `frame(width: 80, height: 100)` around a label that will now grow
+     - [ ] Reader control sheets — fixed detents `.height(218)` / `.height(168)`
+     - [ ] `ArticleCard` — title `.lineLimit(2)`, source `.lineLimit(1)`
+     - [ ] `ReadingTopBar` title, `FilterPanel` tag rows — `.lineLimit(1)`
+     - [ ] The four-icon list header at `HStack(spacing: 2)` next to a scaling 34pt title
+  4. Fixed-size decorations need `@ScaledMetric` too. The 8pt selection dots in `SettingsRow` stay 8pt while their labels triple (see FAB-329) — at large text they are almost invisible, for exactly the users who most need to see them.
+
+  ## Related
+
+  FAB-333 (the reading measure collapses at large in-app sizes) stacks on top of this once UI text starts scaling. FAB-311's `BodySize` work should land first so the two scales compose predictably.
+
+- [ ] 🟠 **FAB-310** · Touch targets below 44×44, against our own spec  `Todo` `High`
+  ## Scope
+
+  Critique §3.4. [accessibility-specs.md](accessibility-specs.md) §2.1 calls 44×44pt mandatory and names the font stepper explicitly.
+
+  | Control | Actual | Where |
+  |---|---|---|
+  | Reader font size `A` − / `A` + | ~**14×17** / ~**20×24** — bare `Text("A")`, no frame | `ReadingControls.fontControls` |
+  | Settings font size − / + | **32×32** | `SettingsView.readingSection` |
+  | Reader line-spacing buttons | 44×**36** | `ReadingControls.fontControls` |
+  | Onboarding "Skip" | ~**36×22** — bare text, no padding | `QuickTourView.skipButton` |
+  | Search-bar clear `✕` | default symbol size, no frame | `SearchBar` |
+
+  Spec §2.2 also requires 8pt of dead space between adjacent targets; the list header packs four 44pt buttons at `HStack(spacing: 2)`.
+
+  The reader font stepper is handled in **FAB-311** along with the rest of that sheet's problems; the others belong here.
+
+- [ ] 🟠 **FAB-311** · Rebuild the reader's font/spacing sheet  `Todo` `High`
+  ## Scope
+
+  Critique §6.8, §6.9, §3.4, §6.2, §6.3. Four problems in one small sheet — worth doing as a single job.
+
+  * **The ✕ collides with the last control.** In *both* sheet variants the close button sits at top-trailing over the content and lands on the right-most control: the large "A" in the font sheet, the Ink swatch in the theme sheet. Both accent-coloured, ~8pt apart, one of them dismisses the sheet. Each sheet also has a drag handle *and* an ✕ — removing the ✕ fixes the collision for free and leaves the idiomatic grabber.
+  * **The font-size control doesn't look like a control.** It renders as `Font size … A 18 A` — no `+`/`−`, no borders, no background. The two A's read as size *labels* flanking a value. Give each a filled, bordered 44×44 container (Apple's own reader does exactly this), which also closes the touch-target half of §3.4.
+  * **Line-spacing uses text-alignment icons.** `["text.alignleft", "text.justify", "text.justify.leading", "text.justify.trailing"]` — four *alignment* symbols standing in for four *line-height* levels, with no labels and no VoiceOver strings. Anyone would read that row as an alignment picker, and the last two are visually near-identical at 18pt. Use symbols that encode vertical rhythm, or drop icons for a labelled segmented control.
+  * **The named size scale is dead code.** [accessibility-specs.md](accessibility-specs.md) §4.2 defines XS 14 / S 16 / M 18 / L 20 / XL 22 / XXL 26 with per-step line heights, and `Typography.Reading.BodySize` implements it — but the reader steps ±1 (13 steps, shows a raw `18`) and Settings steps ±2 (7 steps). Two controls disagreeing on what a step is, for one stored value, both exposing the point size instead of the designed scale, and `lineHeightMultiplier` never runs. Reconnect both to `BodySize`.
+
+- [ ] 🟠 **FAB-312** · Bundle OpenDyslexic-Bold  `Todo` `High`
+  ## Scope
+
+  Critique §7.3. Only `OpenDyslexic-Regular.ttf` is bundled (`Resources/Fonts/`, `project.yml`, `Info.plist`). [accessibility-specs.md](accessibility-specs.md) §4.5 maps Semibold/Bold to `OpenDyslexic-Bold`, and SwiftUI does not synthesise bold for custom fonts — so **every heading in every article read in OpenDyslexic renders at body weight**. Confirmed visually: in the Settings font list, "Georgia" is a heavy bold serif while "OpenDyslexic" is regular. A dyslexic reader gets an article with no visible heading hierarchy, which is the opposite of what the feature is for.
+
+  ## Confirmed visually 2026-09-03, and worse than recorded
+
+  Reading an article with OpenDyslexic selected: **the body renders in OpenDyslexic but the article H1 renders in the system font, bold.** `ArticleHeader` asks for `VersoTypography.Reading(fontFamily:).h1`, i.e. `.custom("OpenDyslexic-Regular", size: 28).weight(.bold)`, and the missing bold face makes it fall back entirely. So the one font in the app that exists for accessibility is the one whose headings don't use it. The Settings list shows the same thing more quietly — "Georgia" is heavy bold, "OpenDyslexic" is regular weight, side by side in one screenshot.
+
+  Also here: the preview row truncates at default text size because `fontRow` uses `.lineLimit(1)` and OpenDyslexic is much wider. Drop the limit or shorten the pangram. And see **FAB-333** — OpenDyslexic's width also collapses the reading measure.
+
+  **Not a bug:** the font loads correctly. An earlier source-only pass predicted it was falling back to the system font because `SettingsView` requests `"OpenDyslexic-Regular"` while `DesignSystemPreview` requests `"OpenDyslexic"`. It renders fine; only the DEBUG preview's string is worth reconciling.
+
+- [ ] 🟠 **FAB-313** · The analytics toggle has no VoiceOver label  `Todo` `High`
+  ## Scope
+
+  Critique §7.4. `SettingsView.privacySection` uses `Toggle("", isOn: $analyticsOptIn).labelsHidden()` with the visible label as a separate `Text`, so the switch announces with no name. Add `.accessibilityLabel(L10n.Settings.analyticsRowLabel)`.
+
+  Small enough to fold into another Settings issue if convenient.
+
+- [ ] 🟡 **FAB-314** · Replace accessibility-specs' hand-maintained contrast tables with a CI check  `Backlog` `Medium`
+  ## Scope
+
+  Critique §3.2. [accessibility-specs.md](accessibility-specs.md) §3.3 states *"All color issues are resolved. No remaining failures."* It audited `textPrimary`, `textSecondary` and `accent` against `background`/`surface` — three pairs. It never checked what those tokens do in combination, or the tokens outside that set. Unaudited and failing:
+
+  | Pair | Where | Ratio | Required |
+  |---|---|---|---|
+  | white glyph on `reading` badge `#D4A353` | Article card | **2.29:1** | 3:1 |
+  | white glyph on `read` badge `#5AAF7A` | Article card | **2.68:1** | 3:1 |
+  | white glyph on `unread` badge `#4A90D9` | Article card | 3.34:1 | 3:1 (barely) |
+  | `placeholder` on `surface` | Search clear button | **1.12–1.55:1** | 3:1 |
+  | `border` on `background` | Field outlines, progress track | **1.16–1.33:1** | 3:1 where it bounds a control |
+  | `warning` on `background` (Paper / Sepia) | Semantic | **4.43 / 4.13:1** | 4.5:1 |
+  | `error` on `surface` (Paper / Sepia) | Field error text, 13pt | **4.46 / 4.07:1** | 4.5:1 |
+  | `accentPressed` on `background` (Ink) | Pressed states | **4.04:1** | 4.5:1 as text |
+  | white on swipe tints `#5AAF7A` / `#4A90D9` | List swipe actions | **2.68 / 3.34:1** | 4.5:1 |
+
+  Also worth recording: `textSecondary` passes with roughly 2% headroom (4.52–4.58:1 on `surface`). Not a bug — a fragility, since any nudge to a surface value breaks it silently.
+
+  ## Fix
+
+  A script that walks `Colors.swift`, asserts every *used* pair, and runs in CI. Then correct §3.3 of the spec, whose conclusion currently reads as "done" and is stronger than its evidence — that is the genuinely dangerous part.
+
+### Design critique 2026-09-01 — reading view
+
+- [ ] 🔴 **FAB-315** · Image captions are printed twice  `Todo` `Urgent`
+  ## Symptom
+
+  Critique §6.7. In an article with a photo, the caption renders under the image *and again* as a full body paragraph in 18pt New York with the credit appended — e.g. "…in the 1960s. Photograph: João Laet/The Guardian". The app's best screen stutters and repeats itself immediately after its only image. Seen on a Guardian article, 2026-09-01.
+
+  ## Cause
+
+  The guard already exists and is one comparison too strict. `HTMLToMarkdownConverter.collapseImageCaptionEcho` drops the echo when the image's alt text and the following paragraph match, but requires `fingerprint(alt) == fingerprint(next)` — exact equality after punctuation normalisation. Publishers that append a credit to the echoed paragraph defeat it.
+
+  ## Fix
+
+  Match on prefix rather than equality: drop the next block when it *starts with* the alt text and the remainder is short or matches a credit pattern (`Photograph:` / `Photo:` / `Credit:` / `Illustration:`). Add the Guardian case to `HTMLToMarkdownConverterTests` — this is a publisher-shaped bug that will recur.
+
+- [ ] 🟠 **FAB-316** · The reader's top bar repeats the title directly below it  `Todo` `High`
+  ## Scope
+
+  Critique §6.4. The bar shows a one-line *truncated* copy of the article title, sitting directly above the same title set in full at 28pt bold. The eye reads the same sentence twice and the first reading is the broken one — in the most valuable strip of the screen.
+
+  [accessibility-specs.md](accessibility-specs.md) §5.2 already decided the bar title should be `accessibilityHidden` while the article is visible; the visual redundancy is the same problem in the other channel.
+
+  ## Fix
+
+  Show the bar title only once the H1 has scrolled out of view. Scroll offset is already tracked precisely, so the condition is cheap.
+
+- [ ] 🟡 **FAB-317** · Immersive mode gains no space at the top  `Backlog` `Medium`
+  ## Scope
+
+  Critique §6.1. The scroll content's `.padding(.top, 44 + safeAreaTop + 24)` is a constant with no dependence on `isChromeVisible`. The `44` reserves room for a top bar that has just faded to `opacity: 0`, so entering immersive mode leaves ~90pt of empty space and the text does not move up at all. The bottom works correctly, because the bottom bar is a `safeAreaInset` whose frame collapses to `height: 0`.
+
+  The whole point of the mode is more text, and it currently delivers only at the bottom — the half not at eye level.
+
+  ## Probably refuted — check before doing any work
+
+  Immersive-mode screenshots from 2026-09-03 (Paper and Night) show the article title starting roughly 65–70pt higher than in the chrome-visible shots, i.e. the content *does* reclaim the bar's space. That contradicts the source reading above, and I cannot reconcile the two: `ArticleReaderView.swift:114` really is a constant `44 + safeAreaTop + 24`, with `.ignoresSafeArea(edges: .top)` at line 200.
+
+  **Controlled test:** open one article, do not scroll, screenshot with chrome visible; tap once to enter immersive, do not scroll, screenshot again. Compare where the H1 starts. If it moves up, close this issue — the shots that suggested the problem originally came from the stale August set and may never have been comparable.
+
+  ## Fix, if the test confirms the problem
+
+  Animate the top padding alongside `isChromeVisible`, matching the existing 0.3s fade.
+
+- [ ] 🔵 **FAB-318** · Reading view smaller polish  `Backlog` `Low`
+  ## Scope
+
+  Critique §6.10, §6.11, §6.12, §6.6.
+
+  * **The two chrome rows don't share an alignment logic.** With TTS active, the transport row puts three controls hard-left and "1×" hard-right with a void between, while the bar beneath centres the progress indicator between edge-anchored icons. Transport glyphs are 16–18pt against the main bar's 20pt, so the secondary row reads as slightly-off rather than deliberately lighter.
+  * ~~**System menus break the theme.**~~ **Checked 2026-09-03 — not a problem, no action.** The critique predicted a bright white menu panel over the dark themes. In Ink the overflow menu renders in the *dark* system material and reads correctly, because `ContentView`'s `.preferredColorScheme` drives it. This is the clearest demonstration of what that modifier buys, and a second reason not to remove it while fixing FAB-304.
+  * **The hint pill sits on top of the article text.** 🟠 Seen 2026-09-03 in Paper and Night: "Tap anywhere to reveal controls" is placed `.padding(.bottom, 80)` from the bottom, which drops a black lozenge into the middle of the reading column — it lands across a body line in Paper and across a section heading in Night, obscuring both. In Paper the hardcoded `Color.black.opacity(0.7)` on cream is exactly the foreign object FAB-325 describes. It is also a bare `Text` with `.onTapGesture` — no `Button`, no accessibility traits, tap target under 44pt. Move it clear of the text column (just above the bottom safe area), theme it, and make it a real control.
+  * **`ArticleHeader` hardcodes 15pt/13pt** where `VersoTypography.UI.listSubtitle` / `.caption` are the same values.
+  * **The reading bar dropped two controls the spec specified.** [accessibility-specs.md](accessibility-specs.md) §2.1 lists font −/+, spacing, margins, theme, mark-read; shipped is font/spacing, TTS, theme, progress. Mark-read moved to the overflow menu; margins vanished. **Measured on iPhone SE 2026-09-03** (375×667pt — the narrowest currently supported device; earlier drafts said 320pt, which was the unsupported SE 1st gen): at the default 18pt Georgia the reading measure is **~32–38 characters per line**, already below the comfortable 45–75 band before the user touches the size control. That makes the missing margins control more relevant, not less — see FAB-333. The 40pt padding is also a literal; `VersoSpacing` has 32 and 48.
+
+### Design critique 2026-09-01 — article list
+
+- [ ] 🟠 **FAB-319** · Filters are invisible once applied, and there's no way to clear them  `Todo` `High`
+  ## Scope
+
+  Critique §5.1, §5.2. Once `FilterPanel` closes, the only signal that filters are active is a small count badge on the header icon — the same badge that fails contrast in dark themes (FAB-305). If the filters match nothing, the user gets the `.searchMiss` empty state with no mention of the filters causing it and no way to clear them: **`FilterPanel` has no "Clear all"**, so tags must be deselected one by one and the date preset reset separately.
+
+  This is the same concern behind the earlier "keep chips visible on empty states" decision, resurfacing after the chips were removed. The old chip bar had a real virtue — filter state was always on screen.
+
+  Separately, **`EmptyState` has no call to action in any variant**. The `.empty` variant is what a brand-new user sees straight after a seven-screen onboarding, and it offers nothing to tap despite `AddArticleView` being one icon away. It is the highest-leverage screen in the app for activation and it is currently decorative.
+
+  **Seen 2026-09-03 on iPhone SE, and the copy makes it worse.** The empty state reads "No articles yet" / *"Share an article from Safari to get started."* — so the one instruction on the screen sends the user **out of the app**, while the `+` button that does the same job sits about 40pt above the message, unmentioned. Content occupies the top third and roughly 500pt below it is empty. Fix the copy and the CTA together: an "Add your first article" button wired to `showAddArticle`, with the share-sheet route as the secondary line rather than the only one.
+
+  ## Fix
+
+  1. "Clear all" in the panel header, enabled when `activeFilterCount > 0`
+  2. "Add your first article" in `.empty`; "Clear filters" in `.searchMiss`
+  3. Consider a dismissible summary row under the header when filters are active ("2 tags · Past month ✕") — restores the chip bar's visibility without its width problems
+
+  Also seen: the panel is a fixed `width: 320` — ~80% of a 393pt screen and **~85% of the 375pt iPhone SE**, leaving a dismiss strip of roughly 55pt, too narrow to read as "tap outside to close". Use a fraction with a maximum rather than a fixed width. And with zero tags in the library it still renders a "Search tags…" field above a lone "All tags" row, searching nothing — hide it when the tag list is empty.
+
+- [ ] 🟠 **FAB-320** · Bulk select: destructive action isn't marked, and nothing shows a count  `Todo` `High`
+  ## Scope
+
+  Critique §5.6.
+
+  **Delete isn't red.** `Button(role: .destructive)` combined with `.buttonStyle(.plain)` drops the role's colour, so "Delete" renders in plain `textPrimary` while "Mark read" sits in accent — the irreversible action is the *less* prominent of the two. The reader's overflow menu gets this right (red, with a trash icon), which makes the bulk case — deleting *several* articles at once — both the inconsistent one and the more dangerous one. Use `semanticColors.error`.
+
+  **No selection count.** With one article selected the header still reads "Verso". iOS convention is "1 Selected", and it matters most immediately before a bulk delete. The confirmation dialog does show a count, but that is after the fact.
+
+- [ ] 🟡 **FAB-321** · Article cards should show read time, not date added  `Backlog` `Medium`
+  ## Scope
+
+  Critique §5.3. `ArticleCard` shows title / source / **date added**, giving the date a full line. `ArticleHeader` — *inside* the article, after the user has already committed — shows date **and** read time.
+
+  That is backwards. Read time is decision-support: its whole value is helping someone choose what to read from a queue. `ReadingEstimate.swift` already exists and the reader already calls it. [accessibility-specs.md](accessibility-specs.md) §5.1 also specifies the row's VoiceOver label as "[title], [source], [estimated read time]", which the implementation delivers in neither channel.
+
+  ## Fix
+
+  `theatlantic.com · 12 min read` on one line; drop or de-emphasise the date. Update the VoiceOver label to match the spec.
+
+- [ ] 🔵 **FAB-322** · Article list smaller polish  `Backlog` `Low`
+  ## Scope
+
+  Critique §5.4, §5.7, §5.9, §5.10, §5.11, §5.8.
+
+  * **Section counts exist for VoiceOver but not on screen.** `sectionHeader` passes `L10n.Filter.unreadAccessibilityLabel(count:)` to VoiceOver and renders only the bare title, so a VoiceOver user hears "Unread, 12 articles" and a sighted user sees "Unread". The old chip bar showed it. Render it.
+  * **Collapsible and non-collapsible headers look identical.** "Unread" and "Archived" render the same; only Archived has a chevron and only Archived is tappable, with the sole cue at the far trailing edge. Section boundaries also read weakly — the gap between sections is barely larger than the gap between two cards.
+  * **Entering select mode re-truncates every title.** The checkbox is inserted *outside* the card, narrowing it, so every row reflows and re-clips on mode entry. Reserve the column at all times, or overlay the checkbox on the card.
+  * **Settings is two taps deep behind "…".** The overflow holds only "Select" and "Settings"; Settings is the app's entire configuration surface (font, size, theme, folder, import, language) and "Select" is the rarer action. With four header slots spent this is a trade rather than an oversight, but "Select" is the better overflow candidate and a gear is more discoverable than an ellipsis.
+  * **Add Article: no escape while saving.** `showsDismissToolbarButton` returns `false` for both `.saving` and `.success`. Success is fine (1.5s auto-dismiss), though 1.5s is too short for VoiceOver to finish the announcement. `.saving` is the real one: a hung parse leaves no close button and no cancel. Keep the ✕ visible during `.saving` and let it cancel.
+  * **Date presets and tags look identical** in the filter panel — both checkmark rows, but dates are single-select and tags multi-select.
+  * **A card with no source renders a collapsed layout.** Seen 2026-09-03: an article whose `sourceDomain` resolves empty drops the domain line entirely, so the card goes title → progress bar → caption with no attribution and uneven height against its neighbours. Decide on a fallback (the site name, the host, or a dash) rather than omitting the row.
+  * **Card containers are at the bottom of the perceptible range.** `surface` on `background` is 1.08–1.11:1 with no border. Confirmed fine in practice on a good screen — recorded only as a fragility, no action needed today.
+
+### Design critique 2026-09-01 — design system consistency
+
+- [ ] 🟠 **FAB-323** · The Share Extension doesn't wear the theme  `Todo` `High`
+  ## Scope
+
+  Critique §3.11. The extension's background is a neutral off-white while the app is warm cream, and its success checkmark is a brighter, more saturated green than `ArticleStatus.read`'s `#5AAF7A`. It reads as a different app.
+
+  That matters more than a normal consistency nit: for anyone who found Verso through the share sheet, **the extension is the first surface they ever see**, and "it looks and feels like paper" is the product's whole first impression.
+
+  ## Fix
+
+  Read `ThemeManager` in the extension (the App Group already shares `selectedTheme`), and use `semanticColors.success`. Its layout also centres content vertically in a full-height sheet where the app's own sheets anchor to the top.
+
+- [ ] 🟡 **FAB-324** · One theme picker component instead of three  `Backlog` `Medium`
+  ## Scope
+
+  Critique §3.3, §7.2. The theme picker is implemented three separate times:
+
+  | Where | Component | Swatch | Label | Label colour source |
+  |---|---|---|---|---|
+  | Onboarding | `ThemePreviewCard` | 120pt card with fake text lines | 13pt | that card's own theme (**wrong** — FAB-306) |
+  | Settings | `ThemeChip` | 32pt flat rectangle, fixed 80×100 | 11pt | current theme |
+
+  **The Settings chip row does not overflow — earlier concern withdrawn.** 4 × 80pt + 32pt padding = 352pt, which fits the 375pt iPhone SE with ~23pt to spare. Earlier drafts worried about a 320pt device; that was the SE 1st gen, which is no longer supported. The fixed `frame(width: 80, height: 100)` remains a problem for **Dynamic Type** (FAB-309), not for screen width.
+  | Reading controls | `ThemeChipView` | 32pt flat rectangle, no fixed frame | 11pt | current theme |
+
+  Swatch hex values are copy-pasted literals in two of them rather than read from `ThemeColors.colors(for:)`.
+
+  **The flat swatch doesn't work, and in the dark themes it disappears entirely.** Night vs Ink is **1.06:1** and Paper vs Sepia **1.07:1**, so the pickers show two creams and two blacks with an 11pt label as the only differentiator — confirmed in Settings and in the reader sheet. Worse, seen 2026-09-03: in the reader's theme sheet under Ink, the **Night swatch (`#1C1A16`) is drawn on the sheet's `surface` (`#181C22`) at roughly 1.03:1 and is effectively invisible** — the selected Ink swatch is only findable by its accent border. The unselected dark swatch is a rectangle you cannot see.
+
+  ## Fix
+
+  One `ThemeSwatch` component, size as a parameter, colours always from `ThemeColors.colors(for:)`. Adopt the **onboarding** treatment — a miniature page with `textPrimary`/`textSecondary` bars — because what distinguishes these themes is the text-on-background relationship, not the background colour, and it is the only one of the three where all four are instantly distinguishable. Raise the label from 11pt to `VersoTypography.UI.caption`.
+
+- [ ] 🟡 **FAB-325** · Hardcoded colours that escape the theme system  `Backlog` `Medium`
+  ## Scope
+
+  Critique §3.9, §3.12.
+
+  | Value | Where | Problem |
+  |---|---|---|
+  | `Color(hex: "766655")` | Archive/unarchive swipe tint | Paper's accent, used in **all four themes** — swipe in Night and you get a brown Paper button |
+  | `Color(hex: "4A90D9")` / `"5AAF7A"` | Mark read/unread swipe tint | Same, plus white labels at 3.34 / 2.68:1 |
+  | `Color.black.opacity(0.7)` + `.white` | `ImmersiveHintPill` | Theme-agnostic; a black pill on cream is a foreign object in Paper |
+  | `Color.black.opacity(0.35)` | Filter-panel scrim | Nearly invisible over Night/Ink backgrounds |
+  | `.red.opacity(0.8)` | `AddArticleView:210` | Should be `semanticColors.error` |
+  | duplicated theme hexes | `ThemeChip`, `ThemeChipView` | See FAB-324 |
+
+  **Confirmed in both dark themes 2026-09-03.** In **Night** the amber status badges and the brown Archive tint actually sit reasonably — Night is a warm palette, and the badge colours were evidently chosen against something like it — but the green Mark Read circle is the only cool colour on the screen and reads as foreign. In **Ink** (cool palette) it inverts: the brown Archive and amber badges clash, the green less so. That is the real argument for making these theme-aware rather than picking better fixed values: no single set works across a warm and a cool dark theme.
+
+  **Both swipe tints confirmed visually 2026-09-03 in Ink:** the trailing Archive action is a **warm brown** circle (`#766655`, Paper's accent) and the leading Mark Read action a **warm green** one (`#5AAF7A`), both floating against Ink's cool near-black. They are unmistakably from another theme. The white glyph inside the green one is also visibly soft, matching its computed 2.68:1.
+
+  **Also:** `SettingsView` uses `Divider().background(colors.border)` ~10 times. `Divider()` draws a hairline in the *system separator colour* and fills its own 1pt frame, so `.background()` is painted behind it and covered — the token never reaches the divider. The dividers currently look fine (better than `border`'s 1.25:1 would predict, which is itself the evidence), so this is a correctness problem, not a visual one: they will not shift with the theme. `ReadingChrome` already has the right pattern — `Rectangle().frame(height: 1).foregroundColor(colors.border)`. Note that "fixing" the dividers to actually use `border` will make them nearly invisible, so raise `border` toward 3:1 first.
+
+  ## Decision needed
+
+  `ArticleStatus.color`'s four badge hues are fixed across all themes — an iOS-system blue inside a warm paper palette. Are they meant to be theme-independent (like `VersoHighlightColor`, which argues this well in its doc comment), or should they take the theme? Right now it reads as unconsidered rather than chosen. Whichever way it goes, document it the way `VersoHighlightColor` does.
+
+- [ ] 🟡 **FAB-326** · Five different ways to close or go back  `Backlog` `Medium`
+  ## Scope
+
+  Critique §3.10. Across the surfaces that have a dismiss control:
+
+  | Surface | Treatment |
+  |---|---|
+  | Settings | chevron in a filled near-white circle, top-leading, title centred |
+  | Add Article | ✕ in a filled near-white circle, top-leading, title centred |
+  | Reader top bar | bare chevron, no circle, top-leading, title centred |
+  | Filter panel | bare ✕, top-trailing, title leading |
+  | Reader control sheets | bare ✕, top-trailing, floating over content |
+
+  Leading vs trailing, circled vs bare, ✕ vs chevron — every axis varies, along no rule a user could learn. The circled variants also use a fill lighter than `surface`, so they read as system chrome rather than as part of the app.
+
+  ## Fix
+
+  Two patterns: push navigation gets a bare leading chevron; modal presentation gets a bare trailing ✕. Drop the circles. Overlaps with FAB-311, which removes the control sheets' ✕ entirely.
+
+### Design critique 2026-09-01 — onboarding & settings
+
+- [ ] 🟡 **FAB-327** · Onboarding is seven screens before the first article  `Backlog` `Medium`
+  ## Scope
+
+  Critique §4.1. `OnboardingFlowView` runs Welcome → Theme → Folder → Analytics consent → Tour 1 → Tour 2 → Tour 3. Exactly **one** is functionally required. For an app whose pitch is "less friction than Pocket", a seven-screen gate is the loudest possible contradiction of the positioning, and the page-dot row shows all seven on screen one — so the first thing Welcome communicates is "six more to go".
+
+  * **Skip only exists on the tour** (screens 5–7); theme and analytics can only be answered.
+  * **No back affordance.** `advance()` is forward-only; the `TabView` allows a backward swipe but nothing signals it and the dots aren't tappable.
+  * **The theme picker runs before any content exists** — asking for a reading-theme choice with nothing to read, using a picker that also lives in Settings and the reading toolbar where it *is* contextual.
+  * **The tour explains features for an empty library.** "Share to save" means nothing until there's something to share.
+
+  ## Fix
+
+  Cut to two required screens: Welcome and Folder. Move theme to first-article-open (a one-time inline pointer at the reading toolbar). Keep analytics consent but as a sheet on first list launch, not a gate. Convert the tour into an empty state that teaches by pointing at real UI — which also feeds FAB-319.
+
+  If that is too large close to release, the minimum is: make Skip global from screen 1, and show only the dots that remain.
+
+  ## Seen 2026-09-03 (Ink)
+
+  The onboarding screens were captured on 2026-09-03, so this is no longer a source-only prediction. Everything above holds. Two additions from seeing it:
+
+  * **The composition has large vertical voids.** Every screen is `Spacer()` / content / `Spacer()` / CTA, so the content floats in the middle with 180–250pt of nothing above and below it, and reads as three unrelated elements rather than one screen. The tour's `TourStep(...).frame(height: 200)` widens the gap further, leaving the headline stranded far above its own icon.
+  * **The page-dot row nearly touches the Continue button** — `.padding(.bottom, VersoSpacing.md)` puts it about 16pt under a 50pt button, so it reads as attached to the CTA rather than as screen furniture.
+
+  The dots did confirm the count: the theme picker is dot 2 of 7, and tour step 1 is dot 5 of 7.
+
+- [ ] 🔵 **FAB-328** · Onboarding smaller polish  `Backlog` `Low`
+  ## Scope
+
+  Critique §4.3, §4.4, §4.5, §4.6. Unverified — see the note on FAB-327.
+
+  * **Disabled Continue with no explanation.** `OnboardingFolderPickerView` disables Continue until a folder is chosen and dims it with `.opacity(0.5)`; nothing says why, and the dimming drops the label to **1.55:1** in Paper. Depends on the `VersoButtonStyle` disabled variant in FAB-305.
+  * **Two glyphs break the icon language — confirmed 2026-09-03.** `Text("☁")` renders as a **colour emoji** (a shaded 3D cloud), so `.foregroundColor(colors.textSecondary)` does nothing, exactly as predicted. Next to the crisp accent-tinted SF Symbols on the neighbouring screens it reads as a mistake. `Text("›")` for the row chevron is likewise a thin typographic mark, visibly different from the real `Image(systemName: "chevron.right")` that `QuickTourView` uses for the same job four files away. Use `Image(systemName: "icloud")` and `chevron.right`.
+  * **"Sure, why not" is the wrong register for a consent affirmative.** The rest of this app's copy is calm and precise — "Verso never uploads your files. They live in your iCloud Drive." A jokey affirmative on a privacy choice reads as nudging, which compounds the button-weighting problem above. This is the single string worth changing first.
+  * **The consent screen weights the answer.** Accept is `.primary` (filled), Decline is `.secondary` (outlined). Given Quebec's Law 25 and GDPR both leaning toward equal-prominence consent — and given privacy-first is a real differentiator here — two `.secondary` buttons would be safer and more on-brand. Worth a look from someone who does this professionally.
+  * **Skip stays in the accessibility tree on the last step.** `.opacity(isLastStep ? 0 : 1)` plus `.disabled(...)` — use a conditional instead.
+
+- [ ] 🟡 **FAB-329** · Settings polish  `Backlog` `Medium`
+  ## Scope
+
+  Critique §7.1, §7.5, §7.6.
+
+  * **Selection is an 8pt dot.** `fontRow` and `languageRow` mark the selected item with `Circle().frame(width: 8, height: 8)` at the far trailing edge of a 78pt row. `defaultRow`'s passive disclosure chevron is 14pt semibold — **the inert affordance is drawn more strongly than the active selection.** `FilterPanel.tagRow` already uses an accent checkmark, in this same app. Use it.
+
+    Confirmed far worse at large text (2026-09-03): the dot is a fixed `frame(width: 8, height: 8)`, so when the row label triples in size the dot stays 8pt and becomes almost invisible — the selection indicator degrades precisely for the users who need it most. A checkmark built from a scaling text style fixes this for free; otherwise it needs `@ScaledMetric`. See FAB-309.
+  * **Two heading levels, one visual style.** `sectionHeader` ("READING") and `sectionLabel` ("Font", "Theme") are both 13pt `textSecondary`, distinguished only by capitalisation — two levels of a real nesting hierarchy in one style. Confirmed in Ink 2026-09-03.
+  * **Evidence for FAB-325's divider point.** In Ink, `border` is `#1E2228` on `#181C22` — 1.16:1, which would be invisible. The Settings dividers are clearly visible, which is itself the proof that `Divider().background(colors.border)` never reaches the divider and the lines are the system separator.
+  * **The folder row shows `lastPathComponent` alone**, so "Articles folder · Verso" parses as a settings *value* rather than a folder name. A folder glyph or the parent directory would disambiguate.
+  * **The font-size stepper stays tappable at its limits** — the guard is inside the closure, so at 26pt the `+` accepts taps and does nothing. Use `.disabled()` so it is inert and announces correctly.
+  * **Font size is in Settings, line spacing only in the reader**, font family only in Settings, theme in all three. Not wrong, but not legible either.
 
 ### Phase 3 — Expansion
 
