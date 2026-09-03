@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**52 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass).
+**51 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -27,12 +27,14 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
 - **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (blank screen) turned out to have two independent causes — one fixed and shipped (PR #360), a second fixed pending Fabio's device confirmation; see its BACKLOG entry for the full history. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
 
-  **Sequencing, agreed with Fabio 2026-09-03** (supersedes the single-line "Pre-submission set" this replaced — that line put FAB-309 before FAB-311, which contradicted FAB-309's own "Related" note that FAB-311's `BodySize` work should land first; this ordering follows the note).
+  **Amended 2026-09-03, after the native-shell decision.** Fabio chose to **ship 1.0 on the current UI and do the native iOS shell as 1.1** ([FAB-334](#)). That changes what belongs in this list: several items below are defects in custom chrome that FAB-334 deletes outright, so fixing them now is work thrown away. Items **13 (FAB-310)**, **15 (FAB-320)** and **16 (FAB-319)** move to FAB-334, as do the chrome halves of FAB-329, FAB-326, FAB-325 and FAB-324 in the post-launch list. Item **11 (FAB-309)** splits: the `VersoTypography.UI` token rebuild stays in 1.0 (cheap, mechanical, and it survives the shell — and a reading app that ignores the system text size shouldn't ship that way for however long 1.1 takes), while its layout audit of chrome components moves to FAB-334. Item **8 (FAB-311)**'s ✕/grabber collision is absorbed too, but its `BodySize` reconnection is reading-view work and stays. **Read FAB-334 before starting any item marked below.**
+
+  **Original sequencing, agreed with Fabio 2026-09-03** (supersedes the single-line "Pre-submission set" this replaced — that line put FAB-309 before FAB-311, which contradicted FAB-309's own "Related" note that FAB-311's `BodySize` work should land first; this ordering follows the note).
 
   *Pre-submission — fix or ship before the final binary submission (FAB-150):*
 
   1. **FAB-304** — theme-switch blank screen (cause 1, shipped PR #360) turned out to have a second, independent cause (reader content blanking after the app switcher) — fixed pending device confirmation, see its BACKLOG entry.
-  2. **FAB-315 + FAB-332** — one PR: duplicate image captions + publisher title/chrome parsing, same converter and test suite
+  2. ~~**FAB-315 + FAB-332**~~ — **done**, see [DONE.md](DONE.md): duplicate image captions + publisher title/chrome parsing, one PR, shared converter and test suite.
   3. **FAB-330** — "0 read" → "N% read" caption. **Needs a decision:** add the missing `%` now, or fold in FAB-278's percent→time-remaining redesign first? Default: minimal `%` fix now, defer FAB-278.
   4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
   5. **FAB-305** — white-on-accent contrast; adds the `VersoButtonStyle` disabled variant FAB-328 later depends on
@@ -41,16 +43,16 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
   9. **FAB-307** — immersive chrome hit-testing + VoiceOver auto-hide (same `ReadingChrome`/`ReadingTopBar` files as #8)
   10. **FAB-308** — localize the 7 hardcoded reading-chrome strings (same files again, do while open)
-  11. **FAB-309** — Dynamic Type: rebuild `VersoTypography.UI` + hardcoded-size fixes + layout audit; after #8 so the scales compose. The largest single item here — treat as its own multi-step arc.
+  11. **FAB-309** — Dynamic Type. **Split by the amendment above:** the `VersoTypography.UI` token rebuild and the hardcoded-size fixes in the reading view and onboarding stay here, after #8 so the scales compose. The layout audit of chrome components (`SettingsRow`, `ThemeChip`, the list header) moves to FAB-334, which deletes them.
   12. **FAB-333** — reading measure collapse w/ OpenDyslexic & max size; stacks on top of #11
-  13. **FAB-310** — remaining touch targets (font stepper already covered by #8)
+  13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
   14. *(pulled out of FAB-322)* **"Add Article: no escape while saving"** — a hung parse currently traps the user with no cancel; real stuck-state bug despite the rest of FAB-322 being Low/Backlog
-  15. **FAB-320** — bulk-select destructive color + selection count; self-contained
-  16. **FAB-319** — filters "Clear all" + empty-state CTA; biggest UX/activation win in this bucket, done last here since most involved
+  15. ~~**FAB-320**~~ — **moved to FAB-334.** System `EditMode` supplies both the red destructive action and the "N Selected" title.
+  16. **FAB-319** — **split.** The empty-state CTA stays in 1.0 (it is the biggest activation win available and it is copy plus one button — note the current copy sends the user *out of the app* to Safari while the `+` sits unmentioned above it). The filter panel's "Clear all" moves to FAB-334, which rehomes filters around `.searchable` anyway.
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (fold into FAB-329) → FAB-323 (share extension theming) → FAB-325 (hardcoded colors/swipe tints/dividers — **needs a decision** on whether `ArticleStatus.color` badges should be theme-independent or theme-aware, and raise `border` contrast toward 3:1 *before* fixing the divider bug or it makes dividers disappear) → FAB-329 (incl. FAB-313; after FAB-309, since the selection-dot scaling problem follows from it) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → FAB-326 (unify five close/dismiss patterns; overlaps with and follows FAB-311) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; depends on FAB-305's disabled variant, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
+  FAB-313 (fold into FAB-329) → FAB-323 (share extension theming) → FAB-325 (hardcoded colors/swipe tints/dividers — **needs a decision** on whether `ArticleStatus.color` badges should be theme-independent or theme-aware, and raise `border` contrast toward 3:1 *before* fixing the divider bug or it makes dividers disappear) → FAB-329 (incl. FAB-313 — **mostly absorbed by FAB-334**: an inset-grouped `Form` supplies checkmarks, real section headers and value+chevron rows; only what survives the shell stays here) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; depends on FAB-305's disabled variant, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -155,21 +157,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   * Or keep the status as-is but filter the section on `scrollPosition > 0`, so `.reading`-with-no-progress articles fall back into Unread.
 
   The first is truer to the data model; the second is a one-line change. Either way the section should not show an entry at 0%.
-
-- [ ] 🔴 **FAB-332** · Publisher chrome and title suffixes survive into the reader  `Todo` `Urgent`
-  ## Symptom
-
-  Seen 2026-09-03 on a CNN article. Two separate content-quality defects on the same screen:
-
-  1. **A social share bar renders as the first body paragraph** — "Facebook Tweet Email Link Threads Link Copied!" — followed by the dateline "Ramsgate, England" as its own paragraph. The reader's best screen opens with publisher chrome.
-  2. **The title keeps its publisher suffix** — "God save the drag kings of England | CNN" — in the H1, the top bar, *and* the article card. Every article from a site that appends " | Publisher" or " - Publisher" to `<title>` carries it.
-
-  ## Fix
-
-  1. Extend `HTMLToMarkdownConverter.isNoiseLine` (FAB-294's screen) to catch share-bar runs: short lines that are mostly a sequence of platform names, and the "Link Copied!" affordance text. Worth checking whether SwiftSoup can drop these structurally by class/role before falling back to text heuristics.
-  2. Strip a trailing ` | <site>` / ` - <site>` / ` — <site>` from the title when the tail matches the article's `siteName` or host. Do it once at parse time so the card, the bar and the H1 all benefit.
-
-  Same family as **FAB-315** (duplicate image captions) — all three are publisher-shaped parsing gaps and all three deserve fixture tests in `HTMLToMarkdownConverterTests` / `SwiftSoupParserTests`.
 
 - [ ] 🟠 **FAB-333** · The reading measure collapses with OpenDyslexic and at the largest in-app size  `Todo` `High`
   ## Symptom
@@ -387,19 +374,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   A script that walks `Colors.swift`, asserts every *used* pair, and runs in CI. Then correct §3.3 of the spec, whose conclusion currently reads as "done" and is stronger than its evidence — that is the genuinely dangerous part.
 
 ### Design critique 2026-09-01 — reading view
-
-- [ ] 🔴 **FAB-315** · Image captions are printed twice  `Todo` `Urgent`
-  ## Symptom
-
-  Critique §6.7. In an article with a photo, the caption renders under the image *and again* as a full body paragraph in 18pt New York with the credit appended — e.g. "…in the 1960s. Photograph: João Laet/The Guardian". The app's best screen stutters and repeats itself immediately after its only image. Seen on a Guardian article, 2026-09-01.
-
-  ## Cause
-
-  The guard already exists and is one comparison too strict. `HTMLToMarkdownConverter.collapseImageCaptionEcho` drops the echo when the image's alt text and the following paragraph match, but requires `fingerprint(alt) == fingerprint(next)` — exact equality after punctuation normalisation. Publishers that append a credit to the echoed paragraph defeat it.
-
-  ## Fix
-
-  Match on prefix rather than equality: drop the next block when it *starts with* the alt text and the remainder is short or matches a credit pattern (`Photograph:` / `Photo:` / `Credit:` / `Illustration:`). Add the Guardian case to `HTMLToMarkdownConverterTests` — this is a publisher-shaped bug that will recur.
 
 - [ ] 🟠 **FAB-316** · The reader's top bar repeats the title directly below it  `Todo` `High`
   ## Scope
@@ -623,6 +597,100 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   * **The folder row shows `lastPathComponent` alone**, so "Articles folder · Verso" parses as a settings *value* rather than a folder name. A folder glyph or the parent directory would disambiguate.
   * **The font-size stepper stays tappable at its limits** — the guard is inside the closure, so at 26pt the `+` accepts taps and does nothing. Use `.disabled()` so it is inert and announces correctly.
   * **Font size is in Settings, line spacing only in the reader**, font family only in Settings, theme in all three. Not wrong, but not legible either.
+
+### Phase E — native iOS shell (1.1)
+
+- [ ] 🟠 **FAB-334** · [Epic] Native iOS shell: replace custom chrome with system components (Liquid Glass)  `Todo` `High`
+  ## Goal
+
+  Make Verso look and behave like a native iOS app — Liquid Glass chrome, a bottom-anchored search field, system navigation, system list and form styling — **without touching the reading view**, which stays exactly as it is.
+
+  Decided with Fabio 2026-09-03: **native shell, custom reading room.** The article list, settings, search, navigation and toolbars adopt system components; the reading surface keeps its bespoke typography, its four themes and its custom chrome. This is how Reeder and Matter are built, and it puts the paper identity where it earns its keep instead of fighting the platform everywhere else.
+
+  ## Why this is an epic and not a skin
+
+  Liquid Glass is not something you apply. Build against the iOS 26 SDK (CI already pins Xcode 26.6) and system components adopt it automatically on iOS 26+, falling back below. The problem is that Verso has almost no system components for it to apply to:
+
+  | System affordance | Uses in Verso today |
+  |---|---|
+  | `.searchable` | **0** — hand-built `SearchBar` |
+  | `.toolbar` | **1**, and it is `.toolbar(.hidden)` |
+  | `List` | 1 (the article list). Settings is a hand-built `ScrollView` of `HStack`s |
+  | `.buttonStyle(.plain)` | **43** — every button opts out of system styling |
+
+  Plus `VersoNavigationBar`, a custom `headerRow` standing in for a navigation bar, and `VersoButtonStyle`. So the work is deleting roughly a thousand lines of re-implemented chrome and letting the system draw it.
+
+  ## Why it changes Phase D's sequencing
+
+  Most of the chrome issues in Phase D are defects in those re-implementations. Adopt the system component and the defect stops existing — fixing them first is work thrown away.
+
+  **Absorbed by this epic (the custom component is deleted, so its bugs go with it):**
+
+  | Issue | What the system gives you instead |
+  |---|---|
+  | FAB-310 | System controls are 44×44pt by default |
+  | FAB-320 | System `EditMode` gives a red destructive action and an "N Selected" title |
+  | FAB-322's select-mode layout shift | `EditMode` owns the checkbox column; content width stops changing |
+  | FAB-326 | One system back button instead of five dismiss treatments |
+  | FAB-329 (partly) | An inset-grouped `Form` gives checkmarks, real section headers, value+chevron rows |
+  | FAB-325's divider half | System `List` draws its own separators |
+  | FAB-319's filter panel | A system menu / sheet; `.searchable` supplies the bottom search field |
+  | FAB-311's ✕ collision | A system sheet with a grabber and no competing close button |
+
+  **Not absorbed — do these in 1.0 as already sequenced.** Everything in the content and reading layers survives untouched: FAB-315 + FAB-332 (parser), FAB-330, FAB-331, FAB-312, FAB-308, FAB-307, FAB-333, FAB-316, FAB-317, FAB-321, FAB-323, FAB-306, FAB-327, FAB-328.
+
+  **FAB-309 is the one to split, not defer.** Its two halves behave differently:
+
+  * *Rebuilding `VersoTypography.UI` on text styles* is cheap, mechanical, and **survives this epic** — system components need correct text styles anyway, and `Typography.Reading` is untouched by the shell either way. Keep it in 1.0.
+  * *The layout audit* (`lineLimit(1)` sweeps, fixed frames, sheet detents on custom components) is largely throwaway, because most of those components are deleted here. Defer the parts that touch chrome; keep the parts that touch the reading view and onboarding.
+
+  The counter-argument, which is real: shipping 1.0 ignoring the system text size means a reading app that ignores it for however long 1.1 takes, and enlarged-text readers are close to this app's core audience. That is the reason the token half stays in 1.0 rather than waiting.
+
+  ## Explicitly out of scope
+
+  The reading view. Beyond the design decision, there is a hard technical reason: the body is not SwiftUI. `HighlightableRegionText` wraps a custom `HighlightableUITextView` per contiguous region, needed for FAB-54/FAB-303 highlighting, and it overrides `draw(_:)` — as FAB-304's second cause made vivid. Nothing about Liquid Glass adoption should go near it.
+
+  Also out of scope: the Share Extension (FAB-323 handles its theming separately) and the iPad epic (FAB-131, FAB-152–162), which stays deferred.
+
+  ## Open decisions — needed before implementation starts
+
+  1. **Deployment target — DECIDED 2026-09-03: raise to iOS 26.0.** Currently **iOS 16.0** (`Verso/project.yml`). The `glassEffect` family is iOS 26-only, so a real Liquid Glass shell needs either `if #available(iOS 26, *)` branches throughout or a raised floor. Verso has no installed base — nobody is on an old build because there is no old build — so this is the cheapest moment in the app's life to raise it, and it only gets more expensive after 1.0 ships.
+
+     ⚠️ **Do not make this change on `main` yet.** 1.0 is one step from final binary submission (FAB-150) and is expected to ship at iOS 16. Raising the floor on `main` changes what 1.0 ships as and would cut its addressable devices for no benefit, since 1.0 uses no iOS 26 API. Land it as the first commit on the 1.1 branch instead (phase 1 below). If 1.0 slips far enough that it would ship after the shell work anyway, revisit — but that should be a deliberate call, not a side effect.
+
+     Worth confirming current iOS 26 adoption before the branch opens; it shipped a year ago, so the cost is probably modest, but the number should be looked up rather than assumed.
+  2. **What happens to the four themes in the shell.** The decision above implies the shell follows light/dark (driven by `VersoTheme.isDark`, which `ContentView.preferredColorScheme` already plumbs) while Paper/Sepia/Night/Ink survive in the reader. Confirm that is acceptable before building — it is a visible reduction outside the reading view.
+  3. **Whether onboarding is rebuilt here or in FAB-327.** FAB-327 already proposes cutting seven screens to two. Doing both at once is more coherent than restyling seven screens and then deleting five of them.
+  4. **`.searchable` placement and scope.** Today search is a custom expanding header field over title + body + site + URL. The system field changes both the interaction and where filters live (FAB-319).
+
+  ## Direction approved 2026-09-03
+
+  Fabio reviewed a side-by-side prototype (article list + reading view, all four themes, current chrome vs. glass) and approved the direction. The open worry going in — that translucent chrome would grey out the warm Paper and Sepia grounds — did not materialise in the mock.
+
+  **Caveat to carry forward:** that prototype was HTML, `backdrop-filter: blur(26px) saturate(190%)` over a theme-derived veil. It is a colour-and-legibility approximation, not Liquid Glass. It has no specular edge, no rim refraction, and no scroll or tilt response — and those are exactly the properties that could still misbehave over a warm ground. **The direction is approved; the material is not yet verified.**
+
+  Before committing to phases 3–6 below, spend a throwaway SwiftUI spike on the 1.1 branch: one screen, real `glassEffect`, all four themes, on device. If the real material dulls Paper and Sepia in a way the mock didn't predict, the fallback is opaque chrome in the light themes and glass in the dark ones — worth knowing before the shell is half-rebuilt, not after.
+
+  ## Suggested phasing
+
+  Each phase should build, run and be shippable on its own — no long-lived branch.
+
+  1. **Foundations.** Decide and raise the deployment target. Rebuild `VersoTypography.UI` on text styles (the FAB-309 half above). No visual redesign yet.
+  2. **Settings.** The lowest-risk screen and the biggest immediate win: hand-built `ScrollView` → `Form` with inset-grouped sections. Absorbs most of FAB-329, FAB-325's dividers, part of FAB-310.
+  3. **Navigation shell.** Remove `.toolbar(.hidden, for: .navigationBar)`, retire `VersoNavigationBar` and the custom `headerRow`, adopt real navigation bars and toolbars. Absorbs FAB-326. Highest-risk phase — this is the code FAB-304's cause 1 lived in, and `VersoMainSplitView`'s selection-driven collapse is load-bearing.
+  4. **Search and filters.** `.searchable` with the iOS 26 bottom field; rehome the filter panel. Absorbs FAB-319.
+  5. **List.** System `List` styling, `EditMode` for bulk select. Absorbs FAB-320 and FAB-322's layout shift.
+  6. **Sweep.** Retire `VersoButtonStyle` where a system style fits; audit the 43 `.buttonStyle(.plain)` sites; re-run the large-text and SE passes.
+
+  ## Verify
+
+  Re-run the full screenshot matrix afterwards — all four themes, onboarding, immersive, large Dynamic Type, iPhone SE — as in `docs/printscreens/design-review-2026-09-03/`. The critique's §8 list is the checklist. Pay particular attention to translucent chrome over the warm Paper background: Liquid Glass samples what is behind it, and these materials were not tuned against cream.
+
+  ## References
+
+  * [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md) — §3.4, §3.5, §5.1, §5.6, §7.1, §7.5 are the findings this absorbs
+  * [navigation-patterns.md](navigation-patterns.md), [DESIGN_SYSTEM_FOUNDATIONS.md](DESIGN_SYSTEM_FOUNDATIONS.md)
+  * [SwiftUI search enhancements in iOS/iPadOS 26](https://nilcoalescing.com/blog/SwiftUISearchEnhancementsIniOSAndiPadOS26/) · [Adapting search to Liquid Glass](https://www.createwithswift.com/adapting-search-to-the-liquid-glass-design-system/)
 
 ### Phase 3 — Expansion
 

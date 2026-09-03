@@ -15,10 +15,13 @@ struct SwiftSoupParser {
         do {
             let doc = try SwiftSoup.parse(html, url.absoluteString)
 
-            let title = try extractTitle(from: doc, url: url)
+            let siteName = extractSiteLabel(from: doc)
+            let rawTitle = try extractTitle(from: doc, url: url)
+            // FAB-332: drop a trailing " | CNN" / " - Site" publisher suffix once, here, so the
+            // card, top bar, and H1 -- which all render this same `title` -- inherit the fix.
+            let title = HTMLToMarkdownConverter.stripPublisherTitleSuffix(rawTitle, siteName: siteName, host: url.host)
             let contentMarkdown = try extractContentMarkdown(from: doc, articleTitle: title, baseURL: url)
             let author = extractAuthor(from: doc)
-            let siteName = extractSiteLabel(from: doc)
 
             return PendingArticle(
                 id: UUID(),
