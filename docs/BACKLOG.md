@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**51 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (theme-switch blank screen, fixed 2026-09-03 — see [DONE.md](DONE.md)), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass).
+**52 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass).
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,13 +25,13 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
-- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (theme switch across the light/dark boundary blanking the screen) is fixed — see [DONE.md](DONE.md); Fabio's real-build confirmation of the repro matrix is still outstanding. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
+- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (blank screen) turned out to have two independent causes — one fixed and shipped (PR #360), a second fixed pending Fabio's device confirmation; see its BACKLOG entry for the full history. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
 
   **Sequencing, agreed with Fabio 2026-09-03** (supersedes the single-line "Pre-submission set" this replaced — that line put FAB-309 before FAB-311, which contradicted FAB-309's own "Related" note that FAB-311's `BodySize` work should land first; this ordering follows the note).
 
   *Pre-submission — fix or ship before the final binary submission (FAB-150):*
 
-  1. ~~**FAB-304** — theme-switch blank screen~~ **Done 2026-09-03**, see [DONE.md](DONE.md). Fabio's real-build confirmation of the repro matrix (below) is still outstanding.
+  1. **FAB-304** — theme-switch blank screen (cause 1, shipped PR #360) turned out to have a second, independent cause (reader content blanking after the app switcher) — fixed pending device confirmation, see its BACKLOG entry.
   2. **FAB-315 + FAB-332** — one PR: duplicate image captions + publisher title/chrome parsing, same converter and test suite
   3. **FAB-330** — "0 read" → "N% read" caption. **Needs a decision:** add the missing `%` now, or fold in FAB-278's percent→time-remaining redesign first? Default: minimal `%` fix now, defer FAB-278.
   4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
@@ -97,6 +97,31 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   ## Depends on
 
   Close or hand off after core Phase 2 issues are done.
+
+### Bugs — found 2026-09-01, reopened 2026-09-03
+
+- [ ] 🔴 **FAB-304** · Blank-screen bug has a second cause: reader content blanks after the app switcher  `In Progress` `Urgent`
+  ## History
+
+  Originally reported 2026-09-01 as: switching theme in Settings across the light/dark boundary (e.g. Ink → Sepia) left the screen blank. Diagnosed and fixed in [PR #360](https://github.com/whysasse/verso-app/pull/360) — see cause/fix below, still valid and shipped. Fabio then tested that PR and reported the blank-screen symptom **still happens**, via a different repro that has nothing to do with Settings or switching theme: reading an article, backgrounding via the app switcher, returning — the body text is blank while the top/bottom chrome renders fine, and tapping/scrolling brings it back. A double-tap while blank still selected text, so the content is present, just not painted. Reopened rather than filed as a new issue, since it's the same reported symptom with a second, independent cause.
+
+  ## Cause 1 (fixed, PR #360) — Settings push torn down by a theme-driven rebuild
+
+  `showSettings` (`@State` on `ArticleListView`) drove `.navigationDestination(isPresented: $showSettings) { SettingsView() }`, but that modifier was registered inside the private `ArticleListFetchedBody`, which `ArticleListView` instantiates with `.id(listFetchIdentity)` — a key that changes with search/date, and — per `ContentView.swift`'s `.preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)` — gets torn down and rebuilt whenever a theme switch crosses the light/dark boundary and forces a hosting-hierarchy rebuild. When that subtree rebuilt, its `navigationDestination` registration went with it, but `showSettings` (owned one level up) survived as `true`: a pushed slot with no destination left to resolve it.
+
+  **Fix:** in [`ArticleListView.swift`](<Verso/Sources/Screens/ArticleList/ArticleListView.swift>), moved the `navigationDestination` onto `ArticleListView.body` itself, next to `.toolbar(.hidden, for: .navigationBar)` — a stable ancestor nothing re-keys. Removed the now-unused `showSettings` binding plumbing from `ArticleListFetchedBody`. Left the two similarly-shaped `.sheet`s (`showFolderPicker`/`showAddArticle`) and `ContentView`'s `.preferredColorScheme` untouched (removing the latter would trade this bug for system chrome no longer following the theme in Night/Ink).
+
+  ## Cause 2 (in progress) — reader's UIKit text views don't repaint after returning from background
+
+  The reading view's body isn't pure SwiftUI text: `HighlightableRegionText` ([HighlightableRegionText.swift](<Verso/Sources/Components/Reading/HighlightableRegionText.swift>)) is a `UIViewRepresentable` wrapping a custom `UITextView` subclass (`HighlightableUITextView`), needed for FAB-54/FAB-303's highlighting feature (a selection-change hook and per-run background color that plain SwiftUI `Text` doesn't offer). `MarkdownBodyView` creates one per contiguous region of blocks, so an article's body is several separate `UITextView`s inside a plain `ScrollView`. Nothing in the reading path (`ArticleReaderView`, `MarkdownBodyView`, `HighlightableRegionText`) observed `scenePhase`/`UIApplication.didBecomeActiveNotification`. `HighlightableUITextView` overrides `draw(_:)` for the blockquote accent bar, and iOS gives no guarantee that a custom-drawn view's backing store survives being backgrounded — explaining the exact shape of the symptom: chrome (SwiftUI-native) redraws fine, the UITextView-backed body doesn't until something forces a layout pass, and selection still works while blank because TextKit's layout geometry (used for hit-testing) is untouched by a lost backing store.
+
+  **Fix (implemented, not yet device-confirmed):** `HighlightableUITextView` now observes `UIApplication.didBecomeActiveNotification` and calls `setNeedsLayout()`/`setNeedsDisplay()` on return to foreground, removing the observer in `deinit`. Scoped to the one class doing custom drawing rather than threading `scenePhase` through three files for the same effect.
+
+  **Alternate theory considered and set aside:** `VersoApp.swift` calls `articleLibraryService.rebuildCache(...)` unconditionally on every `scenePhase == .active` transition, not just cold launch, which could in principle invalidate a Core Data object out from under an open `ArticleReaderView`. Set aside because Fabio's repro shows the text is still there (selectable), which points at a pure redraw problem rather than a data problem — but worth a look if the redraw fix doesn't fully resolve it.
+
+  ## Verify
+
+  `xcodebuild build` (Verso scheme) succeeds. Real confirmation is Fabio's part: open an article, background via the app switcher, wait a few seconds, return, and check the body renders immediately with no tap/scroll needed — plus re-run the original theme-switch matrix (Ink→Paper, Sepia→Night crossing light/dark; Ink→Night, Paper→Sepia as a control) to confirm cause 1 stays fixed.
 
 ### Bugs — found 2026-09-03 (Ink theme + onboarding pass)
 

@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**181 completed issues.**
+**180 completed issues.**
 
 ## iOS
 
@@ -179,23 +179,6 @@
   ## Verified
 
   `xcodebuild build` succeeded for the `Verso` scheme. **Not verified here**: the actual visual result on a simulator/device (top spacing under the Dynamic Island, all three `headerRow` states, the folder-picker prompt state, iPad sidebar toggle behavior) — Fabio's part after the PR.
-
-### Bugs — design critique remediation (2026-09-03)
-
-- [x] 🔴 **FAB-304** · Switching theme from Settings across the light/dark boundary blanked the screen  `Done` `Urgent`
-  Reported by Fabio 2026-09-01: switching theme in Settings across the light/dark boundary (e.g. Ink → Sepia) left the screen blank, filled with the new theme's background, with no content and no way back. Completed 2026-09-03.
-
-  ## Cause
-
-  `showSettings` (`@State` on `ArticleListView`) drove `.navigationDestination(isPresented: $showSettings) { SettingsView() }`, but that modifier was registered inside the private `ArticleListFetchedBody`, which `ArticleListView` instantiates with `.id(listFetchIdentity)` — a key that changes with search/date, and — per `ContentView.swift`'s `.preferredColorScheme(themeManager.currentTheme.isDark ? .dark : .light)` — gets torn down and rebuilt whenever a theme switch crosses the light/dark boundary and forces a hosting-hierarchy rebuild. When that subtree rebuilt, its `navigationDestination` registration went with it, but `showSettings` (owned one level up) survived as `true`: a pushed slot with no destination left to resolve it.
-
-  ## Fix
-
-  In [`ArticleListView.swift`](<Verso/Sources/Screens/ArticleList/ArticleListView.swift>): moved `.navigationDestination(isPresented: $showSettings) { SettingsView() }` out of `ArticleListFetchedBody` and onto `ArticleListView.body` itself, next to `.toolbar(.hidden, for: .navigationBar)` — a stable ancestor that nothing re-keys. Removed the now-unused `showSettings` `@Binding` plumbing (property, init parameter, call-site pass-through) from `ArticleListFetchedBody`, which no longer needs it. Deliberately left `showFolderPicker`/`showAddArticle` (two `.sheet`s in the same parent-owned-state shape) untouched, and left `ContentView`'s `.preferredColorScheme` in place — removing it would trade this bug for system chrome (menus, alerts, keyboard, selection handles) no longer following the theme in Night/Ink.
-
-  ## Verified
-
-  `xcodebuild -scheme Verso -destination 'generic/platform=iOS Simulator' build` succeeded. **Not verified here**: the actual repro on a real build (BACKLOG's confirm matrix — Ink→Paper and Sepia→Night crossing light/dark vs. Ink→Night and Paper→Sepia not crossing it) — Fabio's part after the PR.
 
 ### Phase 1 — Foundation
 
