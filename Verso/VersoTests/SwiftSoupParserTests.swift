@@ -215,6 +215,32 @@ final class SwiftSoupParserTests: XCTestCase {
         XCTAssertTrue(markdown.contains("Ten years after my husband died in a surfing accident, I have learned things about grief that nobody warned me of."))
     }
 
+    /// FAB-332: reproduces the CNN case (2026-09-03) -- a flattened social-share bar renders as
+    /// the first body paragraph, and the title keeps its " | CNN" suffix through into the stored
+    /// `title` field the card, top bar, and H1 all render.
+    func testCNNArticleDropsShareBarAndStripsTitleSuffix() throws {
+        let html = """
+        <html>
+        <head>
+            <title>God save the drag kings of England | CNN</title>
+            <meta property="og:site_name" content="CNN" />
+        </head>
+        <body><article>
+            <p>Facebook Tweet Email Link Threads Link Copied!</p>
+            <p>Drag kings across England are having a moment, reclaiming a stage long dominated by drag queens.</p>
+        </article></body>
+        </html>
+        """
+        let article = try SwiftSoupParser.parse(html: html, url: URL(string: "https://edition.cnn.com/style/drag-kings-england")!)
+
+        XCTAssertEqual(article.title, "God save the drag kings of England")
+        XCTAssertFalse(
+            article.contentMarkdown.contains("Facebook"),
+            "the flattened share bar should be stripped: \(article.contentMarkdown)"
+        )
+        XCTAssertTrue(article.contentMarkdown.contains("Drag kings across England are having a moment, reclaiming a stage long dominated by drag queens."))
+    }
+
     static let guardianLikeHTML = """
     <html><body><article>
         <p>Ten years after my husband died in a surfing accident, I have learned things about grief that nobody warned me of.</p>
@@ -301,6 +327,54 @@ final class HTMLToMarkdownConverterNoiseTests: XCTestCase {
         let result = HTMLToMarkdownConverter.convert("<p>Unclosed paragraph with a stray < angle bracket.", articleTitle: nil, baseURL: nil)
         XCTAssertTrue(result.contains("Unclosed paragraph with a stray"))
     }
+
+    // MARK: - FAB-315: image caption echo with an appended credit
+
+    func testCollapsesImageCaptionEchoWhenCreditIsAppended() {
+        // Reproduces the Guardian case (2026-09-01): the echoed paragraph isn't an exact repeat
+        // of the alt text, it's the alt text plus "Photograph: <credit>" appended.
+        let markdown = """
+        ![A woman surfs the waves in the 1960s](https://example.com/photo.jpg)
+
+        A woman surfs the waves in the 1960s. Photograph: João Laet/The Guardian
+
+        Real body paragraph continues here.
+        """
+        let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
+        XCTAssertTrue(result.contains("![A woman surfs the waves in the 1960s](https://example.com/photo.jpg)"))
+        XCTAssertFalse(result.contains("Photograph: João Laet/The Guardian"), "the echoed caption+credit paragraph should be dropped: \(result)")
+        XCTAssertTrue(result.contains("Real body paragraph continues here."))
+    }
+
+    /// Regression guard for the pre-FAB-315 exact-match case -- must keep working unchanged.
+    func testCollapsesImageCaptionEchoOnExactDuplicate() {
+        let markdown = """
+        ![Sunset over the bay](https://example.com/sunset.jpg)
+
+        Sunset over the bay
+
+        Real body paragraph.
+        """
+        let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
+        let blocks = result.components(separatedBy: "\n\n")
+        XCTAssertEqual(blocks, ["![Sunset over the bay](https://example.com/sunset.jpg)", "Real body paragraph."])
+    }
+
+    /// A paragraph that merely *starts* with the same words as the alt text before continuing
+    /// into unrelated content must survive -- only a short/credit-shaped remainder counts as an
+    /// echo, not any shared prefix.
+    func testImageCaptionEchoRequiresShortOrCreditShapedRemainder() {
+        let markdown = """
+        ![A woman surfs the waves](https://example.com/photo.jpg)
+
+        A woman surfs the waves in an entirely different context that has nothing to do with the caption.
+
+        Real body paragraph.
+        """
+        let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
+        XCTAssertTrue(result.contains("A woman surfs the waves in an entirely different context"))
+    }
+
 }
 
 /// Regression coverage for FAB-295: the Share Extension's `SwiftSoupParser` path had no
@@ -410,5 +484,74 @@ final class SwiftSoupParserImageTests: XCTestCase {
         """
         let article = try SwiftSoupParser.parse(html: html, url: sourceURL)
         XCTAssertTrue(article.contentMarkdown.contains("![Relative path photo](https://example.com/media/photo.jpg)"))
+    }
+}
+
+/// FAB-332: a publisher's social-share bar often has no separator between buttons once tags are
+/// stripped, so it flattens into one run-on line ("Facebook Tweet Email Link Threads Link
+/// Copied!") rather than one noise line per button -- these cover the ratio-based detection
+/// `isNoiseLine` uses for that shape, on top of the existing exact-fingerprint noise rules.
+final class HTMLToMarkdownConverterShareBarTests: XCTestCase {
+
+    func testDropsFlattenedShareBarParagraph() {
+        let markdown = "Intro paragraph.\n\nFacebook Tweet Email Link Threads Link Copied!\n\nBody paragraph."
+        let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
+        XCTAssertFalse(result.contains("Facebook"))
+        XCTAssertFalse(result.contains("Threads"))
+        XCTAssertTrue(result.contains("Intro paragraph."))
+        XCTAssertTrue(result.contains("Body paragraph."))
+    }
+
+    func testDropsStandaloneLinkCopiedLine() {
+        let markdown = "Intro paragraph.\n\nLink Copied!\n\nBody paragraph."
+        let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
+        XCTAssertFalse(result.contains("Link Copied!"))
+        XCTAssertTrue(result.contains("Intro paragraph."))
+        XCTAssertTrue(result.contains("Body paragraph."))
+    }
+
+    /// Guard against the ratio-based check sweeping up ordinary prose that happens to contain a
+    /// generic word like "link" -- only a run mostly made of platform names counts.
+    func testOrdinarySentenceContainingLinkIsNotTreatedAsShareBar() {
+        let markdown = "Click the link below for details."
+        let result = HTMLToMarkdownConverter.sanitizeMarkdownBody(markdown, articleTitle: nil)
+        XCTAssertTrue(result.contains("Click the link below for details."))
+    }
+}
+
+/// Focused coverage for `HTMLToMarkdownConverter.stripPublisherTitleSuffix` (FAB-332): a
+/// trailing " | Site" / " - Site" / " — Site" is dropped only when the tail can be tied back to
+/// the article's own `siteName` or URL `host`, so a title with a legitimate mid-title dash or
+/// pipe (a real subtitle) is left alone.
+final class HTMLToMarkdownConverterTitleSuffixTests: XCTestCase {
+
+    func testStripsPipeSuffixMatchingSiteName() {
+        let result = HTMLToMarkdownConverter.stripPublisherTitleSuffix(
+            "God save the drag kings of England | CNN", siteName: "CNN", host: "edition.cnn.com"
+        )
+        XCTAssertEqual(result, "God save the drag kings of England")
+    }
+
+    func testStripsDashSuffixMatchingHostWhenSiteNameIsNil() {
+        let result = HTMLToMarkdownConverter.stripPublisherTitleSuffix(
+            "Some Headline - CNN", siteName: nil, host: "edition.cnn.com"
+        )
+        XCTAssertEqual(result, "Some Headline")
+    }
+
+    /// A title's trailing segment that isn't this publisher's name must survive untouched --
+    /// e.g. a real subtitle that happens to use " - " as its own separator.
+    func testLeavesTitleAloneWhenSuffixDoesNotMatchPublisher() {
+        let title = "Report: Sales Are Up - Not Down"
+        let result = HTMLToMarkdownConverter.stripPublisherTitleSuffix(
+            title, siteName: "Business Times", host: "businesstimes.example.com"
+        )
+        XCTAssertEqual(result, title)
+    }
+
+    func testLeavesTitleAloneWhenNoSiteNameOrHostGiven() {
+        let title = "A Headline | Something"
+        let result = HTMLToMarkdownConverter.stripPublisherTitleSuffix(title, siteName: nil, host: nil)
+        XCTAssertEqual(result, title)
     }
 }

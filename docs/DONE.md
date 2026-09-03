@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**180 completed issues.**
+**182 completed issues.**
 
 ## iOS
 
@@ -40,6 +40,31 @@
   ## Verified
 
   New tests: `SwiftSoupParserImageTests` (bare `<img>`, lazy `data-src`, Guardian-style `<picture>`+`srcset`, figure+figcaption-as-alt, figcaption-noise-not-promoted, figure-fallback-on-non-image-content, tracking-pixel skip, no-dimensions-not-skipped, relative-URL resolution — 8 tests), `ArticleMarkdownImageLocalizerTests` (stem truncation, collision-letter naming — 7 tests), plus 4 new `MarkdownWriterTests` cases for delete/archive carrying or no-oping on the `.media` folder. 57 tests total in `VersoTests`, all passing. `xcodegen generate` + `xcodebuild build` succeeded for both the `Verso` and `ShareExtension` schemes. Not verified here: an actual live Share Extension import with real images (Medium/Guardian/Substack) — Fabio's part after the PR.
+
+### Design critique 2026-09-01/03 — publisher-shaped parsing gaps
+
+- [x] 🔴 **FAB-315** · Image captions are printed twice  `Done` `Urgent`
+  An article's image caption rendered under the image *and again* as a full body paragraph, e.g. "…in the 1960s. Photograph: João Laet/The Guardian" — seen on a Guardian article, critique §6.7, 2026-09-01. Completed 2026-09-03, same PR as FAB-332.
+
+  ## Cause
+
+  `HTMLToMarkdownConverter.collapseImageCaptionEcho`'s de-dupe guard already existed but was one comparison too strict: it required `fingerprint(alt) == fingerprint(next)` (exact equality), and publishers appending a photo credit to the echoed paragraph defeat that.
+
+  ## Fix
+
+  New `HTMLToMarkdownConverter.isImageCaptionEcho(alt:followingParagraph:)`: matches on prefix rather than equality — drops the next block when it *starts with* the alt text and the remainder (after trimming leading punctuation left behind by e.g. "...1960s. Photograph: X") is short or starts with a recognized credit prefix (`Photograph:` / `Photo:` / `Credit:` / `Illustration:`). A paragraph that merely shares a prefix before continuing into unrelated content is left alone — only a short/credit-shaped remainder counts as an echo.
+
+- [x] 🔴 **FAB-332** · Publisher chrome and title suffixes survive into the reader  `Done` `Urgent`
+  Two content-quality defects on the same CNN article, 2026-09-03: a flattened social-share bar ("Facebook Tweet Email Link Threads Link Copied!") rendered as the first body paragraph, and the title kept its publisher suffix ("God save the drag kings of England | CNN") into the H1, top bar, and article card. Completed 2026-09-03, same PR as FAB-315 — same family of publisher-shaped parsing gaps, same converter and test suite.
+
+  ## Fix
+
+  1. **Share-bar noise line**: `HTMLToMarkdownConverter.isNoiseLine` gained `isShareBarLine` — a short line is treated as noise when most of its words are known share-platform/action tokens (Facebook, Twitter/Tweet/X, Email, Link, Threads, WhatsApp, Reddit, Pinterest, LinkedIn, Messenger, Print, Copy/Copied, …) *and* at least one is an unambiguous platform name, so an ordinary sentence containing a generic word like "link" isn't swept up. "Link Copied!" alone is also caught, via an added exact fingerprint. Considered selecting these structurally by class/role in SwiftSoup instead, but publisher share-bar markup has no consistent class/role across sites — kept it a text heuristic, consistent with every other noise rule here and shared across both import paths.
+  2. **Title suffix stripping**: new `HTMLToMarkdownConverter.stripPublisherTitleSuffix(_:siteName:host:)` strips a trailing ` | X` / ` - X` / ` — X` only when `X` matches the article's `siteName` or URL `host` (letters-only containment, so a subdomain like `edition.cnn.com` still matches "CNN") — not a blind "strip after any separator," so a title with a legitimate subtitle survives. Called once, right after title extraction, in both `SwiftSoupParser.parse` and `ReadabilityParser`'s completion handler, so the cleaned title flows into `PendingArticle.title` (and into the existing title-echo stripping) — meaning the card, top bar, and H1, which all render that same stored field, inherit the fix from one place.
+
+  ## Verified
+
+  New tests in `Verso/VersoTests/SwiftSoupParserTests.swift`: `HTMLToMarkdownConverterNoiseTests` (caption-echo-with-credit, exact-duplicate regression, prefix-without-credit guard), `HTMLToMarkdownConverterShareBarTests` (flattened share bar, standalone "Link Copied!", ordinary-sentence-with-"link" guard), `HTMLToMarkdownConverterTitleSuffixTests` (pipe/dash suffix stripped via siteName/host, non-matching suffix left alone, no-siteName-or-host left alone), and a full-pipeline `SwiftSoupParserTests.testCNNArticleDropsShareBarAndStripsTitleSuffix` reproducing the reported article. `xcodebuild build` succeeded; the full updated test suite passes. Not verified here: a live add-by-URL import of the actual CNN/Guardian articles through `ReadabilityParser` — Fabio's part after the PR.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

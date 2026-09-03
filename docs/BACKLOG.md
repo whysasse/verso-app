@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**53 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**51 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -34,7 +34,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   *Pre-submission — fix or ship before the final binary submission (FAB-150):*
 
   1. **FAB-304** — theme-switch blank screen (cause 1, shipped PR #360) turned out to have a second, independent cause (reader content blanking after the app switcher) — fixed pending device confirmation, see its BACKLOG entry.
-  2. **FAB-315 + FAB-332** — one PR: duplicate image captions + publisher title/chrome parsing, same converter and test suite
+  2. ~~**FAB-315 + FAB-332**~~ — **done**, see [DONE.md](DONE.md): duplicate image captions + publisher title/chrome parsing, one PR, shared converter and test suite.
   3. **FAB-330** — "0 read" → "N% read" caption. **Needs a decision:** add the missing `%` now, or fold in FAB-278's percent→time-remaining redesign first? Default: minimal `%` fix now, defer FAB-278.
   4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
   5. **FAB-305** — white-on-accent contrast; adds the `VersoButtonStyle` disabled variant FAB-328 later depends on
@@ -157,21 +157,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   * Or keep the status as-is but filter the section on `scrollPosition > 0`, so `.reading`-with-no-progress articles fall back into Unread.
 
   The first is truer to the data model; the second is a one-line change. Either way the section should not show an entry at 0%.
-
-- [ ] 🔴 **FAB-332** · Publisher chrome and title suffixes survive into the reader  `Todo` `Urgent`
-  ## Symptom
-
-  Seen 2026-09-03 on a CNN article. Two separate content-quality defects on the same screen:
-
-  1. **A social share bar renders as the first body paragraph** — "Facebook Tweet Email Link Threads Link Copied!" — followed by the dateline "Ramsgate, England" as its own paragraph. The reader's best screen opens with publisher chrome.
-  2. **The title keeps its publisher suffix** — "God save the drag kings of England | CNN" — in the H1, the top bar, *and* the article card. Every article from a site that appends " | Publisher" or " - Publisher" to `<title>` carries it.
-
-  ## Fix
-
-  1. Extend `HTMLToMarkdownConverter.isNoiseLine` (FAB-294's screen) to catch share-bar runs: short lines that are mostly a sequence of platform names, and the "Link Copied!" affordance text. Worth checking whether SwiftSoup can drop these structurally by class/role before falling back to text heuristics.
-  2. Strip a trailing ` | <site>` / ` - <site>` / ` — <site>` from the title when the tail matches the article's `siteName` or host. Do it once at parse time so the card, the bar and the H1 all benefit.
-
-  Same family as **FAB-315** (duplicate image captions) — all three are publisher-shaped parsing gaps and all three deserve fixture tests in `HTMLToMarkdownConverterTests` / `SwiftSoupParserTests`.
 
 - [ ] 🟠 **FAB-333** · The reading measure collapses with OpenDyslexic and at the largest in-app size  `Todo` `High`
   ## Symptom
@@ -389,19 +374,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   A script that walks `Colors.swift`, asserts every *used* pair, and runs in CI. Then correct §3.3 of the spec, whose conclusion currently reads as "done" and is stronger than its evidence — that is the genuinely dangerous part.
 
 ### Design critique 2026-09-01 — reading view
-
-- [ ] 🔴 **FAB-315** · Image captions are printed twice  `Todo` `Urgent`
-  ## Symptom
-
-  Critique §6.7. In an article with a photo, the caption renders under the image *and again* as a full body paragraph in 18pt New York with the credit appended — e.g. "…in the 1960s. Photograph: João Laet/The Guardian". The app's best screen stutters and repeats itself immediately after its only image. Seen on a Guardian article, 2026-09-01.
-
-  ## Cause
-
-  The guard already exists and is one comparison too strict. `HTMLToMarkdownConverter.collapseImageCaptionEcho` drops the echo when the image's alt text and the following paragraph match, but requires `fingerprint(alt) == fingerprint(next)` — exact equality after punctuation normalisation. Publishers that append a credit to the echoed paragraph defeat it.
-
-  ## Fix
-
-  Match on prefix rather than equality: drop the next block when it *starts with* the alt text and the remainder is short or matches a credit pattern (`Photograph:` / `Photo:` / `Credit:` / `Illustration:`). Add the Guardian case to `HTMLToMarkdownConverterTests` — this is a publisher-shaped bug that will recur.
 
 - [ ] 🟠 **FAB-316** · The reader's top bar repeats the title directly below it  `Todo` `High`
   ## Scope

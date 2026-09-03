@@ -118,22 +118,29 @@ final class ReadabilityParser: NSObject {
                 return
             }
 
-            let trimmedTitle = parsed.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmedByline = parsed.byline?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmedSite = parsed.siteName?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let siteName = (trimmedSite?.isEmpty == false) ? trimmedSite : nil
+            // FAB-332: drop a trailing " | CNN" / " - Site" publisher suffix once, here, so the
+            // card, top bar, and H1 -- which all render this same `title` -- inherit the fix.
+            let trimmedTitle = HTMLToMarkdownConverter.stripPublisherTitleSuffix(
+                parsed.title.trimmingCharacters(in: .whitespacesAndNewlines),
+                siteName: siteName,
+                host: sourceURL.host
+            )
             let markdown = HTMLToMarkdownConverter.convert(
                 parsed.content,
                 articleTitle: trimmedTitle.isEmpty ? nil : trimmedTitle,
                 baseURL: sourceURL
             )
-            let trimmedByline = parsed.byline?.trimmingCharacters(in: .whitespacesAndNewlines)
-            let trimmedSite = parsed.siteName?.trimmingCharacters(in: .whitespacesAndNewlines)
             let article = PendingArticle(
                 id: UUID(),
                 url: sourceURL,
-                title: parsed.title.trimmingCharacters(in: .whitespacesAndNewlines),
+                title: trimmedTitle,
                 contentMarkdown: markdown,
                 dateAdded: Date(),
                 author: (trimmedByline?.isEmpty == false) ? trimmedByline : nil,
-                siteName: (trimmedSite?.isEmpty == false) ? trimmedSite : nil
+                siteName: siteName
             )
             self.finish(with: article)
         }

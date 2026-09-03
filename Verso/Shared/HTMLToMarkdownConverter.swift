@@ -268,7 +268,48 @@ enum HTMLToMarkdownConverter {
         "sign up",
         "sign in",
         "featured",
+        // FAB-332: the "Link Copied!" affordance text left behind by a share button, when it
+        // survives as its own standalone line rather than folded into a share-bar run below.
+        "link copied!",
     ]
+
+    /// FAB-332: individual tokens that make up a publisher share bar -- platform names, share
+    /// actions, and the "copied" confirmation state. Several of these (`link`, `copy`, `email`)
+    /// are ordinary words on their own, so a line only counts as a share bar via `isShareBarLine`
+    /// below when *most* of its words are drawn from this set *and* at least one is an
+    /// unambiguous platform name from `shareBarPlatformTokens`.
+    private static let shareBarTokens: Set<String> = [
+        "facebook", "twitter", "tweet", "x", "email", "mail", "link", "threads",
+        "whatsapp", "reddit", "pinterest", "linkedin", "messenger", "flipboard",
+        "print", "share", "copy", "copied", "sms", "instagram", "tumblr", "telegram",
+    ]
+
+    /// Platform names within `shareBarTokens` that can't plausibly appear in ordinary prose --
+    /// the anchor that keeps `isShareBarLine` from flagging a real sentence that merely
+    /// contains a generic word like "link" or "share".
+    private static let shareBarPlatformTokens: Set<String> = [
+        "facebook", "twitter", "tweet", "x", "threads", "whatsapp", "reddit",
+        "pinterest", "linkedin", "messenger", "flipboard", "instagram", "tumblr", "telegram",
+    ]
+
+    /// True for a short line that reads as a flattened social-share bar -- e.g. "Facebook Tweet
+    /// Email Link Threads Link Copied!" (FAB-332, seen on a CNN article). Publisher share
+    /// buttons often have no separator between them once tags are stripped, so this becomes one
+    /// run-on line rather than one noise line per button. Matched by ratio (most words are known
+    /// share tokens) rather than an exact fingerprint, since the set of buttons varies by
+    /// publisher and page -- gated on at least one unambiguous platform-name token so an
+    /// ordinary short sentence containing "link" isn't swept up (see
+    /// `testOrdinarySentenceContainingLinkIsNotTreatedAsShareBar`).
+    private static func isShareBarLine(_ line: String) -> Bool {
+        let words = line.split(whereSeparator: { $0.isWhitespace })
+        guard words.count >= 2, words.count <= 12 else { return false }
+        let normalized = words.map {
+            $0.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "!.,:;"))
+        }
+        let matchCount = normalized.filter { shareBarTokens.contains($0) }.count
+        guard Double(matchCount) / Double(normalized.count) >= 0.7 else { return false }
+        return normalized.contains { shareBarPlatformTokens.contains($0) }
+    }
 
     /// Case-insensitive regex for standalone "N min read" labels (with or without a trailing " · ").
     private static let minReadPattern: NSRegularExpression? = try? NSRegularExpression(
@@ -300,6 +341,7 @@ enum HTMLToMarkdownConverter {
         if let re = digitsOnlyPattern, re.firstMatch(in: trimmed, options: [], range: range) != nil { return true }
         if let re = punctuationOnlyPattern, re.firstMatch(in: trimmed, options: [], range: range) != nil { return true }
         if let re = minReadPattern, re.firstMatch(in: trimmed, options: [], range: range) != nil { return true }
+        if isShareBarLine(trimmed) { return true }
         return false
     }
 
@@ -399,6 +441,34 @@ enum HTMLToMarkdownConverter {
         return out.joined(separator: "\n\n")
     }
 
+    /// Credit-line prefixes publishers commonly append to an echoed caption paragraph -- e.g.
+    /// "…in the 1960s. Photograph: João Laet/The Guardian" (FAB-315). Matched against the
+    /// fingerprinted (lowercased) remainder, so case doesn't matter.
+    private static let imageCaptionCreditPrefixes = ["photograph:", "photo:", "credit:", "illustration:"]
+
+    /// Leading punctuation left behind between the alt text and an appended credit once the alt
+    /// text's own prefix is dropped -- e.g. the "." in "...1960s. Photograph: X" -- plus
+    /// whitespace, so `imageCaptionCreditPrefixes` sees a clean "photograph:" start.
+    private static let captionEchoRemainderTrimSet = CharacterSet.whitespaces.union(CharacterSet(charactersIn: ".,;:–—-"))
+
+    /// True when `paragraph` is just the image's alt text/caption echoed back as body text --
+    /// either an exact repeat, or the same text with a short publisher credit appended
+    /// ("<alt> Photograph: X"). FAB-315: the original exact-match check missed the Guardian
+    /// case because the echoed paragraph isn't identical to the alt text, it's the alt text
+    /// plus a credit. Only a short remainder (e.g. trailing punctuation) or one starting with a
+    /// recognized credit prefix counts -- a paragraph that merely *starts* with the same words
+    /// before continuing into unrelated content must not be collapsed.
+    static func isImageCaptionEcho(alt: String, followingParagraph paragraph: String) -> Bool {
+        let altFP = fingerprint(block: alt)
+        guard !altFP.isEmpty else { return false }
+        let paragraphFP = fingerprint(block: paragraph)
+        if altFP == paragraphFP { return true }
+        guard paragraphFP.hasPrefix(altFP) else { return false }
+        let remainder = String(paragraphFP.dropFirst(altFP.count)).trimmingCharacters(in: captionEchoRemainderTrimSet)
+        if remainder.isEmpty || remainder.count <= 3 { return true }
+        return imageCaptionCreditPrefixes.contains { remainder.hasPrefix($0) }
+    }
+
     /// When `![caption](url)` is immediately followed by the same caption as body text, drop the redundant paragraph.
     private static func collapseImageCaptionEcho(_ markdown: String) -> String {
         let blocks = markdown.components(separatedBy: "\n\n")
@@ -415,7 +485,7 @@ enum HTMLToMarkdownConverter {
                    m.numberOfRanges > 1,
                    let r = Range(m.range(at: 1), in: b) {
                     let alt = String(b[r]).trimmingCharacters(in: .whitespacesAndNewlines)
-                    if !alt.isEmpty, fingerprint(block: alt) == fingerprint(block: next) {
+                    if !alt.isEmpty, isImageCaptionEcho(alt: alt, followingParagraph: next) {
                         out.append(blocks[i].trimmingCharacters(in: .whitespacesAndNewlines))
                         i += 2
                         continue
@@ -426,6 +496,53 @@ enum HTMLToMarkdownConverter {
             i += 1
         }
         return out.joined(separator: "\n\n")
+    }
+
+    /// Separators publishers use to append their own name to a page `<title>` for SEO -- not
+    /// something that belongs in the reader's H1/top bar/article card (FAB-332).
+    private static let publisherTitleSeparators = [" | ", " — ", " – ", " - "]
+
+    /// Strips a trailing ` | <site>` / ` - <site>` / ` — <site>` from `title` when `<site>`
+    /// matches the article's `siteName` or its URL `host` -- e.g. "God save the drag kings of
+    /// England | CNN" → "God save the drag kings of England". Deliberately conservative: a
+    /// title is only trimmed when the tail after the separator can be tied back to *this*
+    /// publisher, so a title that legitimately contains a pipe or dash (e.g. a subtitle) is left
+    /// alone. Called once at parse time (`SwiftSoupParser`, `ReadabilityParser`) so the card, the
+    /// top bar, and the H1 -- which all render the same stored `title` -- benefit from one fix.
+    static func stripPublisherTitleSuffix(_ title: String, siteName: String?, host: String?) -> String {
+        let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTitle.isEmpty else { return trimmedTitle }
+        for separator in publisherTitleSeparators {
+            guard let range = trimmedTitle.range(of: separator, options: .backwards) else { continue }
+            let head = String(trimmedTitle[..<range.lowerBound]).trimmingCharacters(in: .whitespaces)
+            let tail = String(trimmedTitle[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+            guard !head.isEmpty, !tail.isEmpty else { continue }
+            if titleSuffixMatchesPublisher(tail, siteName: siteName, host: host) {
+                return head
+            }
+        }
+        return trimmedTitle
+    }
+
+    private static func titleSuffixMatchesPublisher(_ tail: String, siteName: String?, host: String?) -> Bool {
+        let normalizedTail = fingerprint(block: tail)
+        guard normalizedTail.count >= 2 else { return false }
+        if let siteName {
+            let normalizedSite = fingerprint(block: siteName)
+            if !normalizedSite.isEmpty, normalizedSite == normalizedTail { return true }
+        }
+        if let host {
+            var bareHost = host.lowercased()
+            if bareHost.hasPrefix("www.") { bareHost = String(bareHost.dropFirst(4)) }
+            // Letters-only containment (not "does the first label match") so a subdomain like
+            // "edition.cnn.com" or a co.uk-style host still matches "CNN" without trying to
+            // isolate a single "root" label -- publication hosts vary too much for that to be
+            // reliable in general.
+            let hostLetters = bareHost.filter(\.isLetter)
+            let tailLetters = normalizedTail.filter(\.isLetter)
+            if !tailLetters.isEmpty, hostLetters.contains(tailLetters) { return true }
+        }
+        return false
     }
 
     private static func fingerprint(block: String) -> String {
