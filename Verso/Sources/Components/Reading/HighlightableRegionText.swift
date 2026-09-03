@@ -396,6 +396,37 @@ final class HighlightableUITextView: UITextView {
     /// on its own (only `HighlightableRegionText`, the SwiftUI wrapper, does).
     var blockquoteAccentColor: UIColor?
 
+    private var didBecomeActiveObserver: NSObjectProtocol?
+
+    /// FAB-304: this view draws its own content via `draw(_:)` below, and iOS gives no guarantee
+    /// that a custom-drawn view's backing store survives the app being backgrounded -- nothing
+    /// else in the reading path (`ArticleReaderView`, `MarkdownBodyView`) observes app-active
+    /// transitions, so without this a region can come back from the app switcher with laid-out,
+    /// selectable text (TextKit's layout geometry is untouched) that simply isn't painted, until
+    /// a tap or scroll incidentally forces a redraw. Forcing one explicitly on every return to
+    /// foreground closes that gap regardless of user interaction.
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
+        didBecomeActiveObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.setNeedsLayout()
+            self?.setNeedsDisplay()
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        if let didBecomeActiveObserver {
+            NotificationCenter.default.removeObserver(didBecomeActiveObserver)
+        }
+    }
+
     /// Draws the blockquote accent bar: a 3pt-wide rectangle at the region's leading edge, spanning
     /// the full on-screen height of each blockquote block's (possibly multi-line, if the quote
     /// wraps) content -- ported 1:1 from the deleted SwiftUI layout this replaced

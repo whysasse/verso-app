@@ -113,8 +113,7 @@ struct ArticleListView: View {
                     selectedArticleIds: $selectedArticleIds,
                     confirmBulkDelete: $confirmBulkDelete,
                     showFolderPicker: $showFolderPicker,
-                    showAddArticle: $showAddArticle,
-                    showSettings: $showSettings
+                    showAddArticle: $showAddArticle
                 )
                 .environmentObject(themeManager)
                 .environmentObject(folderBookmarkService)
@@ -163,6 +162,18 @@ struct ArticleListView: View {
         // reserves an empty ~44pt band above `headerRow`. Mirrors ArticleReaderView's
         // own bar-hiding for its column.
         .toolbar(.hidden, for: .navigationBar)
+        // FAB-304: lives here, not inside ArticleListFetchedBody, deliberately. That struct
+        // is `.id(listFetchIdentity)`-keyed and gets torn down and rebuilt whenever
+        // search/date change the fetch predicate -- and, more disruptively, whenever
+        // ContentView's `.preferredColorScheme` flips across the light/dark boundary,
+        // which forces a hosting-hierarchy rebuild. A `navigationDestination` registered
+        // inside that subtree gets torn down with it while `showSettings` (owned here,
+        // one level up) survives as true -- a pushed slot with no destination left to
+        // resolve it, i.e. a blank screen. Attaching it to this stable ancestor instead
+        // means nothing re-keys it out from under the push.
+        .navigationDestination(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 
     // MARK: - Header row (FAB-292)
@@ -344,7 +355,6 @@ private struct ArticleListFetchedBody: View {
 
     @Binding var showFolderPicker: Bool
     @Binding var showAddArticle: Bool
-    @Binding var showSettings: Bool
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
@@ -368,8 +378,7 @@ private struct ArticleListFetchedBody: View {
         selectedArticleIds: Binding<Set<UUID>>,
         confirmBulkDelete: Binding<Bool>,
         showFolderPicker: Binding<Bool>,
-        showAddArticle: Binding<Bool>,
-        showSettings: Binding<Bool>
+        showAddArticle: Binding<Bool>
     ) {
         self.listGeometry = listGeometry
         self.listPredicate = listPredicate
@@ -381,7 +390,6 @@ private struct ArticleListFetchedBody: View {
         _confirmBulkDelete = confirmBulkDelete
         _showFolderPicker = showFolderPicker
         _showAddArticle = showAddArticle
-        _showSettings = showSettings
 
         _articles = FetchRequest(
             sortDescriptors: [SortDescriptor(\Article.dateAdded, order: .reverse)],
@@ -533,9 +541,6 @@ private struct ArticleListFetchedBody: View {
                 deleteSelectedArticles()
             }
             Button(L10n.Dialog.deleteArticleCancel, role: .cancel) {}
-        }
-        .navigationDestination(isPresented: $showSettings) {
-            SettingsView()
         }
         .sheet(isPresented: $showFolderPicker) {
             DocumentPicker(onDocumentsPicked: { urls in
