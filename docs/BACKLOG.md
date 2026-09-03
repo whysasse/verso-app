@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**51 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-330–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**49 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-330 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -35,7 +35,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   1. **FAB-304** — theme-switch blank screen (cause 1, shipped PR #360) turned out to have a second, independent cause (reader content blanking after the app switcher) — fixed pending device confirmation, see its BACKLOG entry.
   2. ~~**FAB-315 + FAB-332**~~ — **done**, see [DONE.md](DONE.md): duplicate image captions + publisher title/chrome parsing, one PR, shared converter and test suite.
-  3. **FAB-330** — "0 read" → "N% read" caption. **Needs a decision:** add the missing `%` now, or fold in FAB-278's percent→time-remaining redesign first? Default: minimal `%` fix now, defer FAB-278.
+  3. ~~**FAB-330**~~ — **done**, see [DONE.md](DONE.md): the string already had a `%` in all three locales, just unescaped in the compiled catalog, so it was silently dropped at render time — a one-line escaping fix, not a content fix. FAB-278's percent→time-remaining redesign remains deferred, untouched by this fix.
   4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
   5. **FAB-305** — white-on-accent contrast; adds the `VersoButtonStyle` disabled variant FAB-328 later depends on
   6. **FAB-306** — onboarding theme-picker label contrast (same contrast family as #5, different file)
@@ -126,19 +126,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   `xcodebuild build` (Verso scheme) succeeds. Real confirmation is Fabio's part: open an article, background via the app switcher, wait a few seconds, return, and check the body renders immediately with no tap/scroll needed — plus re-run the original theme-switch matrix (Ink→Paper, Sepia→Night crossing light/dark; Ink→Night, Paper→Sepia as a control) to confirm cause 1 stays fixed.
 
 ### Bugs — found 2026-09-03 (Ink theme + onboarding pass)
-
-- [ ] 🔴 **FAB-330** · "Continue Reading" progress caption reads "0 read" instead of "0% read"  `Todo` `Urgent`
-  ## Symptom
-
-  Seen 2026-09-03 in the Ink theme. Cards in Continue Reading show `0 read`, `20 read`, `3 read` where the value is a **percentage**. As rendered it parses as a count — of articles, minutes, or something else — and "0 read" on an article the section claims you are in the middle of is actively contradictory.
-
-  ## Cause
-
-  `L10n.Home.sectionContinueReadingProgressCaption(count:)` is fed `Int((progressFraction * 100).rounded())` by `ArticleCard`, but the string has no percent marker. Check `UI_COPY.md` and the three locale strings — this needs a `%` (or the localized equivalent; French uses a space before it) in all three, not just English.
-
-  ## Fix
-
-  Correct the string in all locales and add the percent to the VoiceOver value too. Related: FAB-278 already covers changing the reading-progress announcement from percent to time-remaining, so decide whether this caption should say "20% read" or "8 min left" before translating it three times.
 
 - [ ] 🟠 **FAB-331** · Articles at 0% fill up "Continue Reading"  `Todo` `High`
   ## Symptom
