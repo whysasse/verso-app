@@ -78,7 +78,6 @@ struct OnboardingFolderPickerView: View {
                 }
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
                 .disabled(!folderSelected)
-                .opacity(folderSelected ? 1 : 0.5)
 
                 Text(L10n.Onboarding.folderPrivacyNote)
                     .font(VersoTypography.UI.caption)

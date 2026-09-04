@@ -12,16 +12,22 @@ struct VersoButtonStyle: ButtonStyle {
     let theme: ThemeColors
     var isActive: Bool = false
 
+    @Environment(\.isEnabled) private var isEnabled
+
     func makeBody(configuration: Configuration) -> some View {
         switch variant {
         case .primary:
             configuration.label
                 .font(VersoTypography.UI.button)
-                .foregroundColor(.white)
+                .foregroundColor(isEnabled ? theme.background : theme.textSecondary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
-                .background(theme.accent)
+                .background(isEnabled ? theme.accent : theme.surface)
                 .cornerRadius(VersoRadius.md)
+                .overlay(
+                    RoundedRectangle(cornerRadius: VersoRadius.md)
+                        .stroke(theme.border, lineWidth: isEnabled ? 0 : 1)
+                )
                 .opacity(configuration.isPressed ? 0.8 : 1)
 
         case .secondary:
@@ -61,6 +67,10 @@ struct VersoButtonStyle: ButtonStyle {
     return VStack(spacing: 24) {
         Button("Save Article") {}
             .buttonStyle(VersoButtonStyle(variant: .primary, theme: theme))
+
+        Button("Save Article") {}
+            .buttonStyle(VersoButtonStyle(variant: .primary, theme: theme))
+            .disabled(true)
 
         Button("Add to Library") {}
             .buttonStyle(VersoButtonStyle(variant: .secondary, theme: theme))

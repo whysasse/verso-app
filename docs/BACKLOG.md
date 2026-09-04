@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**47 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-305–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**46 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,7 +25,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
-- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (backgrounding corrupts app state, four independent causes) is done — see [DONE.md](DONE.md) for the full history. FAB-305–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
+- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (backgrounding corrupts app state, four independent causes) and FAB-305 (white-on-accent contrast) are done — see [DONE.md](DONE.md) for the full history. FAB-306–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
 
   **Amended 2026-09-03, after the native-shell decision.** Fabio chose to **ship 1.0 on the current UI and do the native iOS shell as 1.1** ([FAB-334](#)). That changes what belongs in this list: several items below are defects in custom chrome that FAB-334 deletes outright, so fixing them now is work thrown away. Items **13 (FAB-310)**, **15 (FAB-320)** and **16 (FAB-319)** move to FAB-334, as do the chrome halves of FAB-329, FAB-326, FAB-325 and FAB-324 in the post-launch list. Item **11 (FAB-309)** splits: the `VersoTypography.UI` token rebuild stays in 1.0 (cheap, mechanical, and it survives the shell — and a reading app that ignores the system text size shouldn't ship that way for however long 1.1 takes), while its layout audit of chrome components moves to FAB-334. Item **8 (FAB-311)**'s ✕/grabber collision is absorbed too, but its `BodySize` reconnection is reading-view work and stays. **Read FAB-334 before starting any item marked below.**
 
@@ -37,7 +37,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   2. ~~**FAB-315 + FAB-332**~~ — **done**, see [DONE.md](DONE.md): duplicate image captions + publisher title/chrome parsing, one PR, shared converter and test suite.
   3. ~~**FAB-330**~~ — **done**, see [DONE.md](DONE.md): the string already had a `%` in all three locales, just unescaped in the compiled catalog, so it was silently dropped at render time — a one-line escaping fix, not a content fix. FAB-278's percent→time-remaining redesign remains deferred, untouched by this fix.
   4. ~~**FAB-331**~~ — **done**, see [DONE.md](DONE.md): took the filter default (`scrollPosition > 0`), not the promote-to-`.reading` floor — lower risk, no data-model change. Revisit the floor post-launch if the filter proves insufficient.
-  5. **FAB-305** — white-on-accent contrast; adds the `VersoButtonStyle` disabled variant FAB-328 later depends on
+  5. ~~**FAB-305**~~ — **done**, see [DONE.md](DONE.md): white-on-accent contrast fixed (`VersoButtonStyle.primary`, the `+` add-article glyph, the filter badge), plus the real `VersoButtonStyle` disabled variant FAB-328 later depends on.
   6. **FAB-306** — onboarding theme-picker label contrast (same contrast family as #5, different file)
   7. **FAB-312** — bundle OpenDyslexic-Bold + fix weight fallback; self-contained
   8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
@@ -52,7 +52,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (fold into FAB-329) → FAB-323 (share extension theming) → FAB-325 (hardcoded colors/swipe tints/dividers — **needs a decision** on whether `ArticleStatus.color` badges should be theme-independent or theme-aware, and raise `border` contrast toward 3:1 *before* fixing the divider bug or it makes dividers disappear) → FAB-329 (incl. FAB-313 — **mostly absorbed by FAB-334**: an inset-grouped `Form` supplies checkmarks, real section headers and value+chevron rows; only what survives the shell stays here) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; depends on FAB-305's disabled variant, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
+  FAB-313 (fold into FAB-329) → FAB-323 (share extension theming) → FAB-325 (hardcoded colors/swipe tints/dividers — **needs a decision** on whether `ArticleStatus.color` badges should be theme-independent or theme-aware, and raise `border` contrast toward 3:1 *before* fixing the divider bug or it makes dividers disappear) → FAB-329 (incl. FAB-313 — **mostly absorbed by FAB-334**: an inset-grouped `Form` supplies checkmarks, real section headers and value+chevron rows; only what survives the shell stays here) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; its disabled-variant dependency on FAB-305 is now satisfied, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -129,32 +129,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
-
-- [ ] 🔴 **FAB-305** · White-on-accent fails WCAG AA in Night and Ink  `Todo` `Urgent`
-  ## Scope
-
-  Critique §3.1. `VersoButtonStyle.primary` hardcodes `.foregroundColor(.white)` on a `theme.accent` fill. Accent is light in both dark themes:
-
-  | Theme | Accent | White label |
-  |---|---|---|
-  | Paper | `#766655` | 5.52:1 ✅ |
-  | Sepia | `#825A37` | 6.06:1 ✅ |
-  | Night | `#C4A97D` | **2.25:1** ❌ (fails even the 3:1 non-text floor) |
-  | Ink | `#7B9FD4` | **2.71:1** ❌ |
-
-  Same pattern in three places: every `.primary` button, the `+` add-article glyph in the list header (white `plus` on a 32pt accent circle), and the active-filter count badge (11pt **bold** white on an accent capsule — the worst case).
-
-  ## Fix
-
-  The correct pattern already exists in the codebase. `FolderPickerPrompt` uses `.foregroundColor(themeManager.colors.background)` on its accent pill, which inverts per theme: Paper 4.87 / Sepia 4.98 / Night 7.71 / Ink 6.82 — passes everywhere. Apply it to `VersoButtonStyle.primary`, the add glyph and the filter badge.
-
-  ## Confirmed visually 2026-09-03 (Ink)
-
-  No longer a computation. In the Ink theme the `+` add-article button is a filled `#7B9FD4` circle whose white `+` visibly dissolves into the fill, while the search / filter / overflow glyphs beside it — accent on background, 6.82:1 — read crisply. **The primary action is the least legible control in the header.** Same on every onboarding CTA: on the analytics consent screen the outlined secondary ("No thanks", 6.82:1) is easier to read than the filled primary ("Sure, why not", 2.71:1), which is the whole problem in one screenshot.
-
-  ## Also add
-
-  `VersoButtonStyle` has no `disabled` variant, so every caller improvises with `.opacity(0.5)`. That collapses the label to **1.55:1** in Paper (seen in Add Article's Save and onboarding's Continue). Add a real disabled case: muted fill with `textSecondary` text, not a global opacity multiplier. Critique §4.3, §5.8.
 
 - [ ] 🔴 **FAB-306** · Onboarding theme-picker card labels fail contrast in 8 of 16 states  `Todo` `Urgent`
   ## Scope
@@ -363,7 +337,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 - [ ] 🟠 **FAB-319** · Filters are invisible once applied, and there's no way to clear them  `Todo` `High`
   ## Scope
 
-  Critique §5.1, §5.2. Once `FilterPanel` closes, the only signal that filters are active is a small count badge on the header icon — the same badge that fails contrast in dark themes (FAB-305). If the filters match nothing, the user gets the `.searchMiss` empty state with no mention of the filters causing it and no way to clear them: **`FilterPanel` has no "Clear all"**, so tags must be deselected one by one and the date preset reset separately.
+  Critique §5.1, §5.2. Once `FilterPanel` closes, the only signal that filters are active is a small count badge on the header icon — the same badge whose dark-theme contrast FAB-305 already fixed. If the filters match nothing, the user gets the `.searchMiss` empty state with no mention of the filters causing it and no way to clear them: **`FilterPanel` has no "Clear all"**, so tags must be deselected one by one and the date preset reset separately.
 
   This is the same concern behind the earlier "keep chips visible on empty states" decision, resurfacing after the chips were removed. The old chip bar had a real virtue — filter state was always on screen.
 
@@ -522,7 +496,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Critique §4.3, §4.4, §4.5, §4.6. Unverified — see the note on FAB-327.
 
-  * **Disabled Continue with no explanation.** `OnboardingFolderPickerView` disables Continue until a folder is chosen and dims it with `.opacity(0.5)`; nothing says why, and the dimming drops the label to **1.55:1** in Paper. Depends on the `VersoButtonStyle` disabled variant in FAB-305.
+  * **Disabled Continue with no explanation.** `OnboardingFolderPickerView` disables Continue until a folder is chosen; FAB-305 replaced the `.opacity(0.5)` contrast hack with a real disabled state, but nothing on screen still says *why* Continue is disabled. That copy/affordance gap remains.
   * **Two glyphs break the icon language — confirmed 2026-09-03.** `Text("☁")` renders as a **colour emoji** (a shaded 3D cloud), so `.foregroundColor(colors.textSecondary)` does nothing, exactly as predicted. Next to the crisp accent-tinted SF Symbols on the neighbouring screens it reads as a mistake. `Text("›")` for the row chevron is likewise a thin typographic mark, visibly different from the real `Image(systemName: "chevron.right")` that `QuickTourView` uses for the same job four files away. Use `Image(systemName: "icloud")` and `chevron.right`.
   * **"Sure, why not" is the wrong register for a consent affirmative.** The rest of this app's copy is calm and precise — "Verso never uploads your files. They live in your iCloud Drive." A jokey affirmative on a privacy choice reads as nudging, which compounds the button-weighting problem above. This is the single string worth changing first.
   * **The consent screen weights the answer.** Accept is `.primary` (filled), Decline is `.secondary` (outlined). Given Quebec's Law 25 and GDPR both leaning toward equal-prominence consent — and given privacy-first is a real differentiator here — two `.secondary` buttons would be safer and more on-brand. Worth a look from someone who does this professionally.

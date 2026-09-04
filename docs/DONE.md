@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**185 completed issues.**
+**186 completed issues.**
 
 ## iOS
 
@@ -151,6 +151,21 @@
   **Round 2 (2026-09-04):** Fabio confirmed cause 3's fix held for (a) the empty list and (b) the scroll-restore position — both fixed. (c) the status-revert-to-unread recurred with a fresh article, traced to cause 4.
 
   **Round 3 (2026-09-04):** Fabio re-tested cause 4's fix on-device — held. [PR #365](https://github.com/whysasse/verso-app/pull/365) merged.
+
+### Design critique 2026-09-01 — white-on-accent contrast (FAB-305)
+
+- [x] 🔴 **FAB-305** · White-on-accent fails WCAG AA in Night and Ink  `Done` `Urgent`
+  Critique §3.1. `VersoButtonStyle.primary` hardcoded `.foregroundColor(.white)` on a `theme.accent` fill. Accent is light in both dark themes, so white-on-accent nearly disappeared: Night 2.25:1, Ink 2.71:1 — both failed even the 3:1 non-text floor. Same hardcoded white also showed up in two places styled by hand instead of through the shared button style: the `+` add-article glyph and the active-filter count badge in the list header. Completed 2026-09-04.
+
+  ## Fix
+
+  * **`VersoButtonStyle.primary`** ([`VersoButton.swift`](<Verso/Sources/Components/Buttons/VersoButton.swift>)): label color now inverts per theme (`theme.background` on `theme.accent`) instead of hardcoded white — the pattern already proven correct in `FolderPickerPrompt.swift`. Passes AA on all 4 themes (Paper 4.87 / Sepia 4.98 / Night 7.71 / Ink 6.82).
+  * **`ArticleListView.swift`**: the `+` add-article glyph and the active-filter count badge both switched from `.foregroundColor(.white)` to `.foregroundColor(themeManager.colors.background)`, same fix as above.
+  * **Also added, per the critique's "Also add" note:** a real disabled state for `VersoButtonStyle.primary`, reading `@Environment(\.isEnabled)` — muted `theme.surface` fill, `theme.textSecondary` label, thin `theme.border` stroke for definition — replacing the `.opacity(0.4)` / `.opacity(0.5)` hacks in `AddArticleView`'s Save button and `OnboardingFolderPickerView`'s Continue button, which dragged an already-borderline color to 1.55:1 in Paper. `textSecondary`-on-`surface` computes to 4.52–4.58:1 across all four themes — real AA, not an opacity fake.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded. Contrast numbers computed with the standard WCAG relative-luminance formula against the actual hex values in `Colors.swift`, not eyeballed.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

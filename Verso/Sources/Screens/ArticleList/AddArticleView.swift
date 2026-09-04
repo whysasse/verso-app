@@ -113,7 +113,6 @@ struct AddArticleView: View {
             }
             .buttonStyle(VersoButtonStyle(variant: .primary, theme: themeManager.colors))
             .disabled(!isValidURL)
-            .opacity(isValidURL ? 1 : 0.4)
 
             Spacer()
         }
