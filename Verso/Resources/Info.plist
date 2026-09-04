@@ -25,6 +25,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Fonts/OpenDyslexic-Regular.ttf</string>
+		<string>Fonts/OpenDyslexic-Bold.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

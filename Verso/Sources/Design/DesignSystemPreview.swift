@@ -296,7 +296,7 @@ struct DesignSystemPreview: View {
             ("New York",      .custom("NewYork", size: 19),        "Default · Apple serif"),
             ("Georgia",       .custom("Georgia", size: 19),        "Classic serif"),
             ("San Francisco", .system(size: 19),                   "System sans-serif"),
-            ("OpenDyslexic",  .custom("OpenDyslexic", size: 19),   "Accessibility · bundled"),
+            ("OpenDyslexic",  .custom("OpenDyslexic-Regular", size: 19), "Accessibility · bundled"),
         ]
 
         return VStack(alignment: .leading, spacing: 20) {
