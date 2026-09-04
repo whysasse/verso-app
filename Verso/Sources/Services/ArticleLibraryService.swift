@@ -9,10 +9,25 @@ final class ArticleLibraryService: ObservableObject {
     @Published private(set) var isRebuilding = false
 
     /// Scans the folder for .md files, upserts them into Core Data, and removes stale records.
+    ///
+    /// FAB-304 (cause 3): unlike every other file-touching call site (`PendingArticleIngester`,
+    /// `ArticleReaderView`'s persist helpers), this used to assume security-scoped access to
+    /// `folderURL` was already open rather than bracketing its own. `VersoApp` stops access on
+    /// `scenePhase == .background` and never restarts it on `.active` before calling this, so from
+    /// the first backgrounding of a session onward, every later rebuild raced whatever unrelated
+    /// bracket elsewhere happened to still be open. Losing that race made `MarkdownReader.readAll`
+    /// return zero files, which the stale-record cleanup below then read as "the user deleted
+    /// everything" and wiped the entire cache — surfacing as a spurious "No articles yet" empty
+    /// state, fixed only by relaunching (which re-runs `FolderBookmarkService.restore()`).
+    /// Bracketing access here, the same way every sibling call site already does, makes this
+    /// self-sufficient instead of dependent on ambient state set up elsewhere.
     func rebuildCache(from folderURL: URL, context: NSManagedObjectContext) async {
         guard !isRebuilding else { return }
         isRebuilding = true
         defer { isRebuilding = false }
+
+        let accessed = folderURL.startAccessingSecurityScopedResource()
+        defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
 
         let mainArticles = await Task.detached(priority: .userInitiated) {
             MarkdownReader.readAll(from: folderURL)
@@ -69,9 +84,19 @@ final class ArticleLibraryService: ObservableObject {
                 }
             }
 
-            // Remove records whose files no longer exist on disk
-            for article in existing where !filePaths.contains(article.filePath) {
-                context.delete(article)
+            // Remove records whose files no longer exist on disk. Guard against a failed or
+            // incomplete folder read (bad security-scoped access, an unmounted iCloud volume,
+            // a transient I/O error) masquerading as "the user deleted every article" — belt and
+            // suspenders alongside the access bracket above, for any other way this read can come
+            // back empty. A folder that's genuinely been emptied is the one case this misses; that
+            // trades against never mass-deleting the cache on a bad read.
+            let readLooksValid = !parsedArticles.isEmpty || existing.isEmpty
+            if readLooksValid {
+                for article in existing where !filePaths.contains(article.filePath) {
+                    context.delete(article)
+                }
+            } else {
+                os_log("Cache rebuild: folder read came back empty with %d existing articles cached — skipping stale-record cleanup", log: Self.log, type: .error, existing.count)
             }
 
             if context.hasChanges {
