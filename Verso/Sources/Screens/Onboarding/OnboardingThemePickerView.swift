@@ -28,7 +28,8 @@ struct OnboardingThemePickerView: View {
                 ForEach(VersoTheme.allCases) { theme in
                     ThemePreviewCard(
                         theme: theme,
-                        isSelected: themeManager.currentTheme == theme
+                        isSelected: themeManager.currentTheme == theme,
+                        activeColors: colors
                     ) {
                         themeManager.currentTheme = theme
                     }
@@ -49,6 +50,10 @@ struct OnboardingThemePickerView: View {
 private struct ThemePreviewCard: View {
     let theme: VersoTheme
     let isSelected: Bool
+    /// The currently active theme's colors — the label sits on the app
+    /// background outside the card, so it must use these, not `themeColors`
+    /// below (FAB-306).
+    let activeColors: ThemeColors
     let onSelect: () -> Void
 
     private var themeColors: ThemeColors { ThemeColors.colors(for: theme) }
@@ -87,7 +92,7 @@ private struct ThemePreviewCard: View {
 
                 Text(theme.displayName)
                     .font(VersoTypography.UI.caption)
-                    .foregroundColor(isSelected ? themeColors.accent : themeColors.textSecondary)
+                    .foregroundColor(isSelected ? activeColors.accent : activeColors.textSecondary)
                     .padding(.top, VersoSpacing.xs)
             }
         }
