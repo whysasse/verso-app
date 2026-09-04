@@ -258,7 +258,7 @@ struct ArticleListView: View {
                         if activeFilterCount > 0 {
                             Text("\(activeFilterCount)")
                                 .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(.white)
+                                .foregroundColor(themeManager.colors.background)
                                 .padding(.horizontal, 5)
                                 .frame(minWidth: 16, minHeight: 16)
                                 .background(Capsule().fill(themeManager.colors.accent))
@@ -278,7 +278,7 @@ struct ArticleListView: View {
                         .frame(width: 32, height: 32)
                     Image(systemName: "plus")
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(themeManager.colors.background)
                 }
                 .frame(width: 44, height: 44)
             }
