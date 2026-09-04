@@ -39,6 +39,20 @@ extension Article {
         set { status = newValue.rawValue }
     }
 
+    /// True once the article has actual saved reading progress (FAB-331).
+    var hasReadingProgress: Bool {
+        (scrollPosition?.doubleValue ?? 0) > 0
+    }
+
+    /// Status for list-section grouping and the status badge (FAB-331): downgrades a `.reading`
+    /// article with zero scroll progress back to `.unread` for display. `ArticleReaderView`
+    /// promotes to `.reading` unconditionally on open, so an accidental tap-and-back otherwise
+    /// clogged Continue Reading forever with 0% cards. Deliberately leaves the persisted `status`
+    /// alone -- this is the lower-risk of BACKLOG's two options, no data-model/migration change.
+    var displayStatusEnum: Status {
+        statusEnum == .reading && !hasReadingProgress ? .unread : statusEnum
+    }
+
     static func create(
         in context: NSManagedObjectContext,
         id: UUID = UUID(),

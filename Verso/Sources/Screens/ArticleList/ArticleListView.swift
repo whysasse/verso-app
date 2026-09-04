@@ -405,9 +405,9 @@ private struct ArticleListFetchedBody: View {
         }
     }
 
-    private var continueReadingArticles: [Article] { filteredArticles.filter { !$0.archived && $0.statusEnum == .reading } }
-    private var unreadArticles: [Article] { filteredArticles.filter { !$0.archived && $0.statusEnum == .unread } }
-    private var readArticles: [Article] { filteredArticles.filter { !$0.archived && $0.statusEnum == .read } }
+    private var continueReadingArticles: [Article] { filteredArticles.filter { !$0.archived && $0.displayStatusEnum == .reading } }
+    private var unreadArticles: [Article] { filteredArticles.filter { !$0.archived && $0.displayStatusEnum == .unread } }
+    private var readArticles: [Article] { filteredArticles.filter { !$0.archived && $0.displayStatusEnum == .read } }
     private var archivedArticles: [Article] { filteredArticles.filter { $0.archived } }
 
     /// Empty state when search/date/tags narrow the list but nothing matches any section.

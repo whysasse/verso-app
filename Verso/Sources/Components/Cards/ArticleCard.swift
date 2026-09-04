@@ -12,7 +12,8 @@ struct ArticleCard: View {
         // split). Preserves the pre-split visual behavior -- an archived article always showed
         // a "read"-colored badge regardless of its actual read state.
         if article.archived { return .read }
-        switch article.statusEnum {
+        // FAB-331: a `.reading` article with no saved progress displays as unread.
+        switch article.displayStatusEnum {
         case .unread:    return .unread
         case .reading:   return .reading
         case .read:      return .read

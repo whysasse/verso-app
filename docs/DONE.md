@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**183 completed issues.**
+**184 completed issues.**
 
 ## iOS
 
@@ -82,6 +82,19 @@
   ## Verified
 
   `xcodebuild build` succeeded for the `Verso` scheme (confirms the string catalog still compiles). Re-ran the printf escaping check against the corrected values for all three locales before committing. Not verified here: seeing the corrected caption render on a real Continue Reading card — Fabio's part after the PR.
+
+- [x] 🟠 **FAB-331** · Articles at 0% fill up "Continue Reading"  `Done` `High`
+  Seen 2026-09-03: four of five Continue Reading cards showed 0% progress. `ArticleReaderView`'s `.task` calls `advanceStatus(to: .reading)` on open, unconditionally — opening an article and immediately going back set `.reading` permanently, and the section filtered on `statusEnum == .reading` with no progress floor. Every accidental tap landed in Continue Reading forever. Completed 2026-09-04.
+
+  ## Fix
+
+  Took the BACKLOG entry's lower-risk default: filter on `scrollPosition > 0` rather than changing when `.reading` gets set (the promote-to-`.reading` floor stays deferred, revisit post-launch if the filter proves insufficient).
+
+  A bare filter alone would have made a 0%-progress `.reading` article vanish from every section — it fails `.reading`'s new floor and its persisted status genuinely isn't `.unread`. Added `Article.displayStatusEnum` (`Verso/Model/Article.swift`) instead: downgrades a `.reading` article with zero scroll progress back to `.unread` for display only, leaving the persisted `status` untouched. Two call sites switched from `statusEnum` to `displayStatusEnum`: `ArticleListView`'s three section filters (`continueReadingArticles`/`unreadArticles`/`readArticles`) and `ArticleCard`'s `displayStatus` (the `StatusBadge` source) — so an article that falls back to Unread also loses its "reading" badge, not just its section. Every other `statusEnum ==` use (the read/unread toggle logic) stays on the real, persisted status.
+
+  ## Verified
+
+  `xcodebuild build` succeeded for the `Verso` scheme. Not verified here: opening an article and backing out immediately to confirm it no longer appears in Continue Reading, and that scrolling partway into another article still promotes it correctly — Fabio's part after the PR.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
