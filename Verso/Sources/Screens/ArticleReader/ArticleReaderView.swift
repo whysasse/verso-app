@@ -12,6 +12,10 @@ struct ArticleReaderView: View {
     @State private var contentHeight: CGFloat = 0
     @State private var screenHeight: CGFloat = UIScreen.main.bounds.height
     @State private var isChromeVisible: Bool = true
+    /// FAB-307 / accessibility-specs.md §5.3: chrome must never hide while VoiceOver is running.
+    /// Seeded from the live value so a VoiceOver user who deep-links straight into the reader
+    /// gets the right behavior on the very first tap, not just after the notification below fires.
+    @State private var isVoiceOverRunning: Bool = UIAccessibility.isVoiceOverRunning
     @State private var showFontControls: Bool = false
     @State private var showThemeControls: Bool = false
     @State private var parsedContent: String = ""
@@ -146,17 +150,37 @@ struct ArticleReaderView: View {
                 }
             }
             .onTapGesture {
+                // FAB-307 / accessibility-specs.md §5.3: chrome must never hide while VoiceOver
+                // is running -- there's no separate auto-hide timer in this app, the tap gesture
+                // is the only thing that ever hides it, so this is the one place to guard.
+                guard !isVoiceOverRunning else { return }
                 let enteringImmersive = isChromeVisible
-                if reduceMotion {
+                let toggleChrome = {
                     isChromeVisible.toggle()
-                    isPillVisible = !isChromeVisible
+                    if isChromeVisible {
+                        isPillVisible = false
+                    } else if !hasShownImmersiveHint {
+                        isPillVisible = true
+                        markImmersiveHintShown()
+                    }
+                }
+                if reduceMotion {
+                    toggleChrome()
                 } else {
                     withAnimation(.easeOut(duration: 0.3)) {
-                        isChromeVisible.toggle()
-                        isPillVisible = !isChromeVisible
+                        toggleChrome()
                     }
                 }
                 AnalyticsService.shared.track("reader.immersiveModeToggled", parameters: ["enabled": enteringImmersive ? "true" : "false"])
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.voiceOverStatusDidChangeNotification)) { _ in
+                isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+                if isVoiceOverRunning {
+                    // VoiceOver just turned on mid-session: bring chrome back immediately rather
+                    // than waiting for the next tap.
+                    isChromeVisible = true
+                    isPillVisible = false
+                }
             }
             }
 
@@ -519,6 +543,21 @@ struct ArticleReaderView: View {
             guard !texts.isEmpty else { return }
             ttsService.start(paragraphs: texts, from: 0)
         }
+    }
+
+    // MARK: - Immersive hint (FAB-307)
+
+    private static let hasShownImmersiveHintKey = "hasShownImmersiveHint"
+
+    private var hasShownImmersiveHint: Bool {
+        UserDefaults.standard.bool(forKey: Self.hasShownImmersiveHintKey)
+    }
+
+    /// Only ever called from the non-VoiceOver branch of the tap gesture above, so this
+    /// structurally satisfies accessibility-specs.md §5.3's "must not be written during a
+    /// VoiceOver session" -- there's no path here while `isVoiceOverRunning` is true.
+    private func markImmersiveHintShown() {
+        UserDefaults.standard.set(true, forKey: Self.hasShownImmersiveHintKey)
     }
 
     private func estimatedReadTime(for text: String) -> Int? {

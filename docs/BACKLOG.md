@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**45 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**44 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,7 +25,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
-- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (backgrounding corrupts app state, four independent causes), FAB-305 (white-on-accent contrast) and FAB-306 (onboarding theme-picker label contrast) are done — see [DONE.md](DONE.md) for the full history. FAB-307–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
+- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (backgrounding corrupts app state, four independent causes), FAB-305 (white-on-accent contrast), FAB-306 (onboarding theme-picker label contrast) and FAB-307 (immersive chrome hit-testing + VoiceOver) are done — see [DONE.md](DONE.md) for the full history. FAB-307–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture). The immersive-mode Back-button repro that no screenshot could answer is now confirmed and fixed as FAB-307.
 
   **Amended 2026-09-03, after the native-shell decision.** Fabio chose to **ship 1.0 on the current UI and do the native iOS shell as 1.1** ([FAB-334](#)). That changes what belongs in this list: several items below are defects in custom chrome that FAB-334 deletes outright, so fixing them now is work thrown away. Items **13 (FAB-310)**, **15 (FAB-320)** and **16 (FAB-319)** move to FAB-334, as do the chrome halves of FAB-329, FAB-326, FAB-325 and FAB-324 in the post-launch list. Item **11 (FAB-309)** splits: the `VersoTypography.UI` token rebuild stays in 1.0 (cheap, mechanical, and it survives the shell — and a reading app that ignores the system text size shouldn't ship that way for however long 1.1 takes), while its layout audit of chrome components moves to FAB-334. Item **8 (FAB-311)**'s ✕/grabber collision is absorbed too, but its `BodySize` reconnection is reading-view work and stays. **Read FAB-334 before starting any item marked below.**
 
@@ -41,7 +41,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   6. ~~**FAB-306**~~ — **done**, see [DONE.md](DONE.md): onboarding theme-picker label contrast fixed (`ThemePreviewCard` now uses the active theme's colours for the label, same pattern as `ThemeSelector`'s `ThemeChip`).
   7. **FAB-312** — bundle OpenDyslexic-Bold + fix weight fallback; self-contained
   8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
-  9. **FAB-307** — immersive chrome hit-testing + VoiceOver auto-hide (same `ReadingChrome`/`ReadingTopBar` files as #8)
+  9. ~~**FAB-307**~~ — **done**, see [DONE.md](DONE.md): `.allowsHitTesting(isVisible)` added to both chrome bars, plus VoiceOver wiring (chrome pinned visible, live `voiceOverStatusDidChangeNotification`, the `hasShownImmersiveHint` flag built and gated).
   10. **FAB-308** — localize the 7 hardcoded reading-chrome strings (same files again, do while open)
   11. **FAB-309** — Dynamic Type. **Split by the amendment above:** the `VersoTypography.UI` token rebuild and the hardcoded-size fixes in the reading view and onboarding stay here, after #8 so the scales compose. The layout audit of chrome components (`SettingsRow`, `ThemeChip`, the list header) moves to FAB-334, which deletes them.
   12. **FAB-333** — reading measure collapse w/ OpenDyslexic & max size; stacks on top of #11
@@ -129,21 +129,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
-
-- [ ] 🟠 **FAB-307** · Immersive chrome: hidden bars stay hit-testable, and VoiceOver decisions were never implemented  `Todo` `High`
-  ## Scope
-
-  Critique §3.7, §3.8. Two related gaps in the same code.
-
-  **Hit testing.** `ReadingTopBar` hides via `.opacity(isVisible ? 1 : 0)`, which in SwiftUI does **not** disable hit testing. The bar is layered above the ScrollView carrying the tap-to-reveal gesture, so in immersive mode a tap on the top-left ~44×44pt should hit the invisible Back button and dismiss the article instead of revealing the chrome. **Repro:** open an article → tap to enter immersive → tap top-left corner. The bottom bar collapses to `height: 0` so it is less exposed, but has the same pattern.
-
-  **VoiceOver.** `UIAccessibility.isVoiceOverRunning` appears **nowhere in the codebase**. [accessibility-specs.md](accessibility-specs.md) §5.3 signed off three decisions that were never built: suppress chrome auto-hide while VoiceOver is running, observe `voiceOverStatusDidChangeNotification`, and gate the `hasShownImmersiveHint` flag write on `!isVoiceOverRunning`.
-
-  ## Fix
-
-  One change covers both: hit testing off when hidden, and never hidden while VoiceOver is on. The implementation did get one thing right already — visibility via `.opacity()` rather than `isHidden`, per the spec, so elements stay in the accessibility tree.
-
-  Also unhandled anywhere: `reduceTransparency`, `differentiateWithoutColor`. `accessibilityReduceMotion` is handled correctly, once, in the reader.
 
 - [ ] 🟠 **FAB-308** · Localize the reading chrome's accessibility strings  `Todo` `High`
   ## Scope

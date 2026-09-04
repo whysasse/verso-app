@@ -124,6 +124,10 @@ struct ReadingTopBar<MenuContent: View>: View {
             alignment: .bottom
         )
         .opacity(isVisible ? 1 : 0)
+        // FAB-307: `.opacity()` alone doesn't disable hit-testing -- an invisible top bar was
+        // still catching taps meant for the reveal gesture beneath it (its Back button most of
+        // all, since that's a 44x44pt corner a reveal-tap is likely to land in).
+        .allowsHitTesting(isVisible)
         .animation(.easeOut(duration: 0.3), value: isVisible)
     }
 }
@@ -207,6 +211,10 @@ struct ReadingBottomBar: View {
             alignment: .top
         )
         .opacity(isVisible ? 1 : 0)
+        // FAB-307: same `.opacity()`-doesn't-disable-hit-testing gap as the top bar. The call
+        // site also collapses this view's outer frame to `height: 0` when hidden, which limits
+        // exposure but doesn't guarantee it -- belt and suspenders.
+        .allowsHitTesting(isVisible)
         .animation(.easeOut(duration: 0.3), value: isVisible)
     }
 }
