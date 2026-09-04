@@ -1,6 +1,6 @@
 # Verso — Localization (i18n) Strategy
 
-**Version:** 1.1 · **Date:** 2026-06-09 · **Ratified:** 2026-06-17 (FAB-276) · **Status:** Signed off; implementation tracked in `docs/BACKLOG.md`
+**Version:** 1.2 · **Date:** 2026-09-03 · **Ratified:** 2026-06-17 (FAB-276) · **Status:** Signed off; implementation tracked in `docs/BACKLOG.md`
 
 Verso ships in three locales: **EN-CA, FR-CA, PT-BR**. This doc records the decisions so iOS and Web implement i18n the same way. All user-facing strings live in `copy/UI_COPY.md` (the `en` base); this doc covers locale policy, plurals, formatting, and invariants. Implementation work is tracked under the **Localization** epic ([FAB-275](BACKLOG.md)) in `docs/BACKLOG.md` (issue tracker of record since Linear retired 2026-06-12).
 
@@ -104,7 +104,28 @@ Known layout fix applied (Phase B, `docs/BACKLOG.md` FAB-275 step 6): `ControlRo
 
 ---
 
-## 8. Beyond the app
+## 8. Editing strings — `UI_COPY.md` is the source of truth, not `Localizable.xcstrings`
+
+Never hand-edit `Verso/Resources/Localizable.xcstrings` or `verso-web/messages/*.json`. Edit `docs/copy/UI_COPY.md`, then regenerate everything from it:
+
+```bash
+python3 docs/copy/codegen/generate.py
+```
+
+This rewrites `Localizable.xcstrings`, `Verso/Generated/L10n.swift`, and `verso-web/messages/{en,fr-CA,pt-BR}.json` together, so all three stay in the same shape as `UI_COPY.md`'s row order — never alphabetized, never hand-touched.
+
+**Known gotcha: Xcode silently rewrites `Localizable.xcstrings` cosmetically.** Simply opening the project or building in Xcode.app (not `xcodebuild` on the command line — confirmed that leaves the file untouched) can make Xcode's String Catalog editor re-serialize the whole file with its own formatting: keys reordered alphabetically, JSON re-indented, no actual translation content changed. This shows up in `git status` as a huge diff (seen 2026-09-03: ~5,000 insertions / ~5,000 deletions, the entire file) that looks alarming but isn't a real edit.
+
+Before committing a `Localizable.xcstrings` diff you didn't intend (i.e. you didn't touch `UI_COPY.md` and didn't run `generate.py`):
+
+1. `git diff Verso/Resources/Localizable.xcstrings` — if every hunk is purely key reordering / whitespace with no `"value"` field actually changing, it's the Xcode-rewrite gotcha above, not a real change.
+2. Discard it: `git checkout -- Verso/Resources/Localizable.xcstrings`.
+
+Don't add the file to `.gitignore` to work around this — it's the actual resource `xcodebuild` compiles into the app bundle for real localization at runtime, so a fresh clone or CI build would ship with no translations (or fail to find the resource) without it. It's generated, but generated-and-committed, the same way a lockfile is.
+
+---
+
+## 9. Beyond the app
 
 - **App Store metadata** (name, subtitle, description, keywords, screenshots) localizes separately from the binary — budget fr-CA and pt-BR listings.
 - **Québec / Bill 96** — French commercial offerings must be available on terms no less favourable than English. If Verso is marketed or sold in Québec, fr-CA in-app **and** store presence is the compliant path.
