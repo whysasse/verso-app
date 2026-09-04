@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**49 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-330 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**48 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-304 (blank screen — one of two causes fixed, see its entry), FAB-305–329 (critique findings), and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -36,7 +36,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   1. **FAB-304** — theme-switch blank screen (cause 1, shipped PR #360) turned out to have a second, independent cause (reader content blanking after the app switcher) — fixed pending device confirmation, see its BACKLOG entry.
   2. ~~**FAB-315 + FAB-332**~~ — **done**, see [DONE.md](DONE.md): duplicate image captions + publisher title/chrome parsing, one PR, shared converter and test suite.
   3. ~~**FAB-330**~~ — **done**, see [DONE.md](DONE.md): the string already had a `%` in all three locales, just unescaped in the compiled catalog, so it was silently dropped at render time — a one-line escaping fix, not a content fix. FAB-278's percent→time-remaining redesign remains deferred, untouched by this fix.
-  4. **FAB-331** — 0%-progress articles clogging Continue Reading. **Needs a decision:** promote-to-`.reading` floor vs. filter on `scrollPosition > 0`. Default: the filter (one line, lower risk); revisit the data-model fix post-launch.
+  4. ~~**FAB-331**~~ — **done**, see [DONE.md](DONE.md): took the filter default (`scrollPosition > 0`), not the promote-to-`.reading` floor — lower risk, no data-model change. Revisit the floor post-launch if the filter proves insufficient.
   5. **FAB-305** — white-on-accent contrast; adds the `VersoButtonStyle` disabled variant FAB-328 later depends on
   6. **FAB-306** — onboarding theme-picker label contrast (same contrast family as #5, different file)
   7. **FAB-312** — bundle OpenDyslexic-Bold + fix weight fallback; self-contained
@@ -126,24 +126,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   `xcodebuild build` (Verso scheme) succeeds. Real confirmation is Fabio's part: open an article, background via the app switcher, wait a few seconds, return, and check the body renders immediately with no tap/scroll needed — plus re-run the original theme-switch matrix (Ink→Paper, Sepia→Night crossing light/dark; Ink→Night, Paper→Sepia as a control) to confirm cause 1 stays fixed.
 
 ### Bugs — found 2026-09-03 (Ink theme + onboarding pass)
-
-- [ ] 🟠 **FAB-331** · Articles at 0% fill up "Continue Reading"  `Todo` `High`
-  ## Symptom
-
-  Seen 2026-09-03: four of five Continue Reading cards show 0% progress. The section is meant to be "things you started".
-
-  ## Cause
-
-  `ArticleReaderView`'s `.task` calls `advanceStatus(to: .reading)` on open, unconditionally. Opening an article and immediately going back sets `.reading` permanently, and `continueReadingArticles` filters on `statusEnum == .reading` with no progress floor. Every accidental tap lands in Continue Reading forever.
-
-  ## Fix
-
-  Two candidate rules, needs a product decision:
-
-  * Only promote to `.reading` once the user has actually read something — a scroll fraction floor (say > 2–3%), or a dwell time.
-  * Or keep the status as-is but filter the section on `scrollPosition > 0`, so `.reading`-with-no-progress articles fall back into Unread.
-
-  The first is truer to the data model; the second is a one-line change. Either way the section should not show an entry at 0%.
 
 - [ ] 🟠 **FAB-333** · The reading measure collapses with OpenDyslexic and at the largest in-app size  `Todo` `High`
   ## Symptom
