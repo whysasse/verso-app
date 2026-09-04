@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**182 completed issues.**
+**183 completed issues.**
 
 ## iOS
 
@@ -65,6 +65,23 @@
   ## Verified
 
   New tests in `Verso/VersoTests/SwiftSoupParserTests.swift`: `HTMLToMarkdownConverterNoiseTests` (caption-echo-with-credit, exact-duplicate regression, prefix-without-credit guard), `HTMLToMarkdownConverterShareBarTests` (flattened share bar, standalone "Link Copied!", ordinary-sentence-with-"link" guard), `HTMLToMarkdownConverterTitleSuffixTests` (pipe/dash suffix stripped via siteName/host, non-matching suffix left alone, no-siteName-or-host left alone), and a full-pipeline `SwiftSoupParserTests.testCNNArticleDropsShareBarAndStripsTitleSuffix` reproducing the reported article. `xcodebuild build` succeeded; the full updated test suite passes. Not verified here: a live add-by-URL import of the actual CNN/Guardian articles through `ReadabilityParser` — Fabio's part after the PR.
+
+### Design critique 2026-09-03 (Ink theme + onboarding pass)
+
+- [x] 🔴 **FAB-330** · "Continue Reading" progress caption reads "0 read" instead of "0% read"  `Done` `Urgent`
+  Cards in Continue Reading showed `0 read`, `20 read`, `3 read` where the value is a percentage — parses as a count, and "0 read" on an article the section claims you're mid-way through is actively contradictory. Seen 2026-09-03 in the Ink theme. Completed 2026-09-03.
+
+  ## Cause
+
+  The BACKLOG entry's original diagnosis ("the string has no percent marker") turned out to be imprecise. `Localizable.xcstrings`'s translated value for `home.section.continueReading.progressCaption` already contained a `%` in all three locales (`"%lld% read"` / `"%lld % lu"` / `"%lld% lido"`, matching `UI_COPY.md` exactly) — but it was a raw, unescaped `%` sitting next to the `%lld` numeric placeholder. `String(localized:)` substitutes that placeholder via Foundation's printf-style formatting, where a literal `%` must be escaped as `%%`; left unescaped, the formatter consumed it as a broken conversion specifier and silently dropped it. Confirmed empirically: `String(format: "%lld% read", 42)` → `"42 read"`, `String(format: "%lld%% read", 42)` → `"42% read"`.
+
+  ## Fix
+
+  Escaped the literal `%` in all three `Localizable.xcstrings` locale values for that one key (`"%lld%% read"` / `"%lld %% lu"` / `"%lld%% lido"`). No change needed to `ArticleCard.swift` (already passes the correct `Int`), `Verso/Generated/L10n.swift` (its `defaultValue` uses plain Swift string interpolation, not printf formatting — unaffected), `UI_COPY.md` (content was already correct), or the VoiceOver value `a11y.progress.value` (`"%lld percent"` spells out the word "percent" instead of using a `%` character, so it never hit this trap). FAB-278's percent→time-remaining redesign for this caption remains a separate, deferred decision.
+
+  ## Verified
+
+  `xcodebuild build` succeeded for the `Verso` scheme (confirms the string catalog still compiles). Re-ran the printf escaping check against the corrected values for all three locales before committing. Not verified here: seeing the corrected caption render on a real Continue Reading card — Fabio's part after the PR.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

@@ -1616,19 +1616,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld% read"
+            "value": "%lld%% read"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "%lld % lu"
+            "value": "%lld %% lu"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "%lld% lido"
+            "value": "%lld%% lido"
           }
         }
       }
