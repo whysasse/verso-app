@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**186 completed issues.**
+**187 completed issues.**
 
 ## iOS
 
@@ -166,6 +166,19 @@
   ## Verify
 
   `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded. Contrast numbers computed with the standard WCAG relative-luminance formula against the actual hex values in `Colors.swift`, not eyeballed.
+
+### Design critique 2026-09-01 — onboarding theme-picker contrast (FAB-306)
+
+- [x] 🔴 **FAB-306** · Onboarding theme-picker card labels fail contrast in 8 of 16 states  `Done` `Urgent`
+  Critique §4.2. `ThemePreviewCard` (in `OnboardingThemePickerView.swift`) colored its label with **the card's own theme's** `accent`/`textSecondary`, painted on the **currently active theme's** background — the label sits outside the card, on the app background. Half the combinations failed 4.5:1 at 13pt; worst was the Night card at 1.85:1 while on Sepia. Completed 2026-09-04.
+
+  ## Fix
+
+  `ThemePreviewCard` now takes the active theme's `ThemeColors` as a parameter (`activeColors`, passed down from `OnboardingThemePickerView.body`'s existing `colors`) and uses it for the label's `foregroundColor` instead of the card's own `themeColors` — the same pattern `ThemeSelector`/`ThemeChip` in Settings already used correctly (caller passes its active `accentColor`/`textColor` in). The card's interior preview (mini background, fake text lines, border/stroke) is unchanged — it's correct to stay in that theme's own colors.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded. Real-device/simulator visual confirmation across all 4 themes is Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

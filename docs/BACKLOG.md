@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**46 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**45 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -25,7 +25,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
 - **Phase A — ship this release.** FAB-163 and FAB-164 done (see [DONE.md](DONE.md)). FAB-150's Store & compliance checklist is done — Fabio reviewed and entered all ASC metadata 2026-08-25 (see [APP_STORE_LISTING.md](APP_STORE_LISTING.md)). Remaining: the final binary submission itself.
 - **Phase B — localization (FAB-275).** Steps 1–8 done (see [DONE.md](DONE.md)). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this phase.
-- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (backgrounding corrupts app state, four independent causes) and FAB-305 (white-on-accent contrast) are done — see [DONE.md](DONE.md) for the full history. FAB-306–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
+- **Phase D — design critique remediation (new, 2026-09-01/03).** FAB-304 (backgrounding corrupts app state, four independent causes), FAB-305 (white-on-accent contrast) and FAB-306 (onboarding theme-picker label contrast) are done — see [DONE.md](DONE.md) for the full history. FAB-307–333 come from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md); its §10 ranks them. Screenshot coverage as of 2026-09-03: Paper, Sepia, Ink and Night all seen, onboarding seen, immersive seen, one large-text pass done. Still unseen: iPhone SE (Fabio to capture), and the immersive-mode Back-button repro (FAB-307), which no screenshot can answer.
 
   **Amended 2026-09-03, after the native-shell decision.** Fabio chose to **ship 1.0 on the current UI and do the native iOS shell as 1.1** ([FAB-334](#)). That changes what belongs in this list: several items below are defects in custom chrome that FAB-334 deletes outright, so fixing them now is work thrown away. Items **13 (FAB-310)**, **15 (FAB-320)** and **16 (FAB-319)** move to FAB-334, as do the chrome halves of FAB-329, FAB-326, FAB-325 and FAB-324 in the post-launch list. Item **11 (FAB-309)** splits: the `VersoTypography.UI` token rebuild stays in 1.0 (cheap, mechanical, and it survives the shell — and a reading app that ignores the system text size shouldn't ship that way for however long 1.1 takes), while its layout audit of chrome components moves to FAB-334. Item **8 (FAB-311)**'s ✕/grabber collision is absorbed too, but its `BodySize` reconnection is reading-view work and stays. **Read FAB-334 before starting any item marked below.**
 
@@ -38,7 +38,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   3. ~~**FAB-330**~~ — **done**, see [DONE.md](DONE.md): the string already had a `%` in all three locales, just unescaped in the compiled catalog, so it was silently dropped at render time — a one-line escaping fix, not a content fix. FAB-278's percent→time-remaining redesign remains deferred, untouched by this fix.
   4. ~~**FAB-331**~~ — **done**, see [DONE.md](DONE.md): took the filter default (`scrollPosition > 0`), not the promote-to-`.reading` floor — lower risk, no data-model change. Revisit the floor post-launch if the filter proves insufficient.
   5. ~~**FAB-305**~~ — **done**, see [DONE.md](DONE.md): white-on-accent contrast fixed (`VersoButtonStyle.primary`, the `+` add-article glyph, the filter badge), plus the real `VersoButtonStyle` disabled variant FAB-328 later depends on.
-  6. **FAB-306** — onboarding theme-picker label contrast (same contrast family as #5, different file)
+  6. ~~**FAB-306**~~ — **done**, see [DONE.md](DONE.md): onboarding theme-picker label contrast fixed (`ThemePreviewCard` now uses the active theme's colours for the label, same pattern as `ThemeSelector`'s `ThemeChip`).
   7. **FAB-312** — bundle OpenDyslexic-Bold + fix weight fallback; self-contained
   8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
   9. **FAB-307** — immersive chrome hit-testing + VoiceOver auto-hide (same `ReadingChrome`/`ReadingTopBar` files as #8)
@@ -129,28 +129,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
-
-- [ ] 🔴 **FAB-306** · Onboarding theme-picker card labels fail contrast in 8 of 16 states  `Todo` `Urgent`
-  ## Scope
-
-  Critique §4.2. `ThemePreviewCard` colours its label with **the card's own theme's** `accent` (selected) or `textSecondary` (unselected), painted on the **currently active theme's** background. Half the combinations fail 4.5:1 at 13pt; worst is the Night card at **1.85:1** while the user is on Sepia.
-
-  | Current | Card | Selected | Unselected |
-  |---|---|---|---|
-  | Paper | Night / Ink | 1.99 / 2.39 ❌ | 3.06 / 3.30 ❌ |
-  | Sepia | Night / Ink | 1.85 / 2.23 ❌ | 2.85 / 3.08 ❌ |
-  | Night | Paper / Sepia | 3.15 / 2.87 ❌ | 3.12 / 2.84 ❌ |
-  | Ink | Paper / Sepia | 3.34 / 3.05 ❌ | 3.31 / 3.02 ❌ |
-
-  ## Confirmed visually 2026-09-03
-
-  With Ink active, the "Paper" and "Sepia" card labels are visibly muddier than "Night" — they are drawn in their own themes' `textSecondary` (`#6E675F`, `#755E40`) on Ink's near-black background, computed at 3.31 and 3.02.
-
-  Worth recording separately: **the onboarding cards themselves are the best component in the app.** Four miniature pages showing a real text-on-background relationship, and the only place all four themes are instantly distinguishable. That is the argument for FAB-324.
-
-  ## Fix
-
-  The label sits *outside* the card, on the app background, so it must use the current theme's colours — `colors.textSecondary` / `colors.accent`, which is what `ThemeSelector` in Settings already does correctly. The card's *interior* preview correctly uses that theme's own colours and stays as-is.
 
 - [ ] 🟠 **FAB-307** · Immersive chrome: hidden bars stay hit-testable, and VoiceOver decisions were never implemented  `Todo` `High`
   ## Scope
@@ -407,7 +385,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   | Where | Component | Swatch | Label | Label colour source |
   |---|---|---|---|---|
-  | Onboarding | `ThemePreviewCard` | 120pt card with fake text lines | 13pt | that card's own theme (**wrong** — FAB-306) |
+  | Onboarding | `ThemePreviewCard` | 120pt card with fake text lines | 13pt | current theme (fixed by FAB-306) |
   | Settings | `ThemeChip` | 32pt flat rectangle, fixed 80×100 | 11pt | current theme |
 
   **The Settings chip row does not overflow — earlier concern withdrawn.** 4 × 80pt + 32pt padding = 352pt, which fits the 375pt iPhone SE with ~23pt to spare. Earlier drafts worried about a 320pt device; that was the SE 1st gen, which is no longer supported. The fixed `frame(width: 80, height: 100)` remains a problem for **Dynamic Type** (FAB-309), not for screen width.
