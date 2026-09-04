@@ -180,6 +180,23 @@
 
   `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded. Real-device/simulator visual confirmation across all 4 themes is Fabio's part.
 
+### Design critique 2026-09-01 — immersive chrome hit-testing + VoiceOver (FAB-307)
+
+- [x] 🟠 **FAB-307** · Immersive chrome: hidden bars stay hit-testable, and VoiceOver decisions were never implemented  `Done` `High`
+  Critique §3.7, §3.8. Two related gaps in `ReadingChrome.swift` / `ArticleReaderView.swift`. **Hit testing:** `ReadingTopBar` and `ReadingBottomBar` hid via `.opacity(isVisible ? 1 : 0)`, which does not disable hit-testing in SwiftUI — the invisible top bar's Back button kept catching the reveal tap in immersive mode. **VoiceOver:** `UIAccessibility.isVoiceOverRunning` appeared nowhere in the codebase, so none of accessibility-specs.md §5.3's three signed-off decisions were built. Completed 2026-09-04.
+
+  ## Fix
+
+  * Added `.allowsHitTesting(isVisible)` next to `.opacity(isVisible ? 1 : 0)` on both `ReadingTopBar` and `ReadingBottomBar` — the whole hit-testing fix.
+  * `ArticleReaderView` now tracks `isVoiceOverRunning` and observes `UIAccessibility.voiceOverStatusDidChangeNotification` live. While VoiceOver is running the immersive tap gesture no longer hides chrome, and turning VoiceOver on mid-session immediately brings chrome back.
+  * Built the `hasShownImmersiveHint` UserDefaults flag referenced by the spec but never implemented — the "tap anywhere to reveal" hint pill now shows once ever (previously it re-appeared on every immersive toggle), and the flag write only ever happens from the non-VoiceOver code path, satisfying the spec's "must not write during a VoiceOver session."
+  * **Note on scope:** the spec/issue describe an "auto-hide timer" for the chrome; there isn't one in this codebase — tap is the only way chrome ever hides — so "must not auto-hide while VoiceOver runs" was implemented as "must not become hidden at all while VoiceOver runs."
+  * Out of scope, left for a future issue: `reduceTransparency` and `differentiateWithoutColor`, mentioned once in the critique as unrelated observations, not in its fix list.
+
+  ## Verify
+
+  `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded, no new warnings in the changed files. Not verified here: the actual repro (tap top-left corner in immersive mode) and real VoiceOver behavior — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
+
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
 - [x] 🟠 **FAB-297** · Long-press menu shows the wrong read/unread action, and archived articles can't be unarchived  `Done` `High`
