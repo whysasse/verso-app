@@ -29,6 +29,16 @@ final class ArticleLibraryService: ObservableObject {
         let accessed = folderURL.startAccessingSecurityScopedResource()
         defer { if accessed { folderURL.stopAccessingSecurityScopedResource() } }
 
+        // FAB-304 (cause 4): the scan below (`Task.detached`) can take real wall-clock time --
+        // scanning every file in the folder, on iCloud storage. If `ArticleReaderView` writes a
+        // fresher `status`/`scroll_position` to a file *while* this scan is in flight, this
+        // rebuild's snapshot of that one file predates the write, but still gets applied to Core
+        // Data afterwards, silently reverting the fresher value even though the file on disk is
+        // already correct (confirmed 2026-09-04: file said `status: reading`, Core Data showed
+        // `unread` after a rebuild ran mid-open). `scanStartedAt` lets the upsert loop below detect
+        // and skip exactly that case per-file, rather than trusting every parsed snapshot blindly.
+        let scanStartedAt = Date()
+
         let mainArticles = await Task.detached(priority: .userInitiated) {
             MarkdownReader.readAll(from: folderURL)
         }.value
@@ -50,6 +60,13 @@ final class ArticleLibraryService: ObservableObject {
             for parsed in parsedArticles {
                 let path = parsed.filePath.path
                 if let article = existingByPath[path] {
+                    if Self.wasModified(atPath: path, after: scanStartedAt) {
+                        // Someone wrote to this file after our scan captured its content -- our
+                        // parse is stale for every field, not just the one that changed. Leave
+                        // this row alone this round; the write's own file-watcher notification
+                        // (or the next rebuild) will pick up the fresher content.
+                        continue
+                    }
                     article.title = parsed.title
                     article.url = parsed.url
                     article.author = parsed.author
@@ -106,5 +123,14 @@ final class ArticleLibraryService: ObservableObject {
         } catch {
             os_log("Cache rebuild failed: %@", log: Self.log, type: .error, error.localizedDescription)
         }
+    }
+
+    /// True if the file at `path` was written after `date` — a cheap `stat`, not a re-read of
+    /// content. A missing/unreadable file conservatively reports "not modified" so the caller falls
+    /// through to its normal (pre-FAB-304-cause-4) behavior rather than silently skipping it.
+    private static func wasModified(atPath path: String, after date: Date) -> Bool {
+        guard let attrs = try? FileManager.default.attributesOfItem(atPath: path),
+              let modDate = attrs[.modificationDate] as? Date else { return false }
+        return modDate > date
     }
 }

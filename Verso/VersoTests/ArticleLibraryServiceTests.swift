@@ -117,4 +117,63 @@ final class ArticleLibraryServiceTests: XCTestCase {
         XCTAssertEqual(articles.first?.statusEnum, .reading, "status must not revert to unread on a bad read")
         XCTAssertEqual(articles.first?.scrollPosition?.doubleValue, 0.42)
     }
+
+    // MARK: - FAB-304 cause 4: a write landing mid-scan must not be reverted by a stale parse
+
+    func test_rebuildCache_skipsFileWrittenDuringTheScan() async throws {
+        // Confirmed on-device 2026-09-04: open a fresh article (ArticleReaderView correctly writes
+        // `status: reading` to the file and to Core Data), and a rebuild whose folder scan was
+        // already in flight -- so its snapshot of this file predates that write -- went on to apply
+        // that stale snapshot afterwards, reverting Core Data's status to `unread` even though the
+        // file on disk still correctly said `reading`.
+        let fileURL = try write("""
+        ---
+        title: "Race Article"
+        status: unread
+        ---
+        Body.
+        """, name: "race.md")
+
+        // Represents the fresher state ArticleReaderView already wrote (to both Core Data and this
+        // file) after the file above was parsed but before this rebuild applies it.
+        let existing = Article.create(in: context, filePath: fileURL.path, title: "Race Article", status: .reading)
+        existing.scrollPosition = NSNumber(value: 0.42)
+        try context.save()
+
+        // Push the file's modification date into the future relative to "now" -- rebuildCache
+        // captures its own scan-start timestamp at call time below, so this deterministically looks
+        // like "modified after the scan started" without needing to race real concurrent timing.
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(60)], ofItemAtPath: fileURL.path)
+
+        let service = await ArticleLibraryService()
+        await service.rebuildCache(from: tempDir, context: context)
+
+        let articles = try fetchAllArticles()
+        XCTAssertEqual(articles.count, 1)
+        XCTAssertEqual(articles.first?.statusEnum, .reading, "a file modified during the scan must not overwrite Core Data with a stale parse")
+        XCTAssertEqual(articles.first?.scrollPosition?.doubleValue, 0.42)
+    }
+
+    func test_rebuildCache_appliesRealChangesWhenFileWasNotTouchedDuringTheScan() async throws {
+        // The mtime guard must not become a blanket "never trust the file" -- a status change that
+        // genuinely predates the scan (the normal case) still has to apply.
+        let fileURL = try write("""
+        ---
+        title: "Settled Article"
+        status: read
+        ---
+        Body.
+        """, name: "settled.md")
+
+        let existing = Article.create(in: context, filePath: fileURL.path, title: "Settled Article", status: .unread)
+        try context.save()
+
+        let service = await ArticleLibraryService()
+        await service.rebuildCache(from: tempDir, context: context)
+
+        let articles = try fetchAllArticles()
+        XCTAssertEqual(articles.count, 1)
+        XCTAssertEqual(articles.first?.statusEnum, .read, "an ordinary (non-racing) file change must still be picked up")
+        _ = existing
+    }
 }
