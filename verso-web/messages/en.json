@@ -72,8 +72,6 @@
     }
   },
   "articleCard": {
-    "accessibilityHint": "Double tap to open",
-    "accessibilityLabel": "{title}, {source}, {estimatedReadTime}",
     "estimatedReadTime": "{count} min read"
   },
   "contextMenu": {

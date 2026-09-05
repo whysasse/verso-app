@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**195 completed issues.**
+**196 completed issues.**
 
 ## iOS
 
@@ -464,6 +464,63 @@
   three call sites compile. Judging whether the compact 2-bar swatch reads well at
   32pt across all four themes — the actual point of this fix — is Fabio's part,
   since the compact layout was a judgment call, not a spec'd design.
+
+### Design critique — article cards should show read time, not date added (FAB-321)
+
+- [x] 🟡 **FAB-321** · Article cards should show read time, not date added  `Done` `Medium`
+  Critique §5.3. Closed 2026-09-05. `ArticleCard` showed title / source / **date
+  added**, giving the date a full line, while `ArticleHeader` — *inside* the
+  article, after the user had already committed — showed date **and** read time.
+  That was backwards: read time is decision-support, its whole value is helping
+  someone choose what to read from a queue.
+
+  * **Visual:** replaced the separate source line + date line with one:
+    `theatlantic.com · 12 min read`, dropping the date (it still appears inside
+    the article via `ArticleHeader`). Computed via `ReadingEstimate.minutes(for:)`
+    against `Article.searchableBody` — the plain-text cache every
+    `ArticleLibraryService` rebuild already populates, so no per-row file I/O in
+    the list. Continue Reading cards (`showsProgress: true`) are unchanged — they
+    keep their own source line above the progress bar.
+  * **Accessibility:** `docs/accessibility-specs.md` §5.1 has specified this row's
+    VoiceOver label as "[title], [source], [estimated read time]" for a while,
+    and the matching strings (`a11y.articleRow.label`/`.hint`) were already
+    generated from `UI_COPY.md` into `L10n.swift` — just never wired to any view,
+    exactly the "delivers in neither channel" gap the critique named. Wired both
+    up now: `.accessibilityElement(children: .combine)` + the spec'd label +
+    "Double tap to open" hint on the row's text column.
+    - **Judgment call:** combined only the title/source/read-time column, not
+      `StatusBadge` next to it — combining the whole row would have silently
+      swallowed the badge's own "Unread"/"Reading"/"Read" announcement (today
+      each Text and the badge are separate stops, so status is announced). This
+      way VoiceOver goes from 3-4 stops per row down to 2 instead of losing the
+      status announcement to satisfy the spec's 3-part label.
+    - Continue Reading cards substitute the visible progress percentage for read
+      time in the announced label, so what's announced matches what's shown,
+      since the spec predates that variant.
+    - Bulk-select mode's checkbox rows are untouched — a "double tap to open"
+      hint would be wrong there (it toggles a checkbox instead), but that's a
+      pre-existing gap outside this ticket's scope, not something this change
+      makes worse.
+  * **Copy cleanup, found while wiring this up:** `docs/copy/UI_COPY.md` had two
+    fully duplicate key pairs for this exact string — `articleCard.
+    accessibilityLabel`/`.accessibilityHint` (unused, in the Article Card
+    section) alongside `a11y.articleRow.label`/`.hint` (also unused, in the
+    dedicated §9 Accessibility-Only Labels section) — with a fr-CA wording
+    mismatch between the two hints ("Appuie deux fois..." vs. "Touche deux
+    fois..."). Removed the Article Card section's pair and kept §9's, matching
+    its sibling hints (filterChip/themeChip unselected, also "Touche...",
+    still themselves unwired — out of this ticket's scope). Regenerated
+    `Localizable.xcstrings`, `L10n.swift`, and the web message JSONs via
+    `docs/copy/codegen/generate.py`.
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves it compiles. This one has real
+  logic (word-count estimation, a branching accessibility label) rather than
+  being purely additive, so read through the new computed properties for
+  empty-string/nil edge cases before pushing. Actually seeing the combined line
+  read well at Dynamic Type and confirming VoiceOver announces it correctly is
+  Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
