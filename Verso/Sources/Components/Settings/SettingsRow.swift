@@ -62,6 +62,12 @@ struct SettingsRow: View {
                 .font(VersoTypography.UI.input)
                 .foregroundColor(colors.textPrimary)
             Spacer()
+            // FAB-329: `path` is just `lastPathComponent` (e.g. "Verso"), which alone
+            // doesn't read as a filesystem location -- the icon supplies that context
+            // without competing with the already-`.lineLimit(1)` text for space.
+            Image(systemName: "folder")
+                .font(.system(size: 13))
+                .foregroundColor(colors.textSecondary)
             Text(path)
                 .font(VersoTypography.UI.listSubtitle)
                 .foregroundColor(colors.textSecondary)
