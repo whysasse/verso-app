@@ -30,7 +30,15 @@ struct ReadingControls: View {
             .padding(.horizontal, VersoSpacing.lg)
             .padding(.top, VersoSpacing.md)
             .padding(.bottom, VersoSpacing.md)
+
+            // The sheet's presentation detent is a fixed height that doesn't
+            // always exactly match this content's natural height; without this,
+            // any leftover space at the bottom shows through uncolored instead
+            // of the sheet's surface. Push content to the top and let the
+            // surface color fill whatever's left below it.
+            Spacer(minLength: 0)
         }
+        .frame(maxHeight: .infinity, alignment: .top)
         .background(colors.surface)
         .overlay(
             Rectangle()
@@ -57,7 +65,6 @@ struct ReadingControls: View {
                 HStack(spacing: VersoSpacing.sm) {
                     fontSizeStepButton(
                         glyphSize: 14,
-                        isEnabled: currentBodySize != .xs,
                         accessibilityLabel: L10n.Reading.controlsDecreaseFontSize,
                         action: { fontSize = currentBodySize.stepped(by: -1).rawValue }
                     )
@@ -69,7 +76,6 @@ struct ReadingControls: View {
 
                     fontSizeStepButton(
                         glyphSize: 20,
-                        isEnabled: currentBodySize != .xxl,
                         accessibilityLabel: L10n.Reading.controlsIncreaseFontSize,
                         action: { fontSize = currentBodySize.stepped(by: 1).rawValue }
                     )
@@ -86,16 +92,18 @@ struct ReadingControls: View {
                         Button {
                             lineSpacing = index
                         } label: {
-                            Text(lineSpacingLabel(for: index))
-                                .font(VersoTypography.UI.caption)
-                                .foregroundColor(lineSpacing == index ? colors.accent : colors.textSecondary)
-                                .frame(minWidth: 44, minHeight: 44)
-                                .background(
-                                    RoundedRectangle(cornerRadius: VersoRadius.sm)
-                                        .fill(lineSpacing == index ? colors.accentSurface : Color.clear)
-                                )
+                            LineSpacingBarsIcon(
+                                barCount: lineSpacingBarCount(for: index),
+                                color: lineSpacing == index ? colors.accent : colors.textSecondary
+                            )
+                            .frame(width: 44, height: 44)
+                            .background(
+                                RoundedRectangle(cornerRadius: VersoRadius.sm)
+                                    .fill(lineSpacing == index ? colors.accentSurface : Color.clear)
+                            )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(lineSpacingLabel(for: index))
                         .accessibilityAddTraits(lineSpacing == index ? .isSelected : [])
                     }
                 }
@@ -105,16 +113,17 @@ struct ReadingControls: View {
 
     /// Small "A" / big "A" button, each in its own filled, bordered 44×44
     /// container — the affordance Safari's own Reader font-size control uses.
+    /// Both ends of the scale look the same: tapping past the limit is a
+    /// harmless no-op (`BodySize.stepped(by:)` clamps), not a disabled state.
     private func fontSizeStepButton(
         glyphSize: CGFloat,
-        isEnabled: Bool,
         accessibilityLabel: String,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Text("A")
                 .font(.system(size: glyphSize, weight: .semibold))
-                .foregroundColor(isEnabled ? colors.accent : colors.textSecondary)
+                .foregroundColor(colors.accent)
                 .frame(width: 44, height: 44)
                 .background(
                     RoundedRectangle(cornerRadius: VersoRadius.sm)
@@ -126,8 +135,20 @@ struct ReadingControls: View {
                 )
         }
         .buttonStyle(.plain)
-        .disabled(!isEnabled)
         .accessibilityLabel(accessibilityLabel)
+    }
+
+    /// Bar counts mirror the four Material Symbols icons Fabio picked
+    /// (format_align_justify → density_small → density_medium → density_large):
+    /// more, tighter-packed bars read as denser/compact spacing, fewer and
+    /// wider-spaced bars read as airier spacing.
+    private func lineSpacingBarCount(for index: Int) -> Int {
+        switch index {
+        case 0:  return 5  // Compact
+        case 1:  return 4  // Normal
+        case 2:  return 3  // Relaxed
+        default: return 2  // Airy
+        }
     }
 
     private func lineSpacingLabel(for index: Int) -> String {
@@ -151,6 +172,35 @@ struct ReadingControls: View {
                 .frame(maxWidth: .infinity)
             }
         }
+    }
+}
+
+/// A small stack of horizontal bars representing a line-spacing density
+/// level — redraws the four Material Symbols icons (format_align_justify,
+/// density_small/medium/large) as themable vector bars instead of bundling
+/// them as fixed-color image assets, so they tint correctly in all 4 themes.
+private struct LineSpacingBarsIcon: View {
+    private static let height: CGFloat = 18
+    private static let barWidth: CGFloat = 20
+    private static let barThickness: CGFloat = 2
+
+    let barCount: Int
+    let color: Color
+
+    private var gap: CGFloat {
+        guard barCount > 1 else { return 0 }
+        return (Self.height - CGFloat(barCount) * Self.barThickness) / CGFloat(barCount - 1)
+    }
+
+    var body: some View {
+        VStack(spacing: gap) {
+            ForEach(0..<barCount, id: \.self) { _ in
+                Capsule()
+                    .fill(color)
+                    .frame(width: Self.barWidth, height: Self.barThickness)
+            }
+        }
+        .frame(height: Self.height)
     }
 }
 
