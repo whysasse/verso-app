@@ -406,13 +406,17 @@ enum L10n {
         static var emptyArchiveSubheadline: String {
             String(localized: "home.empty.archive.subheadline", defaultValue: "Articles you archive will appear here.", comment: "Archive empty state subheadline")
         }
+        /// "Add your first article" -- needs_review. Wired to the same `showAddArticle` binding as the header `+`.
+        static var emptyNoArticlesCta: String {
+            String(localized: "home.empty.noArticles.cta", defaultValue: "Add your first article", comment: "needs_review. Wired to the same `showAddArticle` binding as the header `+`.")
+        }
         /// "No articles yet" -- Empty state headline
         static var emptyNoArticlesHeadline: String {
             String(localized: "home.empty.noArticles.headline", defaultValue: "No articles yet", comment: "Empty state headline")
         }
-        /// "Share an article from Safari to get started." -- Empty state subheadline
+        /// "Or share one from Safari." -- needs_review. FAB-319: reworded from 'Share an article from Safari to get started.' — demoted to the secondary route now that the CTA button above is the primary one.
         static var emptyNoArticlesSubheadline: String {
-            String(localized: "home.empty.noArticles.subheadline", defaultValue: "Share an article from Safari to get started.", comment: "Empty state subheadline")
+            String(localized: "home.empty.noArticles.subheadline", defaultValue: "Or share one from Safari.", comment: "needs_review. FAB-319: reworded from 'Share an article from Safari to get started.' — demoted to the secondary route now that the CTA button above is the primary one.")
         }
         /// "Nothing read yet" -- Added during step 5 web-wiring pass — same as `home.empty.noUnread.headline`. needs_review.
         static var emptyNoReadHeadline: String {
@@ -429,6 +433,10 @@ enum L10n {
         /// "Articles you're currently reading will appear here." -- needs_review.
         static var emptyNoReadingSubheadline: String {
             String(localized: "home.empty.noReading.subheadline", defaultValue: "Articles you're currently reading will appear here.", comment: "needs_review.")
+        }
+        /// "Clear filters" -- needs_review. Clears search text, date preset, and selected tags.
+        static var emptyNoResultsCta: String {
+            String(localized: "home.empty.noResults.cta", defaultValue: "Clear filters", comment: "needs_review. Clears search text, date preset, and selected tags.")
         }
         /// "No results" -- Search empty state headline
         static var emptyNoResultsHeadline: String {

@@ -183,8 +183,9 @@
         "subheadline": "Os artigos que você arquivar vão aparecer aqui."
       },
       "noArticles": {
+        "cta": "Adicione seu primeiro artigo",
         "headline": "Nenhum artigo ainda",
-        "subheadline": "Compartilhe um artigo do Safari para começar."
+        "subheadline": "Ou compartilhe um do Safari."
       },
       "noRead": {
         "headline": "Nada lido ainda",
@@ -195,6 +196,7 @@
         "subheadline": "Os artigos que você está lendo no momento vão aparecer aqui."
       },
       "noResults": {
+        "cta": "Limpar filtros",
         "headline": "Nenhum resultado",
         "subheadline": "Tente outro termo de busca."
       },

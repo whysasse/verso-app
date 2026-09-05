@@ -52,7 +52,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
   14. ~~*(pulled out of FAB-322)* **"Add Article: no escape while saving"**~~ — **done 2026-09-05**: the ✕ now shows and cancels during `.saving`, so a hung parse no longer traps the user. See the struck bullet under FAB-322 for the one known gap (Readability.js's `WKWebView` isn't itself interruptible mid-flight).
   15. ~~**FAB-320**~~ — **moved to FAB-334.** System `EditMode` supplies both the red destructive action and the "N Selected" title.
-  16. **FAB-319** — **split.** The empty-state CTA stays in 1.0 (it is the biggest activation win available and it is copy plus one button — note the current copy sends the user *out of the app* to Safari while the `+` sits unmentioned above it). The filter panel's "Clear all" moves to FAB-334, which rehomes filters around `.searchable` anyway.
+  16. **FAB-319** — **split.** The empty-state CTA **done 2026-09-05** — see the struck bullet under FAB-319 for detail. The filter panel's "Clear all" and summary row move to FAB-334, which rehomes filters around `.searchable` anyway; FAB-319 stays open in BACKLOG for that remainder.
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
@@ -231,7 +231,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
 ### Design critique 2026-09-01 — article list
 
-- [ ] 🟠 **FAB-319** · Filters are invisible once applied, and there's no way to clear them  `Todo` `High`
+- [ ] 🟠 **FAB-319** · Filters are invisible once applied, and there's no way to clear them  `In Progress` `High`
   ## Scope
 
   Critique §5.1, §5.2. Once `FilterPanel` closes, the only signal that filters are active is a small count badge on the header icon — the same badge whose dark-theme contrast FAB-305 already fixed. If the filters match nothing, the user gets the `.searchMiss` empty state with no mention of the filters causing it and no way to clear them: **`FilterPanel` has no "Clear all"**, so tags must be deselected one by one and the date preset reset separately.
@@ -244,9 +244,9 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   ## Fix
 
-  1. "Clear all" in the panel header, enabled when `activeFilterCount > 0`
-  2. "Add your first article" in `.empty`; "Clear filters" in `.searchMiss`
-  3. Consider a dismissible summary row under the header when filters are active ("2 tags · Past month ✕") — restores the chip bar's visibility without its width problems
+  1. "Clear all" in the panel header, enabled when `activeFilterCount > 0` — **moved to FAB-334**, which rehomes `FilterPanel` around `.searchable` anyway.
+  2. ~~"Add your first article" in `.empty`; "Clear filters" in `.searchMiss`~~ — **done 2026-09-05.** `EmptyState` takes an optional `onAction` closure and a per-variant CTA title, rendered as a real button between the headline and the (now secondary) subtext. `.empty` flips `showAddArticle`; `.searchMiss` clears search text, date preset, and tags. The `.empty` subheadline was reworded from "Share an article from Safari to get started." to "Or share one from Safari." now that it's the secondary route, not the only one.
+  3. Consider a dismissible summary row under the header when filters are active ("2 tags · Past month ✕") — restores the chip bar's visibility without its width problems. **Moved to FAB-334** along with #1 — same rehoming.
 
   Also seen: the panel is a fixed `width: 320` — ~80% of a 393pt screen and **~85% of the 375pt iPhone SE**, leaving a dismiss strip of roughly 55pt, too narrow to read as "tap outside to close". Use a fraction with a maximum rather than a fixed width. And with zero tags in the library it still renders a "Search tags…" field above a lone "All tags" row, searching nothing — hide it when the tag list is empty.
 

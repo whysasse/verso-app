@@ -177,8 +177,10 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `home.empty.noArticles.headline` | Empty state headline | No articles yet | Aucun article pour l'instant | Nenhum artigo ainda | — |
-| `home.empty.noArticles.subheadline` | Empty state subheadline | Share an article from Safari to get started. | Partage un article depuis Safari pour commencer. | Compartilhe um artigo do Safari para começar. | — |
+| `home.empty.noArticles.cta` | Empty state CTA button (FAB-319) | Add your first article | Ajoute ton premier article | Adicione seu primeiro artigo | needs_review. Wired to the same `showAddArticle` binding as the header `+`. |
+| `home.empty.noArticles.subheadline` | Empty state subheadline | Or share one from Safari. | Ou partage-en un depuis Safari. | Ou compartilhe um do Safari. | needs_review. FAB-319: reworded from "Share an article from Safari to get started." — demoted to the secondary route now that the CTA button above is the primary one. |
 | `home.empty.noResults.headline` | Search empty state headline | No results | Aucun résultat | Nenhum resultado | — |
+| `home.empty.noResults.cta` | Search empty state CTA button (FAB-319) | Clear filters | Effacer les filtres | Limpar filtros | needs_review. Clears search text, date preset, and selected tags. |
 | `home.empty.noResults.subheadline` | Search empty state subheadline | Try a different search term. | Essaie un autre terme de recherche. | Tente outro termo de busca. | — |
 | `home.empty.archive.headline` | Archive empty state headline | Nothing archived | Rien d'archivé | Nada arquivado | — |
 | `home.empty.archive.subheadline` | Archive empty state subheadline | Articles you archive will appear here. | Les articles que tu archives apparaîtront ici. | Os artigos que você arquivar vão aparecer aqui. | — |

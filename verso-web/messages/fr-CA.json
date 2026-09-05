@@ -183,8 +183,9 @@
         "subheadline": "Les articles que tu archives apparaîtront ici."
       },
       "noArticles": {
+        "cta": "Ajoute ton premier article",
         "headline": "Aucun article pour l'instant",
-        "subheadline": "Partage un article depuis Safari pour commencer."
+        "subheadline": "Ou partage-en un depuis Safari."
       },
       "noRead": {
         "headline": "Rien de lu pour l'instant",
@@ -195,6 +196,7 @@
         "subheadline": "Les articles que tu lis actuellement apparaîtront ici."
       },
       "noResults": {
+        "cta": "Effacer les filtres",
         "headline": "Aucun résultat",
         "subheadline": "Essaie un autre terme de recherche."
       },

@@ -113,7 +113,12 @@ struct ArticleListView: View {
                     selectedArticleIds: $selectedArticleIds,
                     confirmBulkDelete: $confirmBulkDelete,
                     showFolderPicker: $showFolderPicker,
-                    showAddArticle: $showAddArticle
+                    showAddArticle: $showAddArticle,
+                    onClearFilters: {
+                        searchText = ""
+                        datePreset = .any
+                        selectedTags.removeAll()
+                    }
                 )
                 .environmentObject(themeManager)
                 .environmentObject(folderBookmarkService)
@@ -355,6 +360,10 @@ private struct ArticleListFetchedBody: View {
 
     @Binding var showFolderPicker: Bool
     @Binding var showAddArticle: Bool
+    /// FAB-319: clears search text, date preset, and tags -- the three facets
+    /// `narrowedListShowsMiss` checks. Lives here as a closure rather than two more
+    /// bindings since `searchText`/`datePreset` are otherwise private to the parent.
+    let onClearFilters: () -> Void
 
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var folderBookmarkService: FolderBookmarkService
@@ -378,7 +387,8 @@ private struct ArticleListFetchedBody: View {
         selectedArticleIds: Binding<Set<UUID>>,
         confirmBulkDelete: Binding<Bool>,
         showFolderPicker: Binding<Bool>,
-        showAddArticle: Binding<Bool>
+        showAddArticle: Binding<Bool>,
+        onClearFilters: @escaping () -> Void
     ) {
         self.listGeometry = listGeometry
         self.listPredicate = listPredicate
@@ -390,6 +400,7 @@ private struct ArticleListFetchedBody: View {
         _confirmBulkDelete = confirmBulkDelete
         _showFolderPicker = showFolderPicker
         _showAddArticle = showAddArticle
+        self.onClearFilters = onClearFilters
 
         _articles = FetchRequest(
             sortDescriptors: [SortDescriptor(\Article.dateAdded, order: .reverse)],
@@ -437,7 +448,10 @@ private struct ArticleListFetchedBody: View {
         // checkbox Button below handles the tap itself.
         List(selection: isSelecting ? .constant(nil) : $selectedArticle) {
             if filteredArticles.isEmpty {
-                EmptyState(variant: narrowedListShowsMiss ? .searchMiss : .empty)
+                EmptyState(
+                    variant: narrowedListShowsMiss ? .searchMiss : .empty,
+                    onAction: narrowedListShowsMiss ? onClearFilters : { showAddArticle = true }
+                )
                     .environmentObject(themeManager)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: max(260, listGeometry.size.height * 0.52))
