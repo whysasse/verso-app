@@ -13,12 +13,6 @@ report back here if something's actually broken).
 To pull a branch: `git fetch && git checkout <branch>`, then `cd Verso &&
 xcodegen generate` before opening `Verso.xcodeproj`.
 
-**Note on parallel branches:** FAB-311 and FAB-308 were both built off `main`
-independently (neither waited for the other to merge), so this file exists
-separately on both branches with different content. Whichever PR merges
-second will hit a merge conflict on this file — resolve it by keeping both
-branches' entries, not by picking one side.
-
 ---
 
 ## Open
@@ -49,11 +43,20 @@ or **Português (Brasil)** — that's the actual point of this fix.
       text normally (this fix only removed an unused fallback default, no
       visible behavior should change here).
 
+---
+
+## Merged to `main` — checklist not confirmed as run
+
 ### FAB-311 — Rebuild the reader's font/spacing sheet
 
-- **Branch:** `fab-311-reader-font-sheet`
-- **PR:** [whysasse/verso-app#371](https://github.com/whysasse/verso-app/pull/371)
+- **Branch:** `fab-311-reader-font-sheet` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#371](https://github.com/whysasse/verso-app/pull/371) — merged
 - **Also closes:** FAB-335 (verify only, see below)
+
+This shipped to `main` already. Moving it here rather than straight to "Done"
+below since I don't have confirmation the checklist itself was actually run
+device-side — flag me if it was and I'll move it down, or work through it now
+that it's live and report back if anything's off.
 
 Open any article → tap "Font and spacing" (the font-sheet button) to reach
 `ReadingControls`.
@@ -91,4 +94,4 @@ Open any article → tap "Font and spacing" (the font-sheet button) to reach
 
 ## Done (verified and merged)
 
-*(Nothing yet — this fills in as items above get checked off and merged.)*
+*(Nothing yet — this fills in as items above get checked off and confirmed.)*

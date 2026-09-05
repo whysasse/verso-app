@@ -17,9 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**42 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
-
-**Note on parallel open PRs (2026-09-05):** FAB-311 (PR #371) is also implemented but not yet merged — this branch is based on `main` before that merge, so counts/sequencing here don't yet reflect it. Whoever merges second should expect a conflict on this line and the numbered sequencing list below, not a real disagreement about state.
+**42 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — Fabio away from his Mac/device (starting 2026-09-05)
 
@@ -46,7 +44,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   5. ~~**FAB-305**~~ — **done**, see [DONE.md](DONE.md): white-on-accent contrast fixed (`VersoButtonStyle.primary`, the `+` add-article glyph, the filter badge), plus the real `VersoButtonStyle` disabled variant FAB-328 later depends on.
   6. ~~**FAB-306**~~ — **done**, see [DONE.md](DONE.md): onboarding theme-picker label contrast fixed (`ThemePreviewCard` now uses the active theme's colours for the label, same pattern as `ThemeSelector`'s `ThemeChip`).
   7. ~~**FAB-312**~~ — **done**, see [DONE.md](DONE.md): bundled `OpenDyslexic-Bold.ttf` from the same upstream project as the existing Regular face, so `.custom(fontFamily,size:).weight(.bold)` now resolves to a real bold face instead of falling back to system.
-  8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
+  8. ~~**FAB-311**~~ — **done**, see [DONE.md](DONE.md): ✕ removed (drag handle + swipe-to-dismiss already sufficient), font-size buttons got real bordered 44×44 containers, line-spacing icons replaced with a labelled Compact/Normal/Relaxed/Airy control (pre-existing, unused copy strings), and both the reader's and Settings' font-size steppers now step through `BodySize`'s 6 named sizes instead of disagreeing (±1 vs ±2) on what a step is.
   9. ~~**FAB-307**~~ — **done**, see [DONE.md](DONE.md): `.allowsHitTesting(isVisible)` added to both chrome bars, plus VoiceOver wiring (chrome pinned visible, live `voiceOverStatusDidChangeNotification`, the `hasShownImmersiveHint` flag built and gated).
   10. ~~**FAB-308**~~ — **done**, see [DONE.md](DONE.md): the 4 hardcoded label/hint pairs in `ReadingChrome.swift` now go through `L10n` (the back button reuses an existing, already-translated, previously-unused key that also happens to match the accessibility spec's wording), plus the `SearchBar.placeholder` drive-by.
   11. **FAB-309** — Dynamic Type. **Split by the amendment above:** the `VersoTypography.UI` token rebuild and the hardcoded-size fixes in the reading view and onboarding stay here, after #8 so the scales compose. The layout audit of chrome components (`SettingsRow`, `ThemeChip`, the list header) moves to FAB-334, which deletes them.
@@ -132,6 +130,13 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   **Note this is the in-app size scale, not system Dynamic Type** — FAB-309 is still untested and will stack on top of this.
 
+### Bugs — found during FAB-311 PR review (Fabio, 2026-09-05)
+
+- [ ] 🔵 **FAB-335** · Verify the theme sheet's stray dark rectangle is actually gone  `Todo` `Low`
+  While reviewing FAB-311's font sheet, Fabio flagged a strip of uncolored space below the controls that didn't fill the drawer's rounded surface — caused by `ReadingControls`' fixed `presentationDetents` height not matching its content's natural height, leaving the leftover space uncovered by `colors.surface`. Fixed in `ReadingControls.body` (the container shared by both sheet variants) by expanding it to `maxHeight: .infinity` with a trailing `Spacer` pushing content to the top, so the surface color reaches every edge regardless of height.
+
+  Fabio only screenshotted the **font** sheet (`.presentationDetents([.height(218)])`), but the fix lives in the shared container both variants render through, so the **theme** sheet (`.presentationDetents([.height(168)])`) should already be fixed too — same code path, different fixed height. Flagging as its own item rather than assuming: confirm on a real device/simulator that the theme sheet's drawer is also fully colored edge-to-edge with no gap. If it isn't, the shared fix didn't fully cover `themeControls`' shorter content and needs a follow-up.
+
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
@@ -197,16 +202,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   Spec §2.2 also requires 8pt of dead space between adjacent targets; the list header packs four 44pt buttons at `HStack(spacing: 2)`.
 
   The reader font stepper is handled in **FAB-311** along with the rest of that sheet's problems; the others belong here.
-
-- [ ] 🟠 **FAB-311** · Rebuild the reader's font/spacing sheet  `Todo` `High`
-  ## Scope
-
-  Critique §6.8, §6.9, §3.4, §6.2, §6.3. Four problems in one small sheet — worth doing as a single job.
-
-  * **The ✕ collides with the last control.** In *both* sheet variants the close button sits at top-trailing over the content and lands on the right-most control: the large "A" in the font sheet, the Ink swatch in the theme sheet. Both accent-coloured, ~8pt apart, one of them dismisses the sheet. Each sheet also has a drag handle *and* an ✕ — removing the ✕ fixes the collision for free and leaves the idiomatic grabber.
-  * **The font-size control doesn't look like a control.** It renders as `Font size … A 18 A` — no `+`/`−`, no borders, no background. The two A's read as size *labels* flanking a value. Give each a filled, bordered 44×44 container (Apple's own reader does exactly this), which also closes the touch-target half of §3.4.
-  * **Line-spacing uses text-alignment icons.** `["text.alignleft", "text.justify", "text.justify.leading", "text.justify.trailing"]` — four *alignment* symbols standing in for four *line-height* levels, with no labels and no VoiceOver strings. Anyone would read that row as an alignment picker, and the last two are visually near-identical at 18pt. Use symbols that encode vertical rhythm, or drop icons for a labelled segmented control.
-  * **The named size scale is dead code.** [accessibility-specs.md](accessibility-specs.md) §4.2 defines XS 14 / S 16 / M 18 / L 20 / XL 22 / XXL 26 with per-step line heights, and `Typography.Reading.BodySize` implements it — but the reader steps ±1 (13 steps, shows a raw `18`) and Settings steps ±2 (7 steps). Two controls disagreeing on what a step is, for one stored value, both exposing the point size instead of the designed scale, and `lineHeightMultiplier` never runs. Reconnect both to `BodySize`.
 
 - [ ] 🟠 **FAB-313** · The analytics toggle has no VoiceOver label  `Todo` `High`
   ## Scope
