@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**193 completed issues.**
+**194 completed issues.**
 
 ## iOS
 
@@ -386,6 +386,38 @@
   Linux container, no Xcode, both PRs — contrast ratios verified by script (WCAG
   relative luminance), not eyeballed; CI (`ci.yml`) proved both compiled. Actually
   seeing the colors on-device across all four themes was Fabio's part.
+
+### Design critique — Settings polish (FAB-329)
+
+- [x] 🟡 **FAB-329** · Settings polish  `Done` `Medium`
+  Critique §7.1, §7.5, §7.6. Closed 2026-09-05 as a triage, not a single fix — of its
+  5 bullets, only one still needed code:
+
+  * **Folder row disambiguation — fixed.** `SettingsRow.folderRow` showed only
+    `lastPathComponent` ("Articles folder · Verso"), which reads as an arbitrary
+    settings value rather than a folder location. Added a small `folder` SF Symbol
+    before the path text rather than showing more of the path — the trailing text is
+    already `.lineLimit(1)` next to a label and a chevron, and more path text risks
+    the truncation problems FAB-319/FAB-333 already ran into on iPhone SE widths.
+  * **Font-size stepper stays tappable at its limits — already fixed.** Found, not
+    done, in this pass: `SettingsView`'s stepper already has `.disabled(currentBodySize
+    == .xs / .xxl)` plus dimmed color at the limit, evidently a side effect of FAB-311's
+    stepper rebuild that was never called out by name. (The reading view's own
+    control-sheet stepper, `ReadingControls.swift`, deliberately stays non-disabled at
+    its limits by design — documented in-code as an intentional Safari-style choice,
+    not a bug.)
+  * **Selection is an 8pt dot** and **two heading levels share one visual style** —
+    already routed to FAB-334 (its native `Form` gives real checkmarks and section
+    headers for free).
+  * **Divider contrast** — fixed by FAB-325.
+  * **Font size split across Settings/reader** is a real observation but not an
+    actionable fix on its own; left as-is.
+
+  ## Verify
+
+  Linux container, no Xcode — a two-line, purely additive UI change (one `Image`, no
+  logic). CI (`ci.yml`) proves it compiles; actually seeing it look right is Fabio's
+  part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
