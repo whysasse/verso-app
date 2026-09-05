@@ -311,20 +311,29 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 ### Bottom Bar (Reading Controls)
 
+> FAB-308: `margins`/`theme`/`markAsRead`/`markAsUnread`/`tts.play`/`tts.pause` below were pre-authored for an earlier version of this bar (a separate margins control, play/pause TTS phrasing) that FAB-299's ⋯-menu consolidation and FAB-318's margins-never-shipped both superseded — confirmed unused anywhere in source. Left in place rather than deleted (a real cleanup, out of scope here), but they are **not** what the current `ReadingChrome.swift` actually renders; the `fontAndSpacing`/`tts.listen`/`tts.stopListening`/`tts.hint`/`readingTheme` rows below are the live ones.
+
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `reading.controls.decreaseFontSize` | Icon button accessibility label | Decrease font size | Réduire la taille du texte | Diminuir tamanho da fonte | — |
 | `reading.controls.increaseFontSize` | Icon button accessibility label | Increase font size | Augmenter la taille du texte | Aumentar tamanho da fonte | — |
-| `reading.controls.lineSpacing` | Icon button accessibility label | Line spacing | Interligne | Espaçamento entre linhas | — |
-| `reading.controls.lineSpacing.hint` | VoiceOver hint | Double tap to open spacing options | Appuie deux fois pour ouvrir les options d'interligne | Toque duas vezes para abrir as opções de espaçamento | — |
-| `reading.controls.margins` | Icon button accessibility label | Margins | Marges | Margens | — |
-| `reading.controls.margins.hint` | VoiceOver hint | Double tap to open margin options | Appuie deux fois pour ouvrir les options de marges | Toque duas vezes para abrir as opções de margem | — |
-| `reading.controls.theme` | Icon button accessibility label | Theme | Thème | Tema | — |
-| `reading.controls.theme.hint` | VoiceOver hint | Double tap to open theme options | Appuie deux fois pour ouvrir les options de thème | Toque duas vezes para abrir as opções de tema | — |
-| `reading.controls.markAsRead` | Icon button accessibility label | Mark as read | Marquer comme lu | Marcar como lido | — |
-| `reading.controls.markAsUnread` | Icon button accessibility label | Mark as unread | Marquer comme non lu | Marcar como não lido | — |
-| `reading.controls.tts.play` | TTS button accessibility label | Play text-to-speech | Lire la synthèse vocale | Reproduzir texto em voz | — |
-| `reading.controls.tts.pause` | TTS button accessibility label | Pause text-to-speech | Mettre en pause la synthèse vocale | Pausar texto em voz | — |
+| `reading.controls.fontAndSpacing` | Icon button accessibility label | Font and spacing | Taille et interligne | Tamanho e espaçamento | needs_review. |
+| `reading.controls.fontAndSpacing.hint` | VoiceOver hint | Adjust reading font size and line spacing | Ajuster la taille du texte et l'interligne de lecture | Ajustar o tamanho da fonte e o espaçamento entre linhas da leitura | needs_review. |
+| `reading.controls.lineSpacing` | Icon button accessibility label | Line spacing | Interligne | Espaçamento entre linhas | Unused, see note above. |
+| `reading.controls.lineSpacing.hint` | VoiceOver hint | Double tap to open spacing options | Appuie deux fois pour ouvrir les options d'interligne | Toque duas vezes para abrir as opções de espaçamento | Unused, see note above. |
+| `reading.controls.margins` | Icon button accessibility label | Margins | Marges | Margens | Unused, see note above. |
+| `reading.controls.margins.hint` | VoiceOver hint | Double tap to open margin options | Appuie deux fois pour ouvrir les options de marges | Toque duas vezes para abrir as opções de margem | Unused, see note above. |
+| `reading.controls.theme` | Icon button accessibility label | Theme | Thème | Tema | Unused, see note above. |
+| `reading.controls.theme.hint` | VoiceOver hint | Double tap to open theme options | Appuie deux fois pour ouvrir les options de thème | Toque duas vezes para abrir as opções de tema | Unused, see note above. |
+| `reading.controls.readingTheme` | Icon button accessibility label | Reading theme | Thème de lecture | Tema de leitura | needs_review. |
+| `reading.controls.readingTheme.hint` | VoiceOver hint | Change paper, sepia, night, or ink theme | Changer le thème : papier, sépia, nuit ou encre | Mudar o tema: papel, sépia, noite ou tinta | needs_review. |
+| `reading.controls.markAsRead` | Icon button accessibility label | Mark as read | Marquer comme lu | Marcar como lido | Unused, see note above. |
+| `reading.controls.markAsUnread` | Icon button accessibility label | Mark as unread | Marquer comme non lu | Marcar como não lido | Unused, see note above. |
+| `reading.controls.tts.listen` | TTS button accessibility label (not playing) | Listen to article | Écouter l'article | Ouvir o artigo | needs_review. |
+| `reading.controls.tts.stopListening` | TTS button accessibility label (playing) | Stop listening | Arrêter l'écoute | Parar de ouvir | needs_review. |
+| `reading.controls.tts.hint` | VoiceOver hint, both TTS button states | Reads the article aloud | Lit l'article à voix haute | Lê o artigo em voz alta | needs_review. |
+| `reading.controls.tts.play` | TTS button accessibility label | Play text-to-speech | Lire la synthèse vocale | Reproduzir texto em voz | Unused, see note above. |
+| `reading.controls.tts.pause` | TTS button accessibility label | Pause text-to-speech | Mettre en pause la synthèse vocale | Pausar texto em voz | Unused, see note above. |
 
 ### Font/Theme Adjustment Sheet
 

@@ -1616,19 +1616,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld%% read"
+            "value": "%lld% read"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "%lld %% lu"
+            "value": "%lld % lu"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "%lld%% lido"
+            "value": "%lld% lido"
           }
         }
       }
@@ -3421,9 +3421,57 @@
         }
       }
     },
+    "reading.controls.fontAndSpacing": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Font and spacing"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Taille et interligne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tamanho e espaçamento"
+          }
+        }
+      }
+    },
+    "reading.controls.fontAndSpacing.hint": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjust reading font size and line spacing"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajuster la taille du texte et l'interligne de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ajustar o tamanho da fonte e o espaçamento entre linhas da leitura"
+          }
+        }
+      }
+    },
     "reading.controls.lineSpacing": {
       "extractionState": "manual",
-      "comment": "Icon button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3447,7 +3495,7 @@
     },
     "reading.controls.lineSpacing.hint": {
       "extractionState": "manual",
-      "comment": "VoiceOver hint",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3471,7 +3519,7 @@
     },
     "reading.controls.margins": {
       "extractionState": "manual",
-      "comment": "Icon button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3495,7 +3543,7 @@
     },
     "reading.controls.margins.hint": {
       "extractionState": "manual",
-      "comment": "VoiceOver hint",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3519,7 +3567,7 @@
     },
     "reading.controls.theme": {
       "extractionState": "manual",
-      "comment": "Icon button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3543,7 +3591,7 @@
     },
     "reading.controls.theme.hint": {
       "extractionState": "manual",
-      "comment": "VoiceOver hint",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3565,9 +3613,57 @@
         }
       }
     },
+    "reading.controls.readingTheme": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading theme"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Thème de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Tema de leitura"
+          }
+        }
+      }
+    },
+    "reading.controls.readingTheme.hint": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change paper, sepia, night, or ink theme"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Changer le thème : papier, sépia, nuit ou encre"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mudar o tema: papel, sépia, noite ou tinta"
+          }
+        }
+      }
+    },
     "reading.controls.markAsRead": {
       "extractionState": "manual",
-      "comment": "Icon button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3591,7 +3687,7 @@
     },
     "reading.controls.markAsUnread": {
       "extractionState": "manual",
-      "comment": "Icon button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3613,9 +3709,81 @@
         }
       }
     },
+    "reading.controls.tts.listen": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to article"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Écouter l'article"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ouvir o artigo"
+          }
+        }
+      }
+    },
+    "reading.controls.tts.stopListening": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop listening"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Arrêter l'écoute"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Parar de ouvir"
+          }
+        }
+      }
+    },
+    "reading.controls.tts.hint": {
+      "extractionState": "manual",
+      "comment": "needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reads the article aloud"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lit l'article à voix haute"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lê o artigo em voz alta"
+          }
+        }
+      }
+    },
     "reading.controls.tts.play": {
       "extractionState": "manual",
-      "comment": "TTS button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3639,7 +3807,7 @@
     },
     "reading.controls.tts.pause": {
       "extractionState": "manual",
-      "comment": "TTS button accessibility label",
+      "comment": "Unused, see note above.",
       "localizations": {
         "en": {
           "stringUnit": {

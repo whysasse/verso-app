@@ -375,6 +375,10 @@
     },
     "controls": {
       "decreaseFontSize": "Diminuir tamanho da fonte",
+      "fontAndSpacing": {
+        "_label": "Tamanho e espaçamento",
+        "hint": "Ajustar o tamanho da fonte e o espaçamento entre linhas da leitura"
+      },
       "increaseFontSize": "Aumentar tamanho da fonte",
       "lineSpacing": {
         "_label": "Espaçamento entre linhas",
@@ -386,13 +390,20 @@
       },
       "markAsRead": "Marcar como lido",
       "markAsUnread": "Marcar como não lido",
+      "readingTheme": {
+        "_label": "Tema de leitura",
+        "hint": "Mudar o tema: papel, sépia, noite ou tinta"
+      },
       "theme": {
         "_label": "Tema",
         "hint": "Toque duas vezes para abrir as opções de tema"
       },
       "tts": {
+        "hint": "Lê o artigo em voz alta",
+        "listen": "Ouvir o artigo",
         "pause": "Pausar texto em voz",
-        "play": "Reproduzir texto em voz"
+        "play": "Reproduzir texto em voz",
+        "stopListening": "Parar de ouvir"
       }
     },
     "controlsSheet": {

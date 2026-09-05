@@ -810,33 +810,49 @@ enum L10n {
         static var controlsDecreaseFontSize: String {
             String(localized: "reading.controls.decreaseFontSize", defaultValue: "Decrease font size", comment: "Icon button accessibility label")
         }
+        /// "Font and spacing" -- needs_review.
+        static var controlsFontAndSpacing: String {
+            String(localized: "reading.controls.fontAndSpacing", defaultValue: "Font and spacing", comment: "needs_review.")
+        }
+        /// "Adjust reading font size and line spacing" -- needs_review.
+        static var controlsFontAndSpacingHint: String {
+            String(localized: "reading.controls.fontAndSpacing.hint", defaultValue: "Adjust reading font size and line spacing", comment: "needs_review.")
+        }
         /// "Increase font size" -- Icon button accessibility label
         static var controlsIncreaseFontSize: String {
             String(localized: "reading.controls.increaseFontSize", defaultValue: "Increase font size", comment: "Icon button accessibility label")
         }
-        /// "Line spacing" -- Icon button accessibility label
+        /// "Line spacing" -- Unused, see note above.
         static var controlsLineSpacing: String {
-            String(localized: "reading.controls.lineSpacing", defaultValue: "Line spacing", comment: "Icon button accessibility label")
+            String(localized: "reading.controls.lineSpacing", defaultValue: "Line spacing", comment: "Unused, see note above.")
         }
-        /// "Double tap to open spacing options" -- VoiceOver hint
+        /// "Double tap to open spacing options" -- Unused, see note above.
         static var controlsLineSpacingHint: String {
-            String(localized: "reading.controls.lineSpacing.hint", defaultValue: "Double tap to open spacing options", comment: "VoiceOver hint")
+            String(localized: "reading.controls.lineSpacing.hint", defaultValue: "Double tap to open spacing options", comment: "Unused, see note above.")
         }
-        /// "Margins" -- Icon button accessibility label
+        /// "Margins" -- Unused, see note above.
         static var controlsMargins: String {
-            String(localized: "reading.controls.margins", defaultValue: "Margins", comment: "Icon button accessibility label")
+            String(localized: "reading.controls.margins", defaultValue: "Margins", comment: "Unused, see note above.")
         }
-        /// "Double tap to open margin options" -- VoiceOver hint
+        /// "Double tap to open margin options" -- Unused, see note above.
         static var controlsMarginsHint: String {
-            String(localized: "reading.controls.margins.hint", defaultValue: "Double tap to open margin options", comment: "VoiceOver hint")
+            String(localized: "reading.controls.margins.hint", defaultValue: "Double tap to open margin options", comment: "Unused, see note above.")
         }
-        /// "Mark as read" -- Icon button accessibility label
+        /// "Mark as read" -- Unused, see note above.
         static var controlsMarkAsRead: String {
-            String(localized: "reading.controls.markAsRead", defaultValue: "Mark as read", comment: "Icon button accessibility label")
+            String(localized: "reading.controls.markAsRead", defaultValue: "Mark as read", comment: "Unused, see note above.")
         }
-        /// "Mark as unread" -- Icon button accessibility label
+        /// "Mark as unread" -- Unused, see note above.
         static var controlsMarkAsUnread: String {
-            String(localized: "reading.controls.markAsUnread", defaultValue: "Mark as unread", comment: "Icon button accessibility label")
+            String(localized: "reading.controls.markAsUnread", defaultValue: "Mark as unread", comment: "Unused, see note above.")
+        }
+        /// "Reading theme" -- needs_review.
+        static var controlsReadingTheme: String {
+            String(localized: "reading.controls.readingTheme", defaultValue: "Reading theme", comment: "needs_review.")
+        }
+        /// "Change paper, sepia, night, or ink theme" -- needs_review.
+        static var controlsReadingThemeHint: String {
+            String(localized: "reading.controls.readingTheme.hint", defaultValue: "Change paper, sepia, night, or ink theme", comment: "needs_review.")
         }
         /// "Dismiss controls" -- Close (X) button itself reuses `addArticle.close.accessibilityLabel` ('Close') — identical wording/affordance across sheets.
         static var controlsSheetCloseAccessibilityHint: String {
@@ -850,21 +866,33 @@ enum L10n {
         static var controlsSheetLineSpacingLabel: String {
             String(localized: "reading.controlsSheet.lineSpacingLabel", defaultValue: "Line spacing", comment: "Line-spacing row label")
         }
-        /// "Theme" -- Icon button accessibility label
+        /// "Theme" -- Unused, see note above.
         static var controlsTheme: String {
-            String(localized: "reading.controls.theme", defaultValue: "Theme", comment: "Icon button accessibility label")
+            String(localized: "reading.controls.theme", defaultValue: "Theme", comment: "Unused, see note above.")
         }
-        /// "Double tap to open theme options" -- VoiceOver hint
+        /// "Double tap to open theme options" -- Unused, see note above.
         static var controlsThemeHint: String {
-            String(localized: "reading.controls.theme.hint", defaultValue: "Double tap to open theme options", comment: "VoiceOver hint")
+            String(localized: "reading.controls.theme.hint", defaultValue: "Double tap to open theme options", comment: "Unused, see note above.")
         }
-        /// "Pause text-to-speech" -- TTS button accessibility label
+        /// "Reads the article aloud" -- needs_review.
+        static var controlsTtsHint: String {
+            String(localized: "reading.controls.tts.hint", defaultValue: "Reads the article aloud", comment: "needs_review.")
+        }
+        /// "Listen to article" -- needs_review.
+        static var controlsTtsListen: String {
+            String(localized: "reading.controls.tts.listen", defaultValue: "Listen to article", comment: "needs_review.")
+        }
+        /// "Pause text-to-speech" -- Unused, see note above.
         static var controlsTtsPause: String {
-            String(localized: "reading.controls.tts.pause", defaultValue: "Pause text-to-speech", comment: "TTS button accessibility label")
+            String(localized: "reading.controls.tts.pause", defaultValue: "Pause text-to-speech", comment: "Unused, see note above.")
         }
-        /// "Play text-to-speech" -- TTS button accessibility label
+        /// "Play text-to-speech" -- Unused, see note above.
         static var controlsTtsPlay: String {
-            String(localized: "reading.controls.tts.play", defaultValue: "Play text-to-speech", comment: "TTS button accessibility label")
+            String(localized: "reading.controls.tts.play", defaultValue: "Play text-to-speech", comment: "Unused, see note above.")
+        }
+        /// "Stop listening" -- needs_review.
+        static var controlsTtsStopListening: String {
+            String(localized: "reading.controls.tts.stopListening", defaultValue: "Stop listening", comment: "needs_review.")
         }
         /// "By {author}" -- Added during step 4 view-wiring pass — missed in the original audit. `{author}` is the article's author name as-is (not translated); falls back to `publicationFallback` (source name, also not translated) when author is unavailable, with no 'By'/'Par'/'Por' prefix in that case.
         static func headerByline(author: String) -> String {

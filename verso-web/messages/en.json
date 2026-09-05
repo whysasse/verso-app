@@ -375,6 +375,10 @@
     },
     "controls": {
       "decreaseFontSize": "Decrease font size",
+      "fontAndSpacing": {
+        "_label": "Font and spacing",
+        "hint": "Adjust reading font size and line spacing"
+      },
       "increaseFontSize": "Increase font size",
       "lineSpacing": {
         "_label": "Line spacing",
@@ -386,13 +390,20 @@
       },
       "markAsRead": "Mark as read",
       "markAsUnread": "Mark as unread",
+      "readingTheme": {
+        "_label": "Reading theme",
+        "hint": "Change paper, sepia, night, or ink theme"
+      },
       "theme": {
         "_label": "Theme",
         "hint": "Double tap to open theme options"
       },
       "tts": {
+        "hint": "Reads the article aloud",
+        "listen": "Listen to article",
         "pause": "Pause text-to-speech",
-        "play": "Play text-to-speech"
+        "play": "Play text-to-speech",
+        "stopListening": "Stop listening"
       }
     },
     "controlsSheet": {

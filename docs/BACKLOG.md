@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**43 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**42 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — Fabio away from his Mac/device (starting 2026-09-05)
 
@@ -46,7 +46,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   7. ~~**FAB-312**~~ — **done**, see [DONE.md](DONE.md): bundled `OpenDyslexic-Bold.ttf` from the same upstream project as the existing Regular face, so `.custom(fontFamily,size:).weight(.bold)` now resolves to a real bold face instead of falling back to system.
   8. ~~**FAB-311**~~ — **done**, see [DONE.md](DONE.md): ✕ removed (drag handle + swipe-to-dismiss already sufficient), font-size buttons got real bordered 44×44 containers, line-spacing icons replaced with a labelled Compact/Normal/Relaxed/Airy control (pre-existing, unused copy strings), and both the reader's and Settings' font-size steppers now step through `BodySize`'s 6 named sizes instead of disagreeing (±1 vs ±2) on what a step is.
   9. ~~**FAB-307**~~ — **done**, see [DONE.md](DONE.md): `.allowsHitTesting(isVisible)` added to both chrome bars, plus VoiceOver wiring (chrome pinned visible, live `voiceOverStatusDidChangeNotification`, the `hasShownImmersiveHint` flag built and gated).
-  10. **FAB-308** — localize the 7 hardcoded reading-chrome strings (same files again, do while open)
+  10. ~~**FAB-308**~~ — **done**, see [DONE.md](DONE.md): the 4 hardcoded label/hint pairs in `ReadingChrome.swift` now go through `L10n` (the back button reuses an existing, already-translated, previously-unused key that also happens to match the accessibility spec's wording), plus the `SearchBar.placeholder` drive-by.
   11. **FAB-309** — Dynamic Type. **Split by the amendment above:** the `VersoTypography.UI` token rebuild and the hardcoded-size fixes in the reading view and onboarding stay here, after #8 so the scales compose. The layout audit of chrome components (`SettingsRow`, `ThemeChip`, the list header) moves to FAB-334, which deletes them.
   12. **FAB-333** — reading measure collapse w/ OpenDyslexic & max size; stacks on top of #11
   13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
@@ -140,15 +140,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
-
-- [ ] 🟠 **FAB-308** · Localize the reading chrome's accessibility strings  `Todo` `High`
-  ## Scope
-
-  Critique §3.6. After FAB-275 and FAB-284, [`ReadingChrome.swift`](<Verso/Sources/Components/Reading/ReadingChrome.swift>) still has seven hardcoded English strings: `"Back"`, `"Returns to the article list"`, `"Font and spacing"`, `"Adjust reading font size and line spacing"`, `"Listen to article"` / `"Stop listening"`, `"Reads the article aloud"`, `"Reading theme"`, `"Change paper, sepia, night, or ink theme"`.
-
-  A French or Portuguese user running VoiceOver gets an English reading toolbar. Everything else in the file goes through `L10n`, so this is oversight rather than decision.
-
-  Also: `SearchBar`'s default `placeholder: String = "Search titles..."`. Every caller currently passes an `L10n` string so it does not ship today, but it is a loaded gun for the next caller — make it non-optional or default to an `L10n` value.
 
 - [ ] 🔴 **FAB-309** · The app does not support Dynamic Type at all  `Todo` `Urgent`
   ## Symptom

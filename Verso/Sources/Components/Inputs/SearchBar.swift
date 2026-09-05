@@ -2,7 +2,10 @@ import SwiftUI
 
 struct SearchBar: View {
     @Binding var text: String
-    var placeholder: String = "Search titles..."
+    /// No default on purpose (FAB-308): a hardcoded, unlocalized fallback here
+    /// was dead code (every real caller already passes an `L10n` string) but a
+    /// landmine for the next one — making it required closes that off for good.
+    var placeholder: String
     @EnvironmentObject var themeManager: ThemeManager
     @FocusState private var isFocused: Bool
     private var colors: ThemeColors { themeManager.colors }
@@ -41,8 +44,8 @@ struct SearchBar: View {
         @State private var filled = "Swift"
         var body: some View {
             VStack(spacing: 16) {
-                SearchBar(text: $text)
-                SearchBar(text: $filled)
+                SearchBar(text: $text, placeholder: "Search titles...")
+                SearchBar(text: $filled, placeholder: "Search titles...")
             }
             .padding()
             .environmentObject(ThemeManager())

@@ -17,11 +17,46 @@ xcodegen generate` before opening `Verso.xcodeproj`.
 
 ## Open
 
+### FAB-308 — Localize the reading chrome's accessibility strings
+
+- **Branch:** `fab-308-localize-reading-chrome`
+- **PR:** [whysasse/verso-app#372](https://github.com/whysasse/verso-app/pull/372)
+
+Open any article and reveal the reading chrome (tap the article to show/hide
+the bars). Ideally test with the device language set to **French (Canada)**
+or **Português (Brasil)** — that's the actual point of this fix.
+
+- [ ] **Top bar back button** now announces "Back to reading list" (was just
+      "Back") when VoiceOver is on — tap into the reader, turn on VoiceOver,
+      swipe to the top-left chevron, confirm the new wording.
+- [ ] **Bottom bar's 3 buttons** (font/spacing, listen, theme) all announce
+      correctly in VoiceOver, and — this is the actual point of the fix — in
+      the **device's selected language**, not always English. Switch the
+      device language (Settings → General → Language & Region, or the
+      in-app language picker in Settings) to French or Portuguese and
+      re-check all three.
+- [ ] **TTS button still alternates correctly**: "Listen to article" before
+      playback starts, "Stop listening" once it's playing — same as before,
+      just now localized.
+- [ ] **No regressions to the search bar** — the article list's search field
+      and the filter panel's tag-search field still show their placeholder
+      text normally (this fix only removed an unused fallback default, no
+      visible behavior should change here).
+
+---
+
+## Merged to `main` — checklist not confirmed as run
+
 ### FAB-311 — Rebuild the reader's font/spacing sheet
 
-- **Branch:** `fab-311-reader-font-sheet`
-- **PR:** [whysasse/verso-app#371](https://github.com/whysasse/verso-app/pull/371)
+- **Branch:** `fab-311-reader-font-sheet` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#371](https://github.com/whysasse/verso-app/pull/371) — merged
 - **Also closes:** FAB-335 (verify only, see below)
+
+This shipped to `main` already. Moving it here rather than straight to "Done"
+below since I don't have confirmation the checklist itself was actually run
+device-side — flag me if it was and I'll move it down, or work through it now
+that it's live and report back if anything's off.
 
 Open any article → tap "Font and spacing" (the font-sheet button) to reach
 `ReadingControls`.
@@ -59,4 +94,4 @@ Open any article → tap "Font and spacing" (the font-sheet button) to reach
 
 ## Done (verified and merged)
 
-*(Nothing yet — this fills in as items above get checked off and merged.)*
+*(Nothing yet — this fills in as items above get checked off and confirmed.)*
