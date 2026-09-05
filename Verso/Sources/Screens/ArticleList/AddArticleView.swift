@@ -12,6 +12,9 @@ struct AddArticleView: View {
     @State private var viewState: ViewState = .idle
     @State private var errorMessage: String?
     @State private var failedURL: URL?
+    /// FAB-322 (pulled out): tracked so the toolbar ✕ can cancel an in-flight save instead of
+    /// just hiding behind it. See `showsDismissToolbarButton` and the ✕ action below.
+    @State private var saveTask: Task<Void, Never>?
 
     private let parserService = ArticleParserService()
 
@@ -23,11 +26,14 @@ struct AddArticleView: View {
         case failure
     }
 
+    /// FAB-322 (pulled out): `.saving` used to hide the ✕ along with `.success`, which trapped
+    /// the user with no way out if a parse hung (slow site, iCloud sync stall, an unresponsive
+    /// `WKWebView`). `.success` still hides it -- it's a 1.5s auto-dismiss, not a stuck state.
     private var showsDismissToolbarButton: Bool {
         switch viewState {
-        case .idle, .failure, .duplicatePrompt:
+        case .idle, .failure, .duplicatePrompt, .saving:
             return true
-        case .saving, .success:
+        case .success:
             return false
         }
     }
@@ -68,7 +74,11 @@ struct AddArticleView: View {
                         VersoToolbarIconButton(
                             systemName: "xmark",
                             accent: themeManager.colors.accent,
-                            action: { dismiss() },
+                            action: {
+                                // No-op if there's nothing in flight, or it already finished.
+                                saveTask?.cancel()
+                                dismiss()
+                            },
                             iconPointSize: 17,
                             labelWidth: 44,
                             labelHeight: 44,
@@ -109,7 +119,7 @@ struct AddArticleView: View {
             )
 
             Button(L10n.AddArticle.idleSave) {
-                Task { await save() }
+                saveTask = Task { await save() }
             }
             .buttonStyle(VersoButtonStyle(variant: .primary, theme: themeManager.colors))
             .disabled(!isValidURL)
@@ -135,12 +145,12 @@ struct AddArticleView: View {
 
             VStack(spacing: VersoSpacing.sm) {
                 Button(L10n.Share.duplicateUpdateExisting) {
-                    Task { await applyDuplicateReplace(pending: pending, existingPath: existingPath) }
+                    saveTask = Task { await applyDuplicateReplace(pending: pending, existingPath: existingPath) }
                 }
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: themeManager.colors))
 
                 Button(L10n.Share.duplicateSaveCopy) {
-                    Task { await applyDuplicateCopy(pending: pending) }
+                    saveTask = Task { await applyDuplicateCopy(pending: pending) }
                 }
                 .buttonStyle(VersoButtonStyle(variant: .secondary, theme: themeManager.colors))
 
@@ -289,6 +299,12 @@ struct AddArticleView: View {
 
         do {
             let pending = try await parserService.parse(url: url)
+            // FAB-322 (pulled out): the user cancelled via the ✕ while this was in flight --
+            // don't silently land the save (or show a failure screen) on a dismissed sheet.
+            // Note: this stops the save from *completing*, but for the Readability.js path
+            // specifically, the underlying WKWebView load/JS eval isn't itself interruptible
+            // (see ReadabilityParser) -- it keeps running until it naturally finishes.
+            guard !Task.isCancelled else { return }
 
             if let folderURL = folderBookmarkService.folderURL {
                 let folderAccessed = folderURL.startAccessingSecurityScopedResource()
@@ -314,6 +330,7 @@ struct AddArticleView: View {
             )
             viewState = .success
         } catch {
+            guard !Task.isCancelled else { return }
             errorMessage = error.localizedDescription
             viewState = .failure
         }
@@ -332,12 +349,16 @@ struct AddArticleView: View {
         defer { if folderAccessed { folderURL.stopAccessingSecurityScopedResource() } }
         do {
             try await replaceArticleInLibrary(pending: pending, existingPath: existingPath, folderURL: folderURL)
+            // FAB-322 (pulled out): see the matching guard in `save()` -- don't land a
+            // cancelled save on a dismissed sheet.
+            guard !Task.isCancelled else { return }
             AnalyticsService.shared.track(
                 "article.saved",
                 parameters: ["source": "in_app", "duplicate_resolution": "update"]
             )
             viewState = .success
         } catch {
+            guard !Task.isCancelled else { return }
             errorMessage = error.localizedDescription
             viewState = .failure
         }
@@ -358,12 +379,16 @@ struct AddArticleView: View {
             var copyPending = pending
             copyPending.title = ShareDuplicateArticleTitle.titleByAppendingCopySuffix(to: pending.title)
             try await writeNewArticleToLibrary(pending: copyPending, folderURL: folderURL, articleId: UUID())
+            // FAB-322 (pulled out): see the matching guard in `save()` -- don't land a
+            // cancelled save on a dismissed sheet.
+            guard !Task.isCancelled else { return }
             AnalyticsService.shared.track(
                 "article.saved",
                 parameters: ["source": "in_app", "duplicate_resolution": "copy"]
             )
             viewState = .success
         } catch {
+            guard !Task.isCancelled else { return }
             errorMessage = error.localizedDescription
             viewState = .failure
         }
