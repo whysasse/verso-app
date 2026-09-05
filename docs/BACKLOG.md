@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**42 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**43 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -125,6 +125,13 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   * Ship the margins control the spec called for.
 
   **Note this is the in-app size scale, not system Dynamic Type** — FAB-309 is still untested and will stack on top of this.
+
+### Bugs — found during FAB-311 PR review (Fabio, 2026-09-05)
+
+- [ ] 🔵 **FAB-335** · Verify the theme sheet's stray dark rectangle is actually gone  `Todo` `Low`
+  While reviewing FAB-311's font sheet, Fabio flagged a strip of uncolored space below the controls that didn't fill the drawer's rounded surface — caused by `ReadingControls`' fixed `presentationDetents` height not matching its content's natural height, leaving the leftover space uncovered by `colors.surface`. Fixed in `ReadingControls.body` (the container shared by both sheet variants) by expanding it to `maxHeight: .infinity` with a trailing `Spacer` pushing content to the top, so the surface color reaches every edge regardless of height.
+
+  Fabio only screenshotted the **font** sheet (`.presentationDetents([.height(218)])`), but the fix lives in the shared container both variants render through, so the **theme** sheet (`.presentationDetents([.height(168)])`) should already be fixed too — same code path, different fixed height. Flagging as its own item rather than assuming: confirm on a real device/simulator that the theme sheet's drawer is also fully colored edge-to-edge with no gap. If it isn't, the shared fix didn't fully cover `themeControls`' shorter content and needs a follow-up.
 
 ### Design critique 2026-09-01 — contrast & accessibility
 
