@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**196 completed issues.**
+**197 completed issues.**
 
 ## iOS
 
@@ -521,6 +521,46 @@
   empty-string/nil edge cases before pushing. Actually seeing the combined line
   read well at Dynamic Type and confirming VoiceOver announces it correctly is
   Fabio's part.
+
+### Design critique — immersive mode gains no space at the top (FAB-317)
+
+- [x] 🟡 **FAB-317** · Immersive mode gains no space at the top  `Done` `Medium`
+  Critique §6.1. Closed 2026-09-05. `ArticleReaderView`'s scroll content reserved a
+  constant `.padding(.top, 44 + safeAreaTop + 24)` regardless of chrome state — the
+  `44` is exactly `ReadingTopBar`'s own height, reserved even though the bar fades
+  to `.opacity(0)` (never collapses its own frame) on entering immersive mode. The
+  bottom bar already got this right via `.safeAreaInset(edge: .bottom)` +
+  `.frame(height: isChromeVisible ? readingBottomBarContentHeight : 0)`; the top
+  bar had no equivalent.
+
+  The ticket itself flagged an unresolved contradiction: 2026-09-03 screenshots
+  apparently showed the title moving up ~65-70pt on entering immersive, which
+  shouldn't have been possible given a hardcoded constant, and asked for a
+  controlled before/after screenshot test before doing any work. Re-reading the
+  code line-by-line (no other commit had touched this area since) confirmed the
+  padding really was unconditional — no code path ties it to `isChromeVisible`.
+  Lacking Xcode/simulator access to run the screenshot test myself, flagged this
+  to Fabio directly rather than guessing; he confirmed implementing the fix now,
+  deferring the actual before/after confirmation to his own testing pass.
+
+  ## Fix
+
+  `.padding(.top, (isChromeVisible ? 44 : 0) + safeAreaTop + 24)` — only the bar's
+  own reserved height collapses; `safeAreaTop` and the 24pt breathing room stay
+  constant either way. No new animation wiring: the tap handler already wraps
+  `isChromeVisible.toggle()` in `withAnimation(.easeOut(duration: 0.3))` (skipped
+  under Reduce Motion via the existing guard), and since the padding reads
+  `isChromeVisible` directly, it animates for free alongside the bar's fade — the
+  same mechanism already driving the bottom bar's height change.
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves it compiles. This one genuinely
+  needs a device/simulator: confirming the reflow looks right (especially
+  mid-scroll, where all visible content shifts up as chrome collapses), that
+  Reduce Motion gives an instant non-animated jump, and — the actual point of this
+  pass — the before/after screenshot check that resolves the original
+  contradiction. All Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
