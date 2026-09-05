@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**188 completed issues.**
+**189 completed issues.**
 
 ## iOS
 
@@ -211,6 +211,27 @@
   ## Verify
 
   `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded; confirmed the built `.app` bundle actually contains `OpenDyslexic-Bold.ttf` and declares it in the compiled `Info.plist`'s `UIAppFonts`. Not verified here: visually confirming headings render bold in OpenDyslexic on a real Simulator/device — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
+
+### Design critique 2026-09-01 — rebuild reader's font/spacing sheet (FAB-311)
+
+- [x] 🟠 **FAB-311** · Rebuild the reader's font/spacing sheet  `Done` `High`
+  Critique §6.8, §6.9, §3.4, §6.2, §6.3 — four problems in `ReadingControls.swift`, the bottom sheet opened by the reader's "Font and spacing" button. Completed 2026-09-05.
+
+  ## Fix
+
+  * **✕ removed.** It sat directly on top of the last control in both sheet variants (the big "A" / the Ink swatch). The sheet already has a drag handle, and swipe-to-dismiss was already on by default (`.presentationDragIndicator(.hidden)` in `ArticleReaderView.swift` only hides the *system* grabber graphic, it doesn't disable interactive dismiss) — VoiceOver's system-wide two-finger "Escape" gesture still dismisses the sheet.
+  * **Font-size buttons** ("A"/"A") each now sit in their own filled, bordered 44×44 container — Safari Reader's own affordance — with a real `.disabled()` state at both ends of the scale and `L10n.Reading.controlsDecreaseFontSize`/`controlsIncreaseFontSize` as accessibility labels (both strings pre-existed, unused, in `L10n.swift`).
+  * **Line-spacing row** replaced the four `text.alignleft`/`text.justify`/… alignment icons (standing in for *line-height* levels, with no VoiceOver strings) with a 4-segment labelled control using `L10n.ReaderSettings.lineSpacingCompact`/`Normal`/`Relaxed`/`Airy` — pre-existing, fully translated (fr-CA/pt-BR) strings that were defined but never wired to any view. Zero new copy needed. Bumped the row to a full 44pt tall while rebuilding it.
+  * **Reconnected the font-size stepper to `BodySize`.** `Typography.Reading.BodySize` (XS 14/S 16/M 18/L 20/XL 22/XXL 26) had no call sites driving the actual stepper: the reader stepped by `±1` (13 reachable values) and Settings by `±2` (7 reachable values, including `24` — not a real size). Added `BodySize.nearest(to:)` and `BodySize.stepped(by:)` in `Typography.swift`; both the reader sheet and `SettingsView.readingSection`'s font-size row now step through the same 6 named sizes and can never land on an off-scale value again (an existing off-scale stored value silently snaps to the nearest real size on next use).
+
+  ## Explicitly out of scope
+
+  * Settings' font-size buttons stay 32×32, no border — that sizing fix was already reassigned to FAB-334 (native-shell replaces this screen); only the stepping *logic* was this issue's concern.
+  * `BodySize.lineHeightMultiplier` still has no call site. Wiring it into the reading view's actual line-height would mean deciding how it composes with the separate, user-facing compact/normal/relaxed/airy spacing choice — that composition isn't specified anywhere, and BACKLOG's FAB-333 already treats further scale work as later, stacked work. This fix only guarantees the stored size is always one of the 6 named steps, so that composition is possible later.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded, no new warnings in the changed files. Not verified here: opening the sheet on a real Simulator/device to confirm the stepper stops cleanly at both ends, the ✕ is gone with swipe-to-dismiss intact, and the line-spacing row reads Compact/Normal/Relaxed/Airy — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
