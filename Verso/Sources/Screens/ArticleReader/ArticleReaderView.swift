@@ -136,7 +136,14 @@ struct ArticleReaderView: View {
                     }
                     .frame(maxWidth: 680, alignment: .leading)
                     .padding(.horizontal, readingHorizontalPadding)
-                    .padding(.top, 44 + safeAreaTop + 24)
+                    // FAB-317: the `44` reserves ReadingTopBar's own height -- only while it's
+                    // actually visible. The bar itself fades via `.opacity()` (ReadingChrome.swift)
+                    // without ever collapsing its frame, so this is what makes hiding it actually
+                    // reclaim the space, mirroring how the bottom bar's height already collapses to
+                    // 0 in its `.safeAreaInset`. Animates for free: the tap handler below already
+                    // wraps `isChromeVisible.toggle()` in `withAnimation`, and this reads that same
+                    // state directly.
+                    .padding(.top, (isChromeVisible ? 44 : 0) + safeAreaTop + 24)
                     .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
                     // Critical: ScrollView proposes unbounded vertical space; intrinsic height drives backing UIScrollView contentSize.
                     .fixedSize(horizontal: false, vertical: true)

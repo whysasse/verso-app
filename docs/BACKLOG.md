@@ -56,7 +56,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; its disabled-variant dependency on FAB-305 is now satisfied, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
+  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; its disabled-variant dependency on FAB-305 is now satisfied, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -200,23 +200,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   ## Fix
 
   Show the bar title only once the H1 has scrolled out of view. Scroll offset is already tracked precisely, so the condition is cheap.
-
-- [ ] 🟡 **FAB-317** · Immersive mode gains no space at the top  `Backlog` `Medium`
-  ## Scope
-
-  Critique §6.1. The scroll content's `.padding(.top, 44 + safeAreaTop + 24)` is a constant with no dependence on `isChromeVisible`. The `44` reserves room for a top bar that has just faded to `opacity: 0`, so entering immersive mode leaves ~90pt of empty space and the text does not move up at all. The bottom works correctly, because the bottom bar is a `safeAreaInset` whose frame collapses to `height: 0`.
-
-  The whole point of the mode is more text, and it currently delivers only at the bottom — the half not at eye level.
-
-  ## Probably refuted — check before doing any work
-
-  Immersive-mode screenshots from 2026-09-03 (Paper and Night) show the article title starting roughly 65–70pt higher than in the chrome-visible shots, i.e. the content *does* reclaim the bar's space. That contradicts the source reading above, and I cannot reconcile the two: `ArticleReaderView.swift:114` really is a constant `44 + safeAreaTop + 24`, with `.ignoresSafeArea(edges: .top)` at line 200.
-
-  **Controlled test:** open one article, do not scroll, screenshot with chrome visible; tap once to enter immersive, do not scroll, screenshot again. Compare where the H1 starts. If it moves up, close this issue — the shots that suggested the problem originally came from the stale August set and may never have been comparable.
-
-  ## Fix, if the test confirms the problem
-
-  Animate the top padding alongside `isChromeVisible`, matching the existing 0.3s fade.
 
 - [ ] 🔵 **FAB-318** · Reading view smaller polish  `Backlog` `Low`
   ## Scope
