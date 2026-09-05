@@ -163,13 +163,15 @@ struct ReadingControls: View {
     private var themeControls: some View {
         HStack(spacing: 0) {
             ForEach(VersoTheme.allCases) { theme in
+                let isSelected = themeManager.currentTheme == theme
                 Button {
                     themeManager.currentTheme = theme
                 } label: {
-                    ThemeChipView(theme: theme, isSelected: themeManager.currentTheme == theme, colors: colors)
+                    ThemeSwatch(theme: theme, isSelected: isSelected, activeColors: colors, height: 32)
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
             }
         }
     }
@@ -201,37 +203,6 @@ private struct LineSpacingBarsIcon: View {
             }
         }
         .frame(height: Self.height)
-    }
-}
-
-private struct ThemeChipView: View {
-    let theme: VersoTheme
-    let isSelected: Bool
-    let colors: ThemeColors
-
-    private var swatchColor: Color {
-        switch theme {
-        case .paper: return Color(hex: "F5F0E8")
-        case .sepia: return Color(hex: "F2E8D5")
-        case .night: return Color(hex: "1C1A16")
-        case .ink:   return Color(hex: "111418")
-        }
-    }
-
-    var body: some View {
-        VStack(spacing: VersoSpacing.xs) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(swatchColor)
-                .frame(height: 32)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(isSelected ? colors.accent : colors.border, lineWidth: isSelected ? 2 : 1)
-                )
-
-            Text(theme.displayName)
-                .font(.system(size: 11))
-                .foregroundColor(colors.textSecondary)
-        }
     }
 }
 

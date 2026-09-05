@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**194 completed issues.**
+**195 completed issues.**
 
 ## iOS
 
@@ -418,6 +418,52 @@
   Linux container, no Xcode — a two-line, purely additive UI change (one `Image`, no
   logic). CI (`ci.yml`) proves it compiles; actually seeing it look right is Fabio's
   part.
+
+### Design critique — one theme picker component instead of three (FAB-324)
+
+- [x] 🟡 **FAB-324** · One theme picker component instead of three  `Done` `Medium`
+  Critique §3.3, §7.2. Closed 2026-09-05. The theme picker existed as three separate
+  implementations, two of which were badly broken in the dark themes:
+  `ThemeChip` (Settings) and `ThemeChipView` (reading-controls sheet) both drew a
+  flat 32pt color rectangle as the swatch — Night vs Ink measured ~1.06:1 contrast,
+  Paper vs Sepia ~1.07:1, so the unselected swatch of the theme pair not currently
+  active was nearly invisible (confirmed 2026-09-03: the Night swatch under Ink was
+  effectively unfindable except by its accent border). Only `ThemePreviewCard`
+  (Onboarding) read correctly, because it showed a miniature page mockup (title +
+  body bars in `textPrimary`/`textSecondary`) instead of a flat background swatch —
+  what actually distinguishes the themes is the text-on-background relationship,
+  not the background color alone.
+
+  Replaced all three with one shared `ThemeSwatch` (`Verso/Sources/Components/`,
+  alongside `VersoNavigationBar.swift`), colors always from `ThemeColors.colors(for:)`
+  rather than the two flat versions' copy-pasted hex literals:
+
+  * Always renders the onboarding's mini-page treatment. At the full 120pt height
+    (Onboarding): identical to before — title bar + 3 body bars. At the compact
+    32pt height (Settings, reading controls): a 2-bar version (title + one body
+    line) — a judgment call, since scaling all 4 bars proportionally into 32pt
+    would have shrunk them past legibility.
+  * Label raised from the two flat chips' `.system(size: 11)` to
+    `VersoTypography.UI.caption`, matching Onboarding's card.
+  * Label now highlights in the active theme's accent color when selected in all
+    three places — previously only the onboarding card did this; the two chips left
+    the label `textSecondary` even when selected, relying on the border alone.
+  * Bonus while touching all three call sites: added
+    `.accessibilityAddTraits(.isSelected)` to each theme button — none of the three
+    marked the selected theme for VoiceOver before, unlike the line-spacing buttons
+    right next to them in the reading-controls sheet. Outside the critique's stated
+    scope, bundled in since it was a one-line addition per site already being edited.
+
+  `ThemeSelector`'s (Settings) fixed `.frame(width: 80, height: 100)` on the swatch
+  button is unchanged — its Dynamic Type problem stays FAB-334 scope, as already
+  decided (that epic deletes the surrounding component).
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves the new shared component and all
+  three call sites compile. Judging whether the compact 2-bar swatch reads well at
+  32pt across all four themes — the actual point of this fix — is Fabio's part,
+  since the compact layout was a judgment call, not a spec'd design.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
