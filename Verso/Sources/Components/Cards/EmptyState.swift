@@ -21,11 +21,11 @@ struct EmptyState: View {
 
             VStack(spacing: VersoSpacing.md) {
                 Text(headline)
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.system(.title3).weight(.semibold))
                     .foregroundColor(colors.textPrimary)
 
                 Text(subheadline)
-                    .font(.system(size: 15))
+                    .font(VersoTypography.UI.listSubtitle)
                     .foregroundColor(colors.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, VersoSpacing.xl)

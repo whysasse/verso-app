@@ -1,13 +1,17 @@
 import SwiftUI
 
 enum VersoTypography {
+    /// UI text styles (list screens, settings, navigation). These are Dynamic Type
+    /// text styles, not fixed point sizes -- FAB-309: a bare `.system(size:)` never
+    /// responds to the user's system text size, while `.system(<TextStyle>)` does.
+    /// Mapping follows `docs/accessibility-specs.md` §4.3.
     enum UI {
-        static let screenTitle:  Font = .system(size: 34, weight: .bold)
-        static let listTitle:    Font = .system(size: 17, weight: .semibold)
-        static let listSubtitle: Font = .system(size: 15, weight: .regular)
-        static let button:       Font = .system(size: 17, weight: .semibold)
-        static let caption:      Font = .system(size: 13, weight: .regular)
-        static let input:        Font = .system(size: 17, weight: .regular)
+        static let screenTitle:  Font = .system(.largeTitle).weight(.bold)
+        static let listTitle:    Font = .system(.headline)
+        static let listSubtitle: Font = .system(.subheadline)
+        static let button:       Font = .system(.headline)
+        static let caption:      Font = .system(.caption)
+        static let input:        Font = .system(.body)
     }
 
     struct Reading {

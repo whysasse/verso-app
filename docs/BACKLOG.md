@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**42 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**41 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-309, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — Fabio away from his Mac/device (starting 2026-09-05)
 
@@ -47,7 +47,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   8. ~~**FAB-311**~~ — **done**, see [DONE.md](DONE.md): ✕ removed (drag handle + swipe-to-dismiss already sufficient), font-size buttons got real bordered 44×44 containers, line-spacing icons replaced with a labelled Compact/Normal/Relaxed/Airy control (pre-existing, unused copy strings), and both the reader's and Settings' font-size steppers now step through `BodySize`'s 6 named sizes instead of disagreeing (±1 vs ±2) on what a step is.
   9. ~~**FAB-307**~~ — **done**, see [DONE.md](DONE.md): `.allowsHitTesting(isVisible)` added to both chrome bars, plus VoiceOver wiring (chrome pinned visible, live `voiceOverStatusDidChangeNotification`, the `hasShownImmersiveHint` flag built and gated).
   10. ~~**FAB-308**~~ — **done**, see [DONE.md](DONE.md): the 4 hardcoded label/hint pairs in `ReadingChrome.swift` now go through `L10n` (the back button reuses an existing, already-translated, previously-unused key that also happens to match the accessibility spec's wording), plus the `SearchBar.placeholder` drive-by.
-  11. **FAB-309** — Dynamic Type. **Split by the amendment above:** the `VersoTypography.UI` token rebuild and the hardcoded-size fixes in the reading view and onboarding stay here, after #8 so the scales compose. The layout audit of chrome components (`SettingsRow`, `ThemeChip`, the list header) moves to FAB-334, which deletes them.
+  11. ~~**FAB-309**~~ — **done**, see [DONE.md](DONE.md): `VersoTypography.UI`'s six tokens rebuilt on real text styles, plus the reading-view hardcodes (`ArticleHeader`, `ReadingTopBar` title, `EmptyState`) routed through them. The layout audit of chrome components (`SettingsRow`, `ThemeChip`, the list header, reader sheet detents) moves to FAB-334 as already decided in the amendment above, which deletes those components.
   12. **FAB-333** — reading measure collapse w/ OpenDyslexic & max size; stacks on top of #11
   13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
   14. *(pulled out of FAB-322)* **"Add Article: no escape while saving"** — a hung parse currently traps the user with no cancel; real stuck-state bug despite the rest of FAB-322 being Low/Backlog
@@ -128,7 +128,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   * Give OpenDyslexic its own size mapping — its 18pt is visually much larger than Georgia's, so the `BodySize` scale (FAB-311) should be per-family, not absolute.
   * Ship the margins control the spec called for.
 
-  **Note this is the in-app size scale, not system Dynamic Type** — FAB-309 is still untested and will stack on top of this.
+  **Note this is the in-app size scale, not system Dynamic Type** — FAB-309 (system Dynamic Type) is done, but that fix left this in-app scale untouched, and its collapse still stacks on top of it.
 
 ### Bugs — found during FAB-311 PR review (Fabio, 2026-09-05)
 
@@ -140,51 +140,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
-
-- [ ] 🔴 **FAB-309** · The app does not support Dynamic Type at all  `Todo` `Urgent`
-  ## Symptom
-
-  Confirmed 2026-09-03 by screenshots at a large accessibility text size, against a default-size control in the same theme.
-
-  **Nothing built from `VersoTypography` responds to the user's system text size.** Comparing Settings at default vs. large: "GENERAL", "Language", "Automatic", "English", "Français (Canada)", "Português (Brasil)", "READING", "Font" — all pixel-identical. The whole article list is identical too: same titles, same wrapping, same source lines, while the system overflow menu rendered on top of it is three times bigger.
-
-  The **only** things that scale are the font-picker rows, and they scale badly: "OpenDyslexic" wraps mid-word to "OpenDysle / xic" and blows out of its row, and the Georgia and New York previews truncate to "The quick brown…".
-
-  ## Cause — and a correction
-
-  An earlier pass of [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md) §3.5 asserted that *"SwiftUI's `Font.system(size:)` **does** scale with Dynamic Type, so this is not 'Dynamic Type is broken'"*, and scoped this issue as a truncation audit. **That was wrong.** `Font.system(size:)` is a fixed-size font and does not scale; `Font.system(.body)` and the other text styles do. `Font.custom(_:size:)`, by contrast, *does* scale relative to body by default since iOS 14.
-
-  That single distinction explains everything in the screenshots. Every token in `VersoTypography.UI` is a literal `.system(size:)` — `screenTitle` 34, `listTitle` 17, `listSubtitle` 15, `button` 17, `caption` 13, `input` 17 — so every screen built from them is frozen. The font-picker rows are the sole exception because they use `.custom(name, size:)`, which scales.
-
-  **`SettingsRow.fontRow` contains its own control group, which makes this trivial to verify:**
-
-  ```swift
-  .font(name.isEmpty ? .system(size: 17, weight: .semibold) : .custom(name, size: 17).weight(.semibold))
-  ```
-
-  Georgia, New York and OpenDyslexic take the `.custom` branch; the "System" row takes `.system(size:)`. At a large text size, screenshot that list scrolled to show all four — the first three should be huge and "System" should stay small. That is the whole bug in one image.
-
-  ## Why this is Urgent
-
-  [accessibility-specs.md](accessibility-specs.md) §4.1 calls Dynamic Type *"mandatory, not optional"* and §4.3 says *"Use `UIFont.preferredFont(forTextStyle:)` — never hard-coded point sizes,"* with a per-element mapping table that was never implemented. This is a reading app: readers who enlarge system text are close to its core audience, and right now the app ignores that setting everywhere except one screen where it breaks the layout.
-
-  ## Fix
-
-  1. Rebuild `VersoTypography.UI` on text styles, per the spec's §4.3 table: `screenTitle` → `.largeTitle`, `listTitle` → `.headline`, `listSubtitle` → `.subheadline`, `button` → `.headline`, `caption` → `.caption`, `input` → `.body`. Where a specific size is genuinely needed, use `.custom(_:size:relativeTo:)` or `@ScaledMetric` rather than a bare literal.
-  2. Fix the places that also hardcode sizes outside the tokens: `EmptyState` (20/15pt), `ArticleHeader` (15/13pt), `ThemeChip` (11pt), `ReadingTopBar` title (17pt), the filter badge (11pt).
-  3. **Then** run the layout audit, which is where the original scope of this issue starts being useful:
-     - [ ] `SettingsRow.fontRow` — name wraps and overflows today; the preview is `.lineLimit(1)`
-     - [ ] `SettingsRow.folderRow` — label and path share one line, path capped at one line, no layout priority
-     - [ ] `ThemeChip` — fixed `frame(width: 80, height: 100)` around a label that will now grow
-     - [ ] Reader control sheets — fixed detents `.height(218)` / `.height(168)`
-     - [ ] `ArticleCard` — title `.lineLimit(2)`, source `.lineLimit(1)`
-     - [ ] `ReadingTopBar` title, `FilterPanel` tag rows — `.lineLimit(1)`
-     - [ ] The four-icon list header at `HStack(spacing: 2)` next to a scaling 34pt title
-  4. Fixed-size decorations need `@ScaledMetric` too. The 8pt selection dots in `SettingsRow` stay 8pt while their labels triple (see FAB-329) — at large text they are almost invisible, for exactly the users who most need to see them.
-
-  ## Related
-
-  FAB-333 (the reading measure collapses at large in-app sizes) stacks on top of this once UI text starts scaling. FAB-311's `BodySize` work should land first so the two scales compose predictably.
 
 - [ ] 🟠 **FAB-310** · Touch targets below 44×44, against our own spec  `Todo` `High`
   ## Scope
@@ -352,7 +307,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   | Onboarding | `ThemePreviewCard` | 120pt card with fake text lines | 13pt | current theme (fixed by FAB-306) |
   | Settings | `ThemeChip` | 32pt flat rectangle, fixed 80×100 | 11pt | current theme |
 
-  **The Settings chip row does not overflow — earlier concern withdrawn.** 4 × 80pt + 32pt padding = 352pt, which fits the 375pt iPhone SE with ~23pt to spare. Earlier drafts worried about a 320pt device; that was the SE 1st gen, which is no longer supported. The fixed `frame(width: 80, height: 100)` remains a problem for **Dynamic Type** (FAB-309), not for screen width.
+  **The Settings chip row does not overflow — earlier concern withdrawn.** 4 × 80pt + 32pt padding = 352pt, which fits the 375pt iPhone SE with ~23pt to spare. Earlier drafts worried about a 320pt device; that was the SE 1st gen, which is no longer supported. The fixed `frame(width: 80, height: 100)` remains a problem for **Dynamic Type** (its layout-audit fix moved to FAB-334, since `ThemeChip` is one of the components that epic deletes), not for screen width.
   | Reading controls | `ThemeChipView` | 32pt flat rectangle, no fixed frame | 11pt | current theme |
 
   Swatch hex values are copy-pasted literals in two of them rather than read from `ThemeColors.colors(for:)`.
@@ -451,7 +406,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   * **Selection is an 8pt dot.** `fontRow` and `languageRow` mark the selected item with `Circle().frame(width: 8, height: 8)` at the far trailing edge of a 78pt row. `defaultRow`'s passive disclosure chevron is 14pt semibold — **the inert affordance is drawn more strongly than the active selection.** `FilterPanel.tagRow` already uses an accent checkmark, in this same app. Use it.
 
-    Confirmed far worse at large text (2026-09-03): the dot is a fixed `frame(width: 8, height: 8)`, so when the row label triples in size the dot stays 8pt and becomes almost invisible — the selection indicator degrades precisely for the users who need it most. A checkmark built from a scaling text style fixes this for free; otherwise it needs `@ScaledMetric`. See FAB-309.
+    Confirmed far worse at large text (2026-09-03): the dot is a fixed `frame(width: 8, height: 8)`, so when the row label triples in size the dot stays 8pt and becomes almost invisible — the selection indicator degrades precisely for the users who need it most. A checkmark built from a scaling text style fixes this for free; otherwise it needs `@ScaledMetric`. This was FAB-309's layout-audit item 4, moved to FAB-334 along with the rest of `SettingsRow`'s audit.
   * **Two heading levels, one visual style.** `sectionHeader` ("READING") and `sectionLabel` ("Font", "Theme") are both 13pt `textSecondary`, distinguished only by capitalisation — two levels of a real nesting hierarchy in one style. Confirmed in Ink 2026-09-03.
   * **Evidence for FAB-325's divider point.** In Ink, `border` is `#1E2228` on `#181C22` — 1.16:1, which would be invisible. The Settings dividers are clearly visible, which is itself the proof that `Divider().background(colors.border)` never reaches the divider and the lines are the system separator.
   * **The folder row shows `lastPathComponent` alone**, so "Articles folder · Verso" parses as a settings *value* rather than a folder name. A folder glyph or the parent directory would disambiguate.
@@ -535,7 +490,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Each phase should build, run and be shippable on its own — no long-lived branch.
 
-  1. **Foundations.** Decide and raise the deployment target. Rebuild `VersoTypography.UI` on text styles (the FAB-309 half above). No visual redesign yet.
+  1. **Foundations.** Decide and raise the deployment target. `VersoTypography.UI` is already rebuilt on text styles — that part of FAB-309 shipped in 1.0, so this phase starts from there rather than doing it. No visual redesign yet.
   2. **Settings.** The lowest-risk screen and the biggest immediate win: hand-built `ScrollView` → `Form` with inset-grouped sections. Absorbs most of FAB-329, FAB-325's dividers, part of FAB-310.
   3. **Navigation shell.** Remove `.toolbar(.hidden, for: .navigationBar)`, retire `VersoNavigationBar` and the custom `headerRow`, adopt real navigation bars and toolbars. Absorbs FAB-326. Highest-risk phase — this is the code FAB-304's cause 1 lived in, and `VersoMainSplitView`'s selection-driven collapse is load-bearing.
   4. **Search and filters.** `.searchable` with the iOS 26 bottom field; rehome the filter panel. Absorbs FAB-319.

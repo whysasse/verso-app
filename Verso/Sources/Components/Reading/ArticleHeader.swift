@@ -41,10 +41,10 @@ struct ArticleHeader: View {
                 if hasAttributionLine {
                     if !authorTrimmed.isEmpty {
                         Text(L10n.Reading.headerByline(author: authorTrimmed))
-                            .font(.system(size: 15))
+                            .font(VersoTypography.UI.listSubtitle)
                     } else {
                         Text(publicationTrimmed)
-                            .font(.system(size: 15))
+                            .font(VersoTypography.UI.listSubtitle)
                     }
                 }
 
@@ -52,12 +52,12 @@ struct ArticleHeader: View {
                     Text(formattedDate)
                     if let readTime {
                         Text("·")
-                            .font(.system(size: 13))
+                            .font(VersoTypography.UI.caption)
                         Text(L10n.ArticleCard.estimatedReadTime(count: readTime))
-                            .font(.system(size: 13))
+                            .font(VersoTypography.UI.caption)
                     }
                 }
-                .font(.system(size: 13))
+                .font(VersoTypography.UI.caption)
             }
             .foregroundColor(colors.textSecondary)
         }
