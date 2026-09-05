@@ -152,14 +152,6 @@ enum L10n {
         }
     }
     enum ArticleCard {
-        /// "Double tap to open" -- VoiceOver row hint
-        static var accessibilityHint: String {
-            String(localized: "articleCard.accessibilityHint", defaultValue: "Double tap to open", comment: "VoiceOver row hint")
-        }
-        /// "{title}, {source}, {estimated read time}" -- Dynamic — template only, no literal text to translate
-        static func accessibilityLabel(title: String, source: String, estimatedReadTime: String) -> String {
-            String(localized: "articleCard.accessibilityLabel", defaultValue: "\(title), \(source), \(estimatedReadTime)", comment: "Dynamic — template only, no literal text to translate")
-        }
         /// "{N} min read" -- ⚠️ plural: '1 min read' / '{N} min read'. `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: 'min' is already an invariant abbreviation in both languages, no plural variant needed.
         static func estimatedReadTime(count: Int) -> String {
             String(localized: "articleCard.estimatedReadTime", defaultValue: "\(count) min read", comment: "⚠️ plural: '1 min read' / '{N} min read'. `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: 'min' is already an invariant abbreviation in both languages, no plural variant needed.")

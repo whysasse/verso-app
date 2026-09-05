@@ -1681,54 +1681,6 @@
         }
       }
     },
-    "articleCard.accessibilityLabel": {
-      "extractionState": "manual",
-      "comment": "Dynamic — template only, no literal text to translate",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@, %@, %@"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "%@, %@, %@"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "%@, %@, %@"
-          }
-        }
-      }
-    },
-    "articleCard.accessibilityHint": {
-      "extractionState": "manual",
-      "comment": "VoiceOver row hint",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Double tap to open"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Appuie deux fois pour ouvrir"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Toque duas vezes para abrir"
-          }
-        }
-      }
-    },
     "articleCard.estimatedReadTime": {
       "extractionState": "manual",
       "comment": "⚠️ plural: \"1 min read\" / \"{N} min read\". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: \"min\" is already an invariant abbreviation in both languages, no plural variant needed.",

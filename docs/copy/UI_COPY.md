@@ -160,9 +160,9 @@ QuickTourView now implements the 3-step carousel (FAB-281). The interim illustra
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `articleCard.accessibilityLabel` | VoiceOver row label | {title}, {source}, {estimated read time} | {title}, {source}, {estimated read time} | {title}, {source}, {estimated read time} | Dynamic — template only, no literal text to translate |
-| `articleCard.accessibilityHint` | VoiceOver row hint | Double tap to open | Appuie deux fois pour ouvrir | Toque duas vezes para abrir | — |
 | `articleCard.estimatedReadTime` | Read time label | {N} min read | {N} min de lecture | {N} min de leitura | ⚠️ plural: "1 min read" / "{N} min read". `{N}` = ⌈wordCount ÷ WPM⌉. Use a single documented constant **WPM = 220** for MVP. Word count is derived from the **article's** content language, not the UI language. fr-CA/pt-BR: "min" is already an invariant abbreviation in both languages, no plural variant needed. |
+
+VoiceOver row label/hint for this card live in §9 (`a11y.articleRow.label` / `a11y.articleRow.hint`) — FAB-321 (2026-09-05) removed the duplicate `articleCard.accessibilityLabel`/`articleCard.accessibilityHint` pair that had sat here unused, with a fr-CA wording mismatch between the two ("Appuie deux fois..." here vs. "Touche deux fois..." in §9). Kept §9's, matching its sibling hints (filterChip/themeChip).
 
 ### Status Badges
 
