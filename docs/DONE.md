@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**197 completed issues.**
+**198 completed issues.**
 
 ## iOS
 
@@ -561,6 +561,53 @@
   Reduce Motion gives an instant non-animated jump, and — the actual point of this
   pass — the before/after screenshot check that resolves the original
   contradiction. All Fabio's part.
+
+### Design critique — reading view smaller polish (FAB-318)
+
+- [x] 🔵 **FAB-318** · Reading view smaller polish  `Done` `Low`
+  Critique §6.10, §6.11, §6.12, §6.6. Closed 2026-09-05 as a triage — of its 5
+  bullets, 2 needed a fix here:
+
+  * **The two chrome rows didn't share an alignment logic — fixed.**
+    `TTSControlsRow` put its three transport buttons hard-left and "1×" hard-right
+    with a dead gap between, while the main bar below centers its progress
+    indicator between edge-anchored icons. Restructured to the same technique: a
+    leading `Spacer()` reserved at the trailing speed button's own width (54pt)
+    balances that button, so the two flexible `Spacer()`s on either side of the
+    transport trio now center it in the bar. Also unified the transport icons to
+    `readingChromeIconSize` (20pt, the same constant the main bar already used) —
+    they were 16-18pt, which the critique called out as reading "slightly off"
+    rather than deliberately lighter.
+  * **The hint pill sits on top of the article text — fixed.** Theming was
+    already done by FAB-325; the positioning and "make it a real control" halves
+    were still open. Moved from `.padding(.bottom, 80)` (floated mid-screen over
+    whatever body text happened to be there) to `.padding(.bottom, safeAreaBottom
+    + VersoSpacing.lg)` — the pill only ever shows on first entering immersive
+    mode, exactly when the bottom bar's own frame has collapsed to 0, so anchoring
+    it near the true bottom safe area keeps it clear of the reading column
+    regardless of scroll position. Replaced the bare `Text` + `.onTapGesture`
+    with a real `Button` (gets a correct accessibility label for free from the
+    visible Text) and grew the tappable area to the 44pt minimum via
+    `.frame(minHeight: 44)` + `.contentShape(Rectangle())`, without changing the
+    pill's own small visual size.
+  * **System menus break the theme** — already struck through, checked
+    2026-09-03, no action needed.
+  * **`ArticleHeader` hardcodes 15pt/13pt** — found already fixed: current code
+    uses `VersoTypography.UI.listSubtitle`/`.caption` directly, evidently landed
+    as part of FAB-309's typography token rebuild without being called out by
+    name.
+  * **Reading bar dropped the margins control** — the bullet itself said "see
+    FAB-333"; still open there, not this ticket's to fix. Fixed a stale
+    cross-reference in FAB-333's own entry that pointed back to FAB-318 for this
+    exact gap.
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves it compiles. Both fixes are
+  layout/interaction changes with no complex new logic, but need eyes on a
+  device to confirm the transport row actually reads as centered (not just
+  numerically balanced) and that the pill lands somewhere sensible across all
+  four themes and both Dynamic Type extremes — Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
