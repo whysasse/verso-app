@@ -172,15 +172,15 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   | Pair | Where | Ratio | Required |
   |---|---|---|---|
-  | white glyph on `reading` badge `#D4A353` | Article card | **2.29:1** | 3:1 |
-  | white glyph on `read` badge `#5AAF7A` | Article card | **2.68:1** | 3:1 |
-  | white glyph on `unread` badge `#4A90D9` | Article card | 3.34:1 | 3:1 (barely) |
+  | ~~white glyph on `reading` badge `#D4A353`~~ | Article card | ~~**2.29:1**~~ **3.01:1+, fixed FAB-325** | 3:1 |
+  | ~~white glyph on `read` badge `#5AAF7A`~~ | Article card | ~~**2.68:1**~~ **4.50:1+, fixed FAB-325** | 3:1 |
+  | ~~white glyph on `unread` badge `#4A90D9`~~ | Article card | ~~3.34:1~~ **4.53:1, fixed FAB-325** | 3:1 (barely) |
   | `placeholder` on `surface` | Search clear button | **1.12–1.55:1** | 3:1 |
-  | `border` on `background` | Field outlines, progress track | **1.16–1.33:1** | 3:1 where it bounds a control |
+  | `border` on `background` | Field outlines, progress track | **1.16–1.33:1** | 3:1 where it bounds a control — still open, tracked as FAB-325's follow-up (48 call sites, split out for its own review) |
   | `warning` on `background` (Paper / Sepia) | Semantic | **4.43 / 4.13:1** | 4.5:1 |
   | `error` on `surface` (Paper / Sepia) | Field error text, 13pt | **4.46 / 4.07:1** | 4.5:1 |
   | `accentPressed` on `background` (Ink) | Pressed states | **4.04:1** | 4.5:1 as text |
-  | white on swipe tints `#5AAF7A` / `#4A90D9` | List swipe actions | **2.68 / 3.34:1** | 4.5:1 |
+  | ~~white on swipe tints `#5AAF7A` / `#4A90D9`~~ | List swipe actions | ~~**2.68 / 3.34:1**~~ **4.5:1+, fixed FAB-325** | 4.5:1 |
 
   Also worth recording: `textSecondary` passes with roughly 2% headroom (4.52–4.58:1 on `surface`). Not a bug — a fragility, since any nudge to a surface value breaks it silently.
 
@@ -307,36 +307,42 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   One `ThemeSwatch` component, size as a parameter, colours always from `ThemeColors.colors(for:)`. Adopt the **onboarding** treatment — a miniature page with `textPrimary`/`textSecondary` bars — because what distinguishes these themes is the text-on-background relationship, not the background colour, and it is the only one of the three where all four are instantly distinguishable. Raise the label from 11pt to `VersoTypography.UI.caption`.
 
-- [ ] 🟡 **FAB-325** · Hardcoded colours that escape the theme system  `Backlog` `Medium`
+- [ ] 🟡 **FAB-325** · Hardcoded colours that escape the theme system  `In Progress` `Medium`
   ## Scope
 
   Critique §3.9, §3.12.
 
   | Value | Where | Problem |
   |---|---|---|
-  | `Color(hex: "766655")` | Archive/unarchive swipe tint | Paper's accent, used in **all four themes** — swipe in Night and you get a brown Paper button |
-  | `Color(hex: "4A90D9")` / `"5AAF7A"` | Mark read/unread swipe tint | Same, plus white labels at 3.34 / 2.68:1 |
-  | `Color.black.opacity(0.7)` + `.white` | `ImmersiveHintPill` | Theme-agnostic; a black pill on cream is a foreign object in Paper |
-  | `Color.black.opacity(0.35)` | Filter-panel scrim | Nearly invisible over Night/Ink backgrounds |
-  | `.red.opacity(0.8)` | `AddArticleView:210` | Should be `semanticColors.error` |
-  | duplicated theme hexes | `ThemeChip`, `ThemeChipView` | See FAB-324 |
+  | ~~`Color(hex: "766655")`~~ | ~~Archive/unarchive swipe tint~~ | **Done 2026-09-05** — see `ArticleStatusColors` below |
+  | ~~`Color(hex: "4A90D9")` / `"5AAF7A"`~~ | ~~Mark read/unread swipe tint~~ | **Done 2026-09-05** — same |
+  | ~~`Color.black.opacity(0.7)` + `.white`~~ | ~~`ImmersiveHintPill`~~ | **Done 2026-09-05** — now `colors.textPrimary`/`colors.background`, inverted |
+  | ~~`Color.black.opacity(0.35)`~~ | ~~Filter-panel scrim~~ | **Done 2026-09-05** — deepens to 0.55 for dark themes |
+  | ~~`.red.opacity(0.8)`~~ | ~~`AddArticleView`~~ | **Done 2026-09-05** — now `semanticColors.error` |
+  | duplicated theme hexes | `ThemeChip`, `ThemeChipView` | Still open — see FAB-324 |
 
-  **Confirmed in both dark themes 2026-09-03.** In **Night** the amber status badges and the brown Archive tint actually sit reasonably — Night is a warm palette, and the badge colours were evidently chosen against something like it — but the green Mark Read circle is the only cool colour on the screen and reads as foreign. In **Ink** (cool palette) it inverts: the brown Archive and amber badges clash, the green less so. That is the real argument for making these theme-aware rather than picking better fixed values: no single set works across a warm and a cool dark theme.
+  **Still open — border contrast + divider correctness**, split into its own follow-up
+  rather than bundled with the above: `border` is used in 48 places across 16 files
+  (field outlines, disabled-button strokes, progress tracks, dividers, onboarding dots),
+  so raising it toward 3:1 is a far larger visual change than anything else in this
+  issue and deserves to be judged on its own. `SettingsView`/`AboutView`/
+  `AcknowledgementsView` use `Divider().background(colors.border)` ~19 times total —
+  `Divider()` draws a hairline in the *system separator colour* and fills its own 1pt
+  frame, so `.background()` is painted behind it and covered; the token never reaches
+  the divider. They currently look fine (better than `border`'s 1.16–1.33:1 would
+  predict, which is itself the evidence) only because they're accidentally not using
+  `border` at all — this is a correctness bug, not a visual one, and "fixing" it before
+  raising `border` would make every divider nearly invisible. `ReadingChrome` already
+  has the right pattern: `Rectangle().frame(height: 1).foregroundColor(colors.border)`.
 
-  **Both swipe tints confirmed visually 2026-09-03 in Ink:** the trailing Archive action is a **warm brown** circle (`#766655`, Paper's accent) and the leading Mark Read action a **warm green** one (`#5AAF7A`), both floating against Ink's cool near-black. They are unmistakably from another theme. The white glyph inside the green one is also visibly soft, matching its computed 2.68:1.
+  ## Decision — theme-aware (Fabio, 2026-09-05) — implemented
 
-  **Also:** `SettingsView` uses `Divider().background(colors.border)` ~10 times. `Divider()` draws a hairline in the *system separator colour* and fills its own 1pt frame, so `.background()` is painted behind it and covered — the token never reaches the divider. The dividers currently look fine (better than `border`'s 1.25:1 would predict, which is itself the evidence), so this is a correctness problem, not a visual one: they will not shift with the theme. `ReadingChrome` already has the right pattern — `Rectangle().frame(height: 1).foregroundColor(colors.border)`. Note that "fixing" the dividers to actually use `border` will make them nearly invisible, so raise `border` toward 3:1 first.
-
-  ## Decision — theme-aware (Fabio, 2026-09-05)
-
-  `ArticleStatus.color`'s four badge hues were fixed across all themes — an iOS-system blue inside a warm paper palette. Are they meant to be theme-independent (like `VersoHighlightColor`), or should they take the theme? **Resolved: theme-aware**, for reasons that also settle the swipe tints in the same table above:
-
-  * **`VersoHighlightColor`'s theme-independence argument doesn't transfer.** That color is a content-level mark — a highlighter pen laid over article text, deliberately separate from "the theme" the way a real highlighter is separate from the color of the page underneath. `ArticleStatus.color` is chrome: it renders as a badge sitting *on* themed surfaces (`ArticleCard` on `colors.surface`), which is a different relationship — closer to `accent` or `SemanticColors` than to a content overlay.
-  * **`SemanticColors` is the actual precedent, and it's already theme-aware.** `error`/`warning`/`success` already use different hex values in Night/Ink vs. Paper/Sepia — brighter, lighter variants for the exact reason a fixed dark-mode-unaware hue fails contrast against a near-black background. Status badges are the same category of semantic-state color; leaving them as the one fixed exception was the actual inconsistency, not a considered choice.
-  * **Confirmed, concrete clash:** in Night (warm palette) the amber/brown badges sit fine but the green Mark Read circle reads as foreign; in Ink (cool palette) it inverts — brown Archive and amber badges clash, green fits. No single fixed set works across both a warm and a cool dark theme.
-  * **The contrast failures (FAB-314) need new values regardless of this decision** — white-on-`reading` is 2.29:1, white-on-`read` is 2.68:1, both below the 3:1 floor, in the *current* fixed set. Going theme-aware isn't extra work stacked on top of a fix; computing new per-theme values *is* the fix, done once instead of twice.
-  * **Implementation note for whoever picks this up:** keep each status's hue *family* stable across themes (blue reads as unread, amber as reading, green as read, gray as archived) so recognition carries over when switching themes — only saturation/lightness should shift per theme, the same pattern `accent` already uses. The swipe-action tints (this table's first two rows) should read from the same per-theme lookup rather than staying separate hardcoded hex values, closing that part of the table in the same pass.
-  * Document the resolved rationale in `Colors.swift` next to wherever the theme-aware values land, the way `VersoHighlightColor`'s doc comment models it — this section can then be trimmed to a one-line pointer once that lands.
+  `ArticleStatus.color`'s four badge hues were fixed across all themes. Resolved
+  theme-aware; full reasoning now lives as `ArticleStatusColors`'s doc comment in
+  `Colors.swift` (computed contrast ratios, the two targeted hue nudges for the
+  confirmed Night/Ink clashes, and why the swipe tints reuse these values instead of
+  `colors.accent`). The contrast failures FAB-314 found (white-on-`reading` 2.29:1,
+  white-on-`read` 2.68:1) are fixed as part of the same change.
 
 - [ ] 🟡 **FAB-326** · Five different ways to close or go back  `Backlog` `Medium`
   ## Scope

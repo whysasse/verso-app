@@ -131,7 +131,10 @@ struct ArticleListView: View {
             .overlay {
                 if showFilterPanel {
                     ZStack(alignment: .trailing) {
-                        Color.black.opacity(0.35)
+                        // FAB-325: a flat 0.35 barely darkens an already-near-black Night/Ink
+                        // background -- deepen the scrim itself for dark themes rather than
+                        // changing its color (a dimming scrim is conventionally black either way).
+                        Color.black.opacity(themeManager.currentTheme.isDark ? 0.55 : 0.35)
                             .ignoresSafeArea()
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -705,7 +708,11 @@ private struct ArticleListFetchedBody: View {
                     } label: {
                         Label(L10n.Swipe.unarchive, systemImage: "tray.and.arrow.up")
                     }
-                    .tint(Color(hex: "766655"))
+                    // FAB-325: theme-aware, reusing the `archived` status color rather than
+                    // `colors.accent` -- accent is deliberately bright in Night/Ink for a
+                    // *different* foreground pairing (FAB-305), which this swipe label's
+                    // system-fixed white text can't use.
+                    .tint(ArticleStatusColors.colors(for: themeManager.currentTheme).archived)
                     .accessibilityLabel(L10n.A11y.unarchiveAction)
                 } else {
                     Button {
@@ -713,7 +720,7 @@ private struct ArticleListFetchedBody: View {
                     } label: {
                         Label(L10n.Swipe.archive, systemImage: "archivebox")
                     }
-                    .tint(Color(hex: "766655"))
+                    .tint(ArticleStatusColors.colors(for: themeManager.currentTheme).archived)
                     .accessibilityLabel(L10n.A11y.archiveAction)
                 }
             }
@@ -727,7 +734,11 @@ private struct ArticleListFetchedBody: View {
                         systemImage: isRead ? "circle" : "checkmark.circle"
                     )
                 }
-                .tint(isRead ? Color(hex: "4A90D9") : Color(hex: "5AAF7A"))
+                .tint(
+                    isRead
+                        ? ArticleStatusColors.colors(for: themeManager.currentTheme).unread
+                        : ArticleStatusColors.colors(for: themeManager.currentTheme).read
+                )
             }
         }
     }

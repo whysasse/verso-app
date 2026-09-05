@@ -216,7 +216,7 @@ struct AddArticleView: View {
             Spacer()
             Image(systemName: "xmark.circle.fill")
                 .font(.system(size: 56))
-                .foregroundColor(.red.opacity(0.8))
+                .foregroundColor(themeManager.semanticColors.error)
             Text(L10n.AddArticle.failureHeadline)
                 .font(VersoTypography.UI.listTitle)
                 .foregroundColor(themeManager.colors.textPrimary)
