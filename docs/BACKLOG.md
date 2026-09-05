@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**44 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**43 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
@@ -39,7 +39,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   4. ~~**FAB-331**~~ — **done**, see [DONE.md](DONE.md): took the filter default (`scrollPosition > 0`), not the promote-to-`.reading` floor — lower risk, no data-model change. Revisit the floor post-launch if the filter proves insufficient.
   5. ~~**FAB-305**~~ — **done**, see [DONE.md](DONE.md): white-on-accent contrast fixed (`VersoButtonStyle.primary`, the `+` add-article glyph, the filter badge), plus the real `VersoButtonStyle` disabled variant FAB-328 later depends on.
   6. ~~**FAB-306**~~ — **done**, see [DONE.md](DONE.md): onboarding theme-picker label contrast fixed (`ThemePreviewCard` now uses the active theme's colours for the label, same pattern as `ThemeSelector`'s `ThemeChip`).
-  7. **FAB-312** — bundle OpenDyslexic-Bold + fix weight fallback; self-contained
+  7. ~~**FAB-312**~~ — **done**, see [DONE.md](DONE.md): bundled `OpenDyslexic-Bold.ttf` from the same upstream project as the existing Regular face, so `.custom(fontFamily,size:).weight(.bold)` now resolves to a real bold face instead of falling back to system.
   8. **FAB-311** — rebuild reader's font/spacing sheet, reconnect `BodySize`; must land before #11
   9. ~~**FAB-307**~~ — **done**, see [DONE.md](DONE.md): `.allowsHitTesting(isVisible)` added to both chrome bars, plus VoiceOver wiring (chrome pinned visible, live `voiceOverStatusDidChangeNotification`, the `hasShownImmersiveHint` flag built and gated).
   10. **FAB-308** — localize the 7 hardcoded reading-chrome strings (same files again, do while open)
@@ -210,19 +210,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   * **The font-size control doesn't look like a control.** It renders as `Font size … A 18 A` — no `+`/`−`, no borders, no background. The two A's read as size *labels* flanking a value. Give each a filled, bordered 44×44 container (Apple's own reader does exactly this), which also closes the touch-target half of §3.4.
   * **Line-spacing uses text-alignment icons.** `["text.alignleft", "text.justify", "text.justify.leading", "text.justify.trailing"]` — four *alignment* symbols standing in for four *line-height* levels, with no labels and no VoiceOver strings. Anyone would read that row as an alignment picker, and the last two are visually near-identical at 18pt. Use symbols that encode vertical rhythm, or drop icons for a labelled segmented control.
   * **The named size scale is dead code.** [accessibility-specs.md](accessibility-specs.md) §4.2 defines XS 14 / S 16 / M 18 / L 20 / XL 22 / XXL 26 with per-step line heights, and `Typography.Reading.BodySize` implements it — but the reader steps ±1 (13 steps, shows a raw `18`) and Settings steps ±2 (7 steps). Two controls disagreeing on what a step is, for one stored value, both exposing the point size instead of the designed scale, and `lineHeightMultiplier` never runs. Reconnect both to `BodySize`.
-
-- [ ] 🟠 **FAB-312** · Bundle OpenDyslexic-Bold  `Todo` `High`
-  ## Scope
-
-  Critique §7.3. Only `OpenDyslexic-Regular.ttf` is bundled (`Resources/Fonts/`, `project.yml`, `Info.plist`). [accessibility-specs.md](accessibility-specs.md) §4.5 maps Semibold/Bold to `OpenDyslexic-Bold`, and SwiftUI does not synthesise bold for custom fonts — so **every heading in every article read in OpenDyslexic renders at body weight**. Confirmed visually: in the Settings font list, "Georgia" is a heavy bold serif while "OpenDyslexic" is regular. A dyslexic reader gets an article with no visible heading hierarchy, which is the opposite of what the feature is for.
-
-  ## Confirmed visually 2026-09-03, and worse than recorded
-
-  Reading an article with OpenDyslexic selected: **the body renders in OpenDyslexic but the article H1 renders in the system font, bold.** `ArticleHeader` asks for `VersoTypography.Reading(fontFamily:).h1`, i.e. `.custom("OpenDyslexic-Regular", size: 28).weight(.bold)`, and the missing bold face makes it fall back entirely. So the one font in the app that exists for accessibility is the one whose headings don't use it. The Settings list shows the same thing more quietly — "Georgia" is heavy bold, "OpenDyslexic" is regular weight, side by side in one screenshot.
-
-  Also here: the preview row truncates at default text size because `fontRow` uses `.lineLimit(1)` and OpenDyslexic is much wider. Drop the limit or shorten the pangram. And see **FAB-333** — OpenDyslexic's width also collapses the reading measure.
-
-  **Not a bug:** the font loads correctly. An earlier source-only pass predicted it was falling back to the system font because `SettingsView` requests `"OpenDyslexic-Regular"` while `DesignSystemPreview` requests `"OpenDyslexic"`. It renders fine; only the DEBUG preview's string is worth reconciling.
 
 - [ ] 🟠 **FAB-313** · The analytics toggle has no VoiceOver label  `Todo` `High`
   ## Scope

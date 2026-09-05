@@ -83,7 +83,6 @@ struct SettingsRow: View {
                 Text(preview)
                     .font(name.isEmpty ? .system(size: 15) : .custom(name, size: 15))
                     .foregroundColor(colors.textSecondary)
-                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 

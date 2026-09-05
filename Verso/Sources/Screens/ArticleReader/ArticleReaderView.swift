@@ -104,7 +104,8 @@ struct ArticleReaderView: View {
                             author: article.readerDisplayAuthor,
                             publicationFallback: article.readerPublicationFallback,
                             date: article.dateAdded,
-                            readTime: estimatedReadTime(for: parsedContent)
+                            readTime: estimatedReadTime(for: parsedContent),
+                            fontFamily: readingPreferences.fontFamily
                         )
 
                         articleBody

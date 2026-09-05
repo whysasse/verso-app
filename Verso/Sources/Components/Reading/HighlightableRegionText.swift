@@ -365,14 +365,25 @@ extension NSAttributedString.Key {
     static let versoBlockIndex = NSAttributedString.Key("versoBlockIndex")
 }
 
-/// UIKit counterpart to `UIFont.withSymbolicTraits` that falls back to the original font rather
-/// than becoming `nil` when a trait can't be applied (e.g. a custom font family with no bold face).
+/// UIKit counterpart to `UIFont.withSymbolicTraits`. `UIFontDescriptor.withSymbolicTraits`
+/// re-matches against the descriptor it started from -- which pins the exact PostScript name
+/// (e.g. "OpenDyslexic-Regular") -- so it has nothing to search once a new trait contradicts
+/// that name, and returns `nil` for any custom font whose sibling faces were registered as
+/// separate files (confirmed via CoreText: this is exactly why bundling `OpenDyslexic-Bold.ttf`
+/// next to `OpenDyslexic-Regular.ttf`, FAB-312, didn't make body/heading bold text bold). Matching
+/// by *family* name instead finds the sibling face correctly, and resolves identically to the old
+/// approach for the system font (both find the real `.SFNS-Bold`) -- so this is a strict fix, not
+/// a behavior change for the case that already worked. When no matching face exists in the family
+/// (e.g. there's no bundled Italic), CoreText's own best-effort matching degrades to the closest
+/// available face rather than failing outright.
 private extension UIFont {
     func withSymbolicTraits(_ traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
-        guard let descriptor = fontDescriptor.withSymbolicTraits(fontDescriptor.symbolicTraits.union(traits)) else {
-            return self
-        }
-        return UIFont(descriptor: descriptor, size: pointSize)
+        let newTraits = fontDescriptor.symbolicTraits.union(traits)
+        let familyDescriptor = UIFontDescriptor(fontAttributes: [
+            .family: familyName,
+            .traits: [UIFontDescriptor.TraitKey.symbolic: newTraits.rawValue]
+        ])
+        return UIFont(descriptor: familyDescriptor, size: pointSize)
     }
 }
 

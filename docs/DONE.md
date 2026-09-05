@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**187 completed issues.**
+**188 completed issues.**
 
 ## iOS
 
@@ -196,6 +196,21 @@
   ## Verify
 
   `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded, no new warnings in the changed files. Not verified here: the actual repro (tap top-left corner in immersive mode) and real VoiceOver behavior — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
+
+### Design critique 2026-09-01 — bundle OpenDyslexic-Bold (FAB-312)
+
+- [x] 🟠 **FAB-312** · Bundle OpenDyslexic-Bold  `Done` `High`
+  Critique §7.3. Only `OpenDyslexic-Regular.ttf` was bundled, and SwiftUI does not synthesise bold for custom fonts — so `.custom("OpenDyslexic-Regular", size: 28).weight(.bold)` fell back to the system font entirely, meaning every heading in every article read in OpenDyslexic lost its heading hierarchy. Completed 2026-09-04.
+
+  ## Fix
+
+  * Added `Verso/Resources/Fonts/OpenDyslexic-Bold.ttf`, sourced from the same upstream project (`antijingoist/opendyslexic` on GitHub, SIL OFL 1.1 — same license already vendored for the Regular face) as `compiled/OpenDyslexic-Bold.woff2`. Verified with fontTools before bundling: identical `unitsPerEm`/`ascent`/`descent`/`lineGap` and matching per-glyph advance widths against the existing Regular face, so pairing them doesn't introduce a line-height or reflow mismatch between weights; also carries the accented characters fr-CA/pt-BR need.
+  * Registered `Fonts/OpenDyslexic-Bold.ttf` in `UIAppFonts` in both `Verso/project.yml` and `Verso/Resources/Info.plist` (mirroring the existing Regular entry in both). No code change needed for the reading view itself — `Typography.swift`'s `makeFont` already does `.custom(fontFamily, size:).weight(weight)`, which now resolves to a real bold face.
+  * Drive-by, named in the same issue: dropped `SettingsRow.fontRow`'s `.lineLimit(1)` on the pangram preview, which truncated at default text size for OpenDyslexic's wider glyphs. Also reconciled `DesignSystemPreview.swift`'s DEBUG-only preview to request `"OpenDyslexic-Regular"` (matching the real `SettingsView`/`ReadingPreferencesService` family string) instead of `"OpenDyslexic"` — both resolved to the same font either way, but the ticket flagged the mismatch as worth cleaning up.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded; confirmed the built `.app` bundle actually contains `OpenDyslexic-Bold.ttf` and declares it in the compiled `Info.plist`'s `UIAppFonts`. Not verified here: visually confirming headings render bold in OpenDyslexic on a real Simulator/device — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
