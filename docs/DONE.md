@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**190 completed issues.**
+**191 completed issues.**
 
 ## iOS
 
@@ -249,6 +249,21 @@
   ## Verify
 
   `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded, no new warnings in the changed files. Checked `Localizable.xcstrings` against a snapshot taken right after the codegen step — unlike FAB-311's build, this one didn't trigger Xcode's auto-extraction rewrite, so the committed file is exactly `generate.py`'s output. Not verified here: actually hearing the new VoiceOver strings in fr-CA/pt-BR on a real device — that's Fabio's part after the PR.
+
+### Design critique 2026-09-01 — Dynamic Type (FAB-309)
+
+- [x] 🔴 **FAB-309** · The app does not support Dynamic Type at all  `Done` `Urgent`
+  Critique §3.5 (see the correction recorded there). Every `VersoTypography.UI` token was a fixed `Font.system(size:)`, which never scales with the user's system text size — confirmed by screenshots where Settings, the article list, and the reading chrome were pixel-identical at default vs. large accessibility text. Completed 2026-09-05, scoped per Fabio's 2026-09-03 decision on the FAB-334 native-shell epic (see FAB-334): the token rebuild is cheap and survives that epic untouched, so it ships now; the "layout audit" half of the original fix (fixed frames, `lineLimit(1)` truncation, sheet detents — mostly in components FAB-334 deletes outright) moves there instead of being built now and thrown away.
+
+  ## Fix
+
+  * **`VersoTypography.UI`** (`Typography.swift`) rebuilt on real Dynamic Type text styles per `accessibility-specs.md` §4.3: `screenTitle` → `.largeTitle` (bold), `listTitle`/`button` → `.headline`, `listSubtitle` → `.subheadline`, `caption` → `.caption`, `input` → `.body`. All 23 files that consume these constants (Settings, onboarding, the article list, reading chrome) now scale from this one change; at the standard system text size each mapped style's default point size/weight matches what was already there, so nothing visibly moves except in response to the user's text-size setting.
+  * Routed a few bare-literal fonts that live in the reading view — explicitly untouched by the FAB-334 shell — through the same tokens, since their sizes already matched exactly: `ArticleHeader`'s byline/date/read-time lines, `ReadingChrome`'s `ReadingTopBar` title, `EmptyState`'s headline/subheadline (headline has no exact token match, so it's `.title3` weighted semibold rather than a bare literal, per the spec's guidance to use a text-style base instead).
+  * **Deliberately not touched, moved to FAB-334/FAB-324 instead:** `ThemeChip`'s 11pt label and fixed 80×100 frame, the article list's filter-count badge (part of the four-icon header FAB-334 replaces), and the rest of the original issue's layout-audit checklist (`SettingsRow.fontRow`/`.folderRow` overflow, reader control-sheet detents, `ArticleCard`/`FilterPanel` truncation, `@ScaledMetric` on `SettingsRow`'s selection dots) — all in chrome components that epic rebuilds or deletes.
+
+  ## Verify
+
+  This session ran in a Linux container with no Xcode, so `xcodebuild` could not be run locally here — verification is the project's CI (`ci.yml`, macOS runners), watched and fixed if red before merge. Actual on-device Dynamic Type behavior (Settings/list/reading chrome at a large accessibility text size) is Fabio's part after the PR, same as the original screenshot comparison that surfaced this issue.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

@@ -95,7 +95,7 @@ struct ReadingTopBar<MenuContent: View>: View {
             )
 
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .font(VersoTypography.UI.listTitle)
                 .foregroundColor(colors.textPrimary)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
