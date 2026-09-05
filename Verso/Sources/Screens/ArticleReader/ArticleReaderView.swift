@@ -58,6 +58,26 @@ struct ArticleReaderView: View {
         return base + VersoSpacing.xs
     }
 
+    /// FAB-333: the reading column's horizontal padding was a flat 40pt regardless of in-app
+    /// font size, so a fixed-width screen gave back proportionally less room as the user sized
+    /// text up -- the measure collapsed hardest exactly where it mattered most. Holds today's
+    /// 40pt through the default size (`BodySize.md`, 18pt) and below, unchanged, then tapers
+    /// linearly down to `VersoSpacing.md` (16pt) as size approaches the top of the scale
+    /// (`BodySize.xxl`, 26pt) -- reclaiming real width at the sizes where it was scarcest.
+    /// Deliberately size-only, not font-family-aware: OpenDyslexic is visually wider than
+    /// Georgia/New York at the same nominal size, but giving it its own mapping means making
+    /// `BodySize` per-family (a bigger change) rather than guessing an unverified width
+    /// multiplier here. See FAB-333 in docs/DONE.md.
+    private var readingHorizontalPadding: CGFloat {
+        let base: CGFloat = 40
+        let floor: CGFloat = VersoSpacing.md
+        let defaultSize = VersoTypography.Reading.BodySize.md.rawValue   // 18
+        let maxSize = VersoTypography.Reading.BodySize.xxl.rawValue      // 26
+        guard readingPreferences.fontSize > defaultSize else { return base }
+        let t = min(1, (readingPreferences.fontSize - defaultSize) / (maxSize - defaultSize))
+        return base - (base - floor) * t
+    }
+
     /// Visible scroll fraction; short articles fit in less than one viewport so we interpolate from drag distance instead.
     private static func scrollFraction(offset: CGFloat, contentHeight: CGFloat, viewportHeight: CGFloat) -> Double {
         let o = max(0, offset)
@@ -115,7 +135,7 @@ struct ArticleReaderView: View {
                         }
                     }
                     .frame(maxWidth: 680, alignment: .leading)
-                    .padding(.horizontal, 40)
+                    .padding(.horizontal, readingHorizontalPadding)
                     .padding(.top, 44 + safeAreaTop + 24)
                     .padding(.bottom, readingBottomBarContentHeight + safeAreaBottom + 24)
                     // Critical: ScrollView proposes unbounded vertical space; intrinsic height drives backing UIScrollView contentSize.
