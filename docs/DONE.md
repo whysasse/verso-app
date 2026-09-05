@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**188 completed issues.**
+**189 completed issues.**
 
 ## iOS
 
@@ -211,6 +211,23 @@
   ## Verify
 
   `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded; confirmed the built `.app` bundle actually contains `OpenDyslexic-Bold.ttf` and declares it in the compiled `Info.plist`'s `UIAppFonts`. Not verified here: visually confirming headings render bold in OpenDyslexic on a real Simulator/device — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
+
+### Design critique 2026-09-01 — localize reading chrome (FAB-308)
+
+- [x] 🟠 **FAB-308** · Localize the reading chrome's accessibility strings  `Done` `High`
+  Critique §3.6. After FAB-275 and FAB-284, `ReadingChrome.swift` still had 4 hardcoded English label/hint pairs — a French or Portuguese VoiceOver user got an English reading toolbar even though everything else in the file already went through `L10n`. Completed 2026-09-05.
+
+  ## Fix
+
+  * **Top bar back button** ("Back" / "Returns to the article list") now uses `L10n.Reading.backAccessibilityLabel` — an existing, already fully-translated key ("Back to reading list") that was sitting unused. It also happens to match `accessibility-specs.md`'s spec'd wording ("Back to Reading List"), which the old hardcoded "Back" didn't. No hint carried over — no matching hint key existed, and the label alone is already self-descriptive (both params on `VersoToolbarIconButton` are optional, so this is a valid call shape).
+  * **Bottom bar's font/spacing, TTS (both states), and theme buttons** got 7 new keys in `docs/copy/UI_COPY.md`'s "Bottom Bar (Reading Controls)" table (`reading.controls.fontAndSpacing[.hint]`, `.tts.listen`, `.tts.stopListening`, `.tts.hint`, `.readingTheme[.hint]`) — hand-translated fr-CA/pt-BR, flagged `needs_review` per the repo's existing convention.
+  * Found along the way: that same table already had 8 rows (`margins`, `theme`, `markAsRead`, `markAsUnread`, `tts.play`, `tts.pause`, plus their hints) that don't match any string actually in the code — pre-authored for an earlier, unshipped version of this bar (a separate margins control, play/pause TTS phrasing) that FAB-299's ⋯-menu consolidation and FAB-318's margins-never-shipped both superseded. Confirmed unused via grep. Left in place (a real cleanup is out of scope here) but annotated in the table so the next person doesn't mistake them for live.
+  * **Drive-by, named in the same issue:** `SearchBar.placeholder` dropped its hardcoded `"Search titles..."` default. Both real call sites already passed an `L10n` string, so this was dead code today but a landmine for the next caller — now the compiler enforces it.
+  * `python3 docs/copy/codegen/generate.py` regenerated `Localizable.xcstrings`, `L10n.swift`, and the web `messages/*.json` files from the edited `UI_COPY.md`.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild build` (Verso scheme, iOS Simulator destination) succeeded, no new warnings in the changed files. Checked `Localizable.xcstrings` against a snapshot taken right after the codegen step — unlike FAB-311's build, this one didn't trigger Xcode's auto-extraction rewrite, so the committed file is exactly `generate.py`'s output. Not verified here: actually hearing the new VoiceOver strings in fr-CA/pt-BR on a real device — that's Fabio's part after the PR.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

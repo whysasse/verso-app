@@ -207,6 +207,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | App Store Connect listing draft (EN) | `docs/APP_STORE_LISTING.md` |
 | App Store Connect listing draft (fr-CA / pt-BR) | `docs/APP_STORE_LISTING_LOCALIZED.md` |
 | User flows and navigation mechanics | `docs/user-flows.md`, `docs/navigation-patterns.md` |
+| What's shipped but not yet confirmed on a real device (Fabio away from his Mac) | `docs/PENDING_TESTS.md` |
 | Design system philosophy and reading behavior | `docs/DESIGN_SYSTEM_FOUNDATIONS.md` |
 | iCloud/Obsidian file-first decisions | `docs/OBSIDIAN_INTEGRATION.md` |
 | Analytics strategy, event catalog, TelemetryDeck integration | `docs/ANALYTICS_STRATEGY.md` |

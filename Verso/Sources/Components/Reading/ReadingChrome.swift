@@ -91,8 +91,7 @@ struct ReadingTopBar<MenuContent: View>: View {
                 iconPointSize: readingChromeIconSize,
                 labelWidth: 44,
                 labelHeight: 44,
-                accessibilityLabel: "Back",
-                accessibilityHint: "Returns to the article list"
+                accessibilityLabel: L10n.Reading.backAccessibilityLabel
             )
 
             Text(title)
@@ -165,8 +164,8 @@ struct ReadingBottomBar: View {
                     iconPointSize: readingChromeIconSize,
                     labelWidth: 44,
                     labelHeight: 56,
-                    accessibilityLabel: "Font and spacing",
-                    accessibilityHint: "Adjust reading font size and line spacing"
+                    accessibilityLabel: L10n.Reading.controlsFontAndSpacing,
+                    accessibilityHint: L10n.Reading.controlsFontAndSpacingHint
                 )
 
                 Spacer()
@@ -184,8 +183,8 @@ struct ReadingBottomBar: View {
                     iconPointSize: readingChromeIconSize,
                     labelWidth: 44,
                     labelHeight: 56,
-                    accessibilityLabel: isTTSActive ? "Stop listening" : "Listen to article",
-                    accessibilityHint: "Reads the article aloud"
+                    accessibilityLabel: isTTSActive ? L10n.Reading.controlsTtsStopListening : L10n.Reading.controlsTtsListen,
+                    accessibilityHint: L10n.Reading.controlsTtsHint
                 )
 
                 VersoToolbarIconButton(
@@ -195,8 +194,8 @@ struct ReadingBottomBar: View {
                     iconPointSize: readingChromeIconSize,
                     labelWidth: 44,
                     labelHeight: 56,
-                    accessibilityLabel: "Reading theme",
-                    accessibilityHint: "Change paper, sepia, night, or ink theme"
+                    accessibilityLabel: L10n.Reading.controlsReadingTheme,
+                    accessibilityHint: L10n.Reading.controlsReadingThemeHint
                 )
             }
             .padding(.horizontal, VersoSpacing.md)

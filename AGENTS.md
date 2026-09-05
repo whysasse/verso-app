@@ -152,7 +152,7 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 
 - **Per-issue working docs** (e.g. `FAB-77-…md`) move to `_archive/` when the issue closes.
 
-- **Folders:** `product/` (PRD, personas, flows) · `design/` (tokens, components, specs) · `engineering/` (integration/implementation specs) · `copy/` (strings) · `figma-plugin/` · `_archive/`. New top-level docs need a reason to be top-level (currently only HANDOFF, PROJECT_STATUS, BACKLOG, DONE).
+- **Folders:** `product/` (PRD, personas, flows) · `design/` (tokens, components, specs) · `engineering/` (integration/implementation specs) · `copy/` (strings) · `figma-plugin/` · `_archive/`. New top-level docs need a reason to be top-level (currently HANDOFF, PROJECT_STATUS, BACKLOG, DONE, and PENDING_TESTS — the last tracks work shipped but not yet confirmed on a real device while Fabio is away from his Mac).
 
 - **Naming:** `SCREAMING_SNAKE.md` for specs/reference docs, `kebab-case.md` for working notes. Don't rename existing files just to conform.
 

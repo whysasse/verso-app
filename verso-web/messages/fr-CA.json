@@ -375,6 +375,10 @@
     },
     "controls": {
       "decreaseFontSize": "Réduire la taille du texte",
+      "fontAndSpacing": {
+        "_label": "Taille et interligne",
+        "hint": "Ajuster la taille du texte et l'interligne de lecture"
+      },
       "increaseFontSize": "Augmenter la taille du texte",
       "lineSpacing": {
         "_label": "Interligne",
@@ -386,13 +390,20 @@
       },
       "markAsRead": "Marquer comme lu",
       "markAsUnread": "Marquer comme non lu",
+      "readingTheme": {
+        "_label": "Thème de lecture",
+        "hint": "Changer le thème : papier, sépia, nuit ou encre"
+      },
       "theme": {
         "_label": "Thème",
         "hint": "Appuie deux fois pour ouvrir les options de thème"
       },
       "tts": {
+        "hint": "Lit l'article à voix haute",
+        "listen": "Écouter l'article",
         "pause": "Mettre en pause la synthèse vocale",
-        "play": "Lire la synthèse vocale"
+        "play": "Lire la synthèse vocale",
+        "stopListening": "Arrêter l'écoute"
       }
     },
     "controlsSheet": {
