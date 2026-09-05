@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**41 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-309, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**39 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-309, FAB-311, FAB-312, FAB-323, FAB-325, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — Fabio away from his Mac/device (starting 2026-09-05)
 
@@ -56,7 +56,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (fold into FAB-329) → FAB-323 (share extension theming) → FAB-325 (hardcoded colors/swipe tints/dividers — **needs a decision** on whether `ArticleStatus.color` badges should be theme-independent or theme-aware, and raise `border` contrast toward 3:1 *before* fixing the divider bug or it makes dividers disappear) → FAB-329 (incl. FAB-313 — **mostly absorbed by FAB-334**: an inset-grouped `Form` supplies checkmarks, real section headers and value+chevron rows; only what survives the shell stays here) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; its disabled-variant dependency on FAB-305 is now satisfied, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
+  FAB-313 (fold into FAB-329) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → FAB-329 (incl. FAB-313 — **mostly absorbed by FAB-334**: an inset-grouped `Form` supplies checkmarks, real section headers and value+chevron rows; only what survives the shell stays here) → FAB-324 (unify the three theme-picker components; after FAB-306 and FAB-325) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → FAB-321 (read-time vs. date on cards) → FAB-317 (run the confirm test first — screenshot before/after immersive toggle; likely closes with zero code) → FAB-318 (remaining reading-view polish) → FAB-322 remainder (remaining list polish) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → FAB-328 (onboarding smaller polish; its disabled-variant dependency on FAB-305 is now satisfied, sequence after FAB-327's decision since scope may shift) → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -176,7 +176,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   | ~~white glyph on `read` badge `#5AAF7A`~~ | Article card | ~~**2.68:1**~~ **4.50:1+, fixed FAB-325** | 3:1 |
   | ~~white glyph on `unread` badge `#4A90D9`~~ | Article card | ~~3.34:1~~ **4.53:1, fixed FAB-325** | 3:1 (barely) |
   | `placeholder` on `surface` | Search clear button | **1.12–1.55:1** | 3:1 |
-  | `border` on `background` | Field outlines, progress track | **1.16–1.33:1** | 3:1 where it bounds a control — still open, tracked as FAB-325's follow-up (48 call sites, split out for its own review) |
+  | ~~`border` on `background`~~ | Field outlines, progress track | ~~**1.16–1.33:1**~~ **3.0:1+ vs. both background and surface, fixed FAB-325** | 3:1 where it bounds a control |
   | `warning` on `background` (Paper / Sepia) | Semantic | **4.43 / 4.13:1** | 4.5:1 |
   | `error` on `surface` (Paper / Sepia) | Field error text, 13pt | **4.46 / 4.07:1** | 4.5:1 |
   | `accentPressed` on `background` (Ink) | Pressed states | **4.04:1** | 4.5:1 as text |
@@ -307,43 +307,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   One `ThemeSwatch` component, size as a parameter, colours always from `ThemeColors.colors(for:)`. Adopt the **onboarding** treatment — a miniature page with `textPrimary`/`textSecondary` bars — because what distinguishes these themes is the text-on-background relationship, not the background colour, and it is the only one of the three where all four are instantly distinguishable. Raise the label from 11pt to `VersoTypography.UI.caption`.
 
-- [ ] 🟡 **FAB-325** · Hardcoded colours that escape the theme system  `In Progress` `Medium`
-  ## Scope
-
-  Critique §3.9, §3.12.
-
-  | Value | Where | Problem |
-  |---|---|---|
-  | ~~`Color(hex: "766655")`~~ | ~~Archive/unarchive swipe tint~~ | **Done 2026-09-05** — see `ArticleStatusColors` below |
-  | ~~`Color(hex: "4A90D9")` / `"5AAF7A"`~~ | ~~Mark read/unread swipe tint~~ | **Done 2026-09-05** — same |
-  | ~~`Color.black.opacity(0.7)` + `.white`~~ | ~~`ImmersiveHintPill`~~ | **Done 2026-09-05** — now `colors.textPrimary`/`colors.background`, inverted |
-  | ~~`Color.black.opacity(0.35)`~~ | ~~Filter-panel scrim~~ | **Done 2026-09-05** — deepens to 0.55 for dark themes |
-  | ~~`.red.opacity(0.8)`~~ | ~~`AddArticleView`~~ | **Done 2026-09-05** — now `semanticColors.error` |
-  | duplicated theme hexes | `ThemeChip`, `ThemeChipView` | Still open — see FAB-324 |
-
-  **Still open — border contrast + divider correctness**, split into its own follow-up
-  rather than bundled with the above: `border` is used in 48 places across 16 files
-  (field outlines, disabled-button strokes, progress tracks, dividers, onboarding dots),
-  so raising it toward 3:1 is a far larger visual change than anything else in this
-  issue and deserves to be judged on its own. `SettingsView`/`AboutView`/
-  `AcknowledgementsView` use `Divider().background(colors.border)` ~19 times total —
-  `Divider()` draws a hairline in the *system separator colour* and fills its own 1pt
-  frame, so `.background()` is painted behind it and covered; the token never reaches
-  the divider. They currently look fine (better than `border`'s 1.16–1.33:1 would
-  predict, which is itself the evidence) only because they're accidentally not using
-  `border` at all — this is a correctness bug, not a visual one, and "fixing" it before
-  raising `border` would make every divider nearly invisible. `ReadingChrome` already
-  has the right pattern: `Rectangle().frame(height: 1).foregroundColor(colors.border)`.
-
-  ## Decision — theme-aware (Fabio, 2026-09-05) — implemented
-
-  `ArticleStatus.color`'s four badge hues were fixed across all themes. Resolved
-  theme-aware; full reasoning now lives as `ArticleStatusColors`'s doc comment in
-  `Colors.swift` (computed contrast ratios, the two targeted hue nudges for the
-  confirmed Night/Ink clashes, and why the swipe tints reuse these values instead of
-  `colors.accent`). The contrast failures FAB-314 found (white-on-`reading` 2.29:1,
-  white-on-`read` 2.68:1) are fixed as part of the same change.
-
 - [ ] 🟡 **FAB-326** · Five different ways to close or go back  `Backlog` `Medium`
   ## Scope
 
@@ -410,7 +373,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
     Confirmed far worse at large text (2026-09-03): the dot is a fixed `frame(width: 8, height: 8)`, so when the row label triples in size the dot stays 8pt and becomes almost invisible — the selection indicator degrades precisely for the users who need it most. A checkmark built from a scaling text style fixes this for free; otherwise it needs `@ScaledMetric`. This was FAB-309's layout-audit item 4, moved to FAB-334 along with the rest of `SettingsRow`'s audit.
   * **Two heading levels, one visual style.** `sectionHeader` ("READING") and `sectionLabel` ("Font", "Theme") are both 13pt `textSecondary`, distinguished only by capitalisation — two levels of a real nesting hierarchy in one style. Confirmed in Ink 2026-09-03.
-  * **Evidence for FAB-325's divider point.** In Ink, `border` is `#1E2228` on `#181C22` — 1.16:1, which would be invisible. The Settings dividers are clearly visible, which is itself the proof that `Divider().background(colors.border)` never reaches the divider and the lines are the system separator.
+  * ~~**Evidence for FAB-325's divider point.**~~ **Fixed 2026-09-05.** In Ink, `border` was `#1E2228` on `#181C22` — 1.16:1, which would have been invisible; the Settings dividers were clearly visible only because `Divider().background(colors.border)` never reached the divider and the lines were the system separator instead. Both the correctness bug and `border`'s underlying contrast are fixed now.
   * **The folder row shows `lastPathComponent` alone**, so "Articles folder · Verso" parses as a settings *value* rather than a folder name. A folder glyph or the parent directory would disambiguate.
   * **The font-size stepper stays tappable at its limits** — the guard is inside the closure, so at 26pt the `+` accepts taps and does nothing. Use `.disabled()` so it is inert and announces correctly.
   * **Font size is in Settings, line spacing only in the reader**, font family only in Settings, theme in all three. Not wrong, but not legible either.

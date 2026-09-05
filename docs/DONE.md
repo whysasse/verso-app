@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**192 completed issues.**
+**193 completed issues.**
 
 ## iOS
 
@@ -318,6 +318,74 @@
   builds the `Verso` scheme with the `ShareExtension` embedded, which is the real proof
   this compiles for both targets. Actually seeing the extension themed on a Night/Ink
   device, and confirming the top-anchored layout looks right, is Fabio's part.
+
+### Design critique 2026-09-01 — hardcoded colors that escape the theme system (FAB-325)
+
+- [x] 🟡 **FAB-325** · Hardcoded colours that escape the theme system  `Done` `Medium`
+  Critique §3.9, §3.12. Shipped in two PRs, 2026-09-05, split because of their very
+  different risk profiles.
+
+  ## PR 1 — status badges, swipe tints, and the scattered one-off hardcodes
+
+  `ArticleStatus.color`'s four badge hues were fixed across all themes. Per Fabio's
+  2026-09-05 decision, they're now theme-aware via a new `ArticleStatusColors` struct
+  (same pattern as `SemanticColors` — a per-theme lookup independent of `ThemeColors`'
+  9 roles). Computed via WCAG contrast math:
+
+  * `unread`/`read`/`archived` target 4.5:1 against white — reused as the Archive/Mark
+    Read/Mark Unread **swipe-action tints**, which sit behind a system-rendered white
+    *text* label (FAB-314 flagged this at 3.34/2.68:1). `reading` stays badge-only, 3:1.
+  * Only 2 values got an actual hue nudge — `reading` in Ink, `read` in Night — the two
+    clashes the critique confirmed on-screen 2026-09-03. Everything else kept its hue,
+    darkened only as far as the math required.
+  * Archive/Unarchive's swipe tint deliberately does **not** reuse `colors.accent`,
+    even though the pre-fix hardcoded value (`#766655`, Paper's accent) suggested that
+    was the intent — `accent` is bright in Night/Ink specifically for FAB-305's
+    white-on-accent fix, and reusing it here would have silently reintroduced that
+    failure behind this label instead.
+  * Also fixed: `ImmersiveHintPill` (hardcoded black/white → `colors.textPrimary`/
+    `colors.background`, inverted, reusing the theme's own highest-contrast pair
+    instead of inventing a value), the filter-panel scrim (flat 0.35 → 0.55 for dark
+    themes, since it barely darkened an already-near-black background), and
+    `AddArticleView`'s `.red.opacity(0.8)` → `semanticColors.error`.
+
+  ## PR 2 — border contrast + the `Divider().background` correctness bug
+
+  Split out rather than bundled with PR 1: `border` sat at 1.16–1.33:1 against both
+  `background` and `surface` in all four themes (computed, FAB-314's audit) against
+  accessibility-specs.md's 3:1 floor, and is used in 48 places across 16 files — a much
+  larger visual change than anything in PR 1, so it got its own review.
+
+  * Raised `border` in all four themes to clear 3:1 against **both** `background` and
+    `surface` (same minimal-change method as the status colors: same hue per theme,
+    lightness moved only as far as the stricter target required). Paper `#DDD8CE` →
+    `#938466`, Sepia `#D9CAAC` → `#967B45`, Night `#2E2B26` → `#736C5F`, Ink `#1E2228`
+    → `#5B687A`.
+  * Fixed the `Divider().background(colors.border)` correctness bug at all 18 real call
+    sites (`SettingsView` ×11, `AboutView` ×3, `AcknowledgementsView` ×1,
+    `ArticleListView`'s filter panel ×3) plus `DesignSystemPreview`'s 4 for consistency:
+    `Divider()` draws a hairline in the system separator color and fills its own 1pt
+    frame, so `.background()` was painted behind it and never actually seen. Replaced
+    with `ReadingChrome`'s already-correct pattern: `Rectangle().frame(height:
+    1).foregroundColor(colors.border)`. Raising `border` first (PR 1 already shipped)
+    was the right order — reversed, dividers would have rendered in the old
+    near-invisible `border` and disappeared.
+  * `ThemeChip`/`ThemeChipView`'s duplicated theme hexes were never this issue's own
+    scope — that's FAB-324, unchanged.
+
+  ## Judgment call, both PRs
+
+  Every color value above is real design work, not just arithmetic — the contrast math
+  is guaranteed; whether the results read as correct rather than too heavy (especially
+  `border` inside `MarkdownBodyView`'s horizontal rules and table borders, the one place
+  it touches rendered article content rather than chrome) needed Fabio's eyes, same as
+  the copy drafted for FAB-319.
+
+  ## Verify
+
+  Linux container, no Xcode, both PRs — contrast ratios verified by script (WCAG
+  relative luminance), not eyeballed; CI (`ci.yml`) proved both compiled. Actually
+  seeing the colors on-device across all four themes was Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

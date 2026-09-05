@@ -173,7 +173,7 @@ struct DesignSystemPreview: View {
                 }
 
                 if step.label != "XS   14pt" {
-                    Divider().background(colors.border)
+                    Rectangle().frame(height: 1).foregroundColor(colors.border)
                 }
             }
         }
@@ -204,7 +204,7 @@ struct DesignSystemPreview: View {
                 }
 
                 if level.label != "H4  18pt  Semibold" {
-                    Divider().background(colors.border)
+                    Rectangle().frame(height: 1).foregroundColor(colors.border)
                 }
             }
         }
@@ -235,7 +235,7 @@ struct DesignSystemPreview: View {
                 }
 
                 if style.label != "Caption       13pt" {
-                    Divider().background(colors.border)
+                    Rectangle().frame(height: 1).foregroundColor(colors.border)
                 }
             }
         }
@@ -319,7 +319,7 @@ struct DesignSystemPreview: View {
                 }
 
                 if face.name != "OpenDyslexic" {
-                    Divider().background(colors.border)
+                    Rectangle().frame(height: 1).foregroundColor(colors.border)
                 }
             }
         }

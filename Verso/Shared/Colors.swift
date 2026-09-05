@@ -36,6 +36,11 @@ struct ThemeColors {
     let accent: Color
     let accentPressed: Color
     let accentSurface: Color
+    /// FAB-325 (2026-09-05): raised in all four themes to clear 3:1 against *both*
+    /// `background` and `surface` (was 1.16–1.33:1, computed) -- the floor
+    /// `docs/accessibility-specs.md` sets for UI component boundaries (field outlines,
+    /// dividers, the reading progress track). Same hue per theme, lightness moved only
+    /// as far as the stricter of the two targets required.
     let border: Color
     let placeholder: Color
 
@@ -47,7 +52,7 @@ struct ThemeColors {
         accent: Color(hex: "766655"),
         accentPressed: Color(hex: "584D40"),
         accentSurface: Color(hex: "766655").opacity(0.15),
-        border: Color(hex: "DDD8CE"),
+        border: Color(hex: "938466"),
         placeholder: Color(hex: "CEC8BC")
     )
 
@@ -59,7 +64,7 @@ struct ThemeColors {
         accent: Color(hex: "825A37"),
         accentPressed: Color(hex: "614429"),
         accentSurface: Color(hex: "825A37").opacity(0.15),
-        border: Color(hex: "D9CAAC"),
+        border: Color(hex: "967B45"),
         placeholder: Color(hex: "C8BCA0")
     )
 
@@ -71,7 +76,7 @@ struct ThemeColors {
         accent: Color(hex: "C4A97D"),
         accentPressed: Color(hex: "937F5E"),
         accentSurface: Color(hex: "C4A97D").opacity(0.15),
-        border: Color(hex: "2E2B26"),
+        border: Color(hex: "736C5F"),
         placeholder: Color(hex: "302E2A")
     )
 
@@ -83,7 +88,7 @@ struct ThemeColors {
         accent: Color(hex: "7B9FD4"),
         accentPressed: Color(hex: "5C779F"),
         accentSurface: Color(hex: "7B9FD4").opacity(0.15),
-        border: Color(hex: "1E2228"),
+        border: Color(hex: "5B687A"),
         placeholder: Color(hex: "202630")
     )
 

@@ -29,7 +29,7 @@ struct AcknowledgementsView: View {
                     .padding(.horizontal, VersoSpacing.md)
 
                     if index < dependencies.count - 1 {
-                        Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                        Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                     }
                 }
             }

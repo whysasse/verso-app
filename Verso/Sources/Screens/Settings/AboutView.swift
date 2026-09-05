@@ -46,7 +46,7 @@ struct AboutView: View {
             .frame(minHeight: 44)
             .padding(.horizontal, VersoSpacing.md)
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
 
             // Acknowledgements
             NavigationLink(destination: AcknowledgementsView()) {
@@ -64,7 +64,7 @@ struct AboutView: View {
             }
             .buttonStyle(.plain)
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
 
             // GitHub — opens in Safari rather than an embedded in-app browser.
             // An unrestricted WKWebView here would let a reviewer (or user) browse
@@ -87,7 +87,7 @@ struct AboutView: View {
             }
             .buttonStyle(.plain)
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
 
             // Privacy Policy
             NavigationLink(destination: PrivacyPolicyView()) {
