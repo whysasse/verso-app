@@ -1,21 +1,28 @@
 import SwiftUI
 
-// Hardcoded Paper theme values — avoids importing the full design system in the extension.
-private enum PaperTheme {
-    static let background = Color(red: 0.973, green: 0.965, blue: 0.949)
-    static let textPrimary = Color(red: 0.149, green: 0.137, blue: 0.122)
-    static let textSecondary = Color(red: 0.431, green: 0.408, blue: 0.376)
-    static let accent = Color(red: 0.290, green: 0.216, blue: 0.149)
-    static let border = Color(red: 0.827, green: 0.808, blue: 0.784)
+/// FAB-323: reads the theme the user actually picked in the app. `ThemeManager` itself
+/// stays main-app-only (it's an `ObservableObject` with no reason to live here), but it
+/// mirrors `selectedTheme` into the App Group suite specifically for this -- extensions
+/// don't share `UserDefaults.standard` with the host app. Falls back to `.paper`,
+/// matching `ThemeManager`'s own default.
+enum SharedTheme {
+    static var current: VersoTheme {
+        let raw = UserDefaults(suiteName: AppConstants.appGroupID)?.string(forKey: AppConstants.selectedThemeKey)
+        return VersoTheme(rawValue: raw ?? "Paper") ?? .paper
+    }
+    static var colors: ThemeColors { ThemeColors.colors(for: current) }
+    static var semanticColors: SemanticColors { SemanticColors.semanticColors(for: current) }
 }
 
 struct ShareView: View {
     @ObservedObject var viewModel: ShareViewModel
     let extensionContext: NSExtensionContext?
+    private let colors = SharedTheme.colors
+    private let semanticColors = SharedTheme.semanticColors
 
     var body: some View {
-        ZStack {
-            PaperTheme.background.ignoresSafeArea()
+        ZStack(alignment: .top) {
+            colors.background.ignoresSafeArea()
 
             VStack(spacing: 16) {
                 switch viewModel.state {
@@ -41,6 +48,7 @@ struct ShareView: View {
                 }
             }
             .padding(24)
+            .padding(.top, 24)
             .frame(maxWidth: 480)
             .frame(maxWidth: .infinity)
         }
@@ -51,11 +59,11 @@ struct ShareView: View {
     private var savingView: some View {
         VStack(spacing: 12) {
             ProgressView()
-                .tint(PaperTheme.accent)
+                .tint(colors.accent)
                 .scaleEffect(1.2)
             Text(L10n.AddArticle.savingMessage)
                 .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(PaperTheme.textSecondary)
+                .foregroundStyle(colors.textSecondary)
         }
         .frame(minHeight: 80)
     }
@@ -64,11 +72,11 @@ struct ShareView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.Share.duplicateHeadline)
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(PaperTheme.textPrimary)
+                .foregroundStyle(colors.textPrimary)
 
             Text(L10n.Share.duplicateSubheadline(existingTitle: existingTitle))
                 .font(.system(size: 15))
-                .foregroundStyle(PaperTheme.textSecondary)
+                .foregroundStyle(colors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(spacing: 10) {
@@ -79,8 +87,10 @@ struct ShareView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(PaperTheme.accent)
-                        .foregroundStyle(Color.white)
+                        .background(colors.accent)
+                        // Matches VersoButtonStyle.primary's contrast fix (FAB-305) — accent
+                        // isn't reliably light enough for literal white in every theme.
+                        .foregroundStyle(colors.background)
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
                 .buttonStyle(.plain)
@@ -92,12 +102,12 @@ struct ShareView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(PaperTheme.surfaceFill)
-                        .foregroundStyle(PaperTheme.accent)
+                        .background(colors.surface)
+                        .foregroundStyle(colors.accent)
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .stroke(PaperTheme.border, lineWidth: 1)
+                                .stroke(colors.border, lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -106,7 +116,7 @@ struct ShareView: View {
                     extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
                 }
                 .font(.system(size: 15))
-                .foregroundStyle(PaperTheme.textSecondary)
+                .foregroundStyle(colors.textSecondary)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 4)
             }
@@ -118,13 +128,13 @@ struct ShareView: View {
         VStack(spacing: 12) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 36))
-                .foregroundStyle(Color(red: 0.353, green: 0.686, blue: 0.478)) // Read green
+                .foregroundStyle(semanticColors.success)
             Text(isUpdate ? L10n.Share.duplicateSuccessUpdated : L10n.Share.duplicateSuccessSaved)
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(PaperTheme.textPrimary)
+                .foregroundStyle(colors.textPrimary)
             Text(title)
                 .font(.system(size: 13))
-                .foregroundStyle(PaperTheme.textSecondary)
+                .foregroundStyle(colors.textSecondary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .truncationMode(.tail)
@@ -136,27 +146,22 @@ struct ShareView: View {
         VStack(spacing: 12) {
             Image(systemName: "exclamationmark.circle")
                 .font(.system(size: 36))
-                .foregroundStyle(PaperTheme.textSecondary)
+                .foregroundStyle(colors.textSecondary)
             Text(L10n.Share.errorHeadline)
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(PaperTheme.textPrimary)
+                .foregroundStyle(colors.textPrimary)
             HStack(spacing: 16) {
                 Button(L10n.Share.errorDismiss) {
                     extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
                 }
                 .font(.system(size: 15))
-                .foregroundStyle(PaperTheme.textSecondary)
+                .foregroundStyle(colors.textSecondary)
 
                 Link(L10n.Share.errorOpenInSafari, destination: url)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(PaperTheme.accent)
+                    .foregroundStyle(colors.accent)
             }
         }
         .frame(minHeight: 80)
     }
-}
-
-private extension PaperTheme {
-    /// Slightly elevated control surface on Paper background.
-    static let surfaceFill = Color(red: 0.99, green: 0.985, blue: 0.975)
 }

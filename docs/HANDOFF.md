@@ -65,7 +65,7 @@ Place new web screens under `verso-web/app/<screen>/page.tsx`.
 
 All design enum names are exact Swift identifiers. Search the source file to find usage.
 
-### Theme (`Verso/Sources/Design/Colors.swift`)
+### Theme (`Verso/Shared/Colors.swift`)
 
 ```swift
 enum VersoTheme: String { case paper, sepia, night, ink }
@@ -81,7 +81,7 @@ enum VersoTheme: String { case paper, sepia, night, ink }
 
 **`VersoHighlightColor.wash`** (FAB-54, same file): the reading-view text-highlight background. Deliberately **not** one of `ThemeColors`' 9 roles — a single value across all four themes, not theme-tinted.
 
-### Article Status (`Verso/Sources/Design/Colors.swift`)
+### Article Status (`Verso/Shared/Colors.swift`)
 
 ```swift
 enum ArticleStatus: String { case unread, reading, read }

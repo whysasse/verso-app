@@ -8,7 +8,9 @@ final class ShareViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 0.973, green: 0.965, blue: 0.949, alpha: 1) // Paper background
+        // FAB-323: painted before the themed SwiftUI content mounts below, so a
+        // hardcoded light color here would flash under a Night/Ink selection.
+        view.backgroundColor = UIColor(SharedTheme.colors.background)
 
         let hostingController = UIHostingController(rootView: ShareView(viewModel: viewModel, extensionContext: extensionContext))
         addChild(hostingController)
