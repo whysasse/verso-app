@@ -19,6 +19,10 @@ Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issu
 
 **43 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-311, FAB-312, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
+## Working mode — Fabio away from his Mac/device (starting 2026-09-05)
+
+Fabio is on the go and can't run a real build or open the Simulator to confirm each change as it ships. Work continues as normal otherwise — issues get planned, implemented, and verified with `xcodebuild` (compiles, no new warnings), and each gets its own PR — but the manual on-device verification step that normally happens per-PR is deferred instead of blocking. PRs stay **open, unmerged**, and every one of them (plus what to actually check in each) is tracked in **[PENDING_TESTS.md](PENDING_TESTS.md)** so it can all be run through in one batch once Fabio is back at his Mac. Nothing gets merged to `main` off this deferred verification — merging still waits for an explicit go-ahead per PR, same as always.
+
 ## Current sequencing (iPhone-only work, agreed with Fabio 2026-08-24)
 
 Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlog, which are deferred past this release.
