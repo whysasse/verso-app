@@ -26,13 +26,15 @@ struct OnboardingThemePickerView: View {
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: VersoSpacing.md) {
                 ForEach(VersoTheme.allCases) { theme in
-                    ThemePreviewCard(
-                        theme: theme,
-                        isSelected: themeManager.currentTheme == theme,
-                        activeColors: colors
-                    ) {
+                    let isSelected = themeManager.currentTheme == theme
+                    Button {
                         themeManager.currentTheme = theme
+                    } label: {
+                        ThemeSwatch(theme: theme, isSelected: isSelected, activeColors: colors, height: 120)
                     }
+                    .buttonStyle(.plain)
+                    .animation(VersoAnimation.fast, value: isSelected)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
                 }
             }
             .padding(.horizontal, VersoSpacing.lg)
@@ -44,60 +46,6 @@ struct OnboardingThemePickerView: View {
                 .padding(.horizontal, VersoSpacing.lg)
                 .padding(.bottom, VersoSpacing.xl)
         }
-    }
-}
-
-private struct ThemePreviewCard: View {
-    let theme: VersoTheme
-    let isSelected: Bool
-    /// The currently active theme's colors — the label sits on the app
-    /// background outside the card, so it must use these, not `themeColors`
-    /// below (FAB-306).
-    let activeColors: ThemeColors
-    let onSelect: () -> Void
-
-    private var themeColors: ThemeColors { ThemeColors.colors(for: theme) }
-
-    var body: some View {
-        Button(action: onSelect) {
-            VStack(spacing: 0) {
-                ZStack(alignment: .topLeading) {
-                    RoundedRectangle(cornerRadius: VersoRadius.md)
-                        .fill(themeColors.background)
-                        .frame(height: 120)
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(themeColors.textPrimary)
-                            .frame(width: 80, height: 10)
-
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(themeColors.textSecondary)
-                            .frame(width: 60, height: 7)
-
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(themeColors.textSecondary)
-                            .frame(width: 70, height: 7)
-
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(themeColors.textSecondary)
-                            .frame(width: 50, height: 7)
-                    }
-                    .padding(VersoSpacing.sm)
-                }
-                .overlay(
-                    RoundedRectangle(cornerRadius: VersoRadius.md)
-                        .stroke(isSelected ? themeColors.accent : themeColors.border, lineWidth: isSelected ? 2 : 1)
-                )
-
-                Text(theme.displayName)
-                    .font(VersoTypography.UI.caption)
-                    .foregroundColor(isSelected ? activeColors.accent : activeColors.textSecondary)
-                    .padding(.top, VersoSpacing.xs)
-            }
-        }
-        .buttonStyle(.plain)
-        .animation(VersoAnimation.fast, value: isSelected)
     }
 }
 
