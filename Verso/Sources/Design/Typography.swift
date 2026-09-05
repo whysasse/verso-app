@@ -28,6 +28,29 @@ enum VersoTypography {
                 case .xxl:               return 1.5
                 }
             }
+
+            /// All 6 cases ordered smallest → largest. `CaseIterable`'s synthesized
+            /// order already matches declaration order, but stepping logic below
+            /// depends on that ordering, so make it explicit rather than assumed.
+            private static var orderedCases: [BodySize] {
+                allCases.sorted { $0.rawValue < $1.rawValue }
+            }
+
+            /// Snaps an arbitrary point size (e.g. a value stored before FAB-311,
+            /// when the reader and Settings steppers could each drift onto a size
+            /// that isn't one of the 6 designed steps) to the closest real case.
+            static func nearest(to size: CGFloat) -> BodySize {
+                orderedCases.min { abs($0.rawValue - size) < abs($1.rawValue - size) } ?? .md
+            }
+
+            /// Steps to the next/previous case, clamped at both ends of the scale.
+            /// `delta` is typically ±1; anything larger just clamps immediately.
+            func stepped(by delta: Int) -> BodySize {
+                let cases = Self.orderedCases
+                guard let index = cases.firstIndex(of: self) else { return self }
+                let newIndex = min(max(index + delta, 0), cases.count - 1)
+                return cases[newIndex]
+            }
         }
 
         func body(_ size: BodySize) -> Font {

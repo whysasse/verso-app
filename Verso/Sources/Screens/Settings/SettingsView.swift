@@ -148,16 +148,17 @@ struct SettingsView: View {
                     .foregroundColor(colors.textPrimary)
                 Spacer()
                 HStack(spacing: VersoSpacing.sm) {
+                    let currentBodySize = VersoTypography.Reading.BodySize.nearest(to: readingPreferences.fontSize)
+
                     Button {
-                        if readingPreferences.fontSize > 14 {
-                            readingPreferences.fontSize -= 2
-                        }
+                        readingPreferences.fontSize = currentBodySize.stepped(by: -1).rawValue
                     } label: {
                         Image(systemName: "minus")
                             .frame(width: 32, height: 32)
-                            .foregroundColor(readingPreferences.fontSize > 14 ? colors.accent : colors.textSecondary)
+                            .foregroundColor(currentBodySize != .xs ? colors.accent : colors.textSecondary)
                     }
                     .buttonStyle(.plain)
+                    .disabled(currentBodySize == .xs)
 
                     Text(L10n.Settings.fontSizeValueLabel(size: Int(readingPreferences.fontSize)))
                         .font(VersoTypography.UI.caption)
@@ -165,15 +166,14 @@ struct SettingsView: View {
                         .frame(minWidth: 36, alignment: .center)
 
                     Button {
-                        if readingPreferences.fontSize < 26 {
-                            readingPreferences.fontSize += 2
-                        }
+                        readingPreferences.fontSize = currentBodySize.stepped(by: 1).rawValue
                     } label: {
                         Image(systemName: "plus")
                             .frame(width: 32, height: 32)
-                            .foregroundColor(readingPreferences.fontSize < 26 ? colors.accent : colors.textSecondary)
+                            .foregroundColor(currentBodySize != .xxl ? colors.accent : colors.textSecondary)
                     }
                     .buttonStyle(.plain)
+                    .disabled(currentBodySize == .xxl)
                 }
             }
             .frame(minHeight: 44)
