@@ -38,7 +38,7 @@ Articles are saved as plain Markdown files to a user-selected iCloud Drive folde
 - **Entry point:** `Verso/Sources/App/VersoApp.swift` → `ContentView.swift`
 - **Navigation:** `NavigationSplitView` (hybrid: collapses to a single stack on iPhone/compact, sidebar + detail side-by-side on iPad/regular); no tab bar; orchestrated by `VersoMainSplitView.swift`
 - **Share Extension:** Separate app target at `Verso/ShareExtension/` for saving articles from other apps.
-- **Design system code:** 7 Swift files in `Verso/Sources/Design/` (Colors, Typography, Spacing, Radius, ThemeManager, Animation, DesignSystemPreview).
+- **Design system code:** 6 Swift files in `Verso/Sources/Design/` (Typography, Spacing, Radius, ThemeManager, Animation, DesignSystemPreview), plus `Colors.swift` in `Verso/Shared/` (FAB-323: moved so the Share Extension can read theme colors too — it's shared with both targets, not main-app-only).
 
 ### Web
 

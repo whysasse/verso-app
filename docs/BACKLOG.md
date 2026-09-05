@@ -286,17 +286,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
 ### Design critique 2026-09-01 — design system consistency
 
-- [ ] 🟠 **FAB-323** · The Share Extension doesn't wear the theme  `Todo` `High`
-  ## Scope
-
-  Critique §3.11. The extension's background is a neutral off-white while the app is warm cream, and its success checkmark is a brighter, more saturated green than `ArticleStatus.read`'s `#5AAF7A`. It reads as a different app.
-
-  That matters more than a normal consistency nit: for anyone who found Verso through the share sheet, **the extension is the first surface they ever see**, and "it looks and feels like paper" is the product's whole first impression.
-
-  ## Fix
-
-  Read `ThemeManager` in the extension (the App Group already shares `selectedTheme`), and use `semanticColors.success`. Its layout also centres content vertically in a full-height sheet where the app's own sheets anchor to the top.
-
 - [ ] 🟡 **FAB-324** · One theme picker component instead of three  `Backlog` `Medium`
   ## Scope
 

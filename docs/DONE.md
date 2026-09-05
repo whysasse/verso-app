@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**191 completed issues.**
+**192 completed issues.**
 
 ## iOS
 
@@ -264,6 +264,60 @@
   ## Verify
 
   This session ran in a Linux container with no Xcode, so `xcodebuild` could not be run locally here — verification is the project's CI (`ci.yml`, macOS runners), watched and fixed if red before merge. Actual on-device Dynamic Type behavior (Settings/list/reading chrome at a large accessibility text size) is Fabio's part after the PR, same as the original screenshot comparison that surfaced this issue.
+
+### Design critique 2026-09-01 — Share Extension theming (FAB-323)
+
+- [x] 🟠 **FAB-323** · The Share Extension doesn't wear the theme  `Done` `High`
+  Critique §3.11. The extension's background was a hardcoded, slightly-off imitation of
+  Paper regardless of the theme actually selected in the app, and its success checkmark
+  was a brighter, more saturated green than `ArticleStatus.read`'s real color. For anyone
+  who found Verso through the share sheet, the extension is the first surface they ever
+  see — a Night/Ink user got a light extension every time. Completed 2026-09-05.
+
+  ## Correction to this issue's original "Fix" text
+
+  It said *"the App Group already shares `selectedTheme`"* — that was wrong.
+  `ThemeManager` persisted to `UserDefaults.standard`, which is **not** shared with
+  extensions (that's exactly why `FolderBookmarkService` and others already use
+  `UserDefaults(suiteName:)` for cross-target state — an established pattern this issue's
+  text didn't follow). Building on that premise would have shipped code that compiles but
+  always reads `nil` and silently falls back to Paper for every non-Paper user.
+
+  ## Fix
+
+  * **`ThemeManager`** now mirrors `currentTheme` into the App Group suite (new
+    `AppConstants.selectedThemeKey`) alongside its existing `.standard` write — both in
+    `didSet` and once in `init()` as a backfill, so someone who picked a theme before this
+    shipped doesn't see the extension guess Paper until they touch the selector again.
+    `.standard` stays the app's source of truth; this is purely an additive mirror.
+  * **`Colors.swift` moved from `Sources/Design/` to `Shared/`** — `Shared` was already a
+    source folder for both the `Verso` and `ShareExtension` targets in `project.yml`, so
+    this is what actually gives the extension `VersoTheme`/`ThemeColors`/`SemanticColors`
+    to resolve real colors (its only dependency, `L10n`, was already available there).
+  * **`ShareView.swift`**: replaced the hardcoded `PaperTheme` enum with a `SharedTheme`
+    lookup reading the App Group mirror (falling back to `.paper`, matching
+    `ThemeManager`'s own default), and swapped every hardcoded color for the real token —
+    including the "Update existing" button's white-on-accent label, which gets the same
+    `VersoButtonStyle.primary` contrast fix (FAB-305) applied (`colors.background`, not a
+    literal white). The checkmark now uses `semanticColors.success`.
+  * **`ShareViewController.swift`**: the UIKit background painted before the SwiftUI
+    content mounts got the same theme lookup — otherwise a Night/Ink user would see a
+    light flash under the now-correctly-themed content.
+  * **Secondary, named in the same critique bullet:** content was vertically centered in
+    the extension's sheet where the app's own sheets anchor to the top; top-aligned it to
+    match.
+  * `docs/HANDOFF.md` and `AGENTS.md` updated for `Colors.swift`'s new path and the
+    resulting Design-folder file count.
+
+  ## Verify
+
+  Same constraint as recent PRs: Linux container, no Xcode. This one touches target
+  membership more than most (a file moving into a folder two targets already share), so I
+  grepped for any other reference to `Colors.swift`'s old path and confirmed only the
+  archived FAB-77 doc still has it (left alone, per the archive convention). CI (`ci.yml`)
+  builds the `Verso` scheme with the `ShareExtension` embedded, which is the real proof
+  this compiles for both targets. Actually seeing the extension themed on a Night/Ink
+  device, and confirming the top-anchored layout looks right, is Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
