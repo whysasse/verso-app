@@ -10,17 +10,27 @@ struct ImmersiveHintPill: View {
             // on Paper's cream. Reuses the theme's own highest-contrast pair, inverted
             // (textPrimary as fill, background as text) -- works in all four themes since
             // contrast ratio is symmetric, no new color invented.
-            Text(L10n.Reading.immersiveHint)
-                .font(.system(size: 13))
-                .foregroundColor(themeManager.colors.background)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .background(themeManager.colors.textPrimary)
-                .clipShape(Capsule())
-                .onTapGesture {
-                    isVisible = false
-                }
-                .transition(.opacity.animation(VersoAnimation.normal))
+            //
+            // FAB-318: a real `Button` instead of a bare `Text` + `.onTapGesture` -- gets a
+            // correct accessibility label for free (SwiftUI infers it from the visible
+            // Text), where before there was none. `.frame(minHeight: 44)` +
+            // `.contentShape(Rectangle())` grow the tappable area to the 44pt minimum
+            // without changing the pill's own small visual size.
+            Button {
+                isVisible = false
+            } label: {
+                Text(L10n.Reading.immersiveHint)
+                    .font(.system(size: 13))
+                    .foregroundColor(themeManager.colors.background)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(themeManager.colors.textPrimary)
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+            .transition(.opacity.animation(VersoAnimation.normal))
         }
     }
 }

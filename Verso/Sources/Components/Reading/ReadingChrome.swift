@@ -7,11 +7,24 @@ struct TTSControlsRow: View {
     @EnvironmentObject var themeManager: ThemeManager
     private var colors: ThemeColors { themeManager.colors }
 
+    /// Matches the speed button's own width below, so reserving it on the leading edge
+    /// balances that trailing button and the transport trio in between ends up visually
+    /// centered -- same technique the main bar (below) uses to center its progress
+    /// indicator between edge-anchored icons. FAB-318: previously a bare `HStack` with
+    /// the three transport buttons hard-left, a `Spacer()`, then speed hard-right --
+    /// a dead gap rather than a deliberate layout.
+    private let speedButtonWidth: CGFloat = 54
+
     var body: some View {
         HStack(spacing: 0) {
+            Spacer()
+                .frame(width: speedButtonWidth)
+
+            Spacer()
+
             Button(action: tts.skipBack) {
                 Image(systemName: "backward.end.fill")
-                    .font(.system(size: 16))
+                    .font(.system(size: readingChromeIconSize))
                     .foregroundColor(colors.accent)
                     .frame(width: 44, height: 44)
             }
@@ -20,7 +33,7 @@ struct TTSControlsRow: View {
 
             Button(action: { tts.isPlaying ? tts.pause() : tts.resume() }) {
                 Image(systemName: tts.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 18))
+                    .font(.system(size: readingChromeIconSize))
                     .foregroundColor(colors.accent)
                     .frame(width: 44, height: 44)
             }
@@ -29,7 +42,7 @@ struct TTSControlsRow: View {
 
             Button(action: tts.skipForward) {
                 Image(systemName: "forward.end.fill")
-                    .font(.system(size: 16))
+                    .font(.system(size: readingChromeIconSize))
                     .foregroundColor(colors.accent)
                     .frame(width: 44, height: 44)
             }
@@ -42,7 +55,7 @@ struct TTSControlsRow: View {
                 Text(tts.speed.label)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(colors.accent)
-                    .frame(width: 54, height: 44)
+                    .frame(width: speedButtonWidth, height: 44)
             }
             .buttonStyle(.plain)
             .tint(.clear)

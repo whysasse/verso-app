@@ -227,8 +227,14 @@ struct ArticleReaderView: View {
             if isPillVisible {
                 VStack {
                     Spacer()
+                    // FAB-318: was `.padding(.bottom, 80)`, which floated the pill mid-screen
+                    // over whatever body text happened to be there -- it only ever shows on
+                    // first entering immersive mode, exactly when the bottom bar's own frame
+                    // has collapsed to 0, so anchoring it near the true bottom safe area (where
+                    // the bar used to sit) keeps it clear of the reading column regardless of
+                    // scroll position.
                     ImmersiveHintPill(isVisible: $isPillVisible)
-                        .padding(.bottom, 80)
+                        .padding(.bottom, safeAreaBottom + VersoSpacing.lg)
                 }
             }
         }
