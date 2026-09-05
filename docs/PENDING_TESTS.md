@@ -26,7 +26,7 @@ branches' entries, not by picking one side.
 ### FAB-308 — Localize the reading chrome's accessibility strings
 
 - **Branch:** `fab-308-localize-reading-chrome`
-- **PR:** _(added right after this doc is committed — see PR link in chat)_
+- **PR:** [whysasse/verso-app#372](https://github.com/whysasse/verso-app/pull/372)
 
 Open any article and reveal the reading chrome (tap the article to show/hide
 the bars). Ideally test with the device language set to **French (Canada)**
