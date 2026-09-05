@@ -8,6 +8,11 @@ struct EmptyState: View {
     }
 
     let variant: Variant
+    /// FAB-319: the caller supplies the action since only it knows how to add an article or
+    /// clear the active filters -- `EmptyState` itself just renders whichever CTA `ctaTitle`
+    /// names for this variant. `nil` (the default) renders no button, e.g. `.noArchived`, which
+    /// has no CTA copy and isn't currently instantiated anywhere in the app.
+    var onAction: (() -> Void)? = nil
     @EnvironmentObject var themeManager: ThemeManager
     private var colors: ThemeColors { themeManager.colors }
 
@@ -23,6 +28,12 @@ struct EmptyState: View {
                 Text(headline)
                     .font(.system(.title3).weight(.semibold))
                     .foregroundColor(colors.textPrimary)
+
+                if let ctaTitle, let onAction {
+                    Button(ctaTitle, action: onAction)
+                        .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
+                        .padding(.horizontal, VersoSpacing.xl)
+                }
 
                 Text(subheadline)
                     .font(VersoTypography.UI.listSubtitle)
@@ -51,6 +62,14 @@ struct EmptyState: View {
         }
     }
 
+    private var ctaTitle: String? {
+        switch variant {
+        case .empty:      return L10n.Home.emptyNoArticlesCta
+        case .searchMiss: return L10n.Home.emptyNoResultsCta
+        case .noArchived: return nil
+        }
+    }
+
     private var subheadline: String {
         switch variant {
         case .empty:      return L10n.Home.emptyNoArticlesSubheadline
@@ -62,9 +81,9 @@ struct EmptyState: View {
 
 #Preview {
     VStack {
-        EmptyState(variant: .empty)
+        EmptyState(variant: .empty, onAction: {})
         Divider()
-        EmptyState(variant: .searchMiss)
+        EmptyState(variant: .searchMiss, onAction: {})
     }
     .environmentObject(ThemeManager())
 }

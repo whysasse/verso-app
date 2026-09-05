@@ -183,8 +183,9 @@
         "subheadline": "Articles you archive will appear here."
       },
       "noArticles": {
+        "cta": "Add your first article",
         "headline": "No articles yet",
-        "subheadline": "Share an article from Safari to get started."
+        "subheadline": "Or share one from Safari."
       },
       "noRead": {
         "headline": "Nothing read yet",
@@ -195,6 +196,7 @@
         "subheadline": "Articles you're currently reading will appear here."
       },
       "noResults": {
+        "cta": "Clear filters",
         "headline": "No results",
         "subheadline": "Try a different search term."
       },

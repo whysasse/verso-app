@@ -1849,26 +1849,50 @@
         }
       }
     },
-    "home.empty.noArticles.subheadline": {
+    "home.empty.noArticles.cta": {
       "extractionState": "manual",
-      "comment": "Empty state subheadline",
+      "comment": "needs_review. Wired to the same `showAddArticle` binding as the header `+`.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Share an article from Safari to get started."
+            "value": "Add your first article"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Partage un article depuis Safari pour commencer."
+            "value": "Ajoute ton premier article"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Compartilhe um artigo do Safari para começar."
+            "value": "Adicione seu primeiro artigo"
+          }
+        }
+      }
+    },
+    "home.empty.noArticles.subheadline": {
+      "extractionState": "manual",
+      "comment": "needs_review. FAB-319: reworded from \"Share an article from Safari to get started.\" — demoted to the secondary route now that the CTA button above is the primary one.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Or share one from Safari."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ou partage-en un depuis Safari."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Ou compartilhe um do Safari."
           }
         }
       }
@@ -1893,6 +1917,30 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Nenhum resultado"
+          }
+        }
+      }
+    },
+    "home.empty.noResults.cta": {
+      "extractionState": "manual",
+      "comment": "needs_review. Clears search text, date preset, and selected tags.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear filters"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Effacer les filtres"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Limpar filtros"
           }
         }
       }
