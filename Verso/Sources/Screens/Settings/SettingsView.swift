@@ -33,16 +33,16 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 generalSection
-                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                 readingSection
-                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                 storageSection
-                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                 aboutSection
-                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                 privacySection
                 #if DEBUG
-                Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                 debugSection
                 #endif
             }
@@ -107,7 +107,7 @@ struct SettingsView: View {
                     )
                     .padding(.horizontal, VersoSpacing.md)
                     if locale != AppLocale.allCases.last {
-                        Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                        Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                     }
                 }
             }
@@ -134,12 +134,12 @@ struct SettingsView: View {
                     )
                     .padding(.horizontal, VersoSpacing.md)
                     if font.name != availableFonts.last?.name {
-                        Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+                        Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
                     }
                 }
             }
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md).padding(.top, VersoSpacing.sm)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md).padding(.top, VersoSpacing.sm)
 
             // Font size
             HStack {
@@ -179,7 +179,7 @@ struct SettingsView: View {
             .frame(minHeight: 44)
             .padding(.horizontal, VersoSpacing.md)
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
 
             // Theme
             sectionLabel(L10n.ReaderSettings.themeSectionLabel)
@@ -200,7 +200,7 @@ struct SettingsView: View {
             )
             .padding(.horizontal, VersoSpacing.md)
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
 
             SettingsRow(
                 type: .default(label: L10n.Settings.importRowLabel),
@@ -235,7 +235,7 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            Divider().background(colors.border).padding(.horizontal, VersoSpacing.md)
+            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
 
             NavigationLink(destination: PrivacyPolicyView()) {
                 SettingsRow(type: .default(label: L10n.Settings.privacyPolicyRowLabel), usesButtonChrome: false)

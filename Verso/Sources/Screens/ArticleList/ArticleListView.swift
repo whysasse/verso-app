@@ -864,7 +864,7 @@ private struct FilterPanel: View {
                 }
             }
 
-            Divider().background(themeManager.colors.border)
+            Rectangle().frame(height: 1).foregroundColor(themeManager.colors.border)
 
             SearchBar(text: $tagQuery, placeholder: L10n.Home.tagFilterSearchPlaceholder)
                 .padding(.horizontal, VersoSpacing.md)
@@ -872,7 +872,7 @@ private struct FilterPanel: View {
                 .padding(.bottom, VersoSpacing.sm)
                 .environmentObject(themeManager)
 
-            Divider().background(themeManager.colors.border)
+            Rectangle().frame(height: 1).foregroundColor(themeManager.colors.border)
 
             ScrollView {
                 LazyVStack(spacing: 0) {
@@ -883,8 +883,9 @@ private struct FilterPanel: View {
                         selectedTags.removeAll()
                     }
 
-                    Divider()
-                        .background(themeManager.colors.border)
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(themeManager.colors.border)
                         .padding(.leading, VersoSpacing.md)
 
                     if filteredTags.isEmpty && !tagQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
