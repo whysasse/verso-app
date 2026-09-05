@@ -13,6 +13,7 @@ struct DesignSystemPreview: View {
     @State private var selectedTheme: VersoTheme = .paper
 
     private var colors: ThemeColors { ThemeColors.colors(for: selectedTheme) }
+    private var statusPalette: ArticleStatusColors { ArticleStatusColors.colors(for: selectedTheme) }
 
     var body: some View {
         ZStack {
@@ -123,7 +124,7 @@ struct DesignSystemPreview: View {
             ForEach(ArticleStatus.allCases, id: \.rawValue) { status in
                 HStack(spacing: 8) {
                     Circle()
-                        .fill(status.color)
+                        .fill(statusPalette.color(for: status))
                         .frame(width: 14, height: 14)
                     Text(status.rawValue)
                         .font(.system(size: 15))

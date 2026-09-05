@@ -169,16 +169,6 @@ enum ArticleStatus: String, CaseIterable {
         }
     }
 
-    // Badge background color.
-    var color: Color {
-        switch self {
-        case .unread:   return Color(hex: "4A90D9")
-        case .reading:  return Color(hex: "D4A353")
-        case .read:     return Color(hex: "5AAF7A")
-        case .archived: return Color(hex: "8E8E93")
-        }
-    }
-
     // SF Symbol name for the status icon (white, 16pt, inside 28×28 circular badge)
     var icon: String {
         switch self {
@@ -186,6 +176,77 @@ enum ArticleStatus: String, CaseIterable {
         case .reading:  return "book.pages"
         case .read:     return "checkmark"
         case .archived: return "archivebox"
+        }
+    }
+}
+
+/// FAB-325: badge colors, resolved **theme-aware** (decision recorded in `docs/BACKLOG.md`'s
+/// FAB-325 entry, 2026-09-05) -- unlike `VersoHighlightColor` below, which is a content-level
+/// mark deliberately independent of theme. Badges are chrome sitting on a themed surface
+/// (`ArticleCard` on `colors.surface`), the same category as `SemanticColors` above, which
+/// already varies by theme for the same underlying reason: a fixed hue that clears contrast on
+/// a light background can fail it on a near-black one.
+///
+/// Each hue keeps its family across all four themes (still reads as "blue/amber/green/gray" at
+/// a glance) -- only lightness moves, and only as far as the contrast floor below requires.
+/// Two values get an actual hue nudge, both addressing a clash confirmed on-screen 2026-09-03:
+/// `reading` in Ink (amber read as foreign against Ink's cool cast) and `read` in Night (green
+/// read as foreign against Night's warm cast). Computed (WCAG relative luminance), not
+/// eyeballed, same as `docs/DESIGN_TOKENS.md`'s other ratios:
+///
+/// - `unread`, `read`, `archived` target **4.5:1** against white -- they're reused as the
+///   Archive/Mark Read/Mark Unread **swipe-action tints** (`ArticleListView`), which sit behind
+///   a system-rendered white *text* label, not just an icon. `reading` has no such reuse, so it
+///   only needs the **3:1** non-text floor its badge icon actually requires.
+/// - Archive/Unarchive's swipe tint deliberately does **not** reuse `colors.accent`, even though
+///   the pre-fix hardcoded value (`#766655`, Paper's accent) suggests that was the original
+///   intent: `accent` is bright in Night/Ink specifically so a *different* foreground color can
+///   sit on it (FAB-305's white-on-accent fix) -- reusing it here would silently reintroduce
+///   that exact contrast failure behind a label FAB-305 doesn't reach.
+struct ArticleStatusColors {
+    let unread: Color
+    let reading: Color
+    let read: Color
+    let archived: Color
+
+    func color(for status: ArticleStatus) -> Color {
+        switch status {
+        case .unread:   return unread
+        case .reading:  return reading
+        case .read:     return read
+        case .archived: return archived
+        }
+    }
+
+    static let paper = ArticleStatusColors(
+        unread: Color(hex: "2A78CA"),
+        reading: Color(hex: "C28A30"),
+        read: Color(hex: "40845A"),
+        archived: Color(hex: "76767C")
+    )
+
+    static let sepia = paper
+
+    static let night = ArticleStatusColors(
+        unread: Color(hex: "2A78CA"),
+        reading: Color(hex: "C28A30"),
+        read: Color(hex: "408361"),
+        archived: Color(hex: "76767C")
+    )
+
+    static let ink = ArticleStatusColors(
+        unread: Color(hex: "2A78CA"),
+        reading: Color(hex: "A49629"),
+        read: Color(hex: "40845A"),
+        archived: Color(hex: "77767B")
+    )
+
+    static func colors(for theme: VersoTheme) -> ArticleStatusColors {
+        switch theme {
+        case .paper: return .paper
+        case .sepia: return .sepia
+        case .night: return .night
+        case .ink:   return .ink
         }
     }
 }

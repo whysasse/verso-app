@@ -2,15 +2,20 @@ import SwiftUI
 
 struct ImmersiveHintPill: View {
     @Binding var isVisible: Bool
+    @EnvironmentObject var themeManager: ThemeManager
 
     var body: some View {
         if isVisible {
+            // FAB-325: was a hardcoded black pill regardless of theme -- a foreign object
+            // on Paper's cream. Reuses the theme's own highest-contrast pair, inverted
+            // (textPrimary as fill, background as text) -- works in all four themes since
+            // contrast ratio is symmetric, no new color invented.
             Text(L10n.Reading.immersiveHint)
                 .font(.system(size: 13))
-                .foregroundColor(.white)
+                .foregroundColor(themeManager.colors.background)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 6)
-                .background(Color.black.opacity(0.7))
+                .background(themeManager.colors.textPrimary)
                 .clipShape(Capsule())
                 .onTapGesture {
                     isVisible = false
@@ -37,4 +42,5 @@ struct ImmersiveHintPill_Preview: View {
 
 #Preview {
     ImmersiveHintPill_Preview()
+        .environmentObject(ThemeManager())
 }
