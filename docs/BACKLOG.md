@@ -56,7 +56,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → ~~FAB-318~~ (done, see [DONE.md](DONE.md): TTS transport row alignment + immersive hint pill; margins control stays FAB-333 scope) → ~~FAB-322~~ (done, see [DONE.md](DONE.md): section counts + spacing, radio-style date presets, no-source card fallback, VoiceOver-aware success-sheet timing; select-mode layout shift stays FAB-334 scope, Settings-icon placement left as-is per Fabio's call) → FAB-327 (onboarding restructure — **the biggest open product question here**, needs Fabio's call on scope before any implementation, and worth caution touching onboarding this close to submission at all) → **FAB-328 done ahead of sequence, 2026-09-06** (see [DONE.md](DONE.md)): Fabio chose to do it before FAB-327's decision rather than after. 4 of 5 bullets lived in `OnboardingFolderPickerView`/`AnalyticsConsentView`, both screens FAB-327's own proposed fix keeps regardless of outcome, so fixing them first didn't risk being thrown away; the 5th (in `QuickTourView`, which that same proposed fix deletes) stayed open under FAB-328's remainder rather than being done speculatively → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
+  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → ~~FAB-318~~ (done, see [DONE.md](DONE.md): TTS transport row alignment + immersive hint pill; margins control stays FAB-333 scope) → ~~FAB-322~~ (done, see [DONE.md](DONE.md): section counts + spacing, radio-style date presets, no-source card fallback, VoiceOver-aware success-sheet timing; select-mode layout shift stays FAB-334 scope, Settings-icon placement left as-is per Fabio's call) → ~~FAB-328~~ (done, see [DONE.md](DONE.md): real SF Symbols, disabled-Continue hint, "Allow" CTA + equal-weight consent buttons, stale doc note; its last bullet closed as a side effect of FAB-327's fix, below) → **FAB-327 done, minimum-fix scope, 2026-09-06** (see [DONE.md](DONE.md)): Fabio chose the "if too large close to release" minimum from the ticket's own text over the full restructure — global Skip (not tour-only) + a page-dot row that shrinks as you advance, rather than cutting screens. The full restructure (2 screens, Theme/Analytics/Tour relocated) stays open in BACKLOG for a post-launch revisit → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -255,12 +255,14 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
 ### Design critique 2026-09-01 — onboarding & settings
 
-- [ ] 🟡 **FAB-327** · Onboarding is seven screens before the first article  `Backlog` `Medium`
+- [ ] 🟡 **FAB-327** · Onboarding is seven screens before the first article (full restructure)  `Backlog` `Medium`
   ## Scope
 
   Critique §4.1. `OnboardingFlowView` runs Welcome → Theme → Folder → Analytics consent → Tour 1 → Tour 2 → Tour 3. Exactly **one** is functionally required. For an app whose pitch is "less friction than Pocket", a seven-screen gate is the loudest possible contradiction of the positioning, and the page-dot row shows all seven on screen one — so the first thing Welcome communicates is "six more to go".
 
-  * **Skip only exists on the tour** (screens 5–7); theme and analytics can only be answered.
+  **The minimum-fix half of this ticket is done** — see [DONE.md](DONE.md): Skip is now global from screen 1 (not tour-only), and the dot row shrinks as you advance instead of always showing 7. What's below is the larger option Fabio didn't choose for that pass; still open in case it's worth revisiting post-launch.
+
+  * ~~**Skip only exists on the tour** (screens 5–7); theme and analytics can only be answered.~~ **Done**, see DONE.md.
   * **No back affordance.** `advance()` is forward-only; the `TabView` allows a backward swipe but nothing signals it and the dots aren't tappable.
   * **The theme picker runs before any content exists** — asking for a reading-theme choice with nothing to read, using a picker that also lives in Settings and the reading toolbar where it *is* contextual.
   * **The tour explains features for an empty library.** "Share to save" means nothing until there's something to share.
@@ -268,8 +270,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   ## Fix
 
   Cut to two required screens: Welcome and Folder. Move theme to first-article-open (a one-time inline pointer at the reading toolbar). Keep analytics consent but as a sheet on first list launch, not a gate. Convert the tour into an empty state that teaches by pointing at real UI — which also feeds FAB-319.
-
-  If that is too large close to release, the minimum is: make Skip global from screen 1, and show only the dots that remain.
 
   ## Seen 2026-09-03 (Ink)
 
@@ -279,19 +279,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   * **The page-dot row nearly touches the Continue button** — `.padding(.bottom, VersoSpacing.md)` puts it about 16pt under a 50pt button, so it reads as attached to the CTA rather than as screen furniture.
 
   The dots did confirm the count: the theme picker is dot 2 of 7, and tour step 1 is dot 5 of 7.
-
-- [ ] 🔵 **FAB-328** · Onboarding smaller polish (remainder)  `Backlog` `Low`
-  ## Scope
-
-  Critique §4.6. The other 4 bullets this issue originally covered (§4.3-4.5) are
-  done — see [DONE.md](DONE.md). This one bullet stayed open deliberately: it
-  lives in `QuickTourView`, the exact component FAB-327's proposed fix (cut
-  onboarding to Welcome + Folder, convert the tour into an empty-state hint)
-  would delete outright. Fixing it before FAB-327's scope is decided risked being
-  thrown away; pick it up directly if FAB-327 ends up keeping the tour in some
-  form.
-
-  * **Skip stays in the accessibility tree on the last step.** `.opacity(isLastStep ? 0 : 1)` plus `.disabled(...)` — use a conditional instead.
 
 ### Phase E — native iOS shell (1.1)
 

@@ -14,8 +14,6 @@ struct QuickTourView: View {
     let stepNumber: Int
     /// Advances to the next tour step, or finishes onboarding on the final step.
     let onNext: () -> Void
-    /// Skips straight to the end of onboarding, regardless of which tour step this is.
-    let onSkip: () -> Void
 
     private var colors: ThemeColors { themeManager.colors }
     private var isLastStep: Bool { stepNumber == 3 }
@@ -38,11 +36,6 @@ struct QuickTourView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            skipButton
-                .padding(.top, VersoSpacing.md)
-                .padding(.trailing, VersoSpacing.md)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-
             Spacer()
 
             VStack(spacing: VersoSpacing.xl) {
@@ -84,17 +77,6 @@ struct QuickTourView: View {
             .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
         }
     }
-
-    private var skipButton: some View {
-        Button(L10n.Onboarding.tourSkip) {
-            onSkip()
-        }
-        .font(VersoTypography.UI.input)
-        .foregroundColor(colors.textSecondary)
-        .buttonStyle(.plain)
-        .opacity(isLastStep ? 0 : 1)
-        .disabled(isLastStep)
-    }
 }
 
 private struct TourStep: View {
@@ -129,7 +111,7 @@ private struct TourStep: View {
     struct Preview: View {
         @StateObject private var themeManager = ThemeManager()
         var body: some View {
-            QuickTourView(stepNumber: 1, onNext: {}, onSkip: {})
+            QuickTourView(stepNumber: 1, onNext: {})
                 .environmentObject(themeManager)
                 .background(themeManager.colors.background.ignoresSafeArea())
         }
