@@ -8,11 +8,19 @@ script computes ratios straight from the real hex values in
 Verso/Shared/Colors.swift (nothing duplicated here to drift out of sync) and
 asserts every pair that's actually live in the shipped app today.
 
-Two tokens the original critique flagged (`accentPressed`, `warning`) are
-deliberately NOT checked here: neither is used anywhere in shipped UI as of
-this writing (accentPressed only appears in DesignSystemPreview.swift, a
-dev-only screen; warning doesn't appear in any SwiftUI view at all). Add them
-to PAIRS below the day something actually renders with them.
+Three tokens the original critique flagged (`accentPressed`, `warning`,
+`placeholder` against `surface`) are deliberately NOT checked here.
+`accentPressed`/`warning`: neither is used anywhere in shipped UI as of this
+writing (accentPressed only appears in DesignSystemPreview.swift, a dev-only
+screen; warning doesn't appear in any SwiftUI view at all) -- add them the
+day something actually renders with them. `placeholder`/`surface` (FAB-336):
+its only live pairing against `surface` is LoadingState.swift's skeleton-
+loading shimmer, a decorative fill DESIGN_TOKENS.md explicitly describes as
+meant to "blend into the background" -- not a WCAG 1.4.11 "UI component" a
+user needs to identify, so it's out of scope for this check by design, not
+oversight. `placeholder` WAS also SearchBar's clear-icon color (a real
+failure this script caught) until FAB-336 moved that icon onto
+`textSecondary` instead, already checked below.
 
 Usage: python3 scripts/check_contrast.py
 Exit code 0 = every live pair passes (KNOWN_FAILURES notwithstanding), 1 = a
@@ -38,7 +46,6 @@ THEME_COLOR_PAIRS = [
     ("accent", "surface", 4.5, "used as inline link text in articles"),
     ("border", "background", 3.0, "non-text: dividers, field outlines, progress track"),
     ("border", "surface", 3.0, "non-text: dividers, field outlines, progress track"),
-    ("placeholder", "surface", 3.0, "non-text: SearchBar's clear (xmark.circle.fill) icon"),
 ]
 
 # Live outside ThemeColors: SemanticColors.error is the inline field-error
@@ -57,17 +64,13 @@ SEMANTIC_COLOR_PAIRS = [
 BADGE_TEXT_STATUSES = ["unread", "read", "archived"]
 BADGE_ICON_ONLY_STATUSES = ["reading"]
 
-# Pairs that are real, live, and currently fail -- tracked as FAB-336 rather
-# than silently passed or left to break the build on a Medium/Backlog ticket.
+# Pairs that are real, live, and currently fail -- would be tracked as a new
+# backlog issue rather than silently passed or left to break the build on a
+# Low/Medium-priority ticket. Empty as of FAB-336 (2026-09-06): both pairs
+# once listed here (placeholder/surface, error/surface) are resolved -- see
+# the module docstring and docs/DONE.md's FAB-336 entry.
 # (theme, foreground_token, background_token)
-KNOWN_FAILURES = {
-    ("paper", "placeholder", "surface"),
-    ("sepia", "placeholder", "surface"),
-    ("night", "placeholder", "surface"),
-    ("ink", "placeholder", "surface"),
-    ("paper", "error", "surface"),
-    ("sepia", "error", "surface"),
-}
+KNOWN_FAILURES: set[tuple[str, str, str]] = set()
 
 
 def relative_luminance(hex_color: str) -> float:
@@ -182,7 +185,7 @@ def main() -> int:
 
     stale_known_failures = KNOWN_FAILURES - known_failures_seen
     if stale_known_failures:
-        print(f"NOTE: these KNOWN_FAILURES entries now pass -- remove them and close out FAB-336 for: {sorted(stale_known_failures)}")
+        print(f"NOTE: these KNOWN_FAILURES entries now pass -- remove them and close out the tracking issue for: {sorted(stale_known_failures)}")
 
     if failures:
         print(f"\n{len(failures)} contrast regression(s) found:", file=sys.stderr)
@@ -190,7 +193,10 @@ def main() -> int:
             print(f"  FAIL: {f}", file=sys.stderr)
         return 1
 
-    print(f"\nAll live pairs pass (or are documented KNOWN_FAILURES tracked as FAB-336: {len(known_failures_seen)} of them).")
+    if known_failures_seen:
+        print(f"\nAll live pairs pass, except {len(known_failures_seen)} documented KNOWN_FAILURES.")
+    else:
+        print("\nAll live pairs pass. No documented KNOWN_FAILURES.")
     return 0
 
 

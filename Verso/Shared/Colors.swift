@@ -107,14 +107,19 @@ struct SemanticColors {
     let warning: Color
     let success: Color
 
+    // FAB-336: `error` darkened ~10% (C0392B -> AD3327, hue preserved via uniform RGB
+    // scaling -- same method the v1.1 textSecondary fix used) to clear 4.5:1 against
+    // `surface` for VersoTextField's inline error caption. Was 4.46:1 (Paper) / 4.07:1
+    // (Sepia), computed by `scripts/check_contrast.py`; now 5.25:1 / 4.79:1, with real
+    // headroom rather than sitting right at the line.
     static let paper = SemanticColors(
-        error: Color(hex: "C0392B"),
+        error: Color(hex: "AD3327"),
         warning: Color(hex: "B45309"),
         success: Color(hex: "166534")
     )
 
     static let sepia = SemanticColors(
-        error: Color(hex: "C0392B"),
+        error: Color(hex: "AD3327"),
         warning: Color(hex: "B45309"),
         success: Color(hex: "166534")
     )

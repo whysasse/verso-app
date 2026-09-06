@@ -25,8 +25,14 @@ struct SearchBar: View {
                 Button {
                     text = ""
                 } label: {
+                    // FAB-336: was colors.placeholder (1.12-1.55:1 against surface across
+                    // themes, well under the 3:1 non-text floor -- `scripts/check_contrast.py`
+                    // caught it). `placeholder` is meant for decorative, intentionally-recessive
+                    // fills (skeleton loaders) per DESIGN_TOKENS.md, not an icon someone needs to
+                    // see -- the actual fix is matching this to the magnifying glass above, the
+                    // other neutral utility icon in this same control, already validated ≥4.5:1.
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(colors.placeholder)
+                        .foregroundColor(colors.textSecondary)
                 }
                 .buttonStyle(.plain)
             }
