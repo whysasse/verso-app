@@ -756,6 +756,68 @@
   control before this) and whether the shrinking-dots row feels right in
   motion are Fabio's part — added to `docs/PENDING_TESTS.md`.
 
+### Design critique — CI contrast check (FAB-314)
+
+- [x] 🟡 **FAB-314** · Replace accessibility-specs' hand-maintained contrast tables with a CI check  `Done` `Medium`
+  Critique §3.2: `accessibility-specs.md` §3.3 claimed *"All color issues are
+  resolved. No remaining failures"* — true only for the 6 pairs it happened
+  to audit (Text Primary/Secondary/Accent against Background/Surface), never
+  checked against the rest of `Colors.swift`'s tokens. Closed 2026-09-06.
+
+  ## What I found before writing the check
+
+  Went through every real call site of the tokens the critique flagged,
+  rather than trusting its table at face value:
+
+  * `accentPressed` and `warning` are **not used anywhere in shipped UI** —
+    `accentPressed` only appears in `DesignSystemPreview.swift` (a dev-only
+    screen reachable solely from its own `#Preview`), and `warning` doesn't
+    appear in any SwiftUI view at all. Excluded from the checker rather than
+    filed as debt — there's no live bug behind either.
+  * `placeholder` and `error` are genuinely live (`SearchBar`'s clear icon,
+    `VersoTextField`'s error caption) and genuinely fail today — see FAB-336.
+  * `border` and the badge/swipe-tint white-on-color pairs are real and
+    already fixed by FAB-325 — included as regression guards, not because
+    they're currently broken.
+
+  ## Fix
+
+  * **`scripts/check_contrast.py`** (new): standalone Python, no Xcode/
+    Simulator dependency — regex-extracts hex literals straight out of
+    `Verso/Shared/Colors.swift` (`ThemeColors`, `SemanticColors`,
+    `ArticleStatusColors`), computes WCAG 2.1 relative luminance/contrast,
+    and asserts every pair actually live in the app across all 4 themes.
+    Carries a small, explicit `KNOWN_FAILURES` list for the 2 pairs FAB-336
+    tracks — so the check is honest (never silently claims zero failures)
+    without blocking the pipeline on debt this ticket wasn't scoped to fix;
+    any pair failing *outside* that list still fails the build, and the
+    script prints a note if a tracked failure starts passing (so the
+    exceptions list doesn't quietly go stale once FAB-336 lands).
+  * **`.github/workflows/ci.yml`**: new `contrast-check` job on
+    `ubuntu-latest` (no Xcode needed at all — the fastest and cheapest of
+    the three jobs), running the script on every push/PR.
+  * **`accessibility-specs.md`** §3.3: replaced the false "no remaining
+    failures" claim with what's actually true — contrast is enforced by the
+    new script now, §3.2's tables stay as historical record only, and the 2
+    genuine failures are named with a pointer to FAB-336. Also corrected two
+    other stale references to a Text Secondary failure that was actually
+    fixed in v1.1 (§6, §7.2) — leftover from before that fix shipped,
+    unrelated to this ticket but caught while in the same section.
+  * New issue **FAB-336** filed for the 2 genuine failures (search-clear
+    icon vs. surface, inline error caption vs. surface, Paper/Sepia) — not
+    fixed here, since picking new hex values is a design call, not mine to
+    make silently.
+
+  ## Verify
+
+  Unlike most iOS work in this session, I could actually run this one
+  myself: `python3 scripts/check_contrast.py` against the real
+  `Colors.swift`, confirmed it reproduces every ratio the critique table and
+  §3.2 already state, and confirmed it correctly flags a failure when a
+  passing pair is deliberately broken (tested against a scratch copy, not
+  the real file). CI's new `contrast-check` job proves the same script runs
+  clean there. No Swift files changed, so the two Xcode jobs are unaffected.
+
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
 - [x] 🟠 **FAB-297** · Long-press menu shows the wrong read/unread action, and archived articles can't be unarchived  `Done` `High`

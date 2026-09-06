@@ -7,6 +7,19 @@ on:
     branches: [main]
 
 jobs:
+  # FAB-314: WCAG contrast check over Verso/Shared/Colors.swift's actual hex
+  # values -- no Xcode/Simulator involved (pure Python + regex + math), so this
+  # runs on ubuntu-latest instead of the macos-26 runners the two build jobs
+  # below need, and finishes long before either of them. See the script's own
+  # docstring for what it checks and why some known failures don't fail CI.
+  contrast-check:
+    name: Contrast check (design tokens)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - run: python3 scripts/check_contrast.py
+
   # Fast smoke check: Debug, generic iOS destination so it builds without a
   # device/simulator boot. Kept alongside the Release/iOS job below because it's
   # ~1 minute and catches ordinary compile errors on every push/PR without
