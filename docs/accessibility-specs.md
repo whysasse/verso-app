@@ -1,8 +1,8 @@
 # Accessibility Specs & Checklist — Verso
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-09-06
-**Status:** Final — all decisions resolved, ready for Figma handoff and development. Contrast enforcement moved to `scripts/check_contrast.py` (see §3.3).
+**Status:** Final — all decisions resolved, ready for Figma handoff and development. Contrast enforcement moved to `scripts/check_contrast.py` (see §3.3), which now passes clean with zero known failures.
 **Related:** FAB-67 · [Design System Foundations](DESIGN_SYSTEM_FOUNDATIONS.md)
 
 ---
@@ -121,14 +121,25 @@ Contrast is now enforced by **`scripts/check_contrast.py`** in CI (the
 here — this table stays as historical record of the original 24-pair audit,
 but is no longer the source of truth for whether contrast passes.
 
-Two pairs the script checks are genuine, currently-failing debt, tracked as
-**FAB-336**:
+**Resolved 2026-09-06 (FAB-336).** The 2 pairs the script found were fixed,
+not silently tracked:
 
-- `placeholder` vs `surface` (SearchBar's clear icon) — 1.12–1.55:1 across
-  the 4 themes, needs 3:1 non-text.
 - `error` (SemanticColors) vs `surface` (VersoTextField's inline error
-  caption, 13pt) — 4.46:1 (Paper) / 4.07:1 (Sepia), needs 4.5:1. Night and
-  Ink already pass.
+  caption, 13pt) — was 4.46:1 (Paper) / 4.07:1 (Sepia), needed 4.5:1.
+  Darkened `error` ~10% (`#C0392B` → `#AD3327`, hue preserved via uniform
+  RGB scaling, same method the v1.1 Text Secondary fix used) — now 5.25:1 /
+  4.79:1. Night and Ink were already fine.
+- `placeholder` vs `surface` (SearchBar's clear icon) — was 1.12–1.55:1
+  across the 4 themes, needed 3:1 non-text. Not a token-value fix: the icon
+  was on the wrong token to begin with. `placeholder`'s documented role
+  (`DESIGN_TOKENS.md`) is decorative fills meant to *blend into* the
+  background (skeleton loaders), not something a user needs to see —
+  darkening it enough to fix the icon would have made every skeleton loader
+  more visible too. Moved the clear icon onto `textSecondary` instead,
+  matching the magnifying-glass icon beside it (already ≥4.5:1 everywhere).
+  `placeholder`'s only remaining live pairing (the skeleton loaders) is
+  intentionally outside `scripts/check_contrast.py`'s scope now — see that
+  script's own docstring.
 
 Two tokens the critique also flagged, `accentPressed` and `warning`, are
 **not** checked and not tracked as failures: neither is used anywhere in
@@ -362,6 +373,7 @@ All open questions resolved. No outstanding items.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.4 | 2026-09-06 | FAB-336: fixed the 2 failures FAB-314's check found. `error` darkened ~10% to clear 4.5:1 (Paper/Sepia). `placeholder` needed no color change — SearchBar's clear icon was on the wrong token; moved it to `textSecondary` and scoped the checker to stop treating `placeholder`/`surface` as a checked pair, since its only remaining live use (skeleton loaders) is intentionally recessive by design. `scripts/check_contrast.py` now passes with zero known failures. |
 | 1.3 | 2026-09-06 | FAB-314: corrected §3.3's "no remaining failures" claim, which only ever covered the 6 pairs in §3.2. Contrast is now enforced by `scripts/check_contrast.py` in CI, computed from `Colors.swift` directly; §3.2's tables stay as historical record only. 2 genuine open failures tracked as FAB-336. |
 | 1.2 | 2026-04-19 | Accent tokens fixed in Paper (`#7B6B5A` → `#766655`) and Sepia (`#8B6340` → `#825A37`). All 3 open design questions resolved and documented in Section 8. Status updated to Final. |
 | 1.1 | 2026-04-19 | Text Secondary tokens fixed in all 4 themes. Paper: `#8C857D` → `#6E675F`. Sepia: `#8A7355` → `#755E40`. Night: `#8A847A` → `#8F897F`. Ink: `#7B818F` → `#7E8492`. All Text Secondary pairs now pass WCAG AA. |

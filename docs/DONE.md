@@ -889,6 +889,64 @@
   the real file). CI's new `contrast-check` job proves the same script runs
   clean there. No Swift files changed, so the two Xcode jobs are unaffected.
 
+### Design critique — fix the 2 contrast failures the CI check found (FAB-336)
+
+- [x] 🔵 **FAB-336** · Fix the 2 contrast failures `scripts/check_contrast.py` surfaces  `Done` `Low`
+  Both pairs FAB-314's new check found, computed from `Colors.swift`'s real
+  hex values: `placeholder` on `surface` (`SearchBar`'s clear icon, all 4
+  themes, 1.12-1.55:1 against a 3:1 non-text floor) and `error` on `surface`
+  (`VersoTextField`'s inline error caption, Paper 4.46:1 / Sepia 4.07:1
+  against 4.5:1). Closed 2026-09-06.
+
+  ## What I found once I actually looked at the fix
+
+  `error` was a straightforward hex change. `placeholder` turned out not to
+  need one — and changing it would have been the wrong fix. It has exactly
+  2 real call sites: `SearchBar`'s clear-button icon (the one the critique
+  actually flagged — its own "Where" column said "Search clear button"),
+  and `LoadingState.swift`'s skeleton-loading shimmer bars.
+  `DESIGN_TOKENS.md` describes this token's role as fills that should
+  *"blend into the background"* — a decorative, intentionally-recessive
+  loading placeholder, not a WCAG 1.4.11 "UI component" a user needs to
+  identify. Darkening the shared token enough to fix the search icon would
+  have also made every skeleton loader more visible, which nothing asked
+  for and the token's own documented intent argues against.
+
+  The actual bug: `SearchBar`'s clear icon was on the wrong token. It's one
+  of two neutral utility icons in the same control, and the magnifying
+  glass two lines above it already used `colors.textSecondary` — already
+  validated ≥4.5:1 against `surface` in every theme, comfortably clearing
+  the 3:1 floor too.
+
+  ## Fix
+
+  * **`SearchBar.swift`:** clear-button icon's `colors.placeholder` →
+    `colors.textSecondary`, matching the search icon beside it. No token
+    value touched.
+  * **`Colors.swift`:** `SemanticColors.paper`/`.sepia`'s `error`
+    `#C0392B` → `#AD3327` (~10% darker, hue preserved via uniform RGB
+    scaling, same method the v1.1 Text Secondary fix used). Paper
+    4.46→5.25:1, Sepia 4.07→4.79:1 — real headroom, not sitting right at
+    the line. Nothing else uses `error` in a way this could regress — its
+    only other call site is a 56pt non-text icon on `background`, which
+    only gets *more* contrast from a darker red.
+  * **`scripts/check_contrast.py`:** removed `placeholder`/`surface` from
+    the checked pairs entirely — its only remaining live pairing (the
+    skeleton loader) is intentionally outside WCAG 1.4.11's scope, not an
+    oversight. `KNOWN_FAILURES` is now empty.
+  * **`accessibility-specs.md`** §3.3: both failures marked resolved with
+    what actually changed, replacing the "2 genuine open failures" note.
+
+  ## Verify
+
+  Same as FAB-314, I could verify this myself: `python3
+  scripts/check_contrast.py` against the real `Colors.swift` now exits 0
+  with zero `KNOWN_FAILURES`, and still correctly flags a deliberately-
+  broken pair (re-ran the same scratch-copy regression test FAB-314 used).
+  CI's `contrast-check` job proves the same. No on-device testing needed —
+  a pure color-value + tooling change, nothing new to look at that wasn't
+  already validated by the passing script.
+
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
 - [x] 🟠 **FAB-297** · Long-press menu shows the wrong read/unread action, and archived articles can't be unarchived  `Done` `High`

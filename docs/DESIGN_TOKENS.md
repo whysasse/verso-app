@@ -186,10 +186,17 @@ These tokens communicate state and outcome. Because themes vary widely in lumina
 
 | Theme | Hex |
 |-------|-----|
-| Paper | `#C0392B` |
-| Sepia | `#C0392B` |
+| Paper | `#AD3327` |
+| Sepia | `#AD3327` |
 | Night | `#F87171` |
 | Ink   | `#FC8181` |
+
+FAB-336 (2026-09-06): Paper/Sepia darkened from `#C0392B` — that value cleared
+`background` (4.87/5.31:1) but not `surface` (4.46/4.07:1, below the 4.5:1
+this section itself calls for), caught by `scripts/check_contrast.py`. Hue
+preserved via uniform RGB scaling, same method as the v1.1 Text Secondary
+fix (`accessibility-specs.md` §9). Now clears both: `background`
+5.64/5.27:1, `surface` 5.25/4.79:1.
 
 ---
 
