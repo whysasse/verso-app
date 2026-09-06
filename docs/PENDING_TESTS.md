@@ -17,36 +17,6 @@ xcodegen generate` before opening `Verso.xcodeproj`.
 
 ## Open
 
-### FAB-327 — Onboarding: global Skip + shrinking page dots (minimum fix)
-
-- **Branch:** `claude/fab-327-onboarding-skip-dots`
-- **PR:** [whysasse/verso-app#389](https://github.com/whysasse/verso-app/pull/389)
-
-Delete the app (or reset onboarding some other way — it only runs once per
-install) and go through onboarding fresh.
-
-- [ ] **Skip is now visible on every screen** (Welcome, Theme, Folder,
-      Analytics consent, Tour steps 1–2) top-trailing, not just on the tour.
-      Confirm it doesn't collide with anything on any of those screens —
-      none of them were designed with a persistent top-trailing control
-      before this.
-- [ ] **Skip disappears on the last tour step** (step 3, "Start reading") —
-      confirm there's no ghost tap target where it used to be, and with
-      VoiceOver on, swipe through the screen and confirm Skip is not
-      announced at all on that last step.
-- [ ] **Tapping Skip from each screen** ends onboarding cleanly and lands on
-      the article list. From before Folder is picked, confirm you land on
-      the "choose a folder" prompt rather than anything broken. From before
-      Analytics consent, confirm Settings still shows analytics as off
-      (unanswered = opted out, same as "No thanks").
-- [ ] **Page dots shrink as you advance** — screen 1 shows 7 dots, and by
-      the last tour step only 1 dot remains, instead of always showing 7
-      with the highlight moving along. Check this feels right in motion,
-      not just correct as a snapshot.
-- [ ] **Swiping back still works** on any screen (unrelated to this fix, but
-      worth confirming the dot-shrinking didn't do anything odd to layout
-      when swiping backward before Skip has hidden any dots).
-
 ### FAB-308 — Localize the reading chrome's accessibility strings
 
 - **Branch:** `fab-308-localize-reading-chrome`
@@ -291,6 +261,41 @@ again.
       **Português (Brasil)** and confirm "Autoriser"/"Permitir" show
       correctly — these are first-draft translations, not yet linguistically
       reviewed.
+
+---
+
+### FAB-327 — Onboarding: global Skip + shrinking page dots (minimum fix)
+
+- **Branch:** `claude/fab-327-onboarding-skip-dots` (merged 2026-09-06)
+- **PR:** [whysasse/verso-app#389](https://github.com/whysasse/verso-app/pull/389) — merged
+
+Also closes FAB-328's last bullet (Skip stayed in the accessibility tree on
+the last tour step) as a side effect — nothing separate to check for that.
+
+Delete the app (or reset onboarding some other way — it only runs once per
+install) and go through onboarding fresh.
+
+- [ ] **Skip is now visible on every screen** (Welcome, Theme, Folder,
+      Analytics consent, Tour steps 1–2) top-trailing, not just on the tour.
+      Confirm it doesn't collide with anything on any of those screens —
+      none of them were designed with a persistent top-trailing control
+      before this.
+- [ ] **Skip disappears on the last tour step** (step 3, "Start reading") —
+      confirm there's no ghost tap target where it used to be, and with
+      VoiceOver on, swipe through the screen and confirm Skip is not
+      announced at all on that last step.
+- [ ] **Tapping Skip from each screen** ends onboarding cleanly and lands on
+      the article list. From before Folder is picked, confirm you land on
+      the "choose a folder" prompt rather than anything broken. From before
+      Analytics consent, confirm Settings still shows analytics as off
+      (unanswered = opted out, same as "No thanks").
+- [ ] **Page dots shrink as you advance** — screen 1 shows 7 dots, and by
+      the last tour step only 1 dot remains, instead of always showing 7
+      with the highlight moving along. Check this feels right in motion,
+      not just correct as a snapshot.
+- [ ] **Swiping back still works** on any screen (unrelated to this fix, but
+      worth confirming the dot-shrinking didn't do anything odd to layout
+      when swiping backward before Skip has hidden any dots).
 
 ---
 
