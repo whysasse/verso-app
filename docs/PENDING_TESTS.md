@@ -20,7 +20,7 @@ xcodegen generate` before opening `Verso.xcodeproj`.
 ### FAB-333 — Reading measure: OpenDyslexic per-family sizing + new Margins control
 
 - **Branch:** `claude/fab-333-reading-measure`
-- **PR:** (opening next)
+- **PR:** [whysasse/verso-app#391](https://github.com/whysasse/verso-app/pull/391)
 
 This is the one I most want your honest read on, not just check/uncheck —
 two real judgment calls I made without being able to see either on a
