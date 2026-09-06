@@ -465,6 +465,7 @@ private struct ArticleListFetchedBody: View {
                 if !continueReadingArticles.isEmpty {
                     sectionHeader(
                         title: L10n.Home.sectionContinueReading,
+                        count: continueReadingArticles.count,
                         accessibilityLabel: L10n.Home.sectionContinueReadingAccessibilityLabel(count: continueReadingArticles.count)
                     )
                     articleRows(continueReadingArticles, showsProgress: true)
@@ -473,6 +474,7 @@ private struct ArticleListFetchedBody: View {
                 if !unreadArticles.isEmpty {
                     sectionHeader(
                         title: L10n.Filter.unread,
+                        count: unreadArticles.count,
                         accessibilityLabel: L10n.Filter.unreadAccessibilityLabel(count: unreadArticles.count)
                     )
                     articleRows(unreadArticles)
@@ -481,6 +483,7 @@ private struct ArticleListFetchedBody: View {
                 if !readArticles.isEmpty {
                     collapsibleSectionHeader(
                         title: L10n.Filter.read,
+                        count: readArticles.count,
                         accessibilityLabel: L10n.Filter.readAccessibilityLabel(count: readArticles.count),
                         isExpanded: $isReadExpanded
                     )
@@ -494,6 +497,7 @@ private struct ArticleListFetchedBody: View {
                 if !archivedArticles.isEmpty {
                     collapsibleSectionHeader(
                         title: L10n.Filter.archived,
+                        count: archivedArticles.count,
                         accessibilityLabel: L10n.Filter.archivedAccessibilityLabel(count: archivedArticles.count),
                         isExpanded: $isArchivedExpanded
                     )
@@ -583,35 +587,49 @@ private struct ArticleListFetchedBody: View {
 
     // MARK: - Sections
 
-    private func sectionHeader(title: String, accessibilityLabel: String) -> some View {
-        Text(title)
-            .font(VersoTypography.UI.listTitle)
-            .foregroundColor(themeManager.colors.textPrimary)
-            .padding(.horizontal, VersoSpacing.md)
-            .padding(.top, VersoSpacing.md)
-            .padding(.bottom, VersoSpacing.xs)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityLabel(accessibilityLabel)
-            .listRowInsets(EdgeInsets())
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
+    // FAB-322: the count was already reaching VoiceOver via `accessibilityLabel`
+    // ("Unread, 12 articles") but never rendered on screen -- a sighted user just saw
+    // "Unread". The old chip bar showed it; this restores that without new chrome, a
+    // bare digit needs no localization. Also raised top padding (was `.md`, 16pt) to
+    // `.lg` (24pt) so sections read as separated groups, not barely-wider card gaps.
+    private func sectionHeader(title: String, count: Int, accessibilityLabel: String) -> some View {
+        HStack(spacing: VersoSpacing.xs) {
+            Text(title)
+                .font(VersoTypography.UI.listTitle)
+                .foregroundColor(themeManager.colors.textPrimary)
+            Text("\(count)")
+                .font(VersoTypography.UI.listTitle)
+                .foregroundColor(themeManager.colors.textSecondary)
+        }
+        .padding(.horizontal, VersoSpacing.md)
+        .padding(.top, VersoSpacing.lg)
+        .padding(.bottom, VersoSpacing.xs)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
-    private func collapsibleSectionHeader(title: String, accessibilityLabel: String, isExpanded: Binding<Bool>) -> some View {
+    private func collapsibleSectionHeader(title: String, count: Int, accessibilityLabel: String, isExpanded: Binding<Bool>) -> some View {
         Button {
             withAnimation(VersoAnimation.fast) { isExpanded.wrappedValue.toggle() }
         } label: {
-            HStack {
+            HStack(spacing: VersoSpacing.xs) {
                 Text(title)
                     .font(VersoTypography.UI.listTitle)
                     .foregroundColor(themeManager.colors.textPrimary)
+                Text("\(count)")
+                    .font(VersoTypography.UI.listTitle)
+                    .foregroundColor(themeManager.colors.textSecondary)
                 Spacer()
                 Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(themeManager.colors.textSecondary)
             }
             .padding(.horizontal, VersoSpacing.md)
-            .padding(.top, VersoSpacing.md)
+            .padding(.top, VersoSpacing.lg)
             .padding(.bottom, VersoSpacing.xs)
             .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
             .contentShape(Rectangle())
@@ -859,7 +877,7 @@ private struct FilterPanel: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             ForEach(ArticleListDatePreset.allCases) { preset in
-                tagRow(title: preset.displayLabel, isSelected: datePreset == preset) {
+                tagRow(title: preset.displayLabel, isSelected: datePreset == preset, isSingleSelect: true) {
                     datePreset = preset
                 }
             }
@@ -937,7 +955,13 @@ private struct FilterPanel: View {
         .padding(.top, VersoSpacing.md)
     }
 
-    private func tagRow(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+    /// FAB-322: date presets and tags previously shared this exact row, differing only in
+    /// which one happened to have a checkmark on it -- despite being different selection
+    /// models (dates are single-select, tags are multi-select). `isSingleSelect` swaps the
+    /// checkmark (appears only when selected, the standard multi-select affordance) for a
+    /// radio-style indicator that's always visible (outline when unselected, filled when
+    /// selected) -- the standard iOS cue that exactly one option is always chosen.
+    private func tagRow(title: String, isSelected: Bool, isSingleSelect: Bool = false, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: VersoSpacing.sm) {
                 Text(title)
@@ -945,7 +969,11 @@ private struct FilterPanel: View {
                     .foregroundColor(themeManager.colors.textPrimary)
                     .lineLimit(1)
                 Spacer(minLength: VersoSpacing.sm)
-                if isSelected {
+                if isSingleSelect {
+                    Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(isSelected ? themeManager.colors.accent : themeManager.colors.textSecondary)
+                } else if isSelected {
                     Image(systemName: "checkmark")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(themeManager.colors.accent)

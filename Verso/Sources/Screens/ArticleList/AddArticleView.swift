@@ -203,7 +203,13 @@ struct AddArticleView: View {
         }
         .padding(.horizontal, VersoSpacing.md)
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            // FAB-322: 1.5s isn't enough for VoiceOver to finish reading the headline +
+            // subheadline before the sheet dismisses out from under the user. Give it more
+            // room when VoiceOver is actually running -- same accessibility-aware pattern
+            // ArticleReaderView already uses for chrome auto-hide. The exact duration is a
+            // judgment call, not a measured one.
+            let delay = UIAccessibility.isVoiceOverRunning ? 4.0 : 1.5
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 dismiss()
             }
         }
