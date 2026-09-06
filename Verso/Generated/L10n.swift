@@ -628,9 +628,9 @@ enum L10n {
         }
     }
     enum Onboarding {
-        /// "Sure, why not" -- Primary button
+        /// "Allow" -- FAB-328: 'Sure, why not' was the wrong register for a consent affirmative next to this app's otherwise calm, precise copy (e.g. `onboarding.folder.privacyNote`), and compounded the button-weighting problem this same ticket fixed (was `.primary`, now `.secondary`, matching Decline). 'Allow' mirrors Apple's own system permission-prompt wording in all three locales — calm, precise, and pairs naturally with 'No thanks.' Changed 2026-09-06.
         static var analyticsConsentAcceptCta: String {
-            String(localized: "onboarding.analyticsConsent.acceptCta", defaultValue: "Sure, why not", comment: "Primary button")
+            String(localized: "onboarding.analyticsConsent.acceptCta", defaultValue: "Allow", comment: "FAB-328: 'Sure, why not' was the wrong register for a consent affirmative next to this app's otherwise calm, precise copy (e.g. `onboarding.folder.privacyNote`), and compounded the button-weighting problem this same ticket fixed (was `.primary`, now `.secondary`, matching Decline). 'Allow' mirrors Apple's own system permission-prompt wording in all three locales — calm, precise, and pairs naturally with 'No thanks.' Changed 2026-09-06.")
         }
         /// "No thanks" -- Secondary button
         static var analyticsConsentDeclineCta: String {
@@ -652,13 +652,17 @@ enum L10n {
         static var folderContinueCta: String {
             String(localized: "onboarding.folder.continueCta", defaultValue: "Continue", comment: "Added during step 4 view-wiring pass — missed in the original audit.")
         }
+        /// "Choose a folder to continue." -- FAB-328: Continue disabled until a folder is picked, but nothing on screen said why — added 2026-09-06.
+        static var folderContinueDisabledHint: String {
+            String(localized: "onboarding.folder.continueDisabledHint", defaultValue: "Choose a folder to continue.", comment: "FAB-328: Continue disabled until a folder is picked, but nothing on screen said why — added 2026-09-06.")
+        }
         /// "Where should Verso save your articles?" -- Corrected 'store' → 'save' during step 4 view-wiring pass to match shipped code — fr-CA/pt-BR already said 'save' (enregistrer/guardar), so en was the stale one.
         static var folderHeadline: String {
             String(localized: "onboarding.folder.headline", defaultValue: "Where should Verso save your articles?", comment: "Corrected 'store' → 'save' during step 4 view-wiring pass to match shipped code — fr-CA/pt-BR already said 'save' (enregistrer/guardar), so en was the stale one.")
         }
-        /// "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically." -- Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md.
+        /// "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically." -- Shown in `OnboardingFolderPickerView.swift` since FAB-280 (see docs/DONE.md) — this note previously said 'not yet shown,' which is stale; corrected 2026-09-06.
         static var folderObsidianTip: String {
-            String(localized: "onboarding.folder.obsidianTip", defaultValue: "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically.", comment: "Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md.")
+            String(localized: "onboarding.folder.obsidianTip", defaultValue: "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically.", comment: "Shown in `OnboardingFolderPickerView.swift` since FAB-280 (see docs/DONE.md) — this note previously said 'not yet shown,' which is stale; corrected 2026-09-06.")
         }
         /// "Verso never uploads your files. They live in your iCloud Drive." -- Added during step 4 view-wiring pass — missed in the original audit.
         static var folderPrivacyNote: String {

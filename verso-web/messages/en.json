@@ -299,7 +299,7 @@
   },
   "onboarding": {
     "analyticsConsent": {
-      "acceptCta": "Sure, why not",
+      "acceptCta": "Allow",
       "declineCta": "No thanks",
       "headline": "Help make Verso better",
       "subheadline": "Share anonymous usage data — no personal info, no article content, ever."
@@ -307,6 +307,7 @@
     "folder": {
       "chooseCta": "Choose folder…",
       "continueCta": "Continue",
+      "continueDisabledHint": "Choose a folder to continue.",
       "headline": "Where should Verso save your articles?",
       "obsidianTip": "Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically.",
       "privacyNote": "Verso never uploads your files. They live in your iCloud Drive.",

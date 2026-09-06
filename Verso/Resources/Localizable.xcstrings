@@ -361,9 +361,33 @@
         }
       }
     },
+    "onboarding.folder.continueDisabledHint": {
+      "extractionState": "manual",
+      "comment": "FAB-328: Continue disabled until a folder is picked, but nothing on screen said why — added 2026-09-06.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a folder to continue."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Choisis un dossier pour continuer."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Escolha uma pasta para continuar."
+          }
+        }
+      }
+    },
     "onboarding.folder.obsidianTip": {
       "extractionState": "manual",
-      "comment": "Documented but not yet shown in `OnboardingFolderPickerView.swift` — adding it is a UI change, not just a wiring fix. Tracked as FAB-280, see docs/BACKLOG.md.",
+      "comment": "Shown in `OnboardingFolderPickerView.swift` since FAB-280 (see docs/DONE.md) — this note previously said \"not yet shown,\" which is stale; corrected 2026-09-06.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -603,24 +627,24 @@
     },
     "onboarding.analyticsConsent.acceptCta": {
       "extractionState": "manual",
-      "comment": "Primary button",
+      "comment": "FAB-328: \"Sure, why not\" was the wrong register for a consent affirmative next to this app's otherwise calm, precise copy (e.g. `onboarding.folder.privacyNote`), and compounded the button-weighting problem this same ticket fixed (was `.primary`, now `.secondary`, matching Decline). \"Allow\" mirrors Apple's own system permission-prompt wording in all three locales — calm, precise, and pairs naturally with \"No thanks.\" Changed 2026-09-06.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sure, why not"
+            "value": "Allow"
           }
         },
         "fr-CA": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Bien sûr, pourquoi pas"
+            "value": "Autoriser"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "Claro, por que não"
+            "value": "Permitir"
           }
         }
       }

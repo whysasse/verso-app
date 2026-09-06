@@ -31,12 +31,16 @@ struct AnalyticsConsentView: View {
 
             Spacer()
 
+            // FAB-328: both buttons are now `.secondary` -- Accept was `.primary` (filled),
+            // weighting the answer toward opt-in. Given Law 25/GDPR both lean toward
+            // equal-prominence consent, and privacy-first is a real differentiator here,
+            // two equal-weight buttons is the safer, more on-brand choice.
             VStack(spacing: VersoSpacing.sm) {
                 Button(L10n.Onboarding.analyticsConsentAcceptCta) {
                     AnalyticsService.shared.optIn()
                     onNext()
                 }
-                .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
+                .buttonStyle(VersoButtonStyle(variant: .secondary, theme: colors))
 
                 Button(L10n.Onboarding.analyticsConsentDeclineCta, action: onNext)
                     .buttonStyle(VersoButtonStyle(variant: .secondary, theme: colors))

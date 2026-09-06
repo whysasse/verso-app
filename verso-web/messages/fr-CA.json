@@ -299,7 +299,7 @@
   },
   "onboarding": {
     "analyticsConsent": {
-      "acceptCta": "Bien sûr, pourquoi pas",
+      "acceptCta": "Autoriser",
       "declineCta": "Non merci",
       "headline": "Aide à améliorer Verso",
       "subheadline": "Partage des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais."
@@ -307,6 +307,7 @@
     "folder": {
       "chooseCta": "Choisir un dossier…",
       "continueCta": "Continuer",
+      "continueDisabledHint": "Choisis un dossier pour continuer.",
       "headline": "Où Verso doit-il enregistrer tes articles?",
       "obsidianTip": "Tu utilises Obsidian? Pointe Verso vers un dossier dans ton coffre et les articles y apparaîtront automatiquement.",
       "privacyNote": "Verso ne téléverse jamais tes fichiers. Ils restent dans ton iCloud Drive.",
