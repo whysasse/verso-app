@@ -668,6 +668,94 @@
   distinction reads clearly, and timing the VoiceOver announcement against
   the new 4s window is Fabio's part.
 
+### Design critique — onboarding smaller polish (FAB-328)
+
+- [x] 🔵 **FAB-328** · Onboarding smaller polish  `Done` `Low`
+  Critique §4.3-§4.6, 5 bullets total. The first 4 shipped 2026-09-06 (PR #387)
+  but were missed from this file at the time — recorded here retroactively.
+  The 5th was deliberately held back until FAB-327's scope was decided (see
+  its own entry below) and closes now as part of that same change.
+
+  * **Fake glyphs instead of real SF Symbols — fixed.**
+    `OnboardingFolderPickerView`'s `Text("☁")` (a colour emoji `.foregroundColor`
+    couldn't tint) and `Text("›")` (a thin typographic mark, visibly different
+    from the real chevron used elsewhere) replaced with `Image(systemName:
+    "icloud")` and `Image(systemName: "chevron.right")`.
+  * **Disabled Continue had no explanation — fixed.** Added
+    `onboarding.folder.continueDisabledHint` ("Choose a folder to continue.");
+    the caption below Continue now swaps between this and the existing
+    privacy note depending on whether a folder is picked, rather than
+    stacking both.
+  * **Analytics consent CTA wording and weighting — fixed.** Accept's
+    "Sure, why not" → "Allow" (`onboarding.analyticsConsent.acceptCta`,
+    mirrors Apple's own system permission-prompt wording in en/fr-CA/pt-BR).
+    Both buttons are now `.secondary` (Accept was `.primary`) — equal-weight
+    consent, matching Law 25/GDPR's preference for not defaulting the visual
+    weight toward opt-in.
+  * **Stale doc note — fixed.** `onboarding.folder.obsidianTip`'s note in
+    `docs/copy/UI_COPY.md` said "not yet shown... tracked as FAB-280"; FAB-280
+    shipped and the tip has been live in `OnboardingFolderPickerView` since.
+    Corrected the note.
+  * **Skip stayed in the accessibility tree on the last tour step — fixed
+    2026-09-06, as part of FAB-327.** `QuickTourView`'s old
+    `.opacity(isLastStep ? 0 : 1)` + `.disabled(isLastStep)` combination hid
+    the button visually but left it in the tree for VoiceOver/Switch Control.
+    FAB-327's minimum fix moved Skip out of `QuickTourView` entirely (it's
+    global chrome now, see below), and the new home hides it with a plain
+    `if`, which removes it from the tree outright — so this bullet closes as
+    a side effect of that move rather than a standalone fix.
+
+### Design critique — onboarding is seven screens before the first article, minimum fix (FAB-327)
+
+- [x] 🟡 **FAB-327** · Onboarding: global Skip + shrinking page dots (minimum fix)  `Done` `Medium`
+  Critique §4.1: `OnboardingFlowView` runs Welcome → Theme → Folder →
+  Analytics consent → Tour ×3, and only the tour (screens 5–7) had a Skip —
+  Welcome/Theme/Folder/Analytics consent could only be answered forward. The
+  critique's fix has two tiers: cut to 2 required screens (Welcome + Folder,
+  moving Theme/Analytics/Tour elsewhere), or, "if that is too large close to
+  release," the minimum: global Skip + a shrinking dot row. Fabio chose the
+  minimum, given proximity to the final binary submission (FAB-150) — the
+  full restructure stays open, see BACKLOG's trimmed FAB-327 entry.
+
+  ## Fix
+
+  * **Global Skip.** Moved out of `QuickTourView` (where it only existed on
+    tour steps) into `OnboardingFlowView` itself, as a top-trailing overlay
+    on the same outer `ZStack` that already carries `pageDots` as a bottom
+    overlay — so it now floats over every page, Welcome through Tour step 2.
+    Hidden on the last page via `if currentPage < pageCount - 1`, not
+    opacity/disabled, since "Start reading" already ends onboarding there and
+    a second, hidden control shouldn't sit in the accessibility tree (this is
+    also FAB-328's last bullet, above).
+  * **Shrinking page dots.** `pageDots` iterated `0..<pageCount` (always 7,
+    highlight moving along it); now iterates `currentPage..<pageCount`, so
+    the row itself shrinks from 7 dots down to 1 as the user advances instead
+    of staying a constant width.
+  * Verified global Skip is safe to reach before every later screen has been
+    answered: `ArticleListView` already shows `FolderPickerPrompt` whenever
+    `folderBookmarkService.folderURL == nil` (pre-existing, not new), so
+    skipping before Folder just lands the user there; `AnalyticsService`'s
+    opt-in flag defaults to `false` via plain `UserDefaults.bool(forKey:)`,
+    the same opted-out state as tapping "No thanks"; and the theme picker is
+    a preference with its own default, not a requirement. No downstream code
+    assumes onboarding ran to completion.
+
+  ## Not touched
+
+  The rest of FAB-327 — cutting to 2 screens, moving Theme to
+  first-article-open, Analytics consent to a sheet, the tour to an
+  empty-state hint — is the larger option Fabio didn't choose this round.
+  Dots stay non-tappable (not part of the minimum-fix line, and a bigger
+  interaction change).
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves it compiles. Whether Skip
+  reads well positioned top-trailing on every screen (none of
+  Welcome/Theme/Folder/Analytics were designed with a persistent top-trailing
+  control before this) and whether the shrinking-dots row feels right in
+  motion are Fabio's part — added to `docs/PENDING_TESTS.md`.
+
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 
 - [x] 🟠 **FAB-297** · Long-press menu shows the wrong read/unread action, and archived articles can't be unarchived  `Done` `High`
