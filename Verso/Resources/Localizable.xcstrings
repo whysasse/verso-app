@@ -3925,6 +3925,30 @@
         }
       }
     },
+    "reading.controlsSheet.marginsLabel": {
+      "extractionState": "manual",
+      "comment": "FAB-333: new row, next to Font Size and Line Spacing. Reuses `readerSettings.margins.sectionLabel`'s wording since both mean the same thing in the same sheet.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Margins"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Marges"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Margens"
+          }
+        }
+      }
+    },
     "tts.nowPlaying.play": {
       "extractionState": "manual",
       "comment": "Lock screen control",
@@ -4473,6 +4497,102 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Margens"
+          }
+        }
+      }
+    },
+    "readerSettings.margins.wide": {
+      "extractionState": "manual",
+      "comment": "FAB-333: new control. Default (index 0) -- matches the 40pt margin this app always used before this control existed. needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wide"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Large"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Larga"
+          }
+        }
+      }
+    },
+    "readerSettings.margins.normal": {
+      "extractionState": "manual",
+      "comment": "FAB-333: new control. needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Normal"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Normal"
+          }
+        }
+      }
+    },
+    "readerSettings.margins.narrow": {
+      "extractionState": "manual",
+      "comment": "FAB-333: new control. needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Narrow"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Étroite"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Estreita"
+          }
+        }
+      }
+    },
+    "readerSettings.margins.narrowest": {
+      "extractionState": "manual",
+      "comment": "FAB-333: new control. Same 16pt floor `readingHorizontalPadding`'s size-based taper already uses at the top of the font-size scale. needs_review.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Narrowest"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Très étroite"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Bem estreita"
           }
         }
       }

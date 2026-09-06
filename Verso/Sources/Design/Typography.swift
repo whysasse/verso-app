@@ -58,7 +58,21 @@ enum VersoTypography {
         }
 
         func body(_ size: BodySize) -> Font {
-            makeFont(size: size.rawValue, weight: .regular)
+            makeFont(size: renderedBodySize(size).rawValue, weight: .regular)
+        }
+
+        /// FAB-333: OpenDyslexic renders visibly larger than Georgia/New York at the same
+        /// nominal point size -- at the shared scale's default (18pt/`.md`) it reflows the
+        /// body to ~25-30 characters/line, well under the 45-75 comfort range, while Georgia
+        /// at 18pt is fine. Rather than inventing a new point-size scale for OpenDyslexic, this
+        /// renders it one `BodySize` step below whatever the user picked (e.g. `.md` selected
+        /// -> `.sm` rendered), clamped at `.xs`. That's a real but modest ~11% point-size cut --
+        /// OpenDyslexic's problem is partly wider letterforms, not just point size, so this may
+        /// under-correct at the top of the scale. Deliberately conservative and easy to push
+        /// further (change the `-1` below) once someone's actually seen it on a device -- see
+        /// FAB-333 in docs/DONE.md.
+        func renderedBodySize(_ size: BodySize) -> BodySize {
+            fontFamily == "OpenDyslexic-Regular" ? size.stepped(by: -1) : size
         }
 
         private func makeFont(size: CGFloat, weight: Font.Weight) -> Font {

@@ -354,7 +354,11 @@
       "sectionLabel": "Interligne"
     },
     "margins": {
-      "sectionLabel": "Marges"
+      "narrow": "Étroite",
+      "narrowest": "Très étroite",
+      "normal": "Normal",
+      "sectionLabel": "Marges",
+      "wide": "Large"
     },
     "theme": {
       "sectionLabel": "Thème",
@@ -410,7 +414,8 @@
     "controlsSheet": {
       "closeAccessibilityHint": "Fermer les commandes",
       "fontSizeLabel": "Taille du texte",
-      "lineSpacingLabel": "Interligne"
+      "lineSpacingLabel": "Interligne",
+      "marginsLabel": "Marges"
     },
     "header": {
       "byline": "Par {author}"

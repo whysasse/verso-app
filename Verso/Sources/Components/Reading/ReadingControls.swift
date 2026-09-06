@@ -9,6 +9,8 @@ struct ReadingControls: View {
     let variant: Variant
     @Binding var fontSize: CGFloat
     @Binding var lineSpacing: Int
+    /// FAB-333: 0-3, Wide/Normal/Narrow/Narrowest -- see `ArticleReaderView.readingHorizontalPadding`.
+    @Binding var marginLevel: Int
     @EnvironmentObject var themeManager: ThemeManager
     private var colors: ThemeColors { themeManager.colors }
 
@@ -108,6 +110,35 @@ struct ReadingControls: View {
                     }
                 }
             }
+
+            // FAB-333: Wide/Normal/Narrow/Narrowest -- see ArticleReaderView.readingHorizontalPadding
+            // for what each level actually does to the reading column's side padding.
+            HStack {
+                Text(L10n.Reading.controlsSheetMarginsLabel)
+                    .font(VersoTypography.UI.listSubtitle)
+                    .foregroundColor(colors.textSecondary)
+                Spacer()
+                HStack(spacing: VersoSpacing.xs) {
+                    ForEach(0..<4) { index in
+                        Button {
+                            marginLevel = index
+                        } label: {
+                            MarginsIcon(
+                                level: index,
+                                color: marginLevel == index ? colors.accent : colors.textSecondary
+                            )
+                            .frame(width: 44, height: 44)
+                            .background(
+                                RoundedRectangle(cornerRadius: VersoRadius.sm)
+                                    .fill(marginLevel == index ? colors.accentSurface : Color.clear)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(marginsLabel(for: index))
+                        .accessibilityAddTraits(marginLevel == index ? .isSelected : [])
+                    }
+                }
+            }
         }
     }
 
@@ -160,6 +191,15 @@ struct ReadingControls: View {
         }
     }
 
+    private func marginsLabel(for index: Int) -> String {
+        switch index {
+        case 0:  return L10n.ReaderSettings.marginsWide
+        case 1:  return L10n.ReaderSettings.marginsNormal
+        case 2:  return L10n.ReaderSettings.marginsNarrow
+        default: return L10n.ReaderSettings.marginsNarrowest
+        }
+    }
+
     private var themeControls: some View {
         HStack(spacing: 0) {
             ForEach(VersoTheme.allCases) { theme in
@@ -206,14 +246,50 @@ private struct LineSpacingBarsIcon: View {
     }
 }
 
+/// A small "page" outline with two vertical margin marks -- a themable vector
+/// icon in the same style as `LineSpacingBarsIcon` above, for the FAB-333
+/// Margins control. Each mark's distance from the page edge shrinks as the
+/// level narrows, so the icon reads as "how much margin," not just a static
+/// symbol repeated four times with a different fill. Visual judgment call,
+/// same as `LineSpacingBarsIcon`'s bar counts were -- worth a look on device.
+private struct MarginsIcon: View {
+    private static let size: CGFloat = 20
+    /// Distance from the page edge to each margin mark, indexed by level
+    /// (Wide/Normal/Narrow/Narrowest) -- larger means the mark sits further
+    /// into the page, reading as more margin.
+    private static let insets: [CGFloat] = [6, 4, 2.5, 1]
+
+    let level: Int
+    let color: Color
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 3)
+            .stroke(color, lineWidth: 1.5)
+            .frame(width: Self.size, height: Self.size)
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(color)
+                    .frame(width: 2, height: Self.size - 6)
+                    .padding(.leading, Self.insets[level])
+            }
+            .overlay(alignment: .trailing) {
+                Capsule()
+                    .fill(color)
+                    .frame(width: 2, height: Self.size - 6)
+                    .padding(.trailing, Self.insets[level])
+            }
+    }
+}
+
 private struct ReadingControlsPreview: View {
     @State var fontSize: CGFloat = 18
     @State var lineSpacing = 1
+    @State var marginLevel = 0
 
     var body: some View {
         VStack {
             Spacer()
-            ReadingControls(variant: .font, fontSize: $fontSize, lineSpacing: $lineSpacing)
+            ReadingControls(variant: .font, fontSize: $fontSize, lineSpacing: $lineSpacing, marginLevel: $marginLevel)
                 .environmentObject(ThemeManager())
         }
         .background(Color.gray.opacity(0.2))

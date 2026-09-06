@@ -49,7 +49,10 @@ struct ArticleReaderView: View {
     private var lineSpacingValue: CGFloat {
         // Compact=1.2, Normal=1.5, Relaxed=1.75, Airy=2.0
         let multipliers: [CGFloat] = [1.2, 1.5, 1.75, 2.0]
-        return readingPreferences.fontSize * (multipliers[readingPreferences.lineSpacing] - 1)
+        // FAB-333: keyed off the rendered size, not the raw stored step, so extra leading
+        // actually matches the glyphs on screen (matters once OpenDyslexic's render is
+        // smaller than its selected step -- see `ReadingPreferencesService.effectiveFontSize`).
+        return readingPreferences.effectiveFontSize * (multipliers[readingPreferences.lineSpacing] - 1)
     }
 
     /// Matches `ReadingBottomBar`: main row 56pt, + TTS divider + controls when active; plus comfort gap below.
@@ -60,21 +63,25 @@ struct ArticleReaderView: View {
 
     /// FAB-333: the reading column's horizontal padding was a flat 40pt regardless of in-app
     /// font size, so a fixed-width screen gave back proportionally less room as the user sized
-    /// text up -- the measure collapsed hardest exactly where it mattered most. Holds today's
-    /// 40pt through the default size (`BodySize.md`, 18pt) and below, unchanged, then tapers
-    /// linearly down to `VersoSpacing.md` (16pt) as size approaches the top of the scale
-    /// (`BodySize.xxl`, 26pt) -- reclaiming real width at the sizes where it was scarcest.
-    /// Deliberately size-only, not font-family-aware: OpenDyslexic is visually wider than
-    /// Georgia/New York at the same nominal size, but giving it its own mapping means making
-    /// `BodySize` per-family (a bigger change) rather than guessing an unverified width
-    /// multiplier here. See FAB-333 in docs/DONE.md.
+    /// text up -- the measure collapsed hardest exactly where it mattered most. `base` now comes
+    /// from `marginLevel` (the new Margins control) instead of a hardcoded 40, so a user can
+    /// reclaim width manually at any size; whatever that base is, it holds unchanged through the
+    /// default size (`BodySize.md`, 18pt) and below, then tapers linearly down to the shared
+    /// floor `VersoSpacing.md` (16pt) as size approaches the top of the scale (`BodySize.xxl`,
+    /// 26pt) -- reclaiming real width automatically at the sizes where it's scarcest even if the
+    /// user never touches Margins. Keyed off `effectiveFontSize`, not the raw stored step, so the
+    /// taper starts earlier for OpenDyslexic -- whose rendered size is smaller than its selected
+    /// step, but whose *effective* on-screen size is what actually determines whether the measure
+    /// is collapsing. See FAB-333 in docs/DONE.md.
     private var readingHorizontalPadding: CGFloat {
-        let base: CGFloat = 40
+        let bases: [CGFloat] = [40, VersoSpacing.xl, VersoSpacing.lg, VersoSpacing.md]  // Wide/Normal/Narrow/Narrowest
+        let base = bases[readingPreferences.marginLevel]
         let floor: CGFloat = VersoSpacing.md
         let defaultSize = VersoTypography.Reading.BodySize.md.rawValue   // 18
         let maxSize = VersoTypography.Reading.BodySize.xxl.rawValue      // 26
-        guard readingPreferences.fontSize > defaultSize else { return base }
-        let t = min(1, (readingPreferences.fontSize - defaultSize) / (maxSize - defaultSize))
+        let effectiveSize = readingPreferences.effectiveFontSize
+        guard effectiveSize > defaultSize, base > floor else { return base }
+        let t = min(1, (effectiveSize - defaultSize) / (maxSize - defaultSize))
         return base - (base - floor) * t
     }
 
@@ -257,13 +264,15 @@ struct ArticleReaderView: View {
         .navigationBarHidden(true)
         .ignoresSafeArea(edges: .top)
         .sheet(isPresented: $showFontControls) {
-            ReadingControls(variant: .font, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
-                .presentationDetents([.height(218)])
+            // FAB-333: 218 -> 286 to fit the new Margins row (a third row + one more
+            // VersoSpacing.lg gap, ~68pt) without clipping it under the fixed detent.
+            ReadingControls(variant: .font, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing, marginLevel: $readingPreferences.marginLevel)
+                .presentationDetents([.height(286)])
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
         }
         .sheet(isPresented: $showThemeControls) {
-            ReadingControls(variant: .theme, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing)
+            ReadingControls(variant: .theme, fontSize: $readingPreferences.fontSize, lineSpacing: $readingPreferences.lineSpacing, marginLevel: $readingPreferences.marginLevel)
                 .presentationDetents([.height(168)])
                 .presentationDragIndicator(.hidden)
                 .environmentObject(themeManager)
@@ -331,13 +340,13 @@ struct ArticleReaderView: View {
     private var articleBody: some View {
         if parsedContent.isEmpty {
             Text(L10n.Reading.bodyLoading)
-                .font(.custom(readingPreferences.fontFamily, size: readingPreferences.fontSize))
+                .font(.custom(readingPreferences.fontFamily, size: readingPreferences.effectiveFontSize))
                 .foregroundColor(colors.textSecondary)
         } else {
             MarkdownBodyView(
                 nodes: parsedNodes,
                 fontFamily: readingPreferences.fontFamily,
-                fontSize: readingPreferences.fontSize,
+                fontSize: readingPreferences.effectiveFontSize,
                 lineSpacingValue: lineSpacingValue,
                 colors: colors,
                 highlightedParagraphIndex: isTTSActive ? ttsParagraphs[safe: ttsService.currentParagraphIndex]?.index : nil,
