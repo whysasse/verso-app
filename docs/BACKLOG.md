@@ -220,7 +220,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   ## Fix
 
-  Cut to two required screens: Welcome and Folder. Move theme to first-article-open (a one-time inline pointer at the reading toolbar). Keep analytics consent but as a sheet on first list launch, not a gate. Convert the tour into an empty state that teaches by pointing at real UI — which also feeds FAB-319.
+  Cut to two required screens: Welcome and Folder. Move theme to first-article-open (a one-time inline pointer at the reading toolbar). Keep analytics consent but as a sheet on first list launch, not a gate. Convert the tour into an empty state that teaches by pointing at real UI — which also feeds **FAB-334** (FAB-319's filter-panel remainder, the thing this line originally pointed at, was itself absorbed into FAB-334 on 2026-09-03; corrected 2026-09-06 so the dependency points at the ticket that will actually do the work).
 
   ## Seen 2026-09-03 (Ink)
 
@@ -230,6 +230,19 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   * **The page-dot row nearly touches the Continue button** — `.padding(.bottom, VersoSpacing.md)` puts it about 16pt under a 50pt button, so it reads as attached to the CTA rather than as screen furniture.
 
   The dots did confirm the count: the theme picker is dot 2 of 7, and tour step 1 is dot 5 of 7.
+
+  ## Draft resolutions (proposed 2026-09-06, pending Fabio's confirmation)
+
+  Three things were blocking this ticket from being implementation-ready. Proposed answers below — none are decided yet, flagging them here (rather than silently assuming) since they change scope/sequencing:
+
+  1. **Sequencing against FAB-334.** These aren't the same problem (FAB-334 doesn't fix a seven-screen flow just by adopting system components — see FAB-334's own "not absorbed" list, which correctly keeps FAB-327 as its own ticket), but doing them in the wrong order wastes work: reskinning seven screens in Liquid Glass and then deleting five of them is worse than cutting first. **Proposed order:** run this restructure first — cut Welcome/Folder down from seven, still on the current (non-Liquid-Glass) chrome — then let FAB-334 reskin only the two surviving screens as part of its normal onboarding pass. Concretely: this ticket stays a prerequisite phase of 1.1, scheduled before FAB-334 touches any onboarding view. Mirrors this in FAB-334's own open-decision #3 below.
+  2. **Stale FAB-319 reference** — corrected above in the Fix section itself, not just noted here.
+  3. **Interaction specs for the three moves** — none of these have had a spec pass yet; proposing one so there's something concrete to build against or push back on:
+     * **Theme → first-article-open pointer.** Fires once, the first time the reading view opens for the very first saved article (a new one-time flag, same pattern as onboarding's own "runs once per install," not reusing that flag). A lightweight callout anchored on the reading toolbar's theme control — not a sheet, not blocking — dismissed by any tap outside it or by using the control itself. Never blocks reading; if the user never opens an article, it never fires and the theme keeps its current default.
+     * **Analytics consent → sheet on first list launch.** Fires once, the first time the article list appears after onboarding ends (covers both the "Skip" and "completed" paths). Presented as a sheet, not a full page — same copy and equal-weight button treatment already shipped under FAB-328 ("Allow" / "No thanks", both `.secondary`). Swiping the sheet away counts as "No thanks" (opt-out), matching the Law 25/GDPR-driven equal-weight decision already made for this screen — a dismissal must not read as consent.
+     * **Tour → empty-state teaching.** Replaces all 3 tour screens with contextual hints inside the real empty-library state (the one FAB-334 rebuilds), shown one at a time and dismissed by tapping past them, rather than a fixed carousel. E.g. a hint pointing at the actual share/add affordance, so "Share to save" is demonstrated against the real control instead of an illustration of one. Hints clear permanently once the first article is saved — no re-teaching a returning empty state (e.g. after archiving everything).
+
+  Fabio: confirm or correct these three before anyone picks this ticket up — in particular #1's sequencing, since it commits FAB-334 to touching onboarding a second time rather than once.
 
 ### Phase E — native iOS shell (1.1)
 
@@ -293,7 +306,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
      Worth confirming current iOS 26 adoption before the branch opens; it shipped a year ago, so the cost is probably modest, but the number should be looked up rather than assumed.
   2. **What happens to the four themes in the shell.** The decision above implies the shell follows light/dark (driven by `VersoTheme.isDark`, which `ContentView.preferredColorScheme` already plumbs) while Paper/Sepia/Night/Ink survive in the reader. Confirm that is acceptable before building — it is a visible reduction outside the reading view.
-  3. **Whether onboarding is rebuilt here or in FAB-327.** FAB-327 already proposes cutting seven screens to two. Doing both at once is more coherent than restyling seven screens and then deleting five of them.
+  3. **Whether onboarding is rebuilt here or in FAB-327 — draft resolution proposed 2026-09-06, not yet confirmed by Fabio: neither, sequentially.** FAB-327 cuts seven screens to two first (on current chrome), then this epic reskins only the two survivors. See FAB-327's own "Draft resolutions" section for the reasoning; this line stays open until Fabio signs off there.
   4. **`.searchable` placement and scope.** Today search is a custom expanding header field over title + body + site + URL. The system field changes both the interaction and where filters live (FAB-319).
 
   ## Direction approved 2026-09-03
