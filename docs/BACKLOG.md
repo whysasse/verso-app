@@ -56,7 +56,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → ~~FAB-318~~ (done, see [DONE.md](DONE.md): TTS transport row alignment + immersive hint pill; margins control stays FAB-333 scope) → ~~FAB-322~~ (done, see [DONE.md](DONE.md): section counts + spacing, radio-style date presets, no-source card fallback, VoiceOver-aware success-sheet timing; select-mode layout shift stays FAB-334 scope, Settings-icon placement left as-is per Fabio's call) → ~~FAB-328~~ (done, see [DONE.md](DONE.md): real SF Symbols, disabled-Continue hint, "Allow" CTA + equal-weight consent buttons, stale doc note; its last bullet closed as a side effect of FAB-327's fix, below) → **FAB-327 done, minimum-fix scope, 2026-09-06** (see [DONE.md](DONE.md)): Fabio chose the "if too large close to release" minimum from the ticket's own text over the full restructure — global Skip (not tour-only) + a page-dot row that shrinks as you advance, rather than cutting screens. The full restructure (2 screens, Theme/Analytics/Tour relocated) stays open in BACKLOG for a post-launch revisit → FAB-314 (CI contrast-check script, deliberately last so it encodes the corrected passing state).
+  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → ~~FAB-318~~ (done, see [DONE.md](DONE.md): TTS transport row alignment + immersive hint pill; margins control stays FAB-333 scope) → ~~FAB-322~~ (done, see [DONE.md](DONE.md): section counts + spacing, radio-style date presets, no-source card fallback, VoiceOver-aware success-sheet timing; select-mode layout shift stays FAB-334 scope, Settings-icon placement left as-is per Fabio's call) → ~~FAB-328~~ (done, see [DONE.md](DONE.md): real SF Symbols, disabled-Continue hint, "Allow" CTA + equal-weight consent buttons, stale doc note; its last bullet closed as a side effect of FAB-327's fix, below) → ~~FAB-327~~ (done, minimum-fix scope, see [DONE.md](DONE.md): global Skip, not tour-only, + a page-dot row that shrinks as you advance, rather than cutting screens. The full restructure stays open in BACKLOG for a post-launch revisit) → ~~FAB-314~~ (done, see [DONE.md](DONE.md), deliberately last so it encodes the corrected passing state: `scripts/check_contrast.py` now enforces contrast in CI instead of the hand-maintained, overclaiming table; 2 genuine failures it found are FAB-336). This chain is now fully worked through.
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -165,28 +165,21 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Small enough to fold into another Settings issue if convenient.
 
-- [ ] 🟡 **FAB-314** · Replace accessibility-specs' hand-maintained contrast tables with a CI check  `Backlog` `Medium`
+- [ ] 🔵 **FAB-336** · Fix the 2 contrast failures `scripts/check_contrast.py` surfaces  `Backlog` `Low`
   ## Scope
 
-  Critique §3.2. [accessibility-specs.md](accessibility-specs.md) §3.3 states *"All color issues are resolved. No remaining failures."* It audited `textPrimary`, `textSecondary` and `accent` against `background`/`surface` — three pairs. It never checked what those tokens do in combination, or the tokens outside that set. Unaudited and failing:
+  Found by FAB-314's new CI check (see [DONE.md](DONE.md)), which replaced the hand-maintained tables in [accessibility-specs.md](accessibility-specs.md) §3.3. Both are real, live, currently-failing pairs — computed from `Colors.swift`'s actual hex values, not estimated:
 
   | Pair | Where | Ratio | Required |
   |---|---|---|---|
-  | ~~white glyph on `reading` badge `#D4A353`~~ | Article card | ~~**2.29:1**~~ **3.01:1+, fixed FAB-325** | 3:1 |
-  | ~~white glyph on `read` badge `#5AAF7A`~~ | Article card | ~~**2.68:1**~~ **4.50:1+, fixed FAB-325** | 3:1 |
-  | ~~white glyph on `unread` badge `#4A90D9`~~ | Article card | ~~3.34:1~~ **4.53:1, fixed FAB-325** | 3:1 (barely) |
-  | `placeholder` on `surface` | Search clear button | **1.12–1.55:1** | 3:1 |
-  | ~~`border` on `background`~~ | Field outlines, progress track | ~~**1.16–1.33:1**~~ **3.0:1+ vs. both background and surface, fixed FAB-325** | 3:1 where it bounds a control |
-  | `warning` on `background` (Paper / Sepia) | Semantic | **4.43 / 4.13:1** | 4.5:1 |
-  | `error` on `surface` (Paper / Sepia) | Field error text, 13pt | **4.46 / 4.07:1** | 4.5:1 |
-  | `accentPressed` on `background` (Ink) | Pressed states | **4.04:1** | 4.5:1 as text |
-  | ~~white on swipe tints `#5AAF7A` / `#4A90D9`~~ | List swipe actions | ~~**2.68 / 3.34:1**~~ **4.5:1+, fixed FAB-325** | 4.5:1 |
+  | `placeholder` on `surface`, all 4 themes | `SearchBar`'s clear (`xmark.circle.fill`) icon | Paper 1.36:1 · Sepia 1.41:1 · Night 1.16:1 · Ink 1.12:1 | 3:1 non-text |
+  | `error` on `surface`, Paper + Sepia | `VersoTextField`'s inline error caption, 13pt | Paper 4.46:1 · Sepia 4.07:1 | 4.5:1 (Night/Ink already pass) |
 
-  Also worth recording: `textSecondary` passes with roughly 2% headroom (4.52–4.58:1 on `surface`). Not a bug — a fragility, since any nudge to a surface value breaks it silently.
+  Not touched by FAB-314 itself since picking new hex values is a design call. Low priority: the icon is only visible while actively typing in a search field with text entered, and the error caption only appears on a validation failure — neither is a first-run or common-path screen.
 
   ## Fix
 
-  A script that walks `Colors.swift`, asserts every *used* pair, and runs in CI. Then correct §3.3 of the spec, whose conclusion currently reads as "done" and is stronger than its evidence — that is the genuinely dangerous part.
+  Darken/adjust `placeholder` and `error` (Paper/Sepia only for the latter) to clear their thresholds, preserving hue the way `textSecondary`'s v1.1 fix did (`accessibility-specs.md` §9). Re-run `scripts/check_contrast.py` — once both clear, its `KNOWN_FAILURES` entries for them should be deleted (the script prints a note when a tracked failure starts passing) and this issue moves to DONE.
 
 ### Design critique 2026-09-01 — reading view
 

@@ -87,3 +87,4 @@ docs/copy/.ignore_*
 # meant to ship in the bundle or be committed — ignore those, not the curated .md files.
 SampleArticles/*.json
 SampleArticles/*.csv
+__pycache__/

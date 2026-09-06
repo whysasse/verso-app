@@ -1,8 +1,8 @@
 # Accessibility Specs & Checklist — Verso
 
-**Version:** 1.2
-**Date:** 2026-04-19
-**Status:** Final — all decisions resolved, ready for Figma handoff and development.
+**Version:** 1.3
+**Date:** 2026-09-06
+**Status:** Final — all decisions resolved, ready for Figma handoff and development. Contrast enforcement moved to `scripts/check_contrast.py` (see §3.3).
 **Related:** FAB-67 · [Design System Foundations](DESIGN_SYSTEM_FOUNDATIONS.md)
 
 ---
@@ -105,9 +105,39 @@ Context for Accent: used for interactive elements (buttons, links, active states
 
 ### 3.3 Remaining color issues
 
-Text Secondary has been resolved in all themes (see tables above). One remaining issue depends on a pending design decision.
+Text Secondary has been resolved in all themes (see tables above).
 
-All color issues are resolved. No remaining failures.
+**Superseded 2026-09-06 (FAB-314).** This section previously read *"All color
+issues are resolved. No remaining failures"* — true only for the 6 pairs this
+table happens to audit (Text Primary/Secondary/Accent against
+Background/Surface). It never checked what the rest of `Colors.swift`'s
+tokens do in combination, and a critique pass later found several pairs
+outside that set — some already fixed since (badge icons, swipe-action
+tints, and `border` — all FAB-325, 2026-09-05), some still open.
+
+Contrast is now enforced by **`scripts/check_contrast.py`** in CI (the
+`contrast-check` job in `.github/workflows/ci.yml`), computed directly from
+`Verso/Shared/Colors.swift`'s real hex values rather than hand-maintained
+here — this table stays as historical record of the original 24-pair audit,
+but is no longer the source of truth for whether contrast passes.
+
+Two pairs the script checks are genuine, currently-failing debt, tracked as
+**FAB-336**:
+
+- `placeholder` vs `surface` (SearchBar's clear icon) — 1.12–1.55:1 across
+  the 4 themes, needs 3:1 non-text.
+- `error` (SemanticColors) vs `surface` (VersoTextField's inline error
+  caption, 13pt) — 4.46:1 (Paper) / 4.07:1 (Sepia), needs 4.5:1. Night and
+  Ink already pass.
+
+Two tokens the critique also flagged, `accentPressed` and `warning`, are
+**not** checked and not tracked as failures: neither is used anywhere in
+shipped UI today (`accentPressed` only appears in the dev-only
+`DesignSystemPreview.swift`; `warning` doesn't appear in any SwiftUI view at
+all) — their contrast numbers are real but nothing on screen exercises them,
+so there's no live accessibility bug to fix. `scripts/check_contrast.py`
+picks up either token automatically the day something actually renders with
+it.
 
 | Theme | Token | Old value | New value | Status |
 |-------|-------|-----------|-----------|--------|
@@ -254,7 +284,7 @@ The following iOS accessibility settings must be respected. Each must be tested 
 | **Larger Text** (Display & Text Size) | All text scales via Dynamic Type. See Section 4. |
 | **Bold Text** | SF system fonts will automatically bold. Reading fonts (New York, Georgia, OpenDyslexic) do not change — this is acceptable, as the reading font is a user-chosen preference. |
 | **Button Shapes** | Tappable elements with text labels should acquire an underline or border when this setting is on. Verify bottom bar icon buttons — they may need explicit shape treatment since they have no text labels. |
-| **Increase Contrast** | Check all themes. Night and Ink themes should be fine. Paper and Sepia Text Secondary values are already failing (see Section 3.3) — Increase Contrast mode makes this more critical. |
+| **Increase Contrast** | Check all themes. Text Secondary passes its 4.5:1 floor everywhere already (fixed v1.1, see §3.2), but with the least headroom of the audited pairs (~2%) — Increase Contrast mode is the setting most likely to expose that fragility if a token value ever nudges. |
 | **Reduce Transparency** | Any blurred or translucent surfaces must become opaque. If the reading bars use blur effects, they must fall back to a solid color. |
 | **Reduce Motion** | Respect `UIAccessibility.isReduceMotionEnabled`. The immersive mode fade animations (300ms/200ms, Section 5 of Design System Foundations) must be disabled or replaced with an instant show/hide. |
 | **Differentiate Without Color** | No information should rely solely on color. See Section 3.4. |
@@ -276,8 +306,8 @@ Use this checklist for every screen before marking a feature as done. Check each
 
 - [ ] Text Primary on Background passes 4.5:1 in all 4 themes
 - [ ] Text Primary on Surface passes 4.5:1 in all 4 themes
-- [ ] Text Secondary on Background passes 4.5:1 in all 4 themes *(requires token fix — see Section 3.3)*
-- [ ] Text Secondary on Surface passes 4.5:1 in all 4 themes *(requires token fix)*
+- [ ] Text Secondary on Background passes 4.5:1 in all 4 themes *(fixed v1.1 — `scripts/check_contrast.py` covers this in CI now, see §3.3)*
+- [ ] Text Secondary on Surface passes 4.5:1 in all 4 themes *(fixed v1.1 — same)*
 - [ ] Accent on Background passes 4.5:1 where used as text, 3:1 where used as UI component
 - [ ] No information conveyed by color alone
 
@@ -332,6 +362,7 @@ All open questions resolved. No outstanding items.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3 | 2026-09-06 | FAB-314: corrected §3.3's "no remaining failures" claim, which only ever covered the 6 pairs in §3.2. Contrast is now enforced by `scripts/check_contrast.py` in CI, computed from `Colors.swift` directly; §3.2's tables stay as historical record only. 2 genuine open failures tracked as FAB-336. |
 | 1.2 | 2026-04-19 | Accent tokens fixed in Paper (`#7B6B5A` → `#766655`) and Sepia (`#8B6340` → `#825A37`). All 3 open design questions resolved and documented in Section 8. Status updated to Final. |
 | 1.1 | 2026-04-19 | Text Secondary tokens fixed in all 4 themes. Paper: `#8C857D` → `#6E675F`. Sepia: `#8A7355` → `#755E40`. Night: `#8A847A` → `#8F897F`. Ink: `#7B818F` → `#7E8492`. All Text Secondary pairs now pass WCAG AA. |
 | 1.0 | 2026-04-19 | Initial spec. Contrast ratios computed for all 4 themes. Failures documented with remediation guidance. Touch targets, Dynamic Type mapping, VoiceOver labels, iOS system settings, and QA checklist defined. |
