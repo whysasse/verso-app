@@ -90,6 +90,178 @@ Open any article → tap "Font and spacing" (the font-sheet button) to reach
       dark background, so this is the one check that actually exercises why
       that choice was made.
 
+### FAB-329 — Folder row disambiguation
+
+- **Branch:** `claude/fab-329-folder-row-icon` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#381](https://github.com/whysasse/verso-app/pull/381) — merged
+
+Settings → the "Articles folder" row (Storage section).
+
+- [ ] **Folder row now shows a small folder icon** before the folder name/path
+      text, not just the bare name (previously "Articles folder · Verso" gave
+      no visual cue it was a filesystem location).
+- [ ] **No truncation regression on a narrow device** (iPhone SE) — icon +
+      path text + trailing chevron should still fit without clipping.
+- [ ] **Row still opens the folder picker normally** on tap — purely additive
+      change, no behavior should differ.
+
+---
+
+### FAB-324 — One `ThemeSwatch` component instead of three
+
+- **Branch:** `claude/fab-324-theme-swatch` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#382](https://github.com/whysasse/verso-app/pull/382) — merged
+
+The compact 32pt swatch's 2-bar layout was my own judgment call, not a
+spec'd design — this is the one most worth a close look.
+
+- [ ] **Onboarding theme picker** (only reachable pre-onboarding-completion,
+      or via a fresh install/reset — see FAB-328 below for the same
+      constraint): the full 120pt swatches show the 4-bar mini-page mockup,
+      visually unchanged from before this PR.
+- [ ] **Settings → theme picker row** (the 4 small swatches): now shows a
+      compact 2-bar mini-page (title + one line) instead of a flat color
+      rectangle. Check it reads clearly as "a page," not as noise, in **all
+      four themes** — Paper, Sepia, Night, Ink.
+- [ ] **Reading view theme sheet** (bottom bar → theme button, the circular
+      icon): same 32pt swatches — specifically check **Night vs. Ink** and
+      **Paper vs. Sepia** are now clearly distinguishable even when
+      unselected (this was the actual bug: they were ~1.06:1 contrast,
+      nearly identical flat rectangles, before this fix).
+- [ ] **Selected swatch's label is accent-colored**; unselected labels are
+      the secondary text color — check this in Settings and the reading
+      sheet (previously only the onboarding screen did this).
+- [ ] **VoiceOver:** swipe to a theme swatch and confirm the selected one
+      announces as selected (`.isSelected` trait added this pass).
+
+---
+
+### FAB-321 — Read time instead of date added on article cards
+
+- **Branch:** `claude/fab-321-read-time` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#383](https://github.com/whysasse/verso-app/pull/383) — merged
+
+Article list, any section except Continue Reading.
+
+- [ ] **Cards show `source.com · 12 min read` on one line**, replacing the
+      old separate source + date-added lines.
+- [ ] **An article with no source/URL** (e.g. a plain `.md` file dropped into
+      the folder with no frontmatter) shows an em dash or read-time-only
+      fallback — the card should **not** be visibly shorter than its
+      neighbors (that's actually FAB-322's fix, but the fallback logic
+      lives in this same card — worth checking together).
+- [ ] **Continue Reading section cards are unchanged** — still show the
+      source line, progress bar, and percentage caption; no read time there.
+- [ ] **VoiceOver, non-Continue-Reading card:** swiping onto a card should
+      announce "[title], [source], [N min read]" as **one** stop, then
+      swiping again should land on the status badge ("Unread"/"Reading"/
+      "Read") as a **separate** stop — not swallowed into the first
+      announcement.
+- [ ] **VoiceOver hint:** the card announces "Double tap to open."
+
+---
+
+### FAB-317 — Immersive mode top padding
+
+- **Branch:** `claude/fab-317-immersive-top-space` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#384](https://github.com/whysasse/verso-app/pull/384) — merged
+
+**This one has an unresolved contradiction from the original ticket — please
+report what you actually see, not just check/uncheck.**
+
+- [ ] Open an article, don't scroll. Note where the H1 title starts with
+      chrome visible.
+- [ ] Tap once to enter immersive mode. The title/content should visibly
+      shift **up** to reclaim the space the now-hidden top bar occupied,
+      animating smoothly (~0.3s).
+- [ ] **Report back specifically:** did the content *already* shift up
+      correctly before this fix (matching some 2026-09-03 screenshots the
+      original ticket cited), making this PR redundant? Or did this PR
+      actually fix a real "no movement" bug? I couldn't run this test myself
+      (no Xcode/simulator here) and pushed the fix based on reading the code,
+      not on-device confirmation.
+- [ ] **Reduce Motion on** (Settings app → Accessibility → Motion → Reduce
+      Motion): repeat the toggle — the shift should be instant, not animated.
+- [ ] Try toggling immersive mode **mid-scroll** (partway through a long
+      article) — should reflow smoothly, not jump or clip content.
+
+---
+
+### FAB-318 — Reading-view chrome alignment and immersive hint pill
+
+- **Branch:** `claude/fab-318-reading-view-polish` (merged 2026-09-05)
+- **PR:** [whysasse/verso-app#385](https://github.com/whysasse/verso-app/pull/385) — merged
+
+- [ ] **Start TTS playback** (bottom bar → listen icon). The transport row
+      (skip back / play-pause / skip forward / speed) that appears above the
+      main bar should read as **centered**, not hugging the left edge with a
+      big empty gap on the right.
+- [ ] **Transport icons match the main bar's icon size** (font/spacing,
+      listen, theme icons below) — previously visibly smaller/inconsistent.
+- [ ] **First time entering immersive mode** (may need a fresh install if the
+      "seen hint" flag can't be reset from Settings): the "Tap anywhere to
+      reveal controls" pill should appear near the **bottom** of the screen,
+      not floating mid-screen over body text.
+- [ ] **Tap the pill** — it dismisses. Also check with VoiceOver on: it
+      should now announce properly as a real button (was a bare tap gesture
+      with no accessibility label before).
+
+---
+
+### FAB-322 — Article list polish (5 separate fixes)
+
+- **Branch:** `claude/fab-322-list-polish` (merged 2026-09-06)
+- **PR:** [whysasse/verso-app#386](https://github.com/whysasse/verso-app/pull/386) — merged
+
+- [ ] **Section headers show a count** — "Unread", "Read", "Archived",
+      "Continue Reading" now display a number next to the title, not just
+      the bare word.
+- [ ] **More visual space between sections** than before (top padding raised
+      16pt → 24pt) — should read as separated groups, not barely-wider card
+      gaps.
+- [ ] **Filter panel (tag icon in header) → date presets:** each date option
+      (Today / This week / etc.) now shows a circle indicator — filled when
+      selected, outline when not — instead of a checkmark. Exactly one
+      should always be filled.
+- [ ] **Filter panel → tags:** unchanged, still checkmark-only on selected
+      tags (multi-select, no regression expected).
+- [ ] **An article with no source/URL** shows an em dash instead of a
+      shorter, collapsed-looking card (see also FAB-321 above — same card).
+- [ ] **Add Article, with VoiceOver on:** submit a URL, let it succeed, and
+      confirm the success screen stays up long enough (~4s) to finish
+      reading "Article saved" + the subheadline before auto-dismissing
+      (previously always dismissed after a flat 1.5s, cutting VoiceOver off).
+
+---
+
+### FAB-328 — Onboarding polish (4 of 5 bullets)
+
+- **Branch:** `claude/fab-328-onboarding-polish` (merged 2026-09-06)
+- **PR:** [whysasse/verso-app#387](https://github.com/whysasse/verso-app/pull/387) — merged
+
+Onboarding only runs once per install — you'll likely need a fresh install
+(or check Settings' Debug section for a reset option) to see these screens
+again.
+
+- [ ] **Folder Setup screen:** the cloud icon above the headline is a crisp
+      SF Symbol (outline cloud), not the colored 3D emoji cloud it was
+      before.
+- [ ] **Folder-picker row's trailing arrow** is a proper thin chevron
+      matching the app's other chevrons (was a different typographic mark
+      before).
+- [ ] **Before choosing a folder,** the caption below "Continue" reads
+      "Choose a folder to continue." instead of the privacy note.
+- [ ] **After choosing a folder,** the caption switches to "Verso never
+      uploads your files. They live in your iCloud Drive." — confirm the
+      swap happens live, right when you pick a folder.
+- [ ] **Analytics consent screen:** both buttons ("Allow" and "No thanks")
+      now look the same visual weight — both outlined, neither filled solid.
+- [ ] **Accept button reads "Allow"** (was "Sure, why not").
+- [ ] If easy to check: switch device language to **French (Canada)** or
+      **Português (Brasil)** and confirm "Autoriser"/"Permitir" show
+      correctly — these are first-draft translations, not yet linguistically
+      reviewed.
+
 ---
 
 ## Done (verified and merged)
