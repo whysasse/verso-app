@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**198 completed issues.**
+**199 completed issues.**
 
 ## iOS
 
@@ -608,6 +608,65 @@
   device to confirm the transport row actually reads as centered (not just
   numerically balanced) and that the pill lands somewhere sensible across all
   four themes and both Dynamic Type extremes — Fabio's part.
+
+### Design critique — article list smaller polish (FAB-322)
+
+- [x] 🔵 **FAB-322** · Article list smaller polish  `Done` `Low`
+  Critique §5.4, §5.7, §5.9, §5.10, §5.11, §5.8. Closed 2026-09-06. Of 7 bullets
+  (an 8th, card-container contrast, was already recorded as "no action needed"):
+
+  * **Section counts invisible on screen — fixed.** `sectionHeader`/
+    `collapsibleSectionHeader` already passed a count to VoiceOver
+    ("Unread, 12 articles") but rendered only the bare title. Added a plain
+    trailing `Text("\(count)")` in `textSecondary` next to the title in both —
+    no new copy string needed, a bare digit needs no localization.
+  * **Weak section boundaries — fixed, lightly.** Raised the header's top
+    padding from `VersoSpacing.md` (16pt) to `.lg` (24pt) so sections read as
+    separated groups. Didn't attempt a heavier redesign to make collapsible vs.
+    non-collapsible headers structurally different beyond their existing
+    chevron — a bigger, more subjective call than this bullet's "Low" priority
+    warranted.
+  * **Entering select mode re-truncates every title** — already routed to
+    FAB-334 (`EditMode` owns the checkbox column there, so content width stops
+    changing). No action here.
+  * **Settings two taps deep behind "…"** — a genuine header-real-estate
+    tradeoff (a 5th icon vs. today's 4). Asked Fabio rather than guessing at a
+    redesign; he confirmed leaving it as-is for now.
+  * **Add Article: the other half of "no escape while saving" — fixed.** The
+    ✕-during-`.saving` half shipped 2026-09-05 (see the FAB-322-pulled-out
+    entry above); this pass covers the other half, flagged there as still
+    open: the success sheet auto-dismissed after a flat 1.5s regardless of
+    VoiceOver, too fast to finish reading the two confirmation lines. Now
+    ~4s when `UIAccessibility.isVoiceOverRunning`, matching the
+    accessibility-aware pattern `ArticleReaderView` already uses for chrome
+    auto-hide — the exact duration is a judgment call, not a measured one.
+    Still doesn't interrupt an in-flight Readability.js `WKWebView` load/JS
+    eval mid-flight — that continuation-based path isn't itself
+    cancellation-aware, a harder follow-up if it turns out to matter in
+    practice.
+  * **Date presets and tags looked identical — fixed.** Both used the same
+    `tagRow` checkmark style in `FilterPanel` despite different selection
+    models (dates single-select, tags multi-select). Added an
+    `isSingleSelect` mode to `tagRow`: date presets now get a radio-style
+    indicator (`circle`/`largecircle.fill.circle`, always visible) instead of
+    the checkmark (visible only when selected) — the standard iOS cue that
+    exactly one option is always chosen. Tags keep the checkmark unchanged.
+  * **Card with no source rendered a collapsed layout — fixed.** `ArticleCard`
+    omitted the source line entirely when `sourceDomain` was empty (both the
+    Continue Reading branch and, since FAB-321, the regular branch too),
+    giving that card a shorter height than its neighbors. Now falls back to
+    an em dash when there's truly no source (and, on the regular branch, no
+    read time either) — the "or a dash" option the critique itself suggested.
+    The placeholder is excluded from the accessibility label, unchanged,
+    since it's a layout-only cue with nothing real to announce.
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves it compiles. All five fixes
+  are small, independent UI tweaks with no complex new logic. Judging the
+  visual weight of the new counts/spacing, whether the radio-vs-checkmark
+  distinction reads clearly, and timing the VoiceOver announcement against
+  the new 4s window is Fabio's part.
 
 ### Bugs — list actions & discovery (reported by Fabio 2026-08-30)
 

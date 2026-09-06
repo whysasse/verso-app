@@ -50,9 +50,12 @@ struct ArticleCard: View {
     }
 
     /// The non-progress card's one-liner, replacing the old separate source + date
-    /// lines: `theatlantic.com · 12 min read`.
+    /// lines: `theatlantic.com · 12 min read`. FAB-322: falls back to an em dash rather
+    /// than an empty string when both source and read time are genuinely absent (e.g. a
+    /// manually-added file with no URL, before its `searchableBody` cache is rebuilt) --
+    /// omitting the line entirely gave that card a shorter height than its neighbors.
     private var sourceAndReadTimeLine: String {
-        guard let readTimeText else { return sourceDomain }
+        guard let readTimeText else { return sourceDomain.isEmpty ? "—" : sourceDomain }
         return sourceDomain.isEmpty ? readTimeText : "\(sourceDomain) · \(readTimeText)"
     }
 
@@ -84,26 +87,23 @@ struct ArticleCard: View {
                     .lineSpacing(5) // 1.3× line height for 17pt: 17 × 0.3 ≈ 5
 
                 if showsProgress {
-                    if !sourceDomain.isEmpty {
-                        Text(sourceDomain)
-                            .font(VersoTypography.UI.listSubtitle)
-                            .foregroundColor(colors.textSecondary)
-                            .lineLimit(1)
-                            .lineSpacing(6) // 1.4× line height for 15pt: 15 × 0.4 = 6
-                    }
+                    // FAB-322: always render this line, even with no source -- omitting
+                    // it entirely (the old behavior) gave the card a shorter height than
+                    // its neighbors in the Continue Reading row.
+                    Text(sourceDomain.isEmpty ? "—" : sourceDomain)
+                        .font(VersoTypography.UI.listSubtitle)
+                        .foregroundColor(colors.textSecondary)
+                        .lineLimit(1)
+                        .lineSpacing(6) // 1.4× line height for 15pt: 15 × 0.4 = 6
                     ScrollProgress(progress: progressFraction)
                         .padding(.top, VersoSpacing.xxs)
                     Text(L10n.Home.sectionContinueReadingProgressCaption(count: progressPercent))
                         .font(VersoTypography.UI.caption)
                         .foregroundColor(colors.textSecondary)
-                } else if !sourceAndReadTimeLine.isEmpty {
+                } else {
                     // FAB-321: replaces the old separate source + date-added lines --
                     // read time is decision-support, the date isn't (it still shows
-                    // inside the article itself, in ArticleHeader). Guarded like the
-                    // sourceDomain line above: both source and read time can be
-                    // genuinely absent (e.g. a manually-added file with no URL, before
-                    // its searchableBody cache is rebuilt), and an empty Text would
-                    // still claim a line's worth of vertical space.
+                    // inside the article itself, in ArticleHeader).
                     Text(sourceAndReadTimeLine)
                         .font(VersoTypography.UI.listSubtitle)
                         .foregroundColor(colors.textSecondary)
@@ -135,6 +135,9 @@ struct ArticleCard: View {
     let unread = Article.create(in: context, filePath: "a", title: "The Future of Reading in a Digital Age", url: URL(string: "https://www.example.com/article"), status: .unread, source: "example.com", searchableBody: sampleBody(words: 900))
     let reading = Article.create(in: context, filePath: "b", title: "How to Build a Minimalist Reading Habit", url: URL(string: "https://medium.com"), status: .reading, source: "medium.com", searchableBody: sampleBody(words: 1200))
     let read = Article.create(in: context, filePath: "c", title: "Why Paper Still Matters", status: .read, source: "nytimes.com", searchableBody: sampleBody(words: 2640))
+    // FAB-322: no url and no source -- demonstrates the em-dash fallback rather than a
+    // shorter, collapsed card.
+    let noSource = Article.create(in: context, filePath: "d", title: "Notes From a Manually Added File", status: .unread)
 
     reading.scrollPosition = NSNumber(value: 0.62)
 
@@ -142,6 +145,7 @@ struct ArticleCard: View {
         ArticleCard(article: unread)
         ArticleCard(article: reading, showsProgress: true)
         ArticleCard(article: read)
+        ArticleCard(article: noSource)
     }
     .padding()
     .environmentObject(ThemeManager())
