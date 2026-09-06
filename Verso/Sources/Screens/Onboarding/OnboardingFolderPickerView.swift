@@ -21,7 +21,10 @@ struct OnboardingFolderPickerView: View {
                         .overlay(Circle().stroke(colors.border, lineWidth: 1))
                         .frame(width: 64, height: 64)
 
-                    Text("☁")
+                    // FAB-328: was Text("☁"), which renders as a colour emoji (a shaded
+                    // 3D cloud) -- .foregroundColor does nothing to it, so it broke the
+                    // crisp accent-tinted SF Symbol language every neighboring screen uses.
+                    Image(systemName: "icloud")
                         .font(.system(size: 28))
                         .foregroundColor(colors.textSecondary)
                 }
@@ -47,8 +50,11 @@ struct OnboardingFolderPickerView: View {
                             .font(VersoTypography.UI.listSubtitle)
                             .foregroundColor(folderSelected ? colors.textPrimary : colors.textSecondary)
                         Spacer()
-                        Text("›")
-                            .font(.system(size: 20))
+                        // FAB-328: was Text("›"), a thin typographic mark visibly
+                        // different from the real chevron used elsewhere (QuickTourView,
+                        // SettingsRow.folderRow) for the same "tap to pick" affordance.
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(colors.textSecondary)
                     }
                     .padding(.horizontal, VersoSpacing.md)
@@ -79,7 +85,11 @@ struct OnboardingFolderPickerView: View {
                 .buttonStyle(VersoButtonStyle(variant: .primary, theme: colors))
                 .disabled(!folderSelected)
 
-                Text(L10n.Onboarding.folderPrivacyNote)
+                // FAB-328: Continue disables until a folder is chosen, but nothing on
+                // screen said why. Swaps the always-shown privacy note for that
+                // explanation while it's actually relevant, reverting once a folder is
+                // picked -- one caption line either way, not two stacked strings.
+                Text(folderSelected ? L10n.Onboarding.folderPrivacyNote : L10n.Onboarding.folderContinueDisabledHint)
                     .font(VersoTypography.UI.caption)
                     .foregroundColor(colors.textSecondary)
                     .multilineTextAlignment(.center)

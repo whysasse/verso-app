@@ -299,7 +299,7 @@
   },
   "onboarding": {
     "analyticsConsent": {
-      "acceptCta": "Claro, por que não",
+      "acceptCta": "Permitir",
       "declineCta": "Não, obrigado",
       "headline": "Ajude a melhorar o Verso",
       "subheadline": "Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca."
@@ -307,6 +307,7 @@
     "folder": {
       "chooseCta": "Escolher pasta…",
       "continueCta": "Continuar",
+      "continueDisabledHint": "Escolha uma pasta para continuar.",
       "headline": "Onde o Verso deve guardar seus artigos?",
       "obsidianTip": "Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente.",
       "privacyNote": "O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive.",
