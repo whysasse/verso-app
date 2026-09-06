@@ -354,7 +354,11 @@
       "sectionLabel": "Line spacing"
     },
     "margins": {
-      "sectionLabel": "Margins"
+      "narrow": "Narrow",
+      "narrowest": "Narrowest",
+      "normal": "Normal",
+      "sectionLabel": "Margins",
+      "wide": "Wide"
     },
     "theme": {
       "sectionLabel": "Theme",
@@ -410,7 +414,8 @@
     "controlsSheet": {
       "closeAccessibilityHint": "Dismiss controls",
       "fontSizeLabel": "Font size",
-      "lineSpacingLabel": "Line spacing"
+      "lineSpacingLabel": "Line spacing",
+      "marginsLabel": "Margins"
     },
     "header": {
       "byline": "By {author}"

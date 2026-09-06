@@ -780,9 +780,25 @@ enum L10n {
         static var lineSpacingSectionLabel: String {
             String(localized: "readerSettings.lineSpacing.sectionLabel", defaultValue: "Line spacing", comment: "Section label")
         }
+        /// "Narrow" -- FAB-333: new control. needs_review.
+        static var marginsNarrow: String {
+            String(localized: "readerSettings.margins.narrow", defaultValue: "Narrow", comment: "FAB-333: new control. needs_review.")
+        }
+        /// "Narrowest" -- FAB-333: new control. Same 16pt floor `readingHorizontalPadding`'s size-based taper already uses at the top of the font-size scale. needs_review.
+        static var marginsNarrowest: String {
+            String(localized: "readerSettings.margins.narrowest", defaultValue: "Narrowest", comment: "FAB-333: new control. Same 16pt floor `readingHorizontalPadding`'s size-based taper already uses at the top of the font-size scale. needs_review.")
+        }
+        /// "Normal" -- FAB-333: new control. needs_review.
+        static var marginsNormal: String {
+            String(localized: "readerSettings.margins.normal", defaultValue: "Normal", comment: "FAB-333: new control. needs_review.")
+        }
         /// "Margins" -- Section label
         static var marginsSectionLabel: String {
             String(localized: "readerSettings.margins.sectionLabel", defaultValue: "Margins", comment: "Section label")
+        }
+        /// "Wide" -- FAB-333: new control. Default (index 0) -- matches the 40pt margin this app always used before this control existed. needs_review.
+        static var marginsWide: String {
+            String(localized: "readerSettings.margins.wide", defaultValue: "Wide", comment: "FAB-333: new control. Default (index 0) -- matches the 40pt margin this app always used before this control existed. needs_review.")
         }
         /// "Theme" -- Section label
         static var themeSectionLabel: String {
@@ -869,6 +885,10 @@ enum L10n {
         /// "Line spacing" -- Line-spacing row label
         static var controlsSheetLineSpacingLabel: String {
             String(localized: "reading.controlsSheet.lineSpacingLabel", defaultValue: "Line spacing", comment: "Line-spacing row label")
+        }
+        /// "Margins" -- FAB-333: new row, next to Font Size and Line Spacing. Reuses `readerSettings.margins.sectionLabel`'s wording since both mean the same thing in the same sheet.
+        static var controlsSheetMarginsLabel: String {
+            String(localized: "reading.controlsSheet.marginsLabel", defaultValue: "Margins", comment: "FAB-333: new row, next to Font Size and Line Spacing. Reuses `readerSettings.margins.sectionLabel`'s wording since both mean the same thing in the same sheet.")
         }
         /// "Theme" -- Unused, see note above.
         static var controlsTheme: String {

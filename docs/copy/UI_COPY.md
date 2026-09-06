@@ -347,6 +347,7 @@ VoiceOver row label/hint for this card live in §9 (`a11y.articleRow.label` / `a
 | `reading.controlsSheet.closeAccessibilityHint` | Close (X) button VoiceOver hint | Dismiss controls | Fermer les commandes | Fechar os controles | Close (X) button itself reuses `addArticle.close.accessibilityLabel` ("Close") — identical wording/affordance across sheets. |
 | `reading.controlsSheet.fontSizeLabel` | Font-size row label | Font size | Taille du texte | Tamanho da fonte | — |
 | `reading.controlsSheet.lineSpacingLabel` | Line-spacing row label | Line spacing | Interligne | Espaçamento entre linhas | — |
+| `reading.controlsSheet.marginsLabel` | Margins row label | Margins | Marges | Margens | FAB-333: new row, next to Font Size and Line Spacing. Reuses `readerSettings.margins.sectionLabel`'s wording since both mean the same thing in the same sheet. |
 
 ### Text-to-Speech (Lock Screen / Now Playing)
 
@@ -394,6 +395,10 @@ VoiceOver row label/hint for this card live in §9 (`a11y.articleRow.label` / `a
 | `readerSettings.theme.sectionLabel` | Section label | Theme | Thème | Tema | — |
 | `readerSettings.theme.selected.hint` | VoiceOver hint | Currently selected | Actuellement sélectionné | Selecionado atualmente | — |
 | `readerSettings.margins.sectionLabel` | Section label | Margins | Marges | Margens | — |
+| `readerSettings.margins.wide` | Option accessibility label | Wide | Large | Larga | FAB-333: new control. Default (index 0) -- matches the 40pt margin this app always used before this control existed. needs_review. |
+| `readerSettings.margins.normal` | Option accessibility label | Normal | Normal | Normal | FAB-333: new control. needs_review. |
+| `readerSettings.margins.narrow` | Option accessibility label | Narrow | Étroite | Estreita | FAB-333: new control. needs_review. |
+| `readerSettings.margins.narrowest` | Option accessibility label | Narrowest | Très étroite | Bem estreita | FAB-333: new control. Same 16pt floor `readingHorizontalPadding`'s size-based taper already uses at the top of the font-size scale. needs_review. |
 
 ---
 

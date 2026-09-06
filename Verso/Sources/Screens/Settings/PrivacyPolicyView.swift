@@ -13,9 +13,12 @@ struct PrivacyPolicyView: View {
         return MarkdownParser.parse(text)
     }
 
+    // FAB-333: keyed off the rendered size, not the raw stored step -- same reasoning as
+    // ArticleReaderView's identical computed properties, kept in sync here since this screen
+    // renders body text through the same MarkdownBodyView with the same reading preferences.
     private var lineSpacingValue: CGFloat {
         let multipliers: [CGFloat] = [1.2, 1.5, 1.75, 2.0]
-        return readingPreferences.fontSize * (multipliers[readingPreferences.lineSpacing] - 1)
+        return readingPreferences.effectiveFontSize * (multipliers[readingPreferences.lineSpacing] - 1)
     }
 
     var body: some View {
@@ -23,7 +26,7 @@ struct PrivacyPolicyView: View {
             MarkdownBodyView(
                 nodes: nodes,
                 fontFamily: readingPreferences.fontFamily,
-                fontSize: readingPreferences.fontSize,
+                fontSize: readingPreferences.effectiveFontSize,
                 lineSpacingValue: lineSpacingValue,
                 colors: colors
             )

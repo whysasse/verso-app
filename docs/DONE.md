@@ -96,6 +96,77 @@
 
   `xcodebuild build` succeeded for the `Verso` scheme. Not verified here: opening an article and backing out immediately to confirm it no longer appears in Continue Reading, and that scrolling partway into another article still promotes it correctly — Fabio's part after the PR.
 
+- [x] 🟠 **FAB-333** · The reading measure collapses with OpenDyslexic and at the largest in-app size  `Done` `High`
+  Seen 2026-09-03, both in Ink: OpenDyslexic at 18pt reflowed the body to
+  ~25-30 characters/line, and Georgia at the max in-app size (26pt) gave
+  ~28-32 — both well under the 45-75cpl comfort range. The reading column was
+  `.frame(maxWidth: 680)` with a hardcoded `.padding(.horizontal, 40)`, and
+  [accessibility-specs.md](accessibility-specs.md) had already speced a
+  margins control (touch target, VoiceOver label/hint) that was never built.
+  Closed in 2 passes: the padding-taper option shipped 2026-09-05 (kept open
+  here rather than moved to DONE at the time, since it covered only one of
+  three fix options); OpenDyslexic's per-family size and the margins control
+  close it out, 2026-09-06.
+
+  ## Fix (2026-09-06 pass)
+
+  * **OpenDyslexic gets its own effective size.** `VersoTypography.Reading.
+    renderedBodySize(_:)` (new): for `OpenDyslexic-Regular` specifically,
+    renders one `BodySize` step below whatever the user picked (`.md`
+    selected -> `.sm` rendered), clamped at `.xs`; every other family
+    unchanged. Reuses the existing 6 validated point sizes rather than
+    inventing new ones. `ReadingPreferencesService.effectiveFontSize` (new)
+    computes this once from the stored step + family; `fontSize` itself
+    stays the raw, family-agnostic value both steppers (reader + Settings,
+    FAB-311) share, so switching fonts never desyncs what they display.
+    **Flagged honestly, not verified on device:** this is a real but modest
+    ~11% point-size cut. The critique's own numbers suggest OpenDyslexic's
+    problem is partly wider letterforms, not just point size, so it may
+    under-correct at the top of the scale — easy to push further (the `-1`
+    step) once someone's actually seen it.
+  * **New Margins control**, in the reader's existing font sheet
+    (`ReadingControls.swift`, next to Font Size and Line Spacing — not
+    duplicated into Settings, matching Line Spacing's own precedent of
+    living only there). 4 levels reusing existing spacing tokens as the
+    padding base: Wide (40pt, today's unchanged default) / Normal
+    (`VersoSpacing.xl`, 32) / Narrow (`VersoSpacing.lg`, 24) / Narrowest
+    (`VersoSpacing.md`, 16 — the same floor the size-taper already uses).
+    New `marginLevel: Int` (0-3, persisted, defaults to 0/Wide so nobody
+    who's never touched it sees any change) on `ReadingPreferencesService`.
+    New `MarginsIcon` (a small page outline with two inset margin marks,
+    themable vector matching `LineSpacingBarsIcon`'s existing style) — a
+    visual judgment call, same category as that icon's bar counts were.
+  * **The size-based taper now composes with both of the above.**
+    `ArticleReaderView.readingHorizontalPadding` takes its base from
+    `marginLevel` instead of a hardcoded 40, and keys its taper off
+    `effectiveFontSize` instead of the raw stored step — so it correctly
+    starts earlier for OpenDyslexic, whose effective on-screen size (what
+    actually determines whether the measure is collapsing) is smaller than
+    its selected step's label suggests.
+  * `lineSpacingValue` (both `ArticleReaderView` and `PrivacyPolicyView`,
+    which renders body text through the same `MarkdownBodyView` + reading
+    preferences) also switched to `effectiveFontSize`, so extra line leading
+    matches the glyphs actually on screen rather than the pre-adjustment
+    size.
+  * New copy: `reading.controlsSheet.marginsLabel` (row label) and
+    `readerSettings.margins.wide/normal/narrow/narrowest` (4 option
+    accessibility labels, reusing the already-authored, previously-unused
+    `readerSettings.margins.sectionLabel`'s section). fr-CA/pt-BR are
+    first-draft, `needs_review` — same convention as this session's other
+    new copy. The pre-existing unused `reading.controls.margins`/`.hint`
+    strings (from an earlier, superseded standalone-icon-button design)
+    stay as documented dead code, unchanged.
+  * `.font` sheet's `presentationDetents` height: 218 -> 286, to fit the new
+    third row without clipping it.
+
+  ## Verify
+
+  Linux container, no Xcode — CI (`ci.yml`) proves it compiles. Everything
+  about how this actually looks needs real eyes: whether OpenDyslexic's
+  one-step reduction is enough (report honestly, not just check/uncheck —
+  it may need to go further), whether the new Margins icon reads clearly,
+  and whether Narrowest feels too tight. Added to `docs/PENDING_TESTS.md`.
+
 ### Backgrounding corrupts app state (design critique 2026-09-01, four-cause investigation through 2026-09-04)
 
 - [x] 🔴 **FAB-304** · Backgrounding the app corrupts app state: empty article list, lost reading progress, broken scroll restore  `Done` `Urgent`

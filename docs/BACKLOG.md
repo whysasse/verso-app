@@ -48,7 +48,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   9. ~~**FAB-307**~~ — **done**, see [DONE.md](DONE.md): `.allowsHitTesting(isVisible)` added to both chrome bars, plus VoiceOver wiring (chrome pinned visible, live `voiceOverStatusDidChangeNotification`, the `hasShownImmersiveHint` flag built and gated).
   10. ~~**FAB-308**~~ — **done**, see [DONE.md](DONE.md): the 4 hardcoded label/hint pairs in `ReadingChrome.swift` now go through `L10n` (the back button reuses an existing, already-translated, previously-unused key that also happens to match the accessibility spec's wording), plus the `SearchBar.placeholder` drive-by.
   11. ~~**FAB-309**~~ — **done**, see [DONE.md](DONE.md): `VersoTypography.UI`'s six tokens rebuilt on real text styles, plus the reading-view hardcodes (`ArticleHeader`, `ReadingTopBar` title, `EmptyState`) routed through them. The layout audit of chrome components (`SettingsRow`, `ThemeSwatch`'s fixed Settings-row frame, the list header, reader sheet detents) moves to FAB-334 as already decided in the amendment above, which deletes those components.
-  12. **FAB-333** — reading measure collapse w/ OpenDyslexic & max size; stacks on top of #11. **Partially done 2026-09-05:** the padding-taper option shipped; per-family `BodySize` and the margins control remain open (see the issue for detail).
+  12. ~~**FAB-333**~~ — **done**, see [DONE.md](DONE.md): reading measure collapse w/ OpenDyslexic & max size, stacks on top of #11. All 3 fix options now shipped — the padding-taper (2026-09-05), OpenDyslexic's per-family size step-down, and a new Margins control in the reader's font sheet (both 2026-09-06).
   13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
   14. ~~*(pulled out of FAB-322)* **"Add Article: no escape while saving"**~~ — **done 2026-09-05**: the ✕ now shows and cancels during `.saving`, so a hung parse no longer traps the user. See [DONE.md](DONE.md)'s FAB-322 entry for the one known gap (Readability.js's `WKWebView` isn't itself interruptible mid-flight).
   15. ~~**FAB-320**~~ — **moved to FAB-334.** System `EditMode` supplies both the red destructive action and the "N Selected" title.
@@ -103,32 +103,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   ## Depends on
 
   Close or hand off after core Phase 2 issues are done.
-
-### Bugs — found 2026-09-03 (Ink theme + onboarding pass)
-
-- [ ] 🟠 **FAB-333** · The reading measure collapses with OpenDyslexic and at the largest in-app size  `In Progress` `High`
-  ## Symptom
-
-  Seen 2026-09-03, both in Ink:
-
-  * **OpenDyslexic at 18pt** reflows the body to roughly 25–30 characters per line — four or five words. OpenDyslexic is far wider than Georgia or New York at the same point size, and nothing compensates.
-  * **Georgia at the maximum in-app size (26pt)** gives roughly 28–32 characters per line.
-
-  Both are well below the 45–75 character range that makes long-form reading comfortable, and this is the app's core screen.
-
-  ## Cause
-
-  The reading column is `.frame(maxWidth: 680)` with a hardcoded `.padding(.horizontal, 40)`. On a 393pt screen that leaves ~313pt regardless of font family or size, and there is no margin control — [accessibility-specs.md](accessibility-specs.md) §2.1 specified one in the reading bar and it was never built. (FAB-318 pointed here for this same gap before it closed 2026-09-05 without touching margins — this is the entry that actually owns it.)
-
-  ## Fix
-
-  Options, in rough order of effort:
-
-  * ~~Narrow the horizontal padding as font size increases, so the measure degrades more gracefully at the top of the scale.~~ **Done 2026-09-05** — kept open here (not moved to DONE.md) since this covers only one of the three options. `ArticleReaderView.readingHorizontalPadding` tapers the fixed 40pt down to `VersoSpacing.md` (16pt) as size approaches `BodySize.xxl` — reclaims ~48pt of total width at the top of the scale (~313pt → ~361pt on a 393pt screen), but doesn't reach 45–75 characters on its own, and doesn't touch OpenDyslexic's problem at its *default* size (18pt is where the taper starts, not where it kicks in).
-  * **Still open:** Give OpenDyslexic its own size mapping — its 18pt is visually much larger than Georgia's, so the `BodySize` scale (FAB-311) should be per-family, not absolute. This is the one that actually fixes the OpenDyslexic-at-default-size symptom.
-  * **Still open:** Ship the margins control the spec called for.
-
-  **Note this is the in-app size scale, not system Dynamic Type** — FAB-309 (system Dynamic Type) is done, but that fix left this in-app scale untouched, and its collapse still stacks on top of it.
 
 ### Bugs — found during FAB-311 PR review (Fabio, 2026-09-05)
 

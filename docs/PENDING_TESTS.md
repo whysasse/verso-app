@@ -17,6 +17,46 @@ xcodegen generate` before opening `Verso.xcodeproj`.
 
 ## Open
 
+### FAB-333 — Reading measure: OpenDyslexic per-family sizing + new Margins control
+
+- **Branch:** `claude/fab-333-reading-measure`
+- **PR:** (opening next)
+
+This is the one I most want your honest read on, not just check/uncheck —
+two real judgment calls I made without being able to see either on a
+device.
+
+- [ ] **OpenDyslexic at its default size (18pt) now renders noticeably
+      smaller** than before (effectively one step down, ~16pt) — pick
+      OpenDyslexic in Settings or the reader's font sheet, and judge: does
+      the reading column now comfortably fit ~45+ characters per line? If
+      it's still cramped, this one-step reduction wasn't enough and needs
+      to go further (I flagged this as a real possibility, not a guess I'm
+      confident in).
+- [ ] **New "Margins" row** in the reader's font sheet (tap the font/spacing
+      icon in the bottom bar), below Font Size and Line Spacing. 4 options:
+      Wide (today's unchanged default) / Normal / Narrow / Narrowest.
+      Confirm the sheet isn't clipped or scrollable-feeling with the third
+      row added (I widened its fixed height from 218 to 286 to fit it, but
+      couldn't see the actual result).
+- [ ] **Tap through all 4 margin levels** and confirm the reading column
+      visibly widens as you go from Wide to Narrowest, at a normal font
+      size. The new icon (small page outline with two inset marks) is a
+      first pass — tell me if it doesn't read clearly as "margin width."
+- [ ] **VoiceOver:** swipe to a margin option and confirm it announces
+      Wide/Normal/Narrow/Narrowest, and the selected one announces as
+      selected.
+- [ ] **Pick Narrow or Narrowest, then increase font size toward the top of
+      the scale** (26pt) — confirm the column doesn't go edge-to-edge or
+      look broken; the size-based taper and your manual margin choice both
+      pull toward the same 16pt floor, so they shouldn't fight each other,
+      but this is exactly the kind of interaction I can't verify without a
+      device.
+- [ ] If easy to check: switch device language to **French (Canada)** or
+      **Português (Brasil)** and confirm the margin option labels
+      ("Large"/"Étroite"/... and "Larga"/"Estreita"/...) show correctly —
+      first-draft translations, not yet linguistically reviewed.
+
 ### FAB-308 — Localize the reading chrome's accessibility strings
 
 - **Branch:** `fab-308-localize-reading-chrome`
