@@ -2,9 +2,27 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**200 completed issues.**
+**201 completed issues.**
 
 ## iOS
+
+### Pre-TestFlight-deploy check (2026-09-08)
+
+- [x] 🟠 **FAB-316** · The reader's top bar repeats the title directly below it  `Done` `High`
+  Design critique §6.4: the top bar showed a one-line truncated copy of the article title sitting directly above the same title set in full at 28pt bold in `ArticleHeader` — the eye read the same sentence twice, in the most valuable strip of the screen. High-priority, listed in FAB-334's "not absorbed — do in 1.0" set, but had fallen through the cracks: never actually in the executed pre-submission checklist despite BACKLOG claiming it was "already sequenced." Caught and fixed while confirming release readiness, 2026-09-08.
+
+  ## Fix
+
+  Per the ticket's own suggested fix — "show the bar title only once the H1 has scrolled out of view, scroll offset is already tracked precisely" — plus [accessibility-specs.md](accessibility-specs.md) §5.2's separate, previously-unimplemented requirement that the bar title be `accessibilityHidden` while the real H1 is visible (same condition, same fix, done together):
+
+  * **`ArticleHeader.swift`**: new `ArticleTitleHeightPreferenceKey`, reported by a `GeometryReader` behind the H1 `Text` — measures just the H1's own rendered height, not the whole header block (author/date/read-time), so the bar title reappears exactly when the H1 itself leaves the viewport, not a beat late.
+  * **`ArticleReaderView.swift`**: new `articleTitleHeight` state fed by `.onPreferenceChange`, and `hasScrolledPastTitle` (`scrollOffset > restorePadHeight + articleTitleHeight` — `restorePadHeight` is the scroll-restore spacer sitting above the H1 in content coordinates, so it has to clear both). Guards on `articleTitleHeight > 0` so the bar title starts hidden rather than flashing visible for one frame before the real measurement arrives. Passed into `ReadingTopBar` as a new `showTitle` parameter.
+  * **`ReadingChrome.swift`**: `ReadingTopBar` gained `showTitle: Bool = true` (defaulted so its own `#Preview` didn't need touching). The title `Text` gets `.opacity(showTitle ? 1 : 0)` (visual) and `.accessibilityHidden(!showTitle)` (VoiceOver) — same boolean drives both, closing accessibility-specs.md §5.2 as a side effect.
+  * Deliberately did **not** use `GeometryReader`/preferences for the scroll-offset side of this comparison — `ScrollViewScrollMetricsTracker.swift`'s own comment already documents why (preferences drop updates mid-scroll) and that tracker's `scrollOffset` is exactly what this fix reads. The preference key here only measures a static view's height (changes with Dynamic Type/font, not scroll), a different and safe use.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild -scheme Verso -destination 'generic/platform=iOS Simulator' build` succeeded clean, diff limited to the three files above (no `Localizable.xcstrings` cosmetic rewrite this time). Not click-tested live this session — the reasoning mirrors an existing, tested pattern in the same view (`scrollOffset`/`contentHeight` already drive `scrollProgress` the same way), but this is a genuinely new codepath. Worth a specific look during TestFlight testing: open a long article, scroll past the H1, confirm the top bar's title fades in around the same moment the real title's bottom edge crosses the top bar, and scroll back up to confirm it fades back out.
 
 ### Bugs — first real device pass on the FAB-30x/FAB-333 batch (reported by Fabio 2026-09-08)
 
@@ -13,7 +31,7 @@
 
   ## Fix
 
-  * **Stray rectangle at the bottom of the font/theme sheet** (worst right when the system light/dark scheme and the app's own theme disagree) — `ReadingControls`'s root `.background(colors.surface)` filled the sheet's SwiftUI content frame, but sheets don't extend `.background(_:)` beneath the home indicator on their own; that strip fell back to the system sheet's own background, which only tracks system light/dark, not `ThemeManager`. Changed to `.background(colors.surface.ignoresSafeArea(edges: .bottom))`, the same fix `ArticleReaderView`'s bottom bar already uses for the identical reason.
+  * **Stray rectangle at the bottom of the font/theme sheet** (worst right when the system light/dark scheme and the app's own theme disagree) — `ReadingControls`'s root `.background(colors.surface)` filled the sheet's SwiftUI content frame, but sheets don't extend `.background(_:)` beneath the home indicator on their own; that strip fell back to the system sheet's own background, which only tracks system light/dark, not `ThemeManager`. Changed to `.background(colors.surface.ignoresSafeArea(edges: .bottom))`, the same fix `ArticleReaderView`'s bottom bar already uses for the identical reason. Also closes **FAB-335** (BACKLOG's "verify the theme sheet is also fixed" follow-up to FAB-311) — same shared `ReadingControls.body`, confirmed fixed for both sheet variants together.
   * **Theme swatches too close together** in both the reading-view theme sheet (`ReadingControls.themeControls`) and Settings' theme picker (`ThemeSelector`) — both used `HStack(spacing: 0)` around swatches wrapped in `.frame(maxWidth: .infinity)`, so nothing separated them. Both now use `HStack(spacing: VersoSpacing.lg)` (24pt), matching the request for the reading sheet and kept consistent between the two pickers since FAB-324 unified them into one `ThemeSwatch` component specifically so they'd look alike.
   * **Continue Reading card showed "45 read" instead of "45% read"** — a repeat of FAB-330's bug, reintroduced by a later `generate.py` run. FAB-330 (2026-09-04) hand-patched the literal `%` in `Localizable.xcstrings` to `%%` (Foundation's printf-style substitution silently drops a bare `%` sitting next to a `%lld` placeholder) directly in the generated file, without the matching fix in the actual generator — so the next regeneration from `docs/copy/UI_COPY.md` silently dropped the escape again. Fixed at the source this time: `docs/copy/codegen/generate.py`'s `to_format_template` now escapes every literal `%` in a row's `en`/`fr`/`pt` text to `%%` *before* substituting `{placeholder}` → `%lld`/`%@`, so the escape survives any future regeneration. Re-ran `python3 docs/copy/codegen/generate.py`; only `Localizable.xcstrings` changed (back to the escaped values), confirming `UI_COPY.md` itself was already correct and no other row is affected (it's the only row in the whole file with a literal `%`).
 

@@ -1,5 +1,15 @@
 import SwiftUI
 
+/// Reports the H1 title `Text`'s own rendered height so `ArticleReaderView` can tell when it
+/// has scrolled out of view (FAB-316) -- `scrollOffset` is already tracked precisely, this is
+/// the one missing measurement the comparison needs.
+struct ArticleTitleHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct ArticleHeader: View {
     let title: String
     /// Shown after "By …" when non-empty (FAB-144).
@@ -36,6 +46,11 @@ struct ArticleHeader: View {
             Text(title)
                 .font(VersoTypography.Reading(fontFamily: fontFamily).h1)
                 .foregroundColor(colors.textPrimary)
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.preference(key: ArticleTitleHeightPreferenceKey.self, value: proxy.size.height)
+                    }
+                )
 
             VStack(alignment: .leading, spacing: 4) {
                 if hasAttributionLine {

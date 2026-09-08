@@ -10,6 +10,9 @@ struct ArticleReaderView: View {
 
     @State private var scrollOffset: CGFloat = 0
     @State private var contentHeight: CGFloat = 0
+    /// FAB-316: the H1's own rendered height, reported by `ArticleHeader` via
+    /// `ArticleTitleHeightPreferenceKey`. See `hasScrolledPastTitle` below.
+    @State private var articleTitleHeight: CGFloat = 0
     @State private var screenHeight: CGFloat = UIScreen.main.bounds.height
     @State private var isChromeVisible: Bool = true
     /// FAB-307 / accessibility-specs.md §5.3: chrome must never hide while VoiceOver is running.
@@ -44,6 +47,18 @@ struct ArticleReaderView: View {
 
     private var scrollProgress: Double {
         Self.scrollFraction(offset: scrollOffset, contentHeight: contentHeight, viewportHeight: screenHeight)
+    }
+
+    /// FAB-316: the top bar's own title copy is redundant with the real H1 for as long as the
+    /// H1 is on screen -- show it only once the H1 has scrolled out of view. `restorePadHeight`
+    /// (the scroll-restore spacer) sits above the H1 in content coordinates, so `scrollOffset`
+    /// has to clear both for the H1 to have actually left the viewport's top edge.
+    /// `articleTitleHeight` starts at 0 (not yet measured) -- `guard`ing on it keeps the bar
+    /// title hidden rather than flashing visible for one frame before the real measurement
+    /// arrives.
+    private var hasScrolledPastTitle: Bool {
+        guard articleTitleHeight > 0 else { return false }
+        return scrollOffset > restorePadHeight + articleTitleHeight
     }
 
     private var lineSpacingValue: CGFloat {
@@ -164,6 +179,7 @@ struct ArticleReaderView: View {
                     Spacer(minLength: 0)
                 }
             }
+            .onPreferenceChange(ArticleTitleHeightPreferenceKey.self) { articleTitleHeight = $0 }
             .onChange(of: contentHeight) { newHeight in
                 guard !didApplyScrollRestore,
                       let f = pendingRestoreFraction,
@@ -223,6 +239,7 @@ struct ArticleReaderView: View {
                 ReadingTopBar(
                     title: article.title,
                     onBack: closeReader,
+                    showTitle: hasScrolledPastTitle,
                     isVisible: $isChromeVisible
                 ) {
                     readingMenuContent

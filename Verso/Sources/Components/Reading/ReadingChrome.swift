@@ -73,6 +73,12 @@ private let readingChromeIconSize: CGFloat = 20
 struct ReadingTopBar<MenuContent: View>: View {
     let title: String
     var onBack: () -> Void
+    /// FAB-316: the bar's own copy of the title is only shown once the real H1 has scrolled out
+    /// of view -- otherwise the eye (and VoiceOver, per accessibility-specs.md §5.2) encounters
+    /// the same title twice in the most valuable strip of the screen. Defaults `true` so existing
+    /// callers (this file's own `#Preview`) that don't pass it keep their prior always-shown
+    /// behavior.
+    var showTitle: Bool = true
     /// FAB-299: the menu's items -- `ArticleReaderView` (the only caller) owns every action, so
     /// this view stays presentational, matching how the bottom bar's buttons take plain closures.
     @ViewBuilder var menuContent: () -> MenuContent
@@ -86,11 +92,13 @@ struct ReadingTopBar<MenuContent: View>: View {
     init(
         title: String,
         onBack: @escaping () -> Void = {},
+        showTitle: Bool = true,
         isVisible: Binding<Bool>,
         @ViewBuilder menuContent: @escaping () -> MenuContent
     ) {
         self.title = title
         self.onBack = onBack
+        self.showTitle = showTitle
         self._isVisible = isVisible
         self.menuContent = menuContent
     }
@@ -112,6 +120,11 @@ struct ReadingTopBar<MenuContent: View>: View {
                 .foregroundColor(colors.textPrimary)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
+                .opacity(showTitle ? 1 : 0)
+                // accessibility-specs.md §5.2: redundant with the real H1, which VoiceOver
+                // reaches as the first element of the article body -- hidden from the
+                // accessibility tree (not just visually) until the H1 scrolls out of view.
+                .accessibilityHidden(!showTitle)
 
             // Not `VersoToolbarIconButton` here -- that view wraps its content in its own
             // `Button`, which doesn't compose cleanly as a `Menu` label. Same visual metrics

@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**39 open issues** across iOS, Web, Design, and Infra. 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass; FAB-304, FAB-305, FAB-306, FAB-307, FAB-308, FAB-309, FAB-311, FAB-312, FAB-323, FAB-325, FAB-330 and FAB-331 done, see DONE.md). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**28 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08 — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — back to normal (Fabio back at his Mac, 2026-09-08)
 
@@ -53,6 +53,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   14. ~~*(pulled out of FAB-322)* **"Add Article: no escape while saving"**~~ — **done 2026-09-05**: the ✕ now shows and cancels during `.saving`, so a hung parse no longer traps the user. See [DONE.md](DONE.md)'s FAB-322 entry for the one known gap (Readability.js's `WKWebView` isn't itself interruptible mid-flight).
   15. ~~**FAB-320**~~ — **moved to FAB-334.** System `EditMode` supplies both the red destructive action and the "N Selected" title.
   16. **FAB-319** — **split.** The empty-state CTA **done 2026-09-05** — see the struck bullet under FAB-319 for detail. The filter panel's "Clear all" and summary row move to FAB-334, which rehomes filters around `.searchable` anyway; FAB-319 stays open in BACKLOG for that remainder.
+  17. ~~**FAB-316**~~ — **done**, see [DONE.md](DONE.md). Was never actually in this numbered list despite being marked "not absorbed — do in 1.0" further down (line ~266) — a real gap, caught 2026-09-08 confirming release readiness, not a duplicate of anything above. Top bar's title `Text` now only shows once the H1 scrolls out of view (visually and to VoiceOver), closing accessibility-specs.md §5.2's matching requirement as the same fix.
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
@@ -104,13 +105,6 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   Close or hand off after core Phase 2 issues are done.
 
-### Bugs — found during FAB-311 PR review (Fabio, 2026-09-05)
-
-- [ ] 🔵 **FAB-335** · Verify the theme sheet's stray dark rectangle is actually gone  `Todo` `Low`
-  While reviewing FAB-311's font sheet, Fabio flagged a strip of uncolored space below the controls that didn't fill the drawer's rounded surface — caused by `ReadingControls`' fixed `presentationDetents` height not matching its content's natural height, leaving the leftover space uncovered by `colors.surface`. Fixed in `ReadingControls.body` (the container shared by both sheet variants) by expanding it to `maxHeight: .infinity` with a trailing `Spacer` pushing content to the top, so the surface color reaches every edge regardless of height.
-
-  Fabio only screenshotted the **font** sheet (`.presentationDetents([.height(218)])`), but the fix lives in the shared container both variants render through, so the **theme** sheet (`.presentationDetents([.height(168)])`) should already be fixed too — same code path, different fixed height. Flagging as its own item rather than assuming: confirm on a real device/simulator that the theme sheet's drawer is also fully colored edge-to-edge with no gap. If it isn't, the shared fix didn't fully cover `themeControls`' shorter content and needs a follow-up.
-
 ### Design critique 2026-09-01 — contrast & accessibility
 
 Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section references below point into it. All contrast ratios are computed (WCAG 2.1 relative luminance), not eyeballed.
@@ -138,19 +132,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   Critique §7.4. `SettingsView.privacySection` uses `Toggle("", isOn: $analyticsOptIn).labelsHidden()` with the visible label as a separate `Text`, so the switch announces with no name. Add `.accessibilityLabel(L10n.Settings.analyticsRowLabel)`.
 
   Small enough to fold into another Settings issue if convenient.
-
-### Design critique 2026-09-01 — reading view
-
-- [ ] 🟠 **FAB-316** · The reader's top bar repeats the title directly below it  `Todo` `High`
-  ## Scope
-
-  Critique §6.4. The bar shows a one-line *truncated* copy of the article title, sitting directly above the same title set in full at 28pt bold. The eye reads the same sentence twice and the first reading is the broken one — in the most valuable strip of the screen.
-
-  [accessibility-specs.md](accessibility-specs.md) §5.2 already decided the bar title should be `accessibilityHidden` while the article is visible; the visual redundancy is the same problem in the other channel.
-
-  ## Fix
-
-  Show the bar title only once the H1 has scrolled out of view. Scroll offset is already tracked precisely, so the condition is cheap.
 
 ### Design critique 2026-09-01 — article list
 
