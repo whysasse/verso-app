@@ -1,6 +1,6 @@
 # Verso — Pending On-Device Tests
 
-**Version:** 1.0 · **Date:** 2026-09-05 · **Status:** Active
+**Version:** 1.1 · **Date:** 2026-09-08 · **Status:** Active
 
 Fabio is away from his Mac/device and can't run a real build or open the
 Simulator to confirm each change as it ships (see BACKLOG's "Working mode"
@@ -16,6 +16,21 @@ xcodegen generate` before opening `Verso.xcodeproj`.
 ---
 
 ## Open
+
+### FAB-337 — Font/theme sheet rectangle, swatch spacing, missing "%" (fixed from live testing 2026-09-08)
+
+Not a PR — fixed directly on `main` while Fabio tested live. See [DONE.md](DONE.md) for the
+full writeup; just needs the re-check since it was fixed from screenshots, not confirmed live.
+
+- [ ] **Font sheet and theme sheet** — the stray rectangle at the bottom (worst switching
+      light↔dark) is gone in both Night and a light theme.
+- [ ] **Reading-view theme sheet** — the 4 swatches now have visible breathing room (24pt)
+      between them instead of sitting edge-to-edge.
+- [ ] **Settings → theme picker row** — same spacing fix applied there too, for consistency;
+      wasn't explicitly reported but shares the exact same layout bug.
+- [ ] **Continue Reading card** — the progress caption reads "N**%** read", not "N read".
+
+---
 
 ### FAB-333 — Reading measure: OpenDyslexic per-family sizing + new Margins control
 

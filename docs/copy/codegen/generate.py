@@ -110,8 +110,13 @@ def param_name(ph):
     return ph
 
 def to_format_template(s, placeholders):
-    # Replace {placeholder} with %lld or %@ in left-to-right order.
-    out = s
+    # Escape any literal '%' first so it survives as a literal percent sign
+    # once Foundation does printf-style substitution -- a bare '%' sitting
+    # next to a %lld/%@ placeholder gets silently swallowed (FAB-330:
+    # "0 read" instead of "0% read"). Must run before the {placeholder} ->
+    # %lld/%@ substitution below, or it would double-escape the specs we
+    # just inserted.
+    out = s.replace("%", "%%")
     for ph in placeholders:
         spec = "%lld" if ph in INTEGER_PLACEHOLDERS else "%@"
         out = out.replace("{" + ph + "}", spec, 1)

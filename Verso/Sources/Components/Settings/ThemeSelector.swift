@@ -5,7 +5,7 @@ struct ThemeSelector: View {
     private var colors: ThemeColors { themeManager.colors }
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: VersoSpacing.lg) {
             ForEach(VersoTheme.allCases) { theme in
                 let isSelected = themeManager.currentTheme == theme
                 Button {

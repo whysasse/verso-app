@@ -41,7 +41,14 @@ struct ReadingControls: View {
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-        .background(colors.surface)
+        // Sheets don't extend .background(_:) beneath the home indicator on
+        // their own -- without ignoresSafeArea, that strip falls back to the
+        // system sheet's own background (tracks system light/dark only, not
+        // ThemeManager), which is what showed as a stray rectangle at the
+        // bottom, worst right when system appearance and app theme disagree.
+        // ArticleReaderView's bottom bar already uses the same fix for the
+        // same reason.
+        .background(colors.surface.ignoresSafeArea(edges: .bottom))
         .overlay(
             Rectangle()
                 .frame(height: 1)
@@ -201,7 +208,7 @@ struct ReadingControls: View {
     }
 
     private var themeControls: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: VersoSpacing.lg) {
             ForEach(VersoTheme.allCases) { theme in
                 let isSelected = themeManager.currentTheme == theme
                 Button {

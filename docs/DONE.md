@@ -2,9 +2,24 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**199 completed issues.**
+**200 completed issues.**
 
 ## iOS
+
+### Bugs — first real device pass on the FAB-30x/FAB-333 batch (reported by Fabio 2026-09-08)
+
+- [x] 🔵 **FAB-337** · Font/theme sheet stray rectangle, cramped theme swatches, missing "%" on progress caption  `Done` `Low`
+  Three small findings from Fabio's first on-device pass through the batch PENDING_TESTS.md was tracking — screenshots on iPhone, Night and Paper themes. Completed 2026-09-08.
+
+  ## Fix
+
+  * **Stray rectangle at the bottom of the font/theme sheet** (worst right when the system light/dark scheme and the app's own theme disagree) — `ReadingControls`'s root `.background(colors.surface)` filled the sheet's SwiftUI content frame, but sheets don't extend `.background(_:)` beneath the home indicator on their own; that strip fell back to the system sheet's own background, which only tracks system light/dark, not `ThemeManager`. Changed to `.background(colors.surface.ignoresSafeArea(edges: .bottom))`, the same fix `ArticleReaderView`'s bottom bar already uses for the identical reason.
+  * **Theme swatches too close together** in both the reading-view theme sheet (`ReadingControls.themeControls`) and Settings' theme picker (`ThemeSelector`) — both used `HStack(spacing: 0)` around swatches wrapped in `.frame(maxWidth: .infinity)`, so nothing separated them. Both now use `HStack(spacing: VersoSpacing.lg)` (24pt), matching the request for the reading sheet and kept consistent between the two pickers since FAB-324 unified them into one `ThemeSwatch` component specifically so they'd look alike.
+  * **Continue Reading card showed "45 read" instead of "45% read"** — a repeat of FAB-330's bug, reintroduced by a later `generate.py` run. FAB-330 (2026-09-04) hand-patched the literal `%` in `Localizable.xcstrings` to `%%` (Foundation's printf-style substitution silently drops a bare `%` sitting next to a `%lld` placeholder) directly in the generated file, without the matching fix in the actual generator — so the next regeneration from `docs/copy/UI_COPY.md` silently dropped the escape again. Fixed at the source this time: `docs/copy/codegen/generate.py`'s `to_format_template` now escapes every literal `%` in a row's `en`/`fr`/`pt` text to `%%` *before* substituting `{placeholder}` → `%lld`/`%@`, so the escape survives any future regeneration. Re-ran `python3 docs/copy/codegen/generate.py`; only `Localizable.xcstrings` changed (back to the escaped values), confirming `UI_COPY.md` itself was already correct and no other row is affected (it's the only row in the whole file with a literal `%`).
+
+  ## Verified
+
+  `xcodegen generate` + `xcodebuild -scheme Verso -destination 'generic/platform=iOS Simulator' build` succeeded clean. On-device/Simulator re-confirmation of these three specific spots is Fabio's part after this.
 
 ### Bugs — import & rendering (reported by Fabio 2026-08-30)
 
