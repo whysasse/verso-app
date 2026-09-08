@@ -19,7 +19,7 @@
 
   ## Verified
 
-  `xcodegen generate` + `xcodebuild -scheme Verso -destination 'generic/platform=iOS Simulator' build` succeeded clean. On-device/Simulator re-confirmation of these three specific spots is Fabio's part after this.
+  `xcodegen generate` + `xcodebuild -scheme Verso -destination 'generic/platform=iOS Simulator' build` succeeded clean. Fabio re-confirmed all three visually in the Simulator the same session (2026-09-08) — see [PENDING_TESTS.md](PENDING_TESTS.md)'s Done section.
 
 ### Bugs — import & rendering (reported by Fabio 2026-08-30)
 

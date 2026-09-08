@@ -1,6 +1,6 @@
 # Verso — Localization (i18n) Strategy
 
-**Version:** 1.2 · **Date:** 2026-09-03 · **Ratified:** 2026-06-17 (FAB-276) · **Status:** Signed off; implementation tracked in `docs/BACKLOG.md`
+**Version:** 1.3 · **Date:** 2026-09-08 · **Ratified:** 2026-06-17 (FAB-276) · **Status:** Signed off; implementation tracked in `docs/BACKLOG.md`
 
 Verso ships in three locales: **EN-CA, FR-CA, PT-BR**. This doc records the decisions so iOS and Web implement i18n the same way. All user-facing strings live in `copy/UI_COPY.md` (the `en` base); this doc covers locale policy, plurals, formatting, and invariants. Implementation work is tracked under the **Localization** epic ([FAB-275](BACKLOG.md)) in `docs/BACKLOG.md` (issue tracker of record since Linear retired 2026-06-12).
 
@@ -114,7 +114,7 @@ python3 docs/copy/codegen/generate.py
 
 This rewrites `Localizable.xcstrings`, `Verso/Generated/L10n.swift`, and `verso-web/messages/{en,fr-CA,pt-BR}.json` together, so all three stay in the same shape as `UI_COPY.md`'s row order — never alphabetized, never hand-touched.
 
-**Known gotcha: Xcode silently rewrites `Localizable.xcstrings` cosmetically.** Simply opening the project or building in Xcode.app (not `xcodebuild` on the command line — confirmed that leaves the file untouched) can make Xcode's String Catalog editor re-serialize the whole file with its own formatting: keys reordered alphabetically, JSON re-indented, no actual translation content changed. This shows up in `git status` as a huge diff (seen 2026-09-03: ~5,000 insertions / ~5,000 deletions, the entire file) that looks alarming but isn't a real edit.
+**Known gotcha: Xcode silently rewrites `Localizable.xcstrings` cosmetically.** Simply opening the project or building in Xcode.app can make Xcode's String Catalog editor re-serialize the whole file with its own formatting: keys reordered alphabetically, JSON re-indented, plus a batch of new auto-extracted entries for string literals it found in code (e.g. `"·"`, `"%@"`, `"A"` — no actual translation content changed, these are compiler-discovered UI strings, not new copy). This shows up in `git status` as a huge diff (seen 2026-09-03: ~5,000 insertions / ~5,000 deletions, the entire file) that looks alarming but isn't a real edit. **2026-09-08 update:** this originally read "confirmed `xcodebuild` on the command line leaves the file untouched" — no longer reliably true. Seen triggered by a plain `xcodebuild ... build` on Xcode 27 (beta toolchain); likely a newer default for "Use Compiler to Extract Swift Strings" during the build, not specific to Xcode.app. Treat every build as a possible trigger, command-line included, and check `git diff` before committing regardless of how you built.
 
 Before committing a `Localizable.xcstrings` diff you didn't intend (i.e. you didn't touch `UI_COPY.md` and didn't run `generate.py`):
 
