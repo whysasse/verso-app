@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**28 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08 — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**29 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08, +FAB-338 opened same day — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — back to normal (Fabio back at his Mac, 2026-09-08)
 
@@ -163,6 +163,21 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   **No selection count.** With one article selected the header still reads "Verso". iOS convention is "1 Selected", and it matters most immediately before a bulk delete. The confirmation dialog does show a count, but that is after the fact.
 
+  ## Resolution (decided 2026-09-08, ships in FAB-334 phase 6)
+
+  Both halves are fixed by adopting system **chrome** only — the selection model does not change:
+
+  * **Red delete** — drop `.buttonStyle(.plain)` from the bulk-action buttons. `Button(role: .destructive)` is
+    already there; `.plain` is the only thing suppressing the role's colour. That is the entire fix.
+  * **Count** — "N Selected" as the navigation title, with Cancel/Done as toolbar items, once phase 4 has
+    given the list a real toolbar.
+
+  Deliberately **not** adopting `EditMode`'s multi-select: `List(selection:)`'s single-value binding drives
+  `NavigationSplitView`'s sidebar→detail collapse, and a `List` takes one selection binding. Swapping it for a
+  `Set` changes the `List`'s generic type, breaking view identity and resetting scroll position and section
+  collapse on every entry to select mode — worst exactly when the user has scrolled far to find what they want
+  to delete. Accepted losses: no free Select All, no drag-to-select. Neither was asked for.
+
 
 ### Design critique 2026-09-01 — design system consistency
 
@@ -221,9 +236,11 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   3. **Interaction specs for the three moves** — none of these have had a spec pass yet; proposing one so there's something concrete to build against or push back on:
      * **Theme → first-article-open pointer.** Fires once, the first time the reading view opens for the very first saved article (a new one-time flag, same pattern as onboarding's own "runs once per install," not reusing that flag). A lightweight callout anchored on the reading toolbar's theme control — not a sheet, not blocking — dismissed by any tap outside it or by using the control itself. Never blocks reading; if the user never opens an article, it never fires and the theme keeps its current default.
      * **Analytics consent → sheet on first list launch.** Fires once, the first time the article list appears after onboarding ends (covers both the "Skip" and "completed" paths). Presented as a sheet, not a full page — same copy and equal-weight button treatment already shipped under FAB-328 ("Allow" / "No thanks", both `.secondary`). Swiping the sheet away counts as "No thanks" (opt-out), matching the Law 25/GDPR-driven equal-weight decision already made for this screen — a dismissal must not read as consent.
-     * **Tour → empty-state teaching.** Replaces all 3 tour screens with contextual hints inside the real empty-library state (the one FAB-334 rebuilds), shown one at a time and dismissed by tapping past them, rather than a fixed carousel. E.g. a hint pointing at the actual share/add affordance, so "Share to save" is demonstrated against the real control instead of an illustration of one. Hints clear permanently once the first article is saved — no re-teaching a returning empty state (e.g. after archiving everything).
+     * **Tour → empty-state teaching.** ⚠️ **Superseded 2026-09-08 — do not build this.** The tour's teaching moves into the **welcome article (FAB-338)** instead: with an article seeded at folder-pick time the library is never empty on first run, so these hints would never fire. Deleting the 3 tour screens still happens here; only their replacement changed. Original proposal retained below for context. ~~Replaces all 3 tour screens with contextual hints inside the real empty-library state (the one FAB-334 rebuilds), shown one at a time and dismissed by tapping past them, rather than a fixed carousel. E.g. a hint pointing at the actual share/add affordance, so "Share to save" is demonstrated against the real control instead of an illustration of one. Hints clear permanently once the first article is saved — no re-teaching a returning empty state (e.g. after archiving everything).~~
 
-  Fabio: confirm or correct these three before anyone picks this ticket up — in particular #1's sequencing, since it commits FAB-334 to touching onboarding a second time rather than once.
+  **Resolutions 1 and 3 are now settled** (2026-09-08) — see FAB-334's decision block. #1 confirmed as proposed; #3's tour replacement changed to FAB-338. #2 was already corrected in place.
+
+  Original ask, retained: Fabio: confirm or correct these three before anyone picks this ticket up — in particular #1's sequencing, since it commits FAB-334 to touching onboarding a second time rather than once.
 
 ### Phase E — native iOS shell (1.1)
 
@@ -279,7 +296,28 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Also out of scope: the Share Extension (FAB-323 handles its theming separately) and the iPad epic (FAB-131, FAB-152–162), which stays deferred.
 
-  ## Open decisions — needed before implementation starts
+  ## Decisions — all four closed 2026-09-08
+
+  Implementation plan: **[plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md)** — read that
+  to execute; read this ticket for the reasoning behind it. The plan also re-measured this epic's
+  counts (several had drifted) and names four architectural risks found in a 2026-09-08 audit that
+  aren't described here — chiefly that `EditMode` collides with the `List(selection:)` binding
+  `NavigationSplitView` uses for its sidebar→detail collapse.
+
+  | # | Decision | Answer (Fabio, 2026-09-08) |
+  |---|---|---|
+  | 1 | Deployment target | **iOS 26.0**, as provisionally decided. iOS 27 ships ~2026-09-14; iOS 26 was already at 79% of all iPhones / 86% of last-4-years devices in June 2026, so the floor is cheap. Build against the newest SDK, deploy to 26. Still **not** on `main` — first commit on the 1.1 branch. |
+  | 2 | When 1.1 opens | **After 1.0's final binary submission lands.** `main` stays at iOS 16 until then, so a Review rejection or hotfix has a clean base. |
+  | 3 | Themes outside the reader | **Collapse to light/dark**, driven by `VersoTheme.isDark`. Paper/Sepia/Night/Ink survive in the reading view only. |
+  | 4 | Onboarding | **FAB-327 cuts 7 screens to 2 first, on current chrome; the shell then reskins only the 2 survivors.** Confirms FAB-327's 2026-09-06 draft resolution #1. |
+  | 5 | Bulk select vs `EditMode` (raised by the 2026-09-08 audit, not in the original four) | **Keep `selectedArticleIds` and the `.constant(nil)` trick; adopt only `EditMode`'s chrome.** `List(selection:)`'s single-value binding is what drives `NavigationSplitView`'s sidebar→detail collapse — a `List` takes one selection binding, so real multi-select would mean swapping its generic type and losing scroll position and section state on every entry to select mode. FAB-320 needs red-Delete and a count, both of which come free from the chrome alone. See the plan's R1 for the keep/change table. |
+
+  Decision 4 also settles FAB-327's third draft resolution differently than proposed: its
+  "tour → empty-state teaching hints" is **cut**, superseded by the welcome article (FAB-338 below).
+  With an article seeded at folder-pick time the library is never empty on first run, so the hints
+  would never fire.
+
+  ### Original reasoning (2026-09-03, retained)
 
   1. **Deployment target — DECIDED 2026-09-03: raise to iOS 26.0.** Currently **iOS 16.0** (`Verso/project.yml`). The `glassEffect` family is iOS 26-only, so a real Liquid Glass shell needs either `if #available(iOS 26, *)` branches throughout or a raised floor. Verso has no installed base — nobody is on an old build because there is no old build — so this is the cheapest moment in the app's life to raise it, and it only gets more expensive after 1.0 ships.
 
@@ -318,6 +356,56 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   * [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md) — §3.4, §3.5, §5.1, §5.6, §7.1, §7.5 are the findings this absorbs
   * [navigation-patterns.md](navigation-patterns.md), [DESIGN_SYSTEM_FOUNDATIONS.md](DESIGN_SYSTEM_FOUNDATIONS.md)
   * [SwiftUI search enhancements in iOS/iPadOS 26](https://nilcoalescing.com/blog/SwiftUISearchEnhancementsIniOSAndiPadOS26/) · [Adapting search to Liquid Glass](https://www.createwithswift.com/adapting-search-to-the-liquid-glass-design-system/)
+
+- [ ] 🟠 **FAB-338** · Welcome article: seed a real Markdown article on first run  `Todo` `High`
+  ## Scope
+
+  Agreed with Fabio 2026-09-08. **Ships in 1.1, after the native shell lands, before release** —
+  phase 8 of [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md).
+
+  Write one real `.md` article into the user's chosen folder at folder-pick time, so a first-time user
+  opens the app into the reading view with content rather than onto an empty list. It carries the
+  instructions, feature descriptions and usage tips that FAB-327's deleted tour used to.
+
+  **Why this shape.** Verso's pitch is *your articles are plain Markdown files you own* — a welcome
+  article demonstrates that in the first ten seconds, since the user can open their iCloud folder and
+  find the file. It teaches inside the real reading view against real content instead of illustrating
+  controls on a carousel. And it doubles as a first-run QA artifact: with headings, lists, a blockquote,
+  an image and a few hundred words it exercises `HighlightableRegionText`'s region splitting, scroll
+  progress, and the reading-time estimate on launch.
+
+  **Supersedes** FAB-327's proposed empty-state teaching hints (see FAB-334's decision block above).
+  It does **not** supersede FAB-319's empty-state CTA — a user who skips folder selection never gets
+  the article and still lands on the empty state.
+
+  ## Constraints
+
+  These are what make it acceptable rather than intrusive — the app is writing an unsolicited file
+  into a folder belonging to an audience that notices:
+
+  1. **Written once, at folder-pick time.** There is no folder during Welcome. Its own flag, not onboarding's.
+  2. **Deleting it is permanent.** `ICloudFileWatcher`'s next rescan must not resurrect it. The flag has
+     to survive the delete — the detail most likely to be got wrong.
+  3. **Never overwrite, never intrude on an existing library.** Don't write if a file of that name
+     exists, or if the folder already contains `.md` files — `SettingsView.hasMarkdownFiles(in:)`
+     already implements that check; reuse it. Pointing Verso at an existing Obsidian vault must not add a file to it.
+  4. **Honest frontmatter.** No fabricated `source:` or publisher. It is not a saved article and must not
+     pretend to be one — a fake source URL would also make it sort oddly and corrupt the library's data model.
+  5. **Three locales.** EN-CA, FR-CA, PT-BR. Real prose, not strings-file entries: budget genuine
+     translation time, and keep it short enough that maintaining three copies stays cheap as the UI moves.
+
+  ## Resolved
+
+  **The article stays in the library** (Fabio, 2026-09-08) — no auto-archive once the user saves their
+  first real article. Auto-archiving would be the app quietly touching the user's data a second time, and
+  it contradicts the "these are just your files" pitch the article exists to demonstrate. The user
+  archives or deletes it like any other article; per constraint 2, deleting it is permanent.
+
+  ## Depends on
+
+  FAB-334 phases 3–7 (the tips describe the shell's controls) and FAB-327 (which deletes the tour this replaces).
+  Draft the prose during the shell work; finalise control names at the end.
+
 
 ### Phase 3 — Expansion
 
