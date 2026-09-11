@@ -216,6 +216,8 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | Web CSS tokens (authoritative source) | `verso-web/app/globals.css` |
 | Web theme provider implementation | `verso-web/app/providers/ThemeProvider.tsx` |
 | Web locale provider implementation, language picker (FAB-284) | `verso-web/app/providers/LocaleProvider.tsx` |
+| Settled decisions and their reasoning (ADR-lite) | `docs/DECISIONS.md` |
+| Recurring friction across sessions (raw log, not conclusions) | `docs/FRICTION.md` |
 
 ---
 
