@@ -88,3 +88,8 @@ docs/copy/.ignore_*
 SampleArticles/*.json
 SampleArticles/*.csv
 __pycache__/
+
+# sdlc-toolkit/ is a draft, project-agnostic AI-native-SDLC plan meant for
+# ~/.claude/, using Verso as the first test case — not Verso docs. Its own
+# plan says not to commit it to any repo without explicit confirmation.
+sdlc-toolkit/
