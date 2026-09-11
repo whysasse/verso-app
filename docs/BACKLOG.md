@@ -696,6 +696,24 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   A new contributor can read HANDOFF.md and understand how to set up and run both iOS and web versions.
 
+### `error` token drifted from globals.css after FAB-336
+
+- [ ] 🟡 **FAB-339** · [WEB] `error` token drifted: globals.css still has the pre-FAB-336 Paper/Sepia hex  `Todo` `Medium`
+  Found 2026-09-11 by `scripts/checks/check-token-parity.py` (new — see the
+  sdlc-toolkit contract PR), which diffs `docs/DESIGN_TOKENS.md` against
+  `verso-web/app/globals.css` for real instead of by eye.
+
+  FAB-336 (2026-09-06) darkened `error` for Paper/Sepia from `#C0392B` to
+  `#AD3327` in `Colors.swift` and `docs/DESIGN_TOKENS.md`, to clear the
+  4.5:1 floor on `surface`. Its DONE.md entry never mentions `verso-web` —
+  this looks like a plain oversight (the web token port, FAB-165, already
+  existed by then), not a deliberate scope call.
+
+  **Fix:** `verso-web/app/globals.css` — `[data-theme="paper"]` and
+  `[data-theme="sepia"]`'s `--color-error: #C0392B;` → `#AD3327;`. Night
+  and Ink already match `docs/DESIGN_TOKENS.md`. One line each; re-run
+  `scripts/check-token-parity.py` after to confirm.
+
 
 ## Design / UX
 
@@ -753,8 +771,31 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   No app implementation — tracking only for changelog / cross-link with [FAB-150](https://linear.app/fabiosasseron/issue/FAB-150/phase-2-app-store-release-checklist).
 
+### Two issue ids have entries in both BACKLOG.md and DONE.md
 
-## Other
+- [ ] 🔵 **FAB-340** · [Docs] Backlog bookkeeping: FAB-165 and FAB-327 each have an entry in both BACKLOG.md and DONE.md  `Todo` `Low`
+  Found 2026-09-11 by `scripts/checks/check-backlog.sh` (new — see the
+  sdlc-toolkit contract PR), which checks this mechanically now instead of
+  by eye. No app implementation — tracking + a judgment call, not code.
+
+  * **FAB-165** — the `## Web` entry above (checked off, `Completed`) is a
+    stale duplicate: FAB-165 already has a proper `Done` entry in
+    `docs/DONE.md`. Per the backlog-hygiene rule, a completed entry
+    *moves*, it doesn't get copied — this one should simply be deleted
+    from BACKLOG.md.
+  * **FAB-327** — genuinely ambiguous, not just a stray copy. `BACKLOG.md`
+    has an *open* entry for the full scope ("Onboarding is seven screens
+    before the first article — full restructure"), while `DONE.md` has a
+    *done* entry under the same id for a narrower "minimum fix" (global
+    Skip + shrinking page dots) — see `docs/BACKLOG.md`'s own "Current
+    sequencing" note: "the full restructure stays open in BACKLOG for a
+    post-launch revisit." That's a real scope split that never got its own
+    number. Fabio's call: renumber the still-open "full restructure" work
+    under a fresh FAB-xx (leaving FAB-327 as closed, describing only what
+    actually shipped), or leave both under FAB-327 with BACKLOG.md's entry
+    reworded to make clear it's the *remaining* scope, not the original.
+
+
 
 ### Uncategorized
 
