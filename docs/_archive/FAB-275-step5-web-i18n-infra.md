@@ -1,3 +1,8 @@
+> 🗄️ **ARCHIVED 2026-09-11.** Per-issue working doc; the FAB-275 epic is
+> closed — `docs/DONE.md` shows FAB-275 `Done` and `docs/BACKLOG.md`
+> confirms "Steps 1–8 done." Kept for history; do not implement from this
+> document.
+
 # FAB-275 step 5 — Web i18n infrastructure
 
 **Goal:** Web renders `docs/copy/UI_COPY.md` strings in `en` / `fr-CA` / `pt-BR`, the same way iOS does after steps 3–4. *Done when:* web renders per-locale strings (per the epic checklist in `docs/BACKLOG.md`).
