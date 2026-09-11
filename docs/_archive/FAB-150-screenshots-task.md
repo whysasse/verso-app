@@ -1,3 +1,10 @@
+> 🗄️ **ARCHIVED 2026-09-11.** This specific sub-task is done —
+> `docs/BACKLOG.md`'s FAB-150 checklist shows "Screenshots for required
+> device classes — uploaded successfully 2026-08-25," and the files exist
+> in `docs/printscreens/app-store-2026-08/`. The parent FAB-150 (final
+> binary submission) is still open in `docs/BACKLOG.md` — only this task
+> is spent. Kept for history; do not implement from this document.
+
 # FAB-150 — Capture App Store screenshots (task for Claude Code)
 
 **Context:** Part of the FAB-150 App Store release checklist. See `docs/APP_STORE_LISTING.md` for the full listing draft and `docs/BACKLOG.md`'s FAB-150 entry for the release checklist this fits into. Decided 2026-08-24: Claude Code (running locally, since this needs Xcode/Simulator) captures these; Fabio reviews and picks the final set.

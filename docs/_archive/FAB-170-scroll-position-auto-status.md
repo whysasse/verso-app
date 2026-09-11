@@ -1,3 +1,7 @@
+> 🗄️ **ARCHIVED 2026-09-11.** Per-issue working doc; issue closed —
+> `docs/DONE.md` shows FAB-170 `Done`. Kept for history; do not implement
+> from this document.
+
 # FAB-170 — Scroll position persistence + auto-status progression (Web)
 
 **Issue:** Mirror the iOS reading progress tracking — save `scroll_position` to YAML frontmatter on scroll and auto-update article status.  
