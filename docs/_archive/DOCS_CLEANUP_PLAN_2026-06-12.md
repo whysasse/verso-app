@@ -1,3 +1,17 @@
+> 🗄️ **ARCHIVED 2026-09-11.** Found unreferenced by any other doc. A fuller
+> re-check of its own 10-item verification checklist (this banner's first
+> draft only spot-checked 5) shows Phases 1–2 and part of 4 demonstrably
+> ran — but it is not a clean pass: "root `CLAUDE.md` contains only
+> `@AGENTS.md`" no longer holds (`docs/DECISIONS.md` now records the
+> 2026-09-11 decision that reversed it), Phase 3's move into
+> `product/`/`design/`/`engineering/` subfolders never happened (`docs/`
+> is still flat — this also means `AGENTS.md`'s own "Folders" section is
+> currently describing a structure that doesn't exist), and HANDOFF's
+> services table is missing 2 files against current `ls`. Archived anyway
+> — it's still unreferenced, 3 months stale, and superseded by decisions
+> made since — but archiving isn't the same claim as "fully executed."
+> Kept for history; do not implement from this document.
+
 # Verso — Documentation Cleanup & Streamlining Plan
 
 **Date:** 2026-06-12 · **Author:** Claude (audit session) · **Status:** Ready to execute
