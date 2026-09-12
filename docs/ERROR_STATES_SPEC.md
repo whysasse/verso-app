@@ -76,9 +76,9 @@ Tokens are used as **text tints and border colors only** — never as large fill
 - Subheadline: SF Regular 15pt, `textSecondary`
 - Vertical spacing between icon → headline → subheadline: `spacing.md` (16pt)
 - CTAs stacked vertically below subheadline, `spacing.lg` (24pt) gap:
-  - Primary: "Open in Safari" — full-width pill, `accent` fill, SF Semibold 17pt, white label
-  - Secondary: "Dismiss" — full-width pill, `surface` fill + `border` stroke, SF Regular 17pt, `textSecondary`
-- Both buttons: height 50pt, corner radius `pill` (20pt)
+  - Primary: "Open in Safari" — full-width, `accent` fill, SF Semibold 17pt, white label
+  - Secondary: "Dismiss" — full-width, `surface` fill + `border` stroke, SF Regular 17pt, `textSecondary`
+- Both buttons: height 50pt, corner radius `radius.md` (12pt) — matches PrimaryButton/SecondaryButton everywhere else in the system (was `pill`/20pt; corrected 2026-09-12, see docs/DOC_DRIFT_AUDIT_2026-09-12.md §E2 — no button anywhere else at this height uses `pill`, and 20pt on a 50pt element wasn't even a true pill by the system's own logic)
 - Note: URL stub is already saved; article row appears in list with parse-failed indicator
 
 ---
@@ -101,7 +101,7 @@ Tokens are used as **text tints and border colors only** — never as large fill
 - Icon: `folder.badge.questionmark`, 48pt, `textSecondary`
 - Headline: SF Semibold 20pt, `textPrimary`
 - Subheadline: SF Regular 15pt, `textSecondary`
-- CTA: full-width pill (max 280pt), `accent` fill, SF Semibold 17pt, white label, height 50pt
+- CTA: full-width (max 280pt), `accent` fill, corner radius `radius.md` (12pt), SF Semibold 17pt, white label, height 50pt
 - Vertical layout centered in safe area, spacing `spacing.lg` (24pt) between elements
 - Horizontal padding: `spacing.xl` (32pt)
 

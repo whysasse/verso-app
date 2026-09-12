@@ -391,11 +391,18 @@ own FAB entry (or, for A1–A3, one batched documentation-refresh entry
 rather than one per stale line) — filing was a separate decision from
 writing the audit down, made after review:
 
-- **Filed 2026-09-12:** B1 (widened FAB-339), B2 (FAB-341), B3 (FAB-342),
-  B5 (FAB-343), E3 (FAB-344), C1 (FAB-345), C2 (FAB-346), D1 (FAB-347) —
-  every finding with one clear answer and no judgment call attached.
-- **Not yet filed** — each needs a decision before it's a clean FAB entry,
-  not just a doc correction: A1–A3 (one batched refresh, or several —
-  scope not yet chosen), E1 (needs a token-vs-spec call), E2 (needs a
-  radius-family call), G1 (needs a `docs/DECISIONS.md`-level call on the
-  `CLAUDE.md`/`AGENTS.md` split, not a BACKLOG item at all).
+- **Filed as BACKLOG entries:** B1 (widened FAB-339), B2 (FAB-341), B3
+  (FAB-342), B5 (FAB-343), E3 (FAB-344), C1 (FAB-345), C2 (FAB-346), D1
+  (FAB-347) — every finding with one clear answer and no judgment call
+  attached.
+- **Fixed directly, no FAB needed** (small enough to just do once decided):
+  B4 and B6 (both missed when the mechanical batch above was filed —
+  fixed alongside G1 in the same PR, since all three touch
+  `AGENTS.md`/`CLAUDE.md`/`HANDOFF.md`); E2 (Fabio's call: match
+  `radius.md` — fixed in `docs/ERROR_STATES_SPEC.md`).
+- **Decided, not yet done:** E1 (Fabio's call: formalize
+  `warningSurface`/`errorSurface` tokens); A1–A3 (Fabio's call: mark the
+  PRD historical, batch-refresh `site-map.md`/`feature-priority-per-screen.md`/
+  `interactions-and-gestures.md`).
+- **Resolved:** G1 — moved into `CLAUDE.md`'s `## Workflow` directly
+  (not just a broadened pointer).
