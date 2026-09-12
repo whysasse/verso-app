@@ -28,7 +28,8 @@ struct AboutView: View {
             Spacer()
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: L10n.About.title)
+        .navigationTitle(L10n.About.title)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var rows: some View {

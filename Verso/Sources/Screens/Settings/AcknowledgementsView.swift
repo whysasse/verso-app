@@ -36,7 +36,8 @@ struct AcknowledgementsView: View {
             .padding(.top, VersoSpacing.sm)
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: L10n.About.acknowledgementsRowLabel)
+        .navigationTitle(L10n.About.acknowledgementsRowLabel)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

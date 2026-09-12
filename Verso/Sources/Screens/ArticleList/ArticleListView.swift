@@ -98,6 +98,9 @@ struct ArticleListView: View {
                 }
 
                 // Outside `.id(listFetchIdentity)` so typing doesn't recreate this view and drop keyboard focus.
+                // FAB-334 phase 4: only the selecting/searching custom rows remain here now --
+                // phase 6 (select mode) and phase 5 (search) still own those. The default
+                // state's title and icons moved to a real navigation bar + toolbar below.
                 headerRow
                     .padding(.horizontal, VersoSpacing.md)
                     .padding(.top, VersoSpacing.md)
@@ -165,11 +168,69 @@ struct ArticleListView: View {
                 }
             }
         }
-        // FAB-302: the title/controls live in `headerRow` now (FAB-292), not the nav
-        // bar, so hide the sidebar column's bar entirely — otherwise NavigationSplitView
-        // reserves an empty ~44pt band above `headerRow`. Mirrors ArticleReaderView's
-        // own bar-hiding for its column.
-        .toolbar(.hidden, for: .navigationBar)
+        // FAB-334 phase 4: real navigation bar replaces `defaultHeaderRow`'s title + four
+        // icons (absorbs the rest of FAB-310 -- real toolbar items instead of a hand-built
+        // HStack of `.buttonStyle(.plain)` Images). Hidden only while the selecting/searching
+        // custom rows above are on screen, so there's no duplicate title -- those two states
+        // are phase 6/5 territory and keep their current chrome for now.
+        .toolbar(isSelecting || isSearching ? .hidden : .automatic, for: .navigationBar)
+        .navigationTitle(L10n.Home.navTitle)
+        .tint(themeManager.colors.accent)
+        .toolbar {
+            if !isSelecting && !isSearching {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation(VersoAnimation.fast) { isSearching = true }
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .accessibilityLabel(L10n.Home.searchIconAccessibilityLabel)
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation(VersoAnimation.normal) { showFilterPanel = true }
+                    } label: {
+                        Image(systemName: activeFilterCount > 0 ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                            .overlay(alignment: .topTrailing) {
+                                if activeFilterCount > 0 {
+                                    Text("\(activeFilterCount)")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(themeManager.colors.background)
+                                        .padding(.horizontal, 5)
+                                        .frame(minWidth: 16, minHeight: 16)
+                                        .background(Capsule().fill(themeManager.colors.accent))
+                                        .offset(x: 8, y: -8)
+                                }
+                            }
+                    }
+                    .accessibilityLabel(L10n.Home.tagFilterButtonAccessibilityLabel)
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showAddArticle = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel(L10n.Home.addArticleAccessibilityLabel)
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button(L10n.Home.bulkSelectSelect) {
+                            isSelecting = true
+                        }
+                        Button(L10n.Home.settingsAccessibilityLabel) {
+                            showSettings = true
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                    }
+                    .accessibilityLabel(L10n.Home.overflowAccessibilityLabel)
+                }
+            }
+        }
         // FAB-304: lives here, not inside ArticleListFetchedBody, deliberately. That struct
         // is `.id(listFetchIdentity)`-keyed and gets torn down and rebuilt whenever
         // search/date change the fetch predicate -- and, more disruptively, whenever
@@ -178,25 +239,24 @@ struct ArticleListView: View {
         // inside that subtree gets torn down with it while `showSettings` (owned here,
         // one level up) survives as true -- a pushed slot with no destination left to
         // resolve it, i.e. a blank screen. Attaching it to this stable ancestor instead
-        // means nothing re-keys it out from under the push.
+        // means nothing re-keys it out from under the push. Unchanged by phase 4 -- only
+        // how `showSettings` gets set (a real toolbar Menu item now) moved, not this.
         .navigationDestination(isPresented: $showSettings) {
             SettingsView()
         }
     }
 
-    // MARK: - Header row (FAB-292)
+    // MARK: - Header row (FAB-292, trimmed FAB-334 phase 4)
 
-    /// "Verso" and its controls share one row: while selecting, it becomes a Cancel button; while
-    /// searching, it becomes the expanded search field. Otherwise it's the title plus four icons
-    /// (search, filter, add, overflow).
+    /// While selecting, the custom row becomes a Cancel button; while searching, it becomes
+    /// the expanded search field. Both are phase 6/5 territory, unchanged here. The default
+    /// state renders nothing -- its title and icons live in the real nav bar/toolbar above.
     @ViewBuilder
     private var headerRow: some View {
         if isSelecting {
             selectionHeaderRow
         } else if isSearching {
             searchActiveRow
-        } else {
-            defaultHeaderRow
         }
     }
 
@@ -232,81 +292,6 @@ struct ArticleListView: View {
             .buttonStyle(.plain)
             .font(VersoTypography.UI.button)
             .foregroundColor(themeManager.colors.accent)
-        }
-    }
-
-    private var defaultHeaderRow: some View {
-        HStack(spacing: 2) {
-            Text(L10n.Home.navTitle)
-                .font(VersoTypography.UI.screenTitle)
-                .foregroundColor(themeManager.colors.textPrimary)
-                .lineLimit(1)
-
-            Spacer(minLength: VersoSpacing.xs)
-
-            Button {
-                withAnimation(VersoAnimation.fast) { isSearching = true }
-            } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(themeManager.colors.accent)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(L10n.Home.searchIconAccessibilityLabel)
-
-            Button {
-                withAnimation(VersoAnimation.normal) { showFilterPanel = true }
-            } label: {
-                Image(systemName: activeFilterCount > 0 ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                    .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(themeManager.colors.accent)
-                    .frame(width: 44, height: 44)
-                    .overlay(alignment: .topTrailing) {
-                        if activeFilterCount > 0 {
-                            Text("\(activeFilterCount)")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(themeManager.colors.background)
-                                .padding(.horizontal, 5)
-                                .frame(minWidth: 16, minHeight: 16)
-                                .background(Capsule().fill(themeManager.colors.accent))
-                                .offset(x: 2, y: 4)
-                        }
-                    }
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(L10n.Home.tagFilterButtonAccessibilityLabel)
-
-            Button {
-                showAddArticle = true
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(themeManager.colors.accent)
-                        .frame(width: 32, height: 32)
-                    Image(systemName: "plus")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(themeManager.colors.background)
-                }
-                .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(L10n.Home.addArticleAccessibilityLabel)
-
-            Menu {
-                Button(L10n.Home.bulkSelectSelect) {
-                    isSelecting = true
-                }
-                Button(L10n.Home.settingsAccessibilityLabel) {
-                    showSettings = true
-                }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(themeManager.colors.accent)
-                    .frame(width: 44, height: 44)
-            }
-            .accessibilityLabel(L10n.Home.overflowAccessibilityLabel)
         }
     }
 

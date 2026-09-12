@@ -1,5 +1,12 @@
 import SwiftUI
 
+// FAB-334 phase 4: split out of VersoNavigationBar.swift (deleted). That file bundled
+// this button with the VersoNavigationBar modifier -- phase 1 tried to delete the
+// whole file as "dead code" and broke the build, because this component is very much
+// alive: ReadingChrome (out of scope for the whole epic) and AddArticleView/ImportView
+// all depend on it. It survives here on its own, unrelated to the navigation-bar
+// chrome the rest of the file existed for.
+
 /// Icon-only control matching article list toolbar styling: plain button, no system tint, accent foreground.
 struct VersoToolbarIconButton: View {
     let systemName: String
@@ -60,41 +67,5 @@ private extension View {
         } else {
             self
         }
-    }
-}
-
-struct VersoNavigationBar: ViewModifier {
-    let title: String
-    var trailingIcon: String = "plus.circle"
-    var trailingAction: (() -> Void)? = nil
-    @EnvironmentObject var themeManager: ThemeManager
-
-    func body(content: Content) -> some View {
-        content
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(themeManager.colors.background, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                if let action = trailingAction {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        VersoToolbarIconButton(
-                            systemName: trailingIcon,
-                            accent: themeManager.colors.accent,
-                            action: action
-                        )
-                    }
-                }
-            }
-    }
-}
-
-extension View {
-    func versoNavigationBar(
-        title: String,
-        trailingIcon: String = "plus.circle",
-        trailingAction: (() -> Void)? = nil
-    ) -> some View {
-        modifier(VersoNavigationBar(title: title, trailingIcon: trailingIcon, trailingAction: trailingAction))
     }
 }
