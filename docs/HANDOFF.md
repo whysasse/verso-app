@@ -1,6 +1,6 @@
 # Verso — Developer Handoff
 
-**Version:** 1.4 | **Date:** 2026-09-01 | **Status:** Ready for development
+**Version:** 1.4 | **Date:** 2026-09-01 | **Status:** Active
 
 This is the AI entry point for implementation. Read this file first, then fetch the linked docs only for the specific domain you're working in.
 

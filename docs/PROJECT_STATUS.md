@@ -1,6 +1,8 @@
 # Verso — Project Status
 
-**Date:** 2026-09-01 | **PRD Version:** 1.7
+**Version:** — | **Date:** 2026-09-01 | **Status:** Active
+
+(No document version of its own — status reporting doc, updated in place. See [PRD_MinimalistReaderApp.md](PRD_MinimalistReaderApp.md) for the PRD's own version, currently 1.7.)
 
 ---
 

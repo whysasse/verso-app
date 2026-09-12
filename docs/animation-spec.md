@@ -128,7 +128,7 @@ if isLoading {
 | Layer | Animation |
 |---|---|
 | Navigation chrome | System NavigationStack slide (no override) |
-| Article body content | Fade in: opacity 0→1, 250ms easeOut, 50ms delay after push settles |
+| Article body content | Fade in: opacity 0→1, 250ms easeInOut (`VersoAnimation.normal`), 50ms delay after push settles |
 
 The delay lets the system slide complete before revealing text, preventing content from appearing to "race" the chrome.
 
@@ -147,7 +147,7 @@ The delay lets the system slide complete before revealing text, preventing conte
 | Layer | Animation |
 |---|---|
 | Navigation chrome | System swipe-back gesture (no override) |
-| Previously selected row | Row background briefly highlights: opacity 0.12→0, 300ms easeOut |
+| Previously selected row | Row background briefly highlights: opacity 0.12→0, 250ms easeInOut (`VersoAnimation.normal`) |
 
 ```swift
 // In ArticleRow, on re-appear

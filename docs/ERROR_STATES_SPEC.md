@@ -21,7 +21,7 @@ Defines what the user sees for every failure scenario in Verso: copy, UI treatme
 
 | Token | Paper/Sepia | Night | Ink | Usage |
 |-------|------------|-------|-----|-------|
-| `error` | `#C0392B` | `#F87171` | `#FC8181` | Unrecoverable / file failures |
+| `error` | `#AD3327` | `#F87171` | `#FC8181` | Unrecoverable / file failures |
 | `warning` | `#B45309` | `#FCD34D` | `#F6E05E` | Recoverable / connectivity |
 | `success` | `#166534` | `#4ADE80` | `#68D391` | Confirmations |
 

@@ -482,7 +482,7 @@ See Section 6.2 for the canonical data model. The app writes full parsed article
 ### 14.4 Key Behaviors
 
 - **Change detection:** NSMetadataQuery (iOS, iCloud-aware) — reactive re-parse when files change
-- **Graceful degradation:** missing field → use default; invalid frontmatter → skip file with warning; folder moved → prompt user to re-select in Settings
+- **Graceful degradation:** missing field → use default; folder moved → prompt user to re-select in Settings. Invalid-frontmatter handling changed post-launch (FAB-290) — see [`OBSIDIAN_INTEGRATION.md`](OBSIDIAN_INTEGRATION.md) §9 for the current, authoritative behavior (this PRD is marked historical as of 2026-09-12; treat that doc as the live spec).
 - **Simultaneous writes:** last-write-wins on disk; app re-parses on next file event
 - **No data export needed:** files are always accessible in iCloud Drive
 

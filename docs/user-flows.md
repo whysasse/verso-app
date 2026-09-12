@@ -94,7 +94,7 @@ flowchart TD
     %% Archive path
     B -- Swipes left on article --> J[Archive action appears]
     J --> K[User taps Archive]
-    K --> L[Markdown file moved to\n/Archived subfolder in iCloud Drive]
+    K --> L[Markdown file moved to\nArchive/ subfolder in iCloud Drive]
     L --> M[Article removed from main list]
     M --> N{User wants to\nsee archived?}
     N -- No --> A

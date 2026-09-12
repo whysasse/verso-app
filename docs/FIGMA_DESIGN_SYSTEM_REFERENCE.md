@@ -36,7 +36,7 @@ Each variable carries values for all four modes. Figma resolves the correct valu
 | `color/accent-surface` | `rgba(#766655, 15%)` | `rgba(#825A37, 15%)` | `rgba(#C4A97D, 15%)` | `rgba(#7B9FD4, 15%)` |
 | `color/placeholder` | `#CEC8BC` | `#C8BCA0` | `#302E2A` | `#202630` |
 | `color/border` | `#DDD8CE` | `#D9CAAC` | `#2E2B26` | `#1E2228` |
-| `color/error` | `#C0392B` | `#C0392B` | `#F87171` | `#FC8181` |
+| `color/error` | `#AD3327` | `#AD3327` | `#F87171` | `#FC8181` |
 | `color/warning` | `#B45309` | `#B45309` | `#FCD34D` | `#F6E05E` |
 | `color/success` | `#166534` | `#166534` | `#4ADE80` | `#68D391` |
 
@@ -101,7 +101,7 @@ Create these as named **Text Styles** in Figma.
 | `type/ui/list-title` | SF Pro | 17pt | Semibold | 1.3× |
 | `type/ui/list-subtitle` | SF Pro | 15pt | Regular | 1.4× |
 | `type/ui/button` | SF Pro | 17pt | Semibold | 1.0× |
-| `type/ui/input` | SF Pro | 17pt | Regular | 1.3× |
+| `type/ui/input` | SF Pro | 17pt | Regular | 1.0× |
 | `type/ui/caption` | SF Pro | 13pt | Regular | 1.3× |
 
 ### 2.3 Reading body text styles (New York)
@@ -191,7 +191,7 @@ Components live on the **🧩 Components** page in the Figma file. All component
 | Corner radius | 10pt |
 | Font | SF Pro Regular, 17pt |
 | Background | `color/surface` |
-| Border (Default) | 1pt `color/divider` |
+| Border (Default) | 1pt `color/border` |
 | Border (Focused) | 2pt `color/accent` |
 | Border (Error) | 2pt `color/error` |
 | Disabled | 40% component-level opacity |
@@ -262,7 +262,7 @@ Components live on the **🧩 Components** page in the Figma file. All component
 | Font | SF Pro Semibold, 17pt |
 | Title color | `color/text-primary` |
 | Background | `color/background` |
-| Divider (bottom) | 0.5pt `color/divider` |
+| Border (bottom) | 0.5pt `color/border` |
 | Back / Action touch areas | 44×44pt (per DS §6.1 minimum touch target) |
 | Icon color | `color/accent` |
 
