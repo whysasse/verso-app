@@ -45,7 +45,7 @@ The design system and all screen designs are **complete**. Implementation is act
   - Indicators (`StatusBadge`)
   - Buttons (`VersoButton`)
   - Reading (`MarkdownBodyView`, `HighlightableRegionText`, `ReadingChrome`, `ReadingControls`, `ArticleHeader`, `ScrollProgress`, `RelatedArticlesSection`, `ImmersiveHintPill`)
-  - Settings (`ThemeSelector`, `SettingsRow`)
+  - Settings — `Form`-based since FAB-334 phase 3 (2026-09-12); `ThemeSelector`/`SettingsRow` deleted, replaced by `ThemePickerView`/`FontPickerView`/`LanguagePickerView`
 - **Live data wiring** — Screens read from Core Data via `@FetchRequest` against `ArticleLibraryService` (e.g. `ArticleListView`); no mock data remains
 - **iCloud Drive folder picker** — End-to-end via `FolderBookmarkService` and security-scoped bookmarks (FAB-44, FAB-99)
 - **Auto-status progression** — `unread → reading → read` tracked on scroll, persisted to Core Data and YAML frontmatter (FAB-113)

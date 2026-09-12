@@ -209,6 +209,10 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Decided with Fabio 2026-09-03: **native shell, custom reading room.** The article list, settings, search, navigation and toolbars adopt system components; the reading surface keeps its bespoke typography, its four themes and its custom chrome. This is how Reeder and Matter are built, and it puts the paper identity where it earns its keep instead of fighting the platform everywhere else.
 
+  ## Progress (2026-09-12)
+
+  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form`). Phase 0's material spike (real `glassEffect` on device, gating phases 4–7) is still Fabio's own hands-on step — nothing past phase 3 starts until that comes back.
+
   ## Why this is an epic and not a skin
 
   Liquid Glass is not something you apply. Build against the iOS 26 SDK (CI already pins Xcode 26.6) and system components adopt it automatically on iOS 26+, falling back below. The problem is that Verso has almost no system components for it to apply to:
