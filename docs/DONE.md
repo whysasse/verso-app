@@ -2,9 +2,30 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**209 completed issues.**
+**210 completed issues.**
 
 ## iOS
+
+### FAB-334 phase 2: onboarding cut (2026-09-12)
+
+- [x] 🟡 **FAB-348** · Onboarding is seven screens before the first article (full restructure)  `Done` `Medium`
+  Critique §4.1. Cut per this ticket's own "Fix" section and the 2026-09-06 draft resolutions, confirmed 2026-09-08 in FAB-334's decision block: this is a prerequisite phase of the 1.1 native-shell epic (FAB-334 phase 2), run on current (non-Liquid-Glass) chrome before that epic's own reskin touches onboarding at all.
+
+  ## Fix
+
+  * **`OnboardingFlowView.swift`**: `pageCount` 7 → 2 — Welcome and Folder only, the only functionally required screen. Global Skip and the shrinking page-dot row (already shipped under FAB-327's minimum fix) carry over unchanged, just against the smaller count.
+  * **Theme picker deleted** (`OnboardingThemePickerView.swift` removed). Replaced by a one-time pointer at the reading toolbar's theme control, fired the first time the reading view opens for the very first saved article — new `hasShownThemeHint` flag in `ArticleReaderView.swift`, same `UserDefaults`-backed pattern as the existing `hasShownImmersiveHint` (FAB-307). Reuses `ImmersiveHintPill` rather than a new component: gave it an optional `text` parameter (default unchanged, so the immersive-mode call site needed no edit) instead of duplicating a near-identical pill. Dismissed by tapping the pill itself, tapping the real theme control, or any tap that toggles chrome (the pointer is anchored to the bottom bar, which collapses to 0 height in immersive mode right alongside it).
+  * **Analytics consent moved out of the `TabView`** into a sheet presented once from `VersoMainSplitView` — the post-onboarding shell — on first appearance, covering both the Skip and Folder-Continue paths equally. New `hasShownAnalyticsConsent` flag, its own key (not onboarding's `hasCompletedOnboarding`). `.sheet(..., onDismiss:)` marks it shown regardless of how it's dismissed, so a swipe-away counts as declining without reopening — `AnalyticsService.isOptedIn` already defaults `false`, so no extra logic was needed for that half.
+  * **Quick Tour deleted** (`QuickTourView.swift` removed, 120 lines) — its teaching moves into the welcome article (FAB-338), not into empty-state hints, per FAB-334's decision block: a welcome article seeded at folder-pick time means the library is never empty on first run, so those hints would never fire.
+  * `docs/copy/UI_COPY.md`: onboarding theme-picker and tour copy retired (kept `onboarding.tour.skip` — still the live Skip control, just no longer skipping a tour specifically — and the 4 shared `theme.*` labels, still used by Settings and Reader Settings); analytics-consent copy's location notes updated for its new sheet context; one new key, `reading.themeHint`. Regenerated via `docs/copy/codegen/generate.py`.
+
+  ## Not done here
+
+  Two purely cosmetic observations from the 2026-09-03 design critique pass (large vertical voids in the Spacer/content/Spacer/CTA composition; the page-dot row sitting close enough to Continue to read as attached to it) were never part of this ticket's "Fix" section and are left unaddressed — worth a look whenever FAB-334's own onboarding reskin (phase 2 of that epic, the 2 survivors get Liquid Glass) touches these two screens again.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild` for both the `Verso` and `ShareExtension` schemes build clean; `scripts/check.sh` passes. Not verified here: opening onboarding on a real Simulator/device to confirm the theme-hint pointer's position actually points at the theme button rather than floating awkwardly, and that the analytics-consent sheet appears exactly once — no reliable headless Simulator automation for this project, so that's Fabio's part after the PR.
 
 ### Pre-TestFlight-deploy check (2026-09-08)
 
