@@ -73,78 +73,6 @@
         }
       }
     },
-    "onboarding.theme.headline": {
-      "extractionState": "manual",
-      "comment": "Headline",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose your reading theme"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Choisis ton thème de lecture"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Escolha seu tema de leitura"
-          }
-        }
-      }
-    },
-    "onboarding.theme.subheadline": {
-      "extractionState": "manual",
-      "comment": "Subheadline",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You can change this any time from settings."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Tu peux le modifier à tout moment dans les réglages."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Você pode alterar isso a qualquer momento nas configurações."
-          }
-        }
-      }
-    },
-    "onboarding.theme.continue": {
-      "extractionState": "manual",
-      "comment": "Primary button",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Continue"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Continuer"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Continuar"
-          }
-        }
-      }
-    },
     "theme.paper": {
       "extractionState": "manual",
       "comment": "Shared with Settings / Reader Settings",
@@ -409,105 +337,9 @@
         }
       }
     },
-    "onboarding.tour.headline": {
-      "extractionState": "manual",
-      "comment": "Headline",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Here's how it works"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Voici comment ça fonctionne"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Veja como funciona"
-          }
-        }
-      }
-    },
-    "onboarding.tour.step1": {
-      "extractionState": "manual",
-      "comment": "Step 1 label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Share any article from Safari or your browser to save it instantly."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Partage n'importe quel article depuis Safari ou ton navigateur pour l'enregistrer instantanément."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente."
-          }
-        }
-      }
-    },
-    "onboarding.tour.step2": {
-      "extractionState": "manual",
-      "comment": "Step 2 label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open Verso to read. Your list is always in sync with your files."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ouvre Verso pour lire. Ta liste est toujours synchronisée avec tes fichiers."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos."
-          }
-        }
-      }
-    },
-    "onboarding.tour.step3": {
-      "extractionState": "manual",
-      "comment": "Step 3 label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mark articles as read when you're done. They stay in your folder forever."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Marque les articles comme lus une fois terminés. Ils restent dans ton dossier pour toujours."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre."
-          }
-        }
-      }
-    },
     "onboarding.tour.skip": {
       "extractionState": "manual",
-      "comment": "Text button",
+      "comment": "Kept under its original key name to avoid unrelated codegen churn, though \"tour\" no longer describes what it skips.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -525,54 +357,6 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Pular"
-          }
-        }
-      }
-    },
-    "onboarding.tour.next": {
-      "extractionState": "manual",
-      "comment": "Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Suivant"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Próximo"
-          }
-        }
-      }
-    },
-    "onboarding.tour.startReading": {
-      "extractionState": "manual",
-      "comment": "Primary button",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start reading"
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Commencer à lire"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Começar a ler"
           }
         }
       }
@@ -603,7 +387,7 @@
     },
     "onboarding.analyticsConsent.subheadline": {
       "extractionState": "manual",
-      "comment": "Subheadline",
+      "comment": "Sheet subheadline",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -651,7 +435,7 @@
     },
     "onboarding.analyticsConsent.declineCta": {
       "extractionState": "manual",
-      "comment": "Secondary button",
+      "comment": "Swipe-to-dismiss the sheet counts the same as tapping this — the sheet's `onDismiss` marks the flag either way, and `AnalyticsService.isOptedIn` already defaults to false, so a dismissal never reads as consent.",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3273,6 +3057,30 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Toque em qualquer lugar para mostrar os controles"
+          }
+        }
+      }
+    },
+    "reading.themeHint": {
+      "extractionState": "manual",
+      "comment": "needs_review",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap here to change your reading theme"
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Touche ici pour changer ton thème de lecture"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Toque aqui para mudar seu tema de leitura"
           }
         }
       }
@@ -6255,7 +6063,7 @@
     },
     "error.noFolder.headline": {
       "extractionState": "manual",
-      "comment": "Full-screen error headline",
+      "comment": "Inline folder-prompt card headline (not full-screen — corrected 2026-09-12, see `docs/ERROR_STATES_SPEC.md` §3)",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -6279,7 +6087,7 @@
     },
     "error.noFolder.subheadline": {
       "extractionState": "manual",
-      "comment": "Full-screen error subheadline",
+      "comment": "Inline folder-prompt card subheadline",
       "localizations": {
         "en": {
           "stringUnit": {

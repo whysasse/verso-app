@@ -313,19 +313,8 @@
       "privacyNote": "Verso never uploads your files. They live in your iCloud Drive.",
       "subheadline": "Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere."
     },
-    "theme": {
-      "continue": "Continue",
-      "headline": "Choose your reading theme",
-      "subheadline": "You can change this any time from settings."
-    },
     "tour": {
-      "headline": "Here's how it works",
-      "next": "Next",
-      "skip": "Skip",
-      "startReading": "Start reading",
-      "step1": "Share any article from Safari or your browser to save it instantly.",
-      "step2": "Open Verso to read. Your list is always in sync with your files.",
-      "step3": "Mark articles as read when you're done. They stay in your folder forever."
+      "skip": "Skip"
     },
     "welcome": {
       "cta": "Get started",
@@ -440,6 +429,7 @@
         "headline": "Select an article"
       }
     },
+    "themeHint": "Tap here to change your reading theme",
     "topBar": {
       "moreActions": {
         "_label": "More actions",

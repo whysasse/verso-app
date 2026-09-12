@@ -5,7 +5,13 @@ struct OnboardingFlowView: View {
     let onComplete: () -> Void
 
     @State private var currentPage = 0
-    private let pageCount = 7
+    // FAB-348: cut from 7 screens to 2 -- Welcome + Folder. Folder is the only
+    // functionally required screen; Theme, Analytics Consent and the 3-step Quick
+    // Tour all moved elsewhere (see OnboardingFolderPickerView's call site in
+    // VersoMainSplitView.swift for the analytics-consent sheet, and
+    // ArticleReaderView.swift for the theme hint pointer). The tour's teaching
+    // moves into the welcome article (FAB-338) instead of being rebuilt here.
+    private let pageCount = 2
 
     private var colors: ThemeColors { themeManager.colors }
 
@@ -20,30 +26,8 @@ struct OnboardingFlowView: View {
                 })
                 .tag(0)
 
-                OnboardingThemePickerView(onNext: {
-                    AnalyticsService.shared.track("onboarding.stepCompleted", parameters: ["step": "theme_picker"])
-                    advance()
-                })
-                .tag(1)
-
-                OnboardingFolderPickerView(onNext: { advance() })
-                    .tag(2)
-
-                AnalyticsConsentView(onNext: { advance() })
-                    .tag(3)
-
-                // Tour steps 4–6: flattened directly into this outer TabView rather than nested
-                // inside QuickTourView's own TabView — see the comment atop QuickTourView.swift.
-                // FAB-327: Skip is now global chrome (see the `.overlay` below), so QuickTourView
-                // no longer takes its own onSkip.
-                QuickTourView(stepNumber: 1, onNext: advance)
-                    .tag(4)
-
-                QuickTourView(stepNumber: 2, onNext: advance)
-                    .tag(5)
-
-                QuickTourView(stepNumber: 3, onNext: finishTour)
-                    .tag(6)
+                OnboardingFolderPickerView(onNext: finishOnboarding)
+                    .tag(1)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(VersoAnimation.normal, value: currentPage)
@@ -53,14 +37,11 @@ struct OnboardingFlowView: View {
             pageDots
                 .padding(.bottom, VersoSpacing.md)
         }
-        // FAB-327 (minimum fix): Skip used to live inside QuickTourView, so it only
-        // existed on tour steps 5-7 -- Welcome, Theme, Folder and Analytics consent
-        // could only be answered forward. Hoisting it here makes it global chrome
-        // over every page, mirroring pageDots as a bottom overlay on the same ZStack.
-        // Hidden with `if`, not `.opacity()/.disabled()`, on the last page so a
-        // redundant control isn't left sitting in the accessibility tree once
-        // "Start reading" is the only way forward -- folds in FAB-328's last
-        // remaining bullet, which flagged exactly that gap in the old skip button.
+        // FAB-327 (minimum fix, kept through the FAB-348 cut): Skip is global chrome
+        // over every page rather than living inside a single step. Hidden with `if`,
+        // not `.opacity()/.disabled()`, on the last page so a redundant control isn't
+        // left sitting in the accessibility tree once "Continue" is the only way
+        // forward.
         .overlay(alignment: .topTrailing) {
             if currentPage < pageCount - 1 {
                 skipButton
@@ -71,15 +52,12 @@ struct OnboardingFlowView: View {
     }
 
     private var skipButton: some View {
-        Button(L10n.Onboarding.tourSkip, action: finishTour)
+        Button(L10n.Onboarding.tourSkip, action: finishOnboarding)
             .font(VersoTypography.UI.input)
             .foregroundColor(colors.textSecondary)
             .buttonStyle(.plain)
     }
 
-    // FAB-327: dots only ever show the current page plus what's ahead, so the row
-    // shrinks from 7 down to 1 as the user advances instead of staying at a constant
-    // 7 with the highlight moving along it.
     private var pageDots: some View {
         HStack(spacing: VersoSpacing.xs) {
             ForEach(currentPage..<pageCount, id: \.self) { index in
@@ -97,9 +75,8 @@ struct OnboardingFlowView: View {
         }
     }
 
-    /// Ends onboarding, whether reached by "Start reading" on the final step or the global
-    /// Skip overlay from any earlier page.
-    private func finishTour() {
+    /// Ends onboarding, whether reached by Folder's Continue or the global Skip overlay.
+    private func finishOnboarding() {
         AnalyticsService.shared.track("onboarding.stepCompleted", parameters: ["step": "done"])
         onComplete()
     }

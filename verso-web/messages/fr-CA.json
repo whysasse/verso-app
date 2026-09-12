@@ -313,19 +313,8 @@
       "privacyNote": "Verso ne téléverse jamais tes fichiers. Ils restent dans ton iCloud Drive.",
       "subheadline": "Choisis un dossier dans iCloud Drive. Verso enregistre chaque article comme un fichier Markdown que tu peux ouvrir n'importe où."
     },
-    "theme": {
-      "continue": "Continuer",
-      "headline": "Choisis ton thème de lecture",
-      "subheadline": "Tu peux le modifier à tout moment dans les réglages."
-    },
     "tour": {
-      "headline": "Voici comment ça fonctionne",
-      "next": "Suivant",
-      "skip": "Ignorer",
-      "startReading": "Commencer à lire",
-      "step1": "Partage n'importe quel article depuis Safari ou ton navigateur pour l'enregistrer instantanément.",
-      "step2": "Ouvre Verso pour lire. Ta liste est toujours synchronisée avec tes fichiers.",
-      "step3": "Marque les articles comme lus une fois terminés. Ils restent dans ton dossier pour toujours."
+      "skip": "Ignorer"
     },
     "welcome": {
       "cta": "Commencer",
@@ -440,6 +429,7 @@
         "headline": "Sélectionne un article"
       }
     },
+    "themeHint": "Touche ici pour changer ton thème de lecture",
     "topBar": {
       "moreActions": {
         "_label": "Plus d'actions",

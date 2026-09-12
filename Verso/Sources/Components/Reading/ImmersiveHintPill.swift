@@ -2,6 +2,11 @@ import SwiftUI
 
 struct ImmersiveHintPill: View {
     @Binding var isVisible: Bool
+    // FAB-348: parameterized so the reading-theme hint pointer (shown once near the
+    // theme control on first article open) can reuse this same pill instead of a
+    // near-duplicate component. Defaults to the original immersive-mode wording so
+    // that call site is unchanged.
+    var text: String = L10n.Reading.immersiveHint
     @EnvironmentObject var themeManager: ThemeManager
 
     var body: some View {
@@ -19,7 +24,7 @@ struct ImmersiveHintPill: View {
             Button {
                 isVisible = false
             } label: {
-                Text(L10n.Reading.immersiveHint)
+                Text(text)
                     .font(.system(size: 13))
                     .foregroundColor(themeManager.colors.background)
                     .padding(.horizontal, 14)
