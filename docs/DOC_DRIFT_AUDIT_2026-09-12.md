@@ -392,14 +392,10 @@ rather than one per stale line) — filing was a separate decision from
 writing the audit down, made after review:
 
 - **Filed 2026-09-12:** B1 (widened FAB-339), B2 (FAB-341), B3 (FAB-342),
-  B5 (FAB-343), E3 (FAB-344) — the mechanical fixes with one clear answer
-  and no judgment call attached.
+  B5 (FAB-343), E3 (FAB-344), C1 (FAB-345), C2 (FAB-346), D1 (FAB-347) —
+  every finding with one clear answer and no judgment call attached.
 - **Not yet filed** — each needs a decision before it's a clean FAB entry,
   not just a doc correction: A1–A3 (one batched refresh, or several —
   scope not yet chosen), E1 (needs a token-vs-spec call), E2 (needs a
   radius-family call), G1 (needs a `docs/DECISIONS.md`-level call on the
   `CLAUDE.md`/`AGENTS.md` split, not a BACKLOG item at all).
-- **Not a BACKLOG item:** C1, C2, D1 also have clear single answers and
-  could be filed the same way as the mechanical batch above whenever
-  convenient — held back only because attention went to the ones judged
-  higher-severity first, not because they need a decision.

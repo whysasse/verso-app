@@ -864,6 +864,68 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   `scripts/checks/check-doc-headers.sh` to validate the Status vocabulary
   while in there, not just presence.
 
+### Analytics event catalog has 2 gaps and 1 fully undocumented event
+
+- [ ] 🟡 **FAB-345** · [Analytics/Docs] ANALYTICS_STRATEGY.md's event catalog is missing 3 shipped values  `Todo` `Medium`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§C1).
+
+  * `docs/ANALYTICS_STRATEGY.md:52` documents `onboarding.stepCompleted`'s
+    `step` as a closed enum: `"welcome" | "folder_picker" | "done"`.
+    `Verso/Sources/Screens/Onboarding/OnboardingFlowView.swift:24` sends a
+    fourth value, `"theme_picker"` — not in the doc, not in `DONE.md`'s
+    copy of the catalog either.
+  * `docs/ANALYTICS_STRATEGY.md:48` documents `article.saved`'s
+    `duplicate_resolution` as `"none" | "update" | "copy"`.
+    `Verso/Sources/Services/PendingArticleIngester.swift:67-70` sends a
+    fourth value, `"backstop_flagged"`. `docs/DONE.md:1103` actually
+    recorded this addition when it shipped — the drift happened because
+    the canonical strategy doc was never updated to match its own
+    changelog.
+  * `Verso/Sources/Services/LocaleManager.swift:37` tracks
+    `settings.languageChanged`, wired since FAB-284. Appears in zero
+    docs — not the event catalog, not `DONE.md`'s FAB-284 entry, nowhere.
+
+  **Fix:** add all three to `docs/ANALYTICS_STRATEGY.md`'s event catalog.
+
+### PRD still describes frontmatter-error behavior FAB-290 explicitly retired
+
+- [ ] 🟡 **FAB-346** · [Docs] PRD §14.4 contradicts OBSIDIAN_INTEGRATION.md on invalid-frontmatter handling  `Todo` `Medium`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§C2).
+
+  `docs/PRD_MinimalistReaderApp.md:473` (v1.7, 2026-05-10): "invalid
+  frontmatter → skip file with warning." `docs/OBSIDIAN_INTEGRATION.md`
+  §9 (v2.1, 2026-08-24) directly contradicts this — its own changelog
+  (line 247) records that FAB-290 replaced exactly this behavior: the
+  whole file now becomes the article body instead of being skipped. The
+  PRD's §14 even links to `OBSIDIAN_INTEGRATION.md` as "the" spec, but
+  wasn't updated when FAB-290 shipped.
+
+  **Fix:** update PRD §14.4 to match, or trim it to a pointer at
+  `OBSIDIAN_INTEGRATION.md` — the doc that actually keeps a live
+  "Document History" table and is the one built to stay current.
+
+### `animation-spec.md` disagrees with its own code sample, twice
+
+- [ ] 🔵 **FAB-347** · [Docs] animation-spec.md's prose names a different curve/duration than the code sample right below it  `Todo` `Low`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§D1).
+
+  Global Timing Tokens table (`:16`): `VersoAnimation.normal` = easeInOut,
+  250ms. §4a (`:131`) describes the same transition as "250ms **easeOut**,"
+  then the code sample two lines below (`:140`) calls
+  `withAnimation(VersoAnimation.normal)` — the easeInOut token. §4b
+  repeats the pattern: `:150` says "300ms easeOut," the code at `:157`
+  again invokes the 250ms easeInOut token.
+
+  Related: the widely-repeated chrome-fade timing (300ms/200ms, consistent
+  across 4 other docs) matches none of `animation-spec.md`'s own 4 named
+  tokens, despite the doc's closing note (`:170`) that they "should be
+  the single source of truth — avoid hardcoded duration literals
+  elsewhere."
+
+  **Fix:** reconcile the prose/table with the actual code in both spots.
+  While in there, either name a token for the 300ms/200ms chrome fade or
+  flag it explicitly as an intentional hardcoded exception.
+
 ### Uncategorized
 
 - [ ] 🔵 **FAB-277** · [Phase 3] RSVP reading mode  `Backlog` `Low`
