@@ -45,14 +45,15 @@ All event names use dot-separated namespace convention. Parameters are passed as
 
 | Event | Parameters | Answers question |
 |-------|------------|-----------------|
-| `article.saved` | `source: "share_extension" \| "in_app"`; `duplicate_resolution: "none" \| "update" \| "copy"` (omit or `none` when not a duplicate flow) | #2 — core loop start |
+| `article.saved` | `source: "share_extension" \| "in_app"`; `duplicate_resolution: "none" \| "update" \| "copy" \| "backstop_flagged"` (omit or `none` when not a duplicate flow) | #2 — core loop start |
 | `article.opened` | — | #2 — intent to read |
 | `article.readCompleted` | — | #2 — core loop fulfilled |
 | `article.parseFailed` | `errorType: String` | #4 — error detection |
-| `onboarding.stepCompleted` | `step: "welcome" \| "folder_picker" \| "done"` | #3 — drop-off analysis |
+| `onboarding.stepCompleted` | `step: "welcome" \| "theme_picker" \| "folder_picker" \| "done"` | #3 — drop-off analysis |
 | `onboarding.vaultSetupCompleted` | — | #3 — Obsidian integration adoption |
 | `settings.themeChanged` | `theme: "paper" \| "sepia" \| "night" \| "ink"` | #5 — feature adoption |
 | `settings.fontChanged` | `font: String` | #5 — feature adoption |
+| `settings.languageChanged` | `language: String` (locale code, e.g. `"fr-CA"`) | #5 — feature adoption |
 | `reader.immersiveModeToggled` | `enabled: "true" \| "false"` | #6 — feature discoverability |
 | `shareExtension.used` | — | #1 — return usage signal |
 

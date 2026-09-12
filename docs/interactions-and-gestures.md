@@ -36,7 +36,7 @@
 | Tap **article row** | Tap anywhere on a row | Push to Reading View |
 | **Swipe left** on article row | Horizontal swipe | Reveal two trailing actions: **Delete** (red) and **Archive** (gray) |
 | Tap **Delete** (swipe action) | Swipe action button | Confirmation dialog: "Delete this article? This cannot be undone." → confirm deletes Markdown file from iCloud Drive |
-| Tap **Archive** (swipe action) | Swipe action button | Move Markdown file to `/archived/` subfolder; remove row from list with slide-out animation |
+| Tap **Archive** (swipe action) | Swipe action button | Move Markdown file to `Archive/` subfolder; remove row from list with slide-out animation |
 | **Long-press** article row | 0.5s press | Context menu: Open · Archive · Delete · Mark as Read |
 | Tap **search bar** | Tap search field | Activate inline search; keyboard appears; list filters in real time as user types |
 | Tap **✕** in search bar | Clear button | Clear query; restore full list; keyboard dismisses |

@@ -104,7 +104,7 @@ Semantic tokens communicate status and outcome. Because each theme has very diff
 
 | Token   | Paper       | Sepia       | Night       | Ink         | Usage |
 |---------|-------------|-------------|-------------|-------------|-------|
-| Error   | `#C0392B`   | `#C0392B`   | `#F87171`   | `#FC8181`   | Validation errors, destructive states |
+| Error   | `#AD3327`   | `#AD3327`   | `#F87171`   | `#FC8181`   | Validation errors, destructive states |
 | Warning | `#B45309`   | `#B45309`   | `#FCD34D`   | `#F6E05E`   | Cautions, non-critical issues |
 | Success | `#166534`   | `#166534`   | `#4ADE80`   | `#68D391`   | Confirmations, completed actions |
 

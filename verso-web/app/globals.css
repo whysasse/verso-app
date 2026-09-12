@@ -88,10 +88,7 @@
    for the offline/sync-error banners in docs/ERROR_STATES_SPEC.md
    (scenarios 1, 5). Same hex as warning/error, at the 10% opacity those
    banners were already speced at. Not yet consumed by any component --
-   the banners aren't built yet either. Paper/sepia's error-surface uses
-   the correct post-FAB-336 #AD3327, not this file's still-buggy
-   --color-error (#C0392B, tracked separately as FAB-339) -- no reason to
-   bake a known bug into a brand-new token. */
+   the banners aren't built yet either. */
 [data-theme="paper"] {
   --color-background: #F5F0E8;
   --color-surface: #EDE8DF;
@@ -102,7 +99,7 @@
   --color-accent-surface: rgba(118, 102, 85, 0.15);
   --color-border: #DDD8CE;
   --color-placeholder: #CEC8BC;
-  --color-error: #C0392B;
+  --color-error: #AD3327;
   --color-warning: #B45309;
   --color-success: #166534;
   --color-warning-surface: rgba(180, 83, 9, 0.10);
@@ -119,7 +116,7 @@
   --color-accent-surface: rgba(130, 90, 55, 0.15);
   --color-border: #D9CAAC;
   --color-placeholder: #C8BCA0;
-  --color-error: #C0392B;
+  --color-error: #AD3327;
   --color-warning: #B45309;
   --color-success: #166534;
   --color-warning-surface: rgba(180, 83, 9, 0.10);

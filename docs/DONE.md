@@ -2,7 +2,7 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**201 completed issues.**
+**209 completed issues.**
 
 ## iOS
 
@@ -2020,6 +2020,15 @@
 
 ## Web
 
+### Doc drift audit follow-up — `error` token (2026-09-12)
+
+- [x] 🟡 **FAB-339** · [WEB+Docs] `error` token drifted: 4 files still have the pre-FAB-336 Paper/Sepia hex  `Done` `Medium`
+  Found 2026-09-11 by `scripts/checks/check-token-parity.py`, then widened 2026-09-12 by `docs/DOC_DRIFT_AUDIT_2026-09-12.md`'s cross-doc pass — FAB-336 (2026-09-06) darkened `error` for Paper/Sepia from `#C0392B` to `#AD3327` in `Colors.swift` and `docs/DESIGN_TOKENS.md`, but 4 other places never got the matching edit.
+
+  ## Fix
+
+  `#C0392B` → `#AD3327` for Paper/Sepia (Night/Ink already matched) in all 4 places: `verso-web/app/globals.css`'s `[data-theme="paper"]`/`[data-theme="sepia"]` `--color-error:` lines (plus the now-stale tracking comment above them removed), `docs/DESIGN_SYSTEM_FOUNDATIONS.md` §2.5's Semantic Colors table, `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md`'s `color/error` row, `docs/ERROR_STATES_SPEC.md`'s Semantic Color Tokens table.
+
 ### Phase 3 — Expansion
 
 - [x] 🟠 **FAB-165** · [WEB] Phase 1: Scaffold Next.js app + port design system tokens  `Done` `High`
@@ -2803,6 +2812,31 @@
 
 
 ## Infra / Docs
+
+### Doc drift audit follow-up — remaining mechanical fixes (2026-09-12)
+
+Batch of 7 docs-only fixes filed by `docs/DOC_DRIFT_AUDIT_2026-09-12.md`, each a one-clear-answer correction with no judgment call attached. Companion to FAB-339 (see Web section above, same audit).
+
+- [x] 🟡 **FAB-341** · [Docs] Archive subfolder name: `/Archived`, `/archived/`, and the actual `Archive/` all disagree  `Done` `Medium`
+  `docs/user-flows.md:97` and `docs/interactions-and-gestures.md:39` both corrected to match the actual implementation, `Archive/` (capital A, no trailing "d", no leading slash — per `docs/DONE.md:992,1101,1125`).
+
+- [x] 🔵 **FAB-342** · [Docs] `type.ui.input` line-height: DESIGN_TOKENS.md says 1.0×, Figma reference says 1.3×  `Done` `Low`
+  `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md:104` corrected to `1.0×`, matching `docs/DESIGN_TOKENS.md` and the shipped `verso-web/app/globals.css` (`--type-ui-input-line-height: 1;`).
+
+- [x] 🔵 **FAB-343** · [Docs] `color/divider` referenced in 2 docs, but no such token exists — it means `border`  `Done` `Low`
+  Replaced all "Divider"/`color/divider` references with "Border"/`color/border` in `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md` (2 occurrences) and `docs/component-inventory.md` (2 occurrences) — `docs/DESIGN_TOKENS.md` never had a "divider" token; this was a leftover name from an old rename that never fully propagated.
+
+- [x] 🔵 **FAB-344** · [Docs] HANDOFF.md and PROJECT_STATUS.md headers don't use AGENTS.md's Draft/Active/Locked/Archived vocabulary  `Done` `Low`
+  `docs/HANDOFF.md`'s Status corrected from "Ready for development" to `Active`. `docs/PROJECT_STATUS.md` given a proper `**Version:** · **Date:** · **Status:**` header (`Status: Active`), with a note pointing to the PRD for its own version number instead of relabeling `Version` as `PRD Version`. `scripts/checks/check-doc-headers.sh`'s Status-vocabulary validation was left as a follow-up, not done here (out of scope for a docs-only fix).
+
+- [x] 🟡 **FAB-345** · [Analytics/Docs] ANALYTICS_STRATEGY.md's event catalog is missing 3 shipped values  `Done` `Medium`
+  Added `"theme_picker"` to `onboarding.stepCompleted`'s `step` enum (confirmed against `OnboardingFlowView.swift:24`), `"backstop_flagged"` to `article.saved`'s `duplicate_resolution` enum (confirmed against `PendingArticleIngester.swift:67-70`), and a new `settings.languageChanged` row (confirmed against `LocaleManager.swift:37`) — all three cross-checked against the actual shipped code, not just the audit's description.
+
+- [x] 🟡 **FAB-346** · [Docs] PRD §14.4 contradicts OBSIDIAN_INTEGRATION.md on invalid-frontmatter handling  `Done` `Medium`
+  `docs/PRD_MinimalistReaderApp.md` §14.4's "invalid frontmatter → skip file with warning" line (superseded by FAB-290, which replaced skip-file with graceful whole-file adoption) replaced with a pointer to `docs/OBSIDIAN_INTEGRATION.md` §9 as the live spec — consistent with the PRD's 2026-09-12 "marked historical" banner rather than re-stating behavior that doc no longer owns.
+
+- [x] 🔵 **FAB-347** · [Docs] animation-spec.md's prose names a different curve/duration than the code sample right below it  `Done` `Low`
+  §4a and §4b's prose corrected from "250ms easeOut" / "300ms easeOut" to "250ms easeInOut (`VersoAnimation.normal`)", matching both the Global Timing Tokens table and the code samples immediately below each, which already called the `.normal` token. The related-but-separate finding (the widely-repeated 300ms/200ms chrome-fade timing not matching any named token) was left as noted in the audit, not fixed here — it's a design decision (name a token vs. flag as an intentional exception), not a one-answer correction.
 
 ### Phase 1 — Foundation
 
