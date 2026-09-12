@@ -804,7 +804,65 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
     actually shipped), or leave both under FAB-327 with BACKLOG.md's entry
     reworded to make clear it's the *remaining* scope, not the original.
 
+### Archive subfolder name disagrees across 2 docs and the code
 
+- [ ] 🟡 **FAB-341** · [Docs] Archive subfolder name: `/Archived`, `/archived/`, and the actual `Archive/` all disagree  `Todo` `Medium`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§B2).
+
+  `docs/user-flows.md:97` says `/Archived`; `docs/interactions-and-gestures.md:39`
+  says `/archived/`; the actual implementation (`docs/DONE.md:992,1101,1125`)
+  uses `Archive/` (capital A, no trailing "d", no leading slash). None of
+  the three agree with each other.
+
+  **Fix:** correct both docs to `Archive/`.
+
+### `type.ui.input` line-height disagrees between two token docs
+
+- [ ] 🔵 **FAB-342** · [Docs] `type.ui.input` line-height: DESIGN_TOKENS.md says 1.0×, Figma reference says 1.3×  `Todo` `Low`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§B3).
+
+  `docs/DESIGN_TOKENS.md:363` says `1.0×`; `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md:104`
+  says `1.3×` for the identical token — every other UI type style in both
+  tables matches exactly, only `input` diverges.
+  `verso-web/app/globals.css:57` (`--type-ui-input-line-height: 1;`)
+  agrees with `DESIGN_TOKENS.md`, so the Figma doc is the outlier.
+
+  **Fix:** correct `FIGMA_DESIGN_SYSTEM_REFERENCE.md:104` to `1.0×`.
+
+### `color/divider` referenced but never defined as a token
+
+- [ ] 🔵 **FAB-343** · [Docs] `color/divider` referenced in 2 docs, but no such token exists — it means `border`  `Todo` `Low`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§B5).
+
+  `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md` defines the border token as
+  `color/border` (`:38`) but references a nonexistent `color/divider` at
+  `:194` and `:265`. `docs/component-inventory.md` does the same under a
+  display name ("Divider" at `:261`, `:637`), inconsistent even with its
+  own other border references (which correctly say "Border" elsewhere).
+  `docs/DESIGN_TOKENS.md` has no token named anything like "divider" —
+  looks like a leftover from an old name never fully renamed (see
+  `docs/DESIGN_SYSTEM_FOUNDATIONS.md:375`'s changelog, which still says
+  "Divider" from 2026-04-20).
+
+  **Fix:** replace all "Divider" / `color/divider` references with
+  `border` / `color/border` in both docs.
+
+### Doc-header Status field doesn't follow AGENTS.md's own vocabulary
+
+- [ ] 🔵 **FAB-344** · [Docs] HANDOFF.md and PROJECT_STATUS.md headers don't use AGENTS.md's Draft/Active/Locked/Archived vocabulary  `Todo` `Low`
+  Found 2026-09-12 in `docs/DOC_DRIFT_AUDIT_2026-09-12.md` (§E3).
+  Pre-existing — both predate the 2026-09-11 `CLAUDE.md` rewrite, so this
+  isn't new drift — but it's a live violation nothing currently catches:
+  `scripts/checks/check-doc-headers.sh` only checks header *presence* on
+  new docs, not whether the Status value is one of the four allowed ones.
+
+  `docs/HANDOFF.md:3` uses "Ready for development" instead of one of
+  `Draft`/`Active`/`Locked`/`Archived`. `docs/PROJECT_STATUS.md:3` has no
+  `Status:` field at all, and relabels `Version` as `PRD Version`.
+
+  **Fix:** correct both headers. Consider also extending
+  `scripts/checks/check-doc-headers.sh` to validate the Status vocabulary
+  while in there, not just presence.
 
 ### Uncategorized
 
