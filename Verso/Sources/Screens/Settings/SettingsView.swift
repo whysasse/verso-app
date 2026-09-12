@@ -141,10 +141,31 @@ struct SettingsView: View {
                 .buttonStyle(.borderless)
             }
 
-            NavigationLink {
-                ThemePickerView()
-            } label: {
-                LabeledContent(L10n.ReaderSettings.themeSectionLabel, value: themeManager.currentTheme.displayName)
+            // FAB-334 phase 3 fix (2026-09-12): this was originally a `NavigationLink`
+            // push to a separate `ThemePickerView` -- but changing the theme from two
+            // levels deep (List -> Settings -> ThemePickerView) crosses the light/dark
+            // boundary and blanks the screen, the exact FAB-304 failure mode. That fix
+            // only ever protected Settings' own presentation (`showSettings`, kept on a
+            // stable ancestor) -- a second, deeper push was never part of what was
+            // tested or fixed. Reverted to an inline row, exactly `ThemeSelector`'s old
+            // layout (now deleted), which *was* part of FAB-304's on-device-confirmed
+            // safe set: no extra push depth, so no extra exposure to the rebuild.
+            VStack(alignment: .leading, spacing: VersoSpacing.xs) {
+                Text(L10n.ReaderSettings.themeSectionLabel)
+                HStack(spacing: VersoSpacing.lg) {
+                    ForEach(VersoTheme.allCases) { theme in
+                        let isSelected = themeManager.currentTheme == theme
+                        Button {
+                            themeManager.currentTheme = theme
+                        } label: {
+                            ThemeSwatch(theme: theme, isSelected: isSelected, activeColors: themeManager.colors, height: 32)
+                                .frame(width: 80, height: 100)
+                        }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    }
+                }
             }
         }
     }
