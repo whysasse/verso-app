@@ -26,7 +26,7 @@ Articles are saved as plain Markdown files to a user-selected iCloud Drive folde
 - **4 Themes:** Paper, Sepia, Night, Ink. Each has 9 semantic color roles.
 - **WCAG AA:** All text on all themes (4.5:1 normal, 3:1 large text).
 - **Article Status:** Unread → Reading → Read (auto-tracked on scroll).
-- **Filter chips:** All / Unread / Reading / Read. Visible even on empty states.
+- **Article list sections:** Continue Reading (pinned first, shows live scroll-progress), Unread, Read (collapsed by default), Archived (collapsed by default). Empty sections are omitted. Replaced the old status filter-chip bar (FAB-292, 2026-08-29) — `FilterChipBar`/`FilterChip` no longer exist; don't reference them.
 - **MVP search:** Title-only (no full-text body search).
 - **Tags:** Articles can be tagged; filtering/editing via side panel.
 

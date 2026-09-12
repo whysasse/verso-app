@@ -404,15 +404,19 @@ writing the audit down, made after review:
   never built as specified (different buttons, different copy keys,
   scenario 3 isn't even full-screen). Rewrote both scenarios to match
   what's shipped, not just the radius line.
-- **Decided, not yet done:** A1–A3 (Fabio's call: mark the PRD historical,
-  batch-refresh `site-map.md`/`feature-priority-per-screen.md`/
-  `interactions-and-gestures.md`).
-- **Resolved:** G1 — moved into `CLAUDE.md`'s `## Workflow` directly
-  (not just a broadened pointer). E1 — added `warningSurface`/
-  `errorSurface` tokens to `docs/DESIGN_TOKENS.md`, `Colors.swift`, and
-  `globals.css` (10%-opacity tints, mirroring `accentSurface`'s
-  relationship to `accent`); amended the fill-background rule in
-  `DESIGN_TOKENS.md`/`DESIGN_SYSTEM_FOUNDATIONS.md` to name them as the
-  sanctioned exception; wired the new tokens into `ERROR_STATES_SPEC.md`'s
-  offline/sync-error banners; taught `check-token-parity.py` about both
-  new tokens so they can't silently drift the way `error` itself did.
+- **Resolved:** G1 — moved into `CLAUDE.md`'s `## Workflow` directly (not
+  just a broadened pointer). E1 — added `warningSurface`/`errorSurface`
+  tokens to `docs/DESIGN_TOKENS.md`, `Colors.swift`, and `globals.css`;
+  amended the fill-background rule to name them as the sanctioned
+  exception; taught `check-token-parity.py` about both. A1–A3 —
+  `docs/PRD_MinimalistReaderApp.md` marked historical (`Status: Locked`,
+  banner explaining what's still trustworthy vs. not); `site-map.md`,
+  `feature-priority-per-screen.md`, and `interactions-and-gestures.md`
+  refreshed against current `DONE.md` state (sections replacing filter
+  chips, Share/top-bar/search-MVP framing, reading-time/highlighting now
+  shipped, TTS skip-backward and the highlight-menu addition that A3's
+  digging surfaced along the way). `AGENTS.md`'s Architecture section's
+  filter-chip line fixed too, since A1 named it explicitly.
+
+Every finding from this audit is now either filed as a BACKLOG entry or
+fixed directly. Nothing remains open.

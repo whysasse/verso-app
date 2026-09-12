@@ -72,27 +72,32 @@ Sources: [`PRD_MinimalistReaderApp.md`](PRD_MinimalistReaderApp.md) · [`site-ma
 |-----|----------|
 | Article list: title, source domain, date saved, read status indicator | Bulk mark as read |
 | Sort by date saved: newest first / oldest first | Bulk delete |
-| Filter chips: All / Unread / Reading / Read | Swipe quick-actions beyond delete/archive (e.g. tag, bookmark) |
-| Inline search: filters list by title in real-time | Full-text search across article body content |
+| ~~Filter chips: All / Unread / Reading / Read~~ — replaced by always-visible sections (FAB-292, 2026-08-29): Continue Reading, Unread, Read (collapsed), Archived (collapsed) | Swipe quick-actions beyond delete/archive (e.g. tag, bookmark) |
+| Inline search: filters list by title in real-time | ~~Full-text search across article body content~~ — shipped, FAB-50 |
 | Swipe to delete | Filter by tag (requires Tagging System) |
 | Swipe to archive | Filter search by date range or source domain |
-| Archive filter toggle → Archive View | — |
+| ~~Archive filter toggle → Archive View~~ — no separate screen anymore; Archived is a collapsed section on this same screen (see below) | — |
 | Empty state (no articles saved yet) | — |
 | Settings button in nav bar | — |
 
-> **Note on search:** Basic title filtering is in MVP (it's a simple list filter, no indexing required). Full-text body search is post-MVP — it requires a search index and has measurable performance implications.
+> **Note on search (stale as of 2026-08-29, kept for history):** Basic title filtering was in MVP, full-text body search was post-MVP. Both have since shipped — title filtering was always live, and full-text body search shipped as FAB-50.
 
 ---
 
-### Archive View
+### ~~Archive View~~ (superseded 2026-08-29)
+
+> This screen no longer exists. FAB-292 replaced it with an **Archived**
+> section, collapsed by default, inline on the Home · Article List screen
+> above — not a separate destination reached by a toggle. Kept here for
+> history; do not implement from this section.
 
 | MVP | Post-MVP |
 |-----|----------|
-| Filtered list of archived articles (title, source, date) | — |
-| Accessible via toggle on Home screen (not a separate tab) | — |
-| Swipe to unarchive (moves file back to main folder) | — |
-| Swipe to delete permanently | — |
-| Empty state (no archived articles yet) | — |
+| ~~Filtered list of archived articles (title, source, date)~~ | — |
+| ~~Accessible via toggle on Home screen (not a separate tab)~~ | — |
+| Swipe to unarchive (moves file back to main folder) — still true, now within the Archived section | — |
+| Swipe to delete permanently — still true | — |
+| ~~Empty state (no archived articles yet)~~ — the section is simply omitted when empty, same as every other section | — |
 
 ---
 
@@ -101,12 +106,12 @@ Sources: [`PRD_MinimalistReaderApp.md`](PRD_MinimalistReaderApp.md) · [`site-ma
 | MVP | Post-MVP |
 |-----|----------|
 | Full-screen Markdown rendering with chosen theme and font | Scroll position memory (returns to last reading position) |
-| Auto status update: Unread → Reading on open; Reading → Read on scroll to end | Visual reading progress indicator (e.g. "3 min left") |
+| Auto status update: Unread → Reading on open; Reading → Read on scroll to end | ~~Visual reading progress indicator (e.g. "3 min left")~~ — shipped, FAB-55, and now replaces the save-date on Home's article cards entirely (bigger role than "nice to have," per the FAB-292 redesign) |
 | Immersive mode: tap to show/hide top bar and controls | Bookmarks: mark a passage, quick-jump to bookmarks |
-| Top bar: article title, source domain, date saved | Highlighting with color options |
-| Back button returns to previous list (Home or Archive) | Free-form notes within articles |
+| ~~Top bar: article title, source domain, date saved~~ — actual shipped top bar (FAB-299) is `← Back \| Title \| ⋯`; source/date aren't shown there | ~~Highlighting with color options~~ — shipped, FAB-54 + FAB-303 (cross-block selection) |
+| Back button returns to previous list (Home — "or Archive" no longer applies, there's no separate Archive screen) | Free-form notes within articles |
 | Opens Reader Settings sheet | Export highlights and notes as Markdown |
-| Text-to-Speech: play article audio, adjustable speed, skip by paragraph | Share article from within Reading View |
+| Text-to-Speech: play article audio, adjustable speed, skip by paragraph (confirmed bidirectional — forward and back) | ~~Share article from within Reading View~~ — shipped, FAB-299, lives in the `⋯` overflow menu |
 
 ---
 

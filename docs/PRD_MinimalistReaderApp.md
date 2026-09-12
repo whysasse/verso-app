@@ -2,8 +2,20 @@
 
 **Version:** 1.7  
 **Date:** 2026-05-10  
-**Status:** Draft  
+**Status:** Locked  
 **Owner:** Fabio Sasseron
+
+> **Marked historical 2026-09-12.** This PRD reflects the product as
+> designed at inception (2026-05-10) — its rationale, personas, and
+> original requirements are still good context for *why* things were
+> built the way they were. Its **feature-status and screen-composition
+> claims are not kept current**: `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §A
+> found several (filter chips, Reading View top bar, Share button
+> placement, search MVP scope) already stale against shipped behavior.
+> For what's actually true today, use `docs/PROJECT_STATUS.md` and
+> `docs/BACKLOG.md`/`docs/DONE.md` — never this document's status claims.
+> Don't update this file to chase implementation drift; if a *decision*
+> here changes, record that in `docs/DECISIONS.md` instead.
 
 ---
 
