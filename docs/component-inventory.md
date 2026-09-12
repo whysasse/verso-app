@@ -258,7 +258,7 @@ Progress indicator showing read position.
 | Property | Value |
 |----------|-------|
 | Height | 3pt |
-| Background | Divider |
+| Background | Border |
 | Fill | Accent |
 | Position | Top of screen, below ReadingChrome |
 
@@ -634,7 +634,7 @@ Text input for forms and search.
 | Font | SF Regular, 17pt |
 | Horizontal padding | md (16pt) |
 | Background | Surface |
-| Border | 1pt Divider |
+| Border | 1pt Border |
 
 **States:**
 - Empty: Placeholder visible
