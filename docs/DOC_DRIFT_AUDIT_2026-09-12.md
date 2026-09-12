@@ -404,9 +404,15 @@ writing the audit down, made after review:
   never built as specified (different buttons, different copy keys,
   scenario 3 isn't even full-screen). Rewrote both scenarios to match
   what's shipped, not just the radius line.
-- **Decided, not yet done:** E1 (Fabio's call: formalize
-  `warningSurface`/`errorSurface` tokens); A1–A3 (Fabio's call: mark the
-  PRD historical, batch-refresh `site-map.md`/`feature-priority-per-screen.md`/
+- **Decided, not yet done:** A1–A3 (Fabio's call: mark the PRD historical,
+  batch-refresh `site-map.md`/`feature-priority-per-screen.md`/
   `interactions-and-gestures.md`).
 - **Resolved:** G1 — moved into `CLAUDE.md`'s `## Workflow` directly
-  (not just a broadened pointer).
+  (not just a broadened pointer). E1 — added `warningSurface`/
+  `errorSurface` tokens to `docs/DESIGN_TOKENS.md`, `Colors.swift`, and
+  `globals.css` (10%-opacity tints, mirroring `accentSurface`'s
+  relationship to `accent`); amended the fill-background rule in
+  `DESIGN_TOKENS.md`/`DESIGN_SYSTEM_FOUNDATIONS.md` to name them as the
+  sanctioned exception; wired the new tokens into `ERROR_STATES_SPEC.md`'s
+  offline/sync-error banners; taught `check-token-parity.py` about both
+  new tokens so they can't silently drift the way `error` itself did.

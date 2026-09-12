@@ -1,7 +1,7 @@
 # Design Tokens — Verso
 
-**Version:** 1.2  
-**Date:** 2026-09-01  
+**Version:** 1.3  
+**Date:** 2026-09-12  
 **Status:** Draft
 
 This file is the authoritative token registry for Verso's design system. Every token listed here has a corresponding Swift identifier — names match exactly. When values or intent conflict with another doc, this file wins.
@@ -173,7 +173,7 @@ These tokens change with the active theme. All four themes share the same semant
 
 These tokens communicate state and outcome. Because themes vary widely in luminance, each theme defines its own values — light themes use dark saturated tones; dark themes use light desaturated tones.
 
-**Usage constraint for all semantic tokens:** Used as text tints and border colors only. Never as large fill backgrounds.
+**Usage constraint for all semantic tokens:** Used as text tints and border colors only. Never as large fill backgrounds — **except** `warningSurface`/`errorSurface` below, which exist specifically to license a tinted background, the same way `accentSurface` licenses one for `accent`. If you need a background fill and there's no `*Surface` token for it, that's a gap to raise, not a reason to use the base token directly.
 
 ---
 
@@ -229,6 +229,36 @@ fix (`accessibility-specs.md` §9). Now clears both: `background`
 | Sepia | `#166534` |
 | Night | `#4ADE80` |
 | Ink   | `#68D391` |
+
+---
+
+### `warningSurface`
+
+**Role:** A 10%-opacity tint of `warning`. The one sanctioned exception to the "never a large fill background" rule above.  
+**Use for:** The offline-connectivity banner background (`docs/ERROR_STATES_SPEC.md` scenario 1). Not yet consumed by any shipped component — the banner itself isn't built yet.  
+**Don't use for:** Anything `warning` itself already covers (text tints, borders). Always paired with `warning`-tinted foreground content, same relationship `accentSurface` has to `accent`.
+
+| Theme | Value |
+|-------|-------|
+| Paper | `#B45309` @ 10% opacity |
+| Sepia | `#B45309` @ 10% opacity |
+| Night | `#FCD34D` @ 10% opacity |
+| Ink   | `#F6E05E` @ 10% opacity |
+
+---
+
+### `errorSurface`
+
+**Role:** A 10%-opacity tint of `error`. The other sanctioned exception to the fill-background rule.  
+**Use for:** The iCloud/sync-error banner background (`docs/ERROR_STATES_SPEC.md` scenario 5, which reuses scenario 1's banner component with `error` instead of `warning`). Not yet consumed by any shipped component.  
+**Don't use for:** Anything `error` itself already covers.
+
+| Theme | Value |
+|-------|-------|
+| Paper | `#AD3327` @ 10% opacity |
+| Sepia | `#AD3327` @ 10% opacity |
+| Night | `#F87171` @ 10% opacity |
+| Ink   | `#FC8181` @ 10% opacity |
 
 ---
 
@@ -368,6 +398,7 @@ Font family: San Francisco (system), always — regardless of user's reading fon
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3 | 2026-09-12 | Added `warningSurface`/`errorSurface` tokens (10%-opacity tints, for the offline/sync-error banners in `docs/ERROR_STATES_SPEC.md`) — the sanctioned exception to the "never a large fill background" rule, same relationship `accentSurface` has to `accent`. Found needed by `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §E1. Added to Swift `SemanticColors` struct and `verso-web/app/globals.css`. |
 | 1.2 | 2026-09-01 | Added `highlight` token (FAB-54, reading-view text highlighting): `#F5C842` @ 30% opacity, theme-independent. Added to Swift as `VersoHighlightColor.wash` (not a `ThemeColors` role, since it deliberately doesn't vary by theme). New §4 "Color Tokens — Reading (Theme-Independent)"; renumbered §§5–8 accordingly. |
 | 1.1 | 2026-05-02 | Added `accentSurface` token (15%-opacity accent tint, for chip/chip-like selected-state backgrounds). Added to Swift `ThemeColors` struct. |
 | 1.0 | 2026-04-22 | Initial token registry. Consolidates color tokens from DESIGN_SYSTEM_FOUNDATIONS.md §2, spacing from §7, radius from §8, and typography from §3. Values authoritative from DESIGN_SYSTEM_FOUNDATIONS.md v1.6. |

@@ -106,6 +106,15 @@ struct SemanticColors {
     let error: Color
     let warning: Color
     let success: Color
+    /// FAB-341-area (2026-09-12): sanctioned exceptions to "semantic tokens are text
+    /// tints/borders only, never large fill backgrounds" -- for the offline/sync-error
+    /// banners in `docs/ERROR_STATES_SPEC.md` (scenarios 1 and 5), which need a colored
+    /// background wash the same way `accentSurface` licenses one for filter chips. Same
+    /// hex as `error`/`warning`, just at the opacity those banners were already speced at
+    /// (10%, not `accentSurface`'s 15% -- a banner covers more area than a chip, so a
+    /// lighter wash was the existing intent, not changed here).
+    let warningSurface: Color
+    let errorSurface: Color
 
     // FAB-336: `error` darkened ~10% (C0392B -> AD3327, hue preserved via uniform RGB
     // scaling -- same method the v1.1 textSecondary fix used) to clear 4.5:1 against
@@ -115,25 +124,33 @@ struct SemanticColors {
     static let paper = SemanticColors(
         error: Color(hex: "AD3327"),
         warning: Color(hex: "B45309"),
-        success: Color(hex: "166534")
+        success: Color(hex: "166534"),
+        warningSurface: Color(hex: "B45309").opacity(0.10),
+        errorSurface: Color(hex: "AD3327").opacity(0.10)
     )
 
     static let sepia = SemanticColors(
         error: Color(hex: "AD3327"),
         warning: Color(hex: "B45309"),
-        success: Color(hex: "166534")
+        success: Color(hex: "166534"),
+        warningSurface: Color(hex: "B45309").opacity(0.10),
+        errorSurface: Color(hex: "AD3327").opacity(0.10)
     )
 
     static let night = SemanticColors(
         error: Color(hex: "F87171"),
         warning: Color(hex: "FCD34D"),
-        success: Color(hex: "4ADE80")
+        success: Color(hex: "4ADE80"),
+        warningSurface: Color(hex: "FCD34D").opacity(0.10),
+        errorSurface: Color(hex: "F87171").opacity(0.10)
     )
 
     static let ink = SemanticColors(
         error: Color(hex: "FC8181"),
         warning: Color(hex: "F6E05E"),
-        success: Color(hex: "68D391")
+        success: Color(hex: "68D391"),
+        warningSurface: Color(hex: "F6E05E").opacity(0.10),
+        errorSurface: Color(hex: "FC8181").opacity(0.10)
     )
 
     static func semanticColors(for theme: VersoTheme) -> SemanticColors {

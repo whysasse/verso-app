@@ -89,7 +89,7 @@ for theme in ["paper", "sepia", "night", "ink"]:
 COLOR_TOKENS = [
     "background", "surface", "textPrimary", "textSecondary", "accent",
     "accentPressed", "accentSurface", "border", "placeholder", "error",
-    "warning", "success",
+    "warning", "success", "warningSurface", "errorSurface",
 ]
 THEMES = ["Paper", "Sepia", "Night", "Ink"]
 

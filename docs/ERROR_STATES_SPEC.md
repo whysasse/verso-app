@@ -46,7 +46,7 @@ Tokens are used as **text tints and border colors only** — never as large fill
 
 **Spec:**
 - Full-width, sits below navigation bar, above article list
-- Background: `warning` token at 10% opacity
+- Background: `warningSurface` (added 2026-09-12 specifically for this — was "`warning` token at 10% opacity" freeform, now a named token; see `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §E1)
 - Border-bottom: `warning` token, 1pt
 - Headline: SF Semibold 15pt, `warning` token
 - Subheadline: SF Regular 13pt, `textSecondary`
@@ -166,7 +166,7 @@ Icon: `folder.badge.minus`, 48pt, `textSecondary`
 > **Localization note:** `[Your Name]` here is **intentional** — it mirrors Apple's own label for the device-owner row at the top of iOS Settings. It is *not* an unfilled placeholder. Keep it as-is and do not substitute a real name; translators should match Apple's localized term for that row in each locale.
 
 **Spec:**
-- Same banner component as scenario 1, but uses `error` token instead of `warning`
+- Same banner component as scenario 1, but uses `error`/`errorSurface` instead of `warning`/`warningSurface`
 - No action button in banner — user must leave the app to resolve
 - Article list remains visible and operable (reads cached data)
 

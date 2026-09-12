@@ -77,7 +77,10 @@ enum VersoTheme: String { case paper, sepia, night, ink }
 `background` · `surface` · `textPrimary` · `textSecondary` · `accent` · `accentPressed` · `accentSurface` · `border` · `placeholder`
 
 **SemanticColors** (theme-dependent, same file):
-`error` · `warning` · `success`
+`error` · `warning` · `success` · `warningSurface` · `errorSurface` (the
+last two added 2026-09-12 — 10%-opacity tints, the sanctioned exception
+to "never a large fill background", same relationship `accentSurface`
+has to `accent`)
 
 **`VersoHighlightColor.wash`** (FAB-54, same file): the reading-view text-highlight background. Deliberately **not** one of `ThemeColors`' 9 roles — a single value across all four themes, not theme-tinted.
 
