@@ -211,7 +211,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   ## Progress (2026-09-12)
 
-  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form`). Phase 0's material spike (real `glassEffect` on device, gating phases 4–7) is still Fabio's own hands-on step — nothing past phase 3 starts until that comes back.
+  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form`), **phase 0** (material spike — **verdict: proceed**, tinted glass over Paper/Sepia keeps its warmth where untinted washes out, see the plan doc's Phase 0 section for the full verdict and its two carry-forward requirements). Phases 4–7, gated on phase 0, are unblocked.
 
   ## Why this is an epic and not a skin
 
