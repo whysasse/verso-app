@@ -57,7 +57,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
 
   *Post-launch polish — Backlog-status, fine to defer:*
 
-  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → ~~FAB-318~~ (done, see [DONE.md](DONE.md): TTS transport row alignment + immersive hint pill; margins control stays FAB-333 scope) → ~~FAB-322~~ (done, see [DONE.md](DONE.md): section counts + spacing, radio-style date presets, no-source card fallback, VoiceOver-aware success-sheet timing; select-mode layout shift stays FAB-334 scope, Settings-icon placement left as-is per Fabio's call) → ~~FAB-328~~ (done, see [DONE.md](DONE.md): real SF Symbols, disabled-Continue hint, "Allow" CTA + equal-weight consent buttons, stale doc note; its last bullet closed as a side effect of FAB-327's fix, below) → ~~FAB-327~~ (done, minimum-fix scope, see [DONE.md](DONE.md): global Skip, not tour-only, + a page-dot row that shrinks as you advance, rather than cutting screens. The full restructure stays open in BACKLOG for a post-launch revisit) → ~~FAB-314~~ (done, see [DONE.md](DONE.md), deliberately last so it encodes the corrected passing state: `scripts/check_contrast.py` now enforces contrast in CI instead of the hand-maintained, overclaiming table; 2 genuine failures it found are FAB-336) → ~~FAB-336~~ (done, see [DONE.md](DONE.md): `error` darkened ~10%; `placeholder`'s icon moved onto `textSecondary` instead of a token-value fix, since the token's only remaining live use is an intentionally-recessive skeleton loader. Checker now passes with zero known failures) → ~~FAB-337~~ (done, see [DONE.md](DONE.md): found during Fabio's first real on-device pass through this whole chain, 2026-09-08 — font/theme sheet background not reaching under the home indicator, theme swatches sitting edge-to-edge, and generate.py silently dropping FAB-330's `%` escape on regeneration). This chain is now fully worked through — **and confirmed on-device by Fabio, 2026-09-08** (see [PENDING_TESTS.md](PENDING_TESTS.md)'s Done section).
+  FAB-313 (VoiceOver label for the analytics toggle — **no longer folds into FAB-329**: closed 2026-09-05 without touching this, see below) → ~~FAB-323~~ (done, see [DONE.md](DONE.md)) → ~~FAB-325~~ (done, see [DONE.md](DONE.md): status badges + swipe tints, border contrast, divider correctness) → ~~FAB-329~~ (done, see [DONE.md](DONE.md): folder-row icon fixed; selection dot and heading levels absorbed by FAB-334; stepper and dividers already fixed elsewhere) → ~~FAB-324~~ (done, see [DONE.md](DONE.md): one `ThemeSwatch` component replaces the three; the Settings frame's Dynamic Type problem stays FAB-334 scope) → ~~FAB-326~~ (**moved to FAB-334** — system navigation supplies one back button, which is the entire fix) → ~~FAB-321~~ (done, see [DONE.md](DONE.md): read time replaces date on cards, VoiceOver row label wired up) → ~~FAB-317~~ (done, see [DONE.md](DONE.md): top padding now collapses with `isChromeVisible`, resolving the contradiction against the 2026-09-03 screenshots) → ~~FAB-318~~ (done, see [DONE.md](DONE.md): TTS transport row alignment + immersive hint pill; margins control stays FAB-333 scope) → ~~FAB-322~~ (done, see [DONE.md](DONE.md): section counts + spacing, radio-style date presets, no-source card fallback, VoiceOver-aware success-sheet timing; select-mode layout shift stays FAB-334 scope, Settings-icon placement left as-is per Fabio's call) → ~~FAB-328~~ (done, see [DONE.md](DONE.md): real SF Symbols, disabled-Continue hint, "Allow" CTA + equal-weight consent buttons, stale doc note; its last bullet closed as a side effect of FAB-327's fix, below) → ~~FAB-327~~ (done, minimum-fix scope, see [DONE.md](DONE.md): global Skip, not tour-only, + a page-dot row that shrinks as you advance, rather than cutting screens. The full restructure was renumbered FAB-348 2026-09-12 and stays open in BACKLOG, now scheduled as a prerequisite phase of FAB-334 rather than deferred) → ~~FAB-314~~ (done, see [DONE.md](DONE.md), deliberately last so it encodes the corrected passing state: `scripts/check_contrast.py` now enforces contrast in CI instead of the hand-maintained, overclaiming table; 2 genuine failures it found are FAB-336) → ~~FAB-336~~ (done, see [DONE.md](DONE.md): `error` darkened ~10%; `placeholder`'s icon moved onto `textSecondary` instead of a token-value fix, since the token's only remaining live use is an intentionally-recessive skeleton loader. Checker now passes with zero known failures) → ~~FAB-337~~ (done, see [DONE.md](DONE.md): found during Fabio's first real on-device pass through this whole chain, 2026-09-08 — font/theme sheet background not reaching under the home indicator, theme swatches sitting edge-to-edge, and generate.py silently dropping FAB-330's `%` escape on regeneration). This chain is now fully worked through — **and confirmed on-device by Fabio, 2026-09-08** (see [PENDING_TESTS.md](PENDING_TESTS.md)'s Done section).
 - **Phase C — post-launch polish.** FAB-54 (highlighting) done 2026-09-01, and its follow-up FAB-303 (highlighting v2 — cross-block selection, formatting-aware spans, headings/lists/quotes) done 2026-09-02 — all 5 original steps plus all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have shipped — see [DONE.md](DONE.md). FAB-277 (RSVP mode), FAB-278 (VoiceOver progress announcement) still need a UX decision from Fabio before implementation starts.
 
 ## iOS
@@ -202,12 +202,17 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
 ### Design critique 2026-09-01 — onboarding & settings
 
-- [ ] 🟡 **FAB-327** · Onboarding is seven screens before the first article (full restructure)  `Backlog` `Medium`
+- [ ] 🟡 **FAB-348** · Onboarding is seven screens before the first article (full restructure)  `Backlog` `Medium`
   ## Scope
 
   Critique §4.1. `OnboardingFlowView` runs Welcome → Theme → Folder → Analytics consent → Tour 1 → Tour 2 → Tour 3. Exactly **one** is functionally required. For an app whose pitch is "less friction than Pocket", a seven-screen gate is the loudest possible contradiction of the positioning, and the page-dot row shows all seven on screen one — so the first thing Welcome communicates is "six more to go".
 
-  **The minimum-fix half of this ticket is done** — see [DONE.md](DONE.md): Skip is now global from screen 1 (not tour-only), and the dot row shrinks as you advance instead of always showing 7. What's below is the larger option Fabio didn't choose for that pass; still open in case it's worth revisiting post-launch.
+  **Split out from FAB-327 2026-09-12** (bookkeeping cleanup, see FAB-340 in DONE.md): FAB-327 shipped
+  only its minimum-fix half — see [DONE.md](DONE.md): Skip is now global from screen 1 (not tour-only),
+  and the dot row shrinks as you advance instead of always showing 7 — and closed under that scope. This
+  ticket carries the larger option Fabio didn't choose for that pass. It is **not** deferred: per
+  Decision 4 in FAB-334 (2026-09-08), it's scheduled as Phase 2 of the native-shell plan, a prerequisite
+  before FAB-334 touches onboarding — see [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md).
 
   * ~~**Skip only exists on the tour** (screens 5–7); theme and analytics can only be answered.~~ **Done**, see DONE.md.
   * **No back affordance.** `advance()` is forward-only; the `TabView` allows a backward swipe but nothing signals it and the dots aren't tappable.
@@ -231,7 +236,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Three things were blocking this ticket from being implementation-ready. Proposed answers below — none are decided yet, flagging them here (rather than silently assuming) since they change scope/sequencing:
 
-  1. **Sequencing against FAB-334.** These aren't the same problem (FAB-334 doesn't fix a seven-screen flow just by adopting system components — see FAB-334's own "not absorbed" list, which correctly keeps FAB-327 as its own ticket), but doing them in the wrong order wastes work: reskinning seven screens in Liquid Glass and then deleting five of them is worse than cutting first. **Proposed order:** run this restructure first — cut Welcome/Folder down from seven, still on the current (non-Liquid-Glass) chrome — then let FAB-334 reskin only the two surviving screens as part of its normal onboarding pass. Concretely: this ticket stays a prerequisite phase of 1.1, scheduled before FAB-334 touches any onboarding view. Mirrors this in FAB-334's own open-decision #3 below.
+  1. **Sequencing against FAB-334.** These aren't the same problem (FAB-334 doesn't fix a seven-screen flow just by adopting system components — see FAB-334's own "not absorbed" list, which correctly keeps FAB-348 as its own ticket), but doing them in the wrong order wastes work: reskinning seven screens in Liquid Glass and then deleting five of them is worse than cutting first. **Proposed order:** run this restructure first — cut Welcome/Folder down from seven, still on the current (non-Liquid-Glass) chrome — then let FAB-334 reskin only the two surviving screens as part of its normal onboarding pass. Concretely: this ticket stays a prerequisite phase of 1.1, scheduled before FAB-334 touches any onboarding view. Mirrors this in FAB-334's own open-decision #3 below.
   2. **Stale FAB-319 reference** — corrected above in the Fix section itself, not just noted here.
   3. **Interaction specs for the three moves** — none of these have had a spec pass yet; proposing one so there's something concrete to build against or push back on:
      * **Theme → first-article-open pointer.** Fires once, the first time the reading view opens for the very first saved article (a new one-time flag, same pattern as onboarding's own "runs once per install," not reusing that flag). A lightweight callout anchored on the reading toolbar's theme control — not a sheet, not blocking — dismissed by any tap outside it or by using the control itself. Never blocks reading; if the user never opens an article, it never fires and the theme keeps its current default.
@@ -281,7 +286,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   | FAB-319's filter panel | A system menu / sheet; `.searchable` supplies the bottom search field |
   | FAB-311's ✕ collision | A system sheet with a grabber and no competing close button |
 
-  **Not absorbed — do these in 1.0 as already sequenced.** Everything in the content and reading layers survives untouched: FAB-315 + FAB-332 (parser), FAB-330, FAB-331, FAB-312, FAB-308, FAB-307, FAB-333, FAB-316, FAB-317, FAB-321, FAB-323, FAB-306, FAB-327, FAB-328.
+  **Not absorbed — do these in 1.0 as already sequenced.** Everything in the content and reading layers survives untouched: FAB-315 + FAB-332 (parser), FAB-330, FAB-331, FAB-312, FAB-308, FAB-307, FAB-333, FAB-316, FAB-317, FAB-321, FAB-323, FAB-306, FAB-348, FAB-328.
 
   **FAB-309 is the one to split, not defer.** Its two halves behave differently:
 
@@ -309,10 +314,10 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   | 1 | Deployment target | **iOS 26.0**, as provisionally decided. iOS 27 ships ~2026-09-14; iOS 26 was already at 79% of all iPhones / 86% of last-4-years devices in June 2026, so the floor is cheap. Build against the newest SDK, deploy to 26. Still **not** on `main` — first commit on the 1.1 branch. |
   | 2 | When 1.1 opens | **After 1.0's final binary submission lands.** `main` stays at iOS 16 until then, so a Review rejection or hotfix has a clean base. |
   | 3 | Themes outside the reader | **Collapse to light/dark**, driven by `VersoTheme.isDark`. Paper/Sepia/Night/Ink survive in the reading view only. |
-  | 4 | Onboarding | **FAB-327 cuts 7 screens to 2 first, on current chrome; the shell then reskins only the 2 survivors.** Confirms FAB-327's 2026-09-06 draft resolution #1. |
+  | 4 | Onboarding | **FAB-348 cuts 7 screens to 2 first, on current chrome; the shell then reskins only the 2 survivors.** Confirms FAB-348's 2026-09-06 draft resolution #1. |
   | 5 | Bulk select vs `EditMode` (raised by the 2026-09-08 audit, not in the original four) | **Keep `selectedArticleIds` and the `.constant(nil)` trick; adopt only `EditMode`'s chrome.** `List(selection:)`'s single-value binding is what drives `NavigationSplitView`'s sidebar→detail collapse — a `List` takes one selection binding, so real multi-select would mean swapping its generic type and losing scroll position and section state on every entry to select mode. FAB-320 needs red-Delete and a count, both of which come free from the chrome alone. See the plan's R1 for the keep/change table. |
 
-  Decision 4 also settles FAB-327's third draft resolution differently than proposed: its
+  Decision 4 also settles FAB-348's third draft resolution differently than proposed: its
   "tour → empty-state teaching hints" is **cut**, superseded by the welcome article (FAB-338 below).
   With an article seeded at folder-pick time the library is never empty on first run, so the hints
   would never fire.
@@ -325,7 +330,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
      Worth confirming current iOS 26 adoption before the branch opens; it shipped a year ago, so the cost is probably modest, but the number should be looked up rather than assumed.
   2. **What happens to the four themes in the shell.** The decision above implies the shell follows light/dark (driven by `VersoTheme.isDark`, which `ContentView.preferredColorScheme` already plumbs) while Paper/Sepia/Night/Ink survive in the reader. Confirm that is acceptable before building — it is a visible reduction outside the reading view.
-  3. **Whether onboarding is rebuilt here or in FAB-327 — draft resolution proposed 2026-09-06, not yet confirmed by Fabio: neither, sequentially.** FAB-327 cuts seven screens to two first (on current chrome), then this epic reskins only the two survivors. See FAB-327's own "Draft resolutions" section for the reasoning; this line stays open until Fabio signs off there.
+  3. **Whether onboarding is rebuilt here or in FAB-348 — draft resolution proposed 2026-09-06, not yet confirmed by Fabio: neither, sequentially.** FAB-348 cuts seven screens to two first (on current chrome), then this epic reskins only the two survivors. See FAB-348's own "Draft resolutions" section for the reasoning; this line stays open until Fabio signs off there.
   4. **`.searchable` placement and scope.** Today search is a custom expanding header field over title + body + site + URL. The system field changes both the interaction and where filters live (FAB-319).
 
   ## Direction approved 2026-09-03
@@ -365,7 +370,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Write one real `.md` article into the user's chosen folder at folder-pick time, so a first-time user
   opens the app into the reading view with content rather than onto an empty list. It carries the
-  instructions, feature descriptions and usage tips that FAB-327's deleted tour used to.
+  instructions, feature descriptions and usage tips that FAB-348's deleted tour used to.
 
   **Why this shape.** Verso's pitch is *your articles are plain Markdown files you own* — a welcome
   article demonstrates that in the first ten seconds, since the user can open their iCloud folder and
@@ -374,7 +379,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   an image and a few hundred words it exercises `HighlightableRegionText`'s region splitting, scroll
   progress, and the reading-time estimate on launch.
 
-  **Supersedes** FAB-327's proposed empty-state teaching hints (see FAB-334's decision block above).
+  **Supersedes** FAB-348's proposed empty-state teaching hints (see FAB-334's decision block above).
   It does **not** supersede FAB-319's empty-state CTA — a user who skips folder selection never gets
   the article and still lands on the empty state.
 
@@ -403,7 +408,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   ## Depends on
 
-  FAB-334 phases 3–7 (the tips describe the shell's controls) and FAB-327 (which deletes the tour this replaces).
+  FAB-334 phases 3–7 (the tips describe the shell's controls) and FAB-348 (which deletes the tour this replaces).
   Draft the prose during the shell work; finalise control names at the end.
 
 
@@ -572,46 +577,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
 ### Phase 1 — Foundation
 
-- [x] 🟡 **FAB-165** · [WEB] Phase 1: Scaffold Next.js app + port design system tokens  `Completed` `Medium`
-  Initialize verso-web/ as a Next.js 15+ project with TypeScript strict mode, Tailwind CSS, and port design system tokens from iOS.
-
-  ## Completed Tasks
-
-  * [x] Created verso-web/ directory at repo root
-  * [x] Initialized Next.js 16.2.6 with TypeScript v5
-  * [x] Configured TypeScript with strict mode (`strict: true`, `isolatedModules`, `noEmit`)
-  * [x] Set up Tailwind CSS 4 with PostCSS integration
-  * [x] Created app directory structure:
-    - `app/` — Next.js App Router
-    - `app/components/` — UI components (ArticleCard, SearchBar, FilterChipBar, MarkdownRenderer, etc.)
-    - `app/providers/` — Context providers (ThemeProvider)
-    - `hooks/` — Custom React hooks (useArticleLibrary)
-    - `services/` — Utility services
-    - `types/` — TypeScript definitions
-    - `public/fonts/` — Custom fonts (OpenDyslexic)
-  * [x] Ported design system tokens to `app/globals.css`:
-    - Fixed tokens: spacing, corner radius, typography (UI + reading)
-    - Theme tokens for all 4 themes (Paper, Sepia, Night, Ink)
-    - Color roles: primary/secondary text, background, surface, accent, border, placeholder, error, warning, success
-  * [x] Created root layout (`app/layout.tsx`) with ThemeProvider
-  * [x] Created home page (`app/page.tsx`) with article listing, search, filtering, and theme switcher
-  * [x] Configured package.json with core dependencies: `next`, `react`, `react-dom`, `react-markdown`, `gray-matter`, `idb`
-  * [x] Added scripts: `npm run dev`, `npm run build`, `npm start`
-  * [x] Verified dev server starts cleanly: `npm run dev` → http://localhost:3000 (startup time: 747ms)
-
-  ## Verification
-
-  - [x] TypeScript strict mode enabled and checked
-  - [x] Tailwind CSS rendering correctly
-  - [x] Design tokens applied across all 4 themes
-  - [x] Dev server runs without errors
-  - [x] All required directories created
-  - [x] File System Access API integration ready
-
-  ## Completion Date
-
-  **2026-06-15** — Ready for Phase 2 implementation.
-
 ### Phase 3 — Expansion
 
 - [ ] 🟡 **FAB-171** · [WEB] Phase 4: URL article ingestion (fetch + Readability + Markdown)  `Backlog` `Medium`
@@ -779,30 +744,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   * §10 Phase 2: removed data export deliverable; added explicit file-first note; moved tagging into Phase 2 roadmap; §9 risk row aligned
 
   No app implementation — tracking only for changelog / cross-link with [FAB-150](https://linear.app/fabiosasseron/issue/FAB-150/phase-2-app-store-release-checklist).
-
-### Two issue ids have entries in both BACKLOG.md and DONE.md
-
-- [ ] 🔵 **FAB-340** · [Docs] Backlog bookkeeping: FAB-165 and FAB-327 each have an entry in both BACKLOG.md and DONE.md  `Todo` `Low`
-  Found 2026-09-11 by `scripts/checks/check-backlog.sh` (new — see the
-  sdlc-toolkit contract PR), which checks this mechanically now instead of
-  by eye. No app implementation — tracking + a judgment call, not code.
-
-  * **FAB-165** — the `## Web` entry above (checked off, `Completed`) is a
-    stale duplicate: FAB-165 already has a proper `Done` entry in
-    `docs/DONE.md`. Per the backlog-hygiene rule, a completed entry
-    *moves*, it doesn't get copied — this one should simply be deleted
-    from BACKLOG.md.
-  * **FAB-327** — genuinely ambiguous, not just a stray copy. `BACKLOG.md`
-    has an *open* entry for the full scope ("Onboarding is seven screens
-    before the first article — full restructure"), while `DONE.md` has a
-    *done* entry under the same id for a narrower "minimum fix" (global
-    Skip + shrinking page dots) — see `docs/BACKLOG.md`'s own "Current
-    sequencing" note: "the full restructure stays open in BACKLOG for a
-    post-launch revisit." That's a real scope split that never got its own
-    number. Fabio's call: renumber the still-open "full restructure" work
-    under a fresh FAB-xx (leaving FAB-327 as closed, describing only what
-    actually shipped), or leave both under FAB-327 with BACKLOG.md's entry
-    reworded to make clear it's the *remaining* scope, not the original.
 
 ### Archive subfolder name disagrees across 2 docs and the code
 

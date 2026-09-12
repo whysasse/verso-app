@@ -819,7 +819,9 @@
   moving Theme/Analytics/Tour elsewhere), or, "if that is too large close to
   release," the minimum: global Skip + a shrinking dot row. Fabio chose the
   minimum, given proximity to the final binary submission (FAB-150) — the
-  full restructure stays open, see BACKLOG's trimmed FAB-327 entry.
+  full restructure stays open as [FAB-348](../BACKLOG.md) (renumbered
+  2026-09-12 out of this ticket — see the FAB-340 entry in this file's
+  Infra / Docs section).
 
   ## Fix
 
@@ -846,11 +848,11 @@
 
   ## Not touched
 
-  The rest of FAB-327 — cutting to 2 screens, moving Theme to
+  The rest of the original critique — cutting to 2 screens, moving Theme to
   first-article-open, Analytics consent to a sheet, the tour to an
   empty-state hint — is the larger option Fabio didn't choose this round.
-  Dots stay non-tappable (not part of the minimum-fix line, and a bigger
-  interaction change).
+  Split out 2026-09-12 as [FAB-348](../BACKLOG.md). Dots stay non-tappable
+  (not part of the minimum-fix line, and a bigger interaction change).
 
   ## Verify
 
@@ -3160,6 +3162,20 @@
   Replaced 3 hardcoded strings (`Text("Choose your theme")`, `Text("You can always change this later in Settings.")`, `Button("Continue")`) with `L10n.Onboarding.themeHeadline`, `themeSubheadline`, `themeContinue`.
 
   **Completed:** 2026-06-21.
+
+- [x] 🔵 **FAB-340** · [Docs] Backlog bookkeeping: FAB-165 and FAB-327 each had an entry in both BACKLOG.md and DONE.md  `Done` `Low`
+  Found 2026-09-11 by `scripts/checks/check-backlog.sh`. Two separate fixes, both resolved 2026-09-12:
+
+  * **FAB-165** — the `## Web` entry in `docs/BACKLOG.md` (checked off, `Completed`) was a stale
+    duplicate of the proper `Done` entry already in this file. Deleted from `docs/BACKLOG.md` per the
+    backlog-hygiene rule (a completed entry moves, it doesn't get copied).
+  * **FAB-327** — genuinely ambiguous, not a stray copy: `docs/BACKLOG.md` had an open entry for the
+    full restructure scope, while this file records a narrower "minimum fix" under the same id. Fabio's
+    call: renumber the still-open full-restructure work under a fresh id. It's now
+    [FAB-348](../BACKLOG.md), leaving FAB-327 closed and describing only what shipped (see FAB-327's own
+    entry above). All cross-references to the restructure scope across `docs/BACKLOG.md` and
+    `docs/plans/FAB-334-1.1-native-shell-plan.md` updated to FAB-348 in the same pass; references to the
+    shipped minimum fix stay FAB-327.
 
 ## Phase B — Pseudolocalization & layout flex QA (FAB-275 step 6)
 
