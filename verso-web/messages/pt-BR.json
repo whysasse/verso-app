@@ -313,19 +313,8 @@
       "privacyNote": "O Verso nunca envia seus arquivos para a nuvem. Eles ficam no seu iCloud Drive.",
       "subheadline": "Escolha uma pasta no iCloud Drive. O Verso salva cada artigo como um arquivo Markdown que você pode abrir em qualquer lugar."
     },
-    "theme": {
-      "continue": "Continuar",
-      "headline": "Escolha seu tema de leitura",
-      "subheadline": "Você pode alterar isso a qualquer momento nas configurações."
-    },
     "tour": {
-      "headline": "Veja como funciona",
-      "next": "Próximo",
-      "skip": "Pular",
-      "startReading": "Começar a ler",
-      "step1": "Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente.",
-      "step2": "Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos.",
-      "step3": "Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre."
+      "skip": "Pular"
     },
     "welcome": {
       "cta": "Começar",
@@ -440,6 +429,7 @@
         "headline": "Selecione um artigo"
       }
     },
+    "themeHint": "Toque aqui para mudar seu tema de leitura",
     "topBar": {
       "moreActions": {
         "_label": "Mais ações",

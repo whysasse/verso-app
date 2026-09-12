@@ -23,6 +23,10 @@ struct ArticleReaderView: View {
     @State private var showThemeControls: Bool = false
     @State private var parsedContent: String = ""
     @State private var isPillVisible: Bool = false
+    /// FAB-348: one-time pointer at the reading toolbar's theme control, shown the
+    /// first time the reading view opens for the very first saved article -- replaces
+    /// the onboarding theme-picker step. See `hasShownThemeHint` below.
+    @State private var isThemeHintVisible: Bool = false
     @State private var relatedArticles: [Article] = []
     @State private var isTTSActive: Bool = false
     @StateObject private var ttsService = TTSService()
@@ -208,6 +212,10 @@ struct ArticleReaderView: View {
                 let enteringImmersive = isChromeVisible
                 let toggleChrome = {
                     isChromeVisible.toggle()
+                    // FAB-348: any tap that toggles chrome dismisses the theme hint too --
+                    // it's anchored to the bottom bar, which collapses to 0 height right
+                    // alongside it in immersive mode.
+                    isThemeHintVisible = false
                     if isChromeVisible {
                         isPillVisible = false
                     } else if !hasShownImmersiveHint {
@@ -261,12 +269,31 @@ struct ArticleReaderView: View {
                         .padding(.bottom, safeAreaBottom + VersoSpacing.lg)
                 }
             }
+
+            // FAB-348: pointer at the theme control, replacing the deleted onboarding
+            // theme-picker step. Trailing-aligned so it sits roughly above the theme
+            // button (the last, rightmost icon in `ReadingBottomBar`) rather than
+            // centered like the immersive hint above.
+            if isThemeHintVisible {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        ImmersiveHintPill(isVisible: $isThemeHintVisible, text: L10n.Reading.themeHint)
+                            .padding(.trailing, VersoSpacing.md)
+                    }
+                    .padding(.bottom, safeAreaBottom + readingBottomBarContentHeight + VersoSpacing.sm)
+                }
+            }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             ReadingBottomBar(
                 scrollProgress: scrollProgress,
                 onControls: { showFontControls = true },
-                onTheme: { showThemeControls = true },
+                onTheme: {
+                    showThemeControls = true
+                    isThemeHintVisible = false
+                },
                 tts: ttsService,
                 isTTSActive: isTTSActive,
                 onToggleTTS: toggleTTS,
@@ -319,6 +346,10 @@ struct ArticleReaderView: View {
             advanceStatus(to: .reading)
             AnalyticsService.shared.track("article.opened")
             relatedArticles = await RelatedArticlesService().related(to: article, in: viewContext)
+            if !hasShownThemeHint {
+                isThemeHintVisible = true
+                markThemeHintShown()
+            }
         }
         .onDisappear {
             scrollSaveTask?.cancel()
@@ -618,6 +649,18 @@ struct ArticleReaderView: View {
     /// VoiceOver session" -- there's no path here while `isVoiceOverRunning` is true.
     private func markImmersiveHintShown() {
         UserDefaults.standard.set(true, forKey: Self.hasShownImmersiveHintKey)
+    }
+
+    // MARK: - Theme hint (FAB-348)
+
+    private static let hasShownThemeHintKey = "hasShownThemeHint"
+
+    private var hasShownThemeHint: Bool {
+        UserDefaults.standard.bool(forKey: Self.hasShownThemeHintKey)
+    }
+
+    private func markThemeHintShown() {
+        UserDefaults.standard.set(true, forKey: Self.hasShownThemeHintKey)
     }
 
     private func estimatedReadTime(for text: String) -> Int? {

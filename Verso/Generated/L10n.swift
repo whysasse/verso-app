@@ -274,13 +274,13 @@ enum L10n {
         static var noFolderCta: String {
             String(localized: "error.noFolder.cta", defaultValue: "Choose folder", comment: "CTA button")
         }
-        /// "No folder selected." -- Full-screen error headline
+        /// "No folder selected." -- Inline folder-prompt card headline (not full-screen — corrected 2026-09-12, see `docs/ERROR_STATES_SPEC.md` §3)
         static var noFolderHeadline: String {
-            String(localized: "error.noFolder.headline", defaultValue: "No folder selected.", comment: "Full-screen error headline")
+            String(localized: "error.noFolder.headline", defaultValue: "No folder selected.", comment: "Inline folder-prompt card headline (not full-screen — corrected 2026-09-12, see `docs/ERROR_STATES_SPEC.md` §3)")
         }
-        /// "Choose a folder in iCloud Drive to start saving articles." -- Full-screen error subheadline
+        /// "Choose a folder in iCloud Drive to start saving articles." -- Inline folder-prompt card subheadline
         static var noFolderSubheadline: String {
-            String(localized: "error.noFolder.subheadline", defaultValue: "Choose a folder in iCloud Drive to start saving articles.", comment: "Full-screen error subheadline")
+            String(localized: "error.noFolder.subheadline", defaultValue: "Choose a folder in iCloud Drive to start saving articles.", comment: "Inline folder-prompt card subheadline")
         }
         /// "Not available offline." -- Greyed-out row only
         static var offlineArticleUnavailable: String {
@@ -632,17 +632,17 @@ enum L10n {
         static var analyticsConsentAcceptCta: String {
             String(localized: "onboarding.analyticsConsent.acceptCta", defaultValue: "Allow", comment: "FAB-328: 'Sure, why not' was the wrong register for a consent affirmative next to this app's otherwise calm, precise copy (e.g. `onboarding.folder.privacyNote`), and compounded the button-weighting problem this same ticket fixed (was `.primary`, now `.secondary`, matching Decline). 'Allow' mirrors Apple's own system permission-prompt wording in all three locales — calm, precise, and pairs naturally with 'No thanks.' Changed 2026-09-06.")
         }
-        /// "No thanks" -- Secondary button
+        /// "No thanks" -- Swipe-to-dismiss the sheet counts the same as tapping this — the sheet's `onDismiss` marks the flag either way, and `AnalyticsService.isOptedIn` already defaults to false, so a dismissal never reads as consent.
         static var analyticsConsentDeclineCta: String {
-            String(localized: "onboarding.analyticsConsent.declineCta", defaultValue: "No thanks", comment: "Secondary button")
+            String(localized: "onboarding.analyticsConsent.declineCta", defaultValue: "No thanks", comment: "Swipe-to-dismiss the sheet counts the same as tapping this — the sheet's `onDismiss` marks the flag either way, and `AnalyticsService.isOptedIn` already defaults to false, so a dismissal never reads as consent.")
         }
         /// "Help make Verso better" -- Added during step 4 view-wiring pass — missed in the original audit.
         static var analyticsConsentHeadline: String {
             String(localized: "onboarding.analyticsConsent.headline", defaultValue: "Help make Verso better", comment: "Added during step 4 view-wiring pass — missed in the original audit.")
         }
-        /// "Share anonymous usage data — no personal info, no article content, ever." -- Subheadline
+        /// "Share anonymous usage data — no personal info, no article content, ever." -- Sheet subheadline
         static var analyticsConsentSubheadline: String {
-            String(localized: "onboarding.analyticsConsent.subheadline", defaultValue: "Share anonymous usage data — no personal info, no article content, ever.", comment: "Subheadline")
+            String(localized: "onboarding.analyticsConsent.subheadline", defaultValue: "Share anonymous usage data — no personal info, no article content, ever.", comment: "Sheet subheadline")
         }
         /// "Choose folder…" -- Added ellipsis during step 4 view-wiring pass to match the row-placeholder treatment shipped in code (not a standalone button as the original 'Primary button' location implied).
         static var folderChooseCta: String {
@@ -672,45 +672,9 @@ enum L10n {
         static var folderSubheadline: String {
             String(localized: "onboarding.folder.subheadline", defaultValue: "Pick a folder in iCloud Drive. Verso saves each article as a Markdown file you can open anywhere.", comment: "Code previously had different wording ('Articles are saved as Markdown files — yours to keep.'); switched to this canonical copy during step 4 view-wiring pass since fr-CA/pt-BR were already translated against it.")
         }
-        /// "Continue" -- Primary button
-        static var themeContinue: String {
-            String(localized: "onboarding.theme.continue", defaultValue: "Continue", comment: "Primary button")
-        }
-        /// "Choose your reading theme" -- Headline
-        static var themeHeadline: String {
-            String(localized: "onboarding.theme.headline", defaultValue: "Choose your reading theme", comment: "Headline")
-        }
-        /// "You can change this any time from settings." -- Subheadline
-        static var themeSubheadline: String {
-            String(localized: "onboarding.theme.subheadline", defaultValue: "You can change this any time from settings.", comment: "Subheadline")
-        }
-        /// "Here's how it works" -- Headline
-        static var tourHeadline: String {
-            String(localized: "onboarding.tour.headline", defaultValue: "Here's how it works", comment: "Headline")
-        }
-        /// "Next" -- Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users.
-        static var tourNext: String {
-            String(localized: "onboarding.tour.next", defaultValue: "Next", comment: "Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users.")
-        }
-        /// "Skip" -- Text button
+        /// "Skip" -- Kept under its original key name to avoid unrelated codegen churn, though 'tour' no longer describes what it skips.
         static var tourSkip: String {
-            String(localized: "onboarding.tour.skip", defaultValue: "Skip", comment: "Text button")
-        }
-        /// "Start reading" -- Primary button
-        static var tourStartReading: String {
-            String(localized: "onboarding.tour.startReading", defaultValue: "Start reading", comment: "Primary button")
-        }
-        /// "Share any article from Safari or your browser to save it instantly." -- Step 1 label
-        static var tourStep1: String {
-            String(localized: "onboarding.tour.step1", defaultValue: "Share any article from Safari or your browser to save it instantly.", comment: "Step 1 label")
-        }
-        /// "Open Verso to read. Your list is always in sync with your files." -- Step 2 label
-        static var tourStep2: String {
-            String(localized: "onboarding.tour.step2", defaultValue: "Open Verso to read. Your list is always in sync with your files.", comment: "Step 2 label")
-        }
-        /// "Mark articles as read when you're done. They stay in your folder forever." -- Step 3 label
-        static var tourStep3: String {
-            String(localized: "onboarding.tour.step3", defaultValue: "Mark articles as read when you're done. They stay in your folder forever.", comment: "Step 3 label")
+            String(localized: "onboarding.tour.skip", defaultValue: "Skip", comment: "Kept under its original key name to avoid unrelated codegen churn, though 'tour' no longer describes what it skips.")
         }
         /// "Get started" -- Primary button
         static var welcomeCta: String {
@@ -953,6 +917,10 @@ enum L10n {
         /// "Select an article" -- Added during step 4 view-wiring pass — iPad split view postdates the original audit.
         static var splitViewPlaceholderHeadline: String {
             String(localized: "reading.splitView.placeholder.headline", defaultValue: "Select an article", comment: "Added during step 4 view-wiring pass — iPad split view postdates the original audit.")
+        }
+        /// "Tap here to change your reading theme" -- needs_review
+        static var themeHint: String {
+            String(localized: "reading.themeHint", defaultValue: "Tap here to change your reading theme", comment: "needs_review")
         }
         /// "More actions" -- `⋯` button accessibility label
         static var topBarMoreActions: String {

@@ -23,13 +23,12 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `onboarding.welcome.subheadline` | Subheadline | A quiet place to read. No accounts, no algorithms — just Markdown files in your iCloud Drive. | Un endroit calme pour lire. Aucun compte, aucun algorithme — seulement des fichiers Markdown dans ton iCloud Drive. | Um lugar tranquilo para ler. Sem contas, sem algoritmos — apenas arquivos Markdown no seu iCloud Drive. | — |
 | `onboarding.welcome.cta` | Primary button | Get started | Commencer | Começar | — |
 
-### OB-2 · Theme Picker
+### Shared · Theme Labels
+
+> **FAB-348 (2026-09-12):** the onboarding theme-picker *step* (`onboarding.theme.headline`/`.subheadline`/`.continue`) is deleted — theme choice moves to a first-article-open pointer (see `reading.themeHint` above) instead of a dedicated screen. The 4 theme labels below survive unchanged; they're shared with Settings and Reader Settings, both still live.
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.theme.headline` | Headline | Choose your reading theme | Choisis ton thème de lecture | Escolha seu tema de leitura | — |
-| `onboarding.theme.subheadline` | Subheadline | You can change this any time from settings. | Tu peux le modifier à tout moment dans les réglages. | Você pode alterar isso a qualquer momento nas configurações. | — |
-| `onboarding.theme.continue` | Primary button | Continue | Continuer | Continuar | — |
 | `theme.paper` | Theme label | Paper | Papier | Papel | Shared with Settings / Reader Settings |
 | `theme.sepia` | Theme label | Sepia | Sépia | Sépia | Shared |
 | `theme.night` | Theme label | Night | Nuit | Noite | Shared |
@@ -47,28 +46,24 @@ All user-visible text strings for Verso, across **both platforms (iOS and Web)**
 | `onboarding.folder.continueDisabledHint` | Caption below Continue button, before a folder is chosen (swaps with `privacyNote` above) | Choose a folder to continue. | Choisis un dossier pour continuer. | Escolha uma pasta para continuar. | FAB-328: Continue disabled until a folder is picked, but nothing on screen said why — added 2026-09-06. |
 | `onboarding.folder.obsidianTip` | Tip text | Using Obsidian? Point Verso to a folder inside your vault and articles will appear there automatically. | Tu utilises Obsidian? Pointe Verso vers un dossier dans ton coffre et les articles y apparaîtront automatiquement. | Usa o Obsidian? Aponte o Verso para uma pasta dentro do seu vault e os artigos vão aparecer lá automaticamente. | Shown in `OnboardingFolderPickerView.swift` since FAB-280 (see docs/DONE.md) — this note previously said "not yet shown," which is stale; corrected 2026-09-06. |
 
-### OB-4 · Quick Tour
+### OB-4 · Quick Tour — deleted (FAB-348, 2026-09-12)
+
+> The 3-step tour (`QuickTourView.swift`) is deleted; its teaching moves into the welcome article (FAB-338) instead. `onboarding.tour.headline`/`.step1`/`.step2`/`.step3`/`.next`/`.startReading` are retired along with it. `onboarding.tour.skip` **survives, unchanged** — it's still the global Skip control in `OnboardingFlowView`'s now-2-screen flow (Welcome + Folder), just no longer skipping a tour specifically.
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.tour.headline` | Headline | Here's how it works | Voici comment ça fonctionne | Veja como funciona | — |
-| `onboarding.tour.step1` | Step 1 label | Share any article from Safari or your browser to save it instantly. | Partage n'importe quel article depuis Safari ou ton navigateur pour l'enregistrer instantanément. | Compartilhe qualquer artigo do Safari ou do seu navegador para salvá-lo instantaneamente. | — |
-| `onboarding.tour.step2` | Step 2 label | Open Verso to read. Your list is always in sync with your files. | Ouvre Verso pour lire. Ta liste est toujours synchronisée avec tes fichiers. | Abra o Verso para ler. Sua lista está sempre sincronizada com seus arquivos. | — |
-| `onboarding.tour.step3` | Step 3 label | Mark articles as read when you're done. They stay in your folder forever. | Marque les articles comme lus une fois terminés. Ils restent dans ton dossier pour toujours. | Marque os artigos como lidos quando terminar. Eles permanecem na sua pasta para sempre. | — |
-| `onboarding.tour.skip` | Text button | Skip | Ignorer | Pular | — |
-| `onboarding.tour.next` | Text/chevron button on non-final tour steps | Next | Suivant | Próximo | Added FAB-285 — explicit advance control alongside swipe, for discoverability and VoiceOver/Switch Control users. |
-| `onboarding.tour.startReading` | Primary button | Start reading | Commencer à lire | Começar a ler | — |
+| `onboarding.tour.skip` | Text button, global chrome over Welcome (hidden on the last page) | Skip | Ignorer | Pular | Kept under its original key name to avoid unrelated codegen churn, though "tour" no longer describes what it skips. |
 
-QuickTourView now implements the 3-step carousel (FAB-281). The interim illustration keys (`onboarding.tour.illustration*`) are retired — they were removed from the generated artifacts alongside the carousel rewrite and should not be referenced in new code. As of FAB-285, the 3 tour steps are flattened into `OnboardingFlowView`'s own outer `TabView` (tags 4–6) rather than nested in a second `TabView` inside `QuickTourView` — two stacked paging containers on the same axis were absorbing the swipe gesture. `QuickTourView` no longer owns its own page-dot indicator; `OnboardingFlowView`'s single 7-dot indicator covers the whole flow.
+### OB-5 · Analytics Consent — moved to a sheet (FAB-348, 2026-09-12)
 
-### OB-5 · Analytics Consent
+> No longer an onboarding `TabView` page. `AnalyticsConsentView` is now presented as a sheet from `VersoMainSplitView`, shown once on first list launch (after onboarding ends, whichever path — Skip or Folder's Continue — got there). Copy is unchanged; only the presentation context is.
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `onboarding.analyticsConsent.headline` | Headline | Help make Verso better | Aide à améliorer Verso | Ajude a melhorar o Verso | Added during step 4 view-wiring pass — missed in the original audit. |
-| `onboarding.analyticsConsent.subheadline` | Subheadline | Share anonymous usage data — no personal info, no article content, ever. | Partage des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais. | Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca. | — |
+| `onboarding.analyticsConsent.headline` | Sheet headline | Help make Verso better | Aide à améliorer Verso | Ajude a melhorar o Verso | Added during step 4 view-wiring pass — missed in the original audit. |
+| `onboarding.analyticsConsent.subheadline` | Sheet subheadline | Share anonymous usage data — no personal info, no article content, ever. | Partage des données d'utilisation anonymes — aucune information personnelle, aucun contenu d'article, jamais. | Compartilhe dados de uso anônimos — sem informações pessoais, sem conteúdo de artigos, nunca. | — |
 | `onboarding.analyticsConsent.acceptCta` | Secondary button (was primary) | Allow | Autoriser | Permitir | FAB-328: "Sure, why not" was the wrong register for a consent affirmative next to this app's otherwise calm, precise copy (e.g. `onboarding.folder.privacyNote`), and compounded the button-weighting problem this same ticket fixed (was `.primary`, now `.secondary`, matching Decline). "Allow" mirrors Apple's own system permission-prompt wording in all three locales — calm, precise, and pairs naturally with "No thanks." Changed 2026-09-06. |
-| `onboarding.analyticsConsent.declineCta` | Secondary button | No thanks | Non merci | Não, obrigado | — |
+| `onboarding.analyticsConsent.declineCta` | Secondary button | No thanks | Non merci | Não, obrigado | Swipe-to-dismiss the sheet counts the same as tapping this — the sheet's `onDismiss` marks the flag either way, and `AnalyticsService.isOptedIn` already defaults to false, so a dismissal never reads as consent. |
 
 ---
 
@@ -292,6 +287,14 @@ VoiceOver row label/hint for this card live in §9 (`a11y.articleRow.label` / `a
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `reading.immersiveHint` | Hint pill (first launch only) | Tap anywhere to reveal controls | Touche n'importe où pour afficher les commandes | Toque em qualquer lugar para mostrar os controles | Never shown when VoiceOver is active |
+
+### Theme Hint (FAB-348)
+
+> Replaces the deleted onboarding theme-picker step. Shown once, the first time the reading view opens for the very first saved article — a pointer at the reading toolbar's theme control (`ImmersiveHintPill`, reused with custom text) rather than a dedicated onboarding screen.
+
+| Key | Location | en | fr-CA | pt-BR | Notes |
+|-----|----------|----|-------|-------|-------|
+| `reading.themeHint` | Hint pill, anchored near the theme control (first article open only) | Tap here to change your reading theme | Touche ici pour changer ton thème de lecture | Toque aqui para mudar seu tema de leitura | needs_review |
 
 ### Top Bar (Reading) — ellipsis menu
 

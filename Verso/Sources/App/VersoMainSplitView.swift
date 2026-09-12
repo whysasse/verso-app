@@ -14,6 +14,12 @@ struct VersoMainSplitView: View {
     /// on top, without touching `selectedArticle` (that would re-trigger the sidebar's collapse logic).
     @State private var detailPath = NavigationPath()
 
+    // FAB-348: analytics consent moved out of the onboarding flow (used to be a TabView
+    // page, "OnboardingConsentView") into a sheet shown once here instead -- the first
+    // time the article list appears after onboarding ends, covering both the Skip and
+    // Continue paths equally. Its own flag, not onboarding's `hasCompletedOnboarding`.
+    @State private var showAnalyticsConsent = false
+
     var body: some View {
         NavigationSplitView {
             ArticleListView(selectedArticle: $selectedArticle)
@@ -46,6 +52,32 @@ struct VersoMainSplitView: View {
             }
         }
         .navigationSplitViewStyle(.balanced)
+        .task {
+            if !hasShownAnalyticsConsent {
+                showAnalyticsConsent = true
+            }
+        }
+        // onDismiss (not either button) marks it shown, so a swipe-away counts as
+        // "No thanks" without reopening -- AnalyticsService.isOptedIn already defaults
+        // false, so declining-by-dismissal needs no extra code, only that this sheet
+        // never shows twice. Matches the Law 25/GDPR equal-weight decision already
+        // shipped under FAB-328: a dismissal must not read as consent either way.
+        .sheet(isPresented: $showAnalyticsConsent, onDismiss: markAnalyticsConsentShown) {
+            AnalyticsConsentView(onNext: { showAnalyticsConsent = false })
+                .environmentObject(themeManager)
+        }
+    }
+
+    // MARK: - Analytics consent sheet (FAB-348)
+
+    private static let hasShownAnalyticsConsentKey = "hasShownAnalyticsConsent"
+
+    private var hasShownAnalyticsConsent: Bool {
+        UserDefaults.standard.bool(forKey: Self.hasShownAnalyticsConsentKey)
+    }
+
+    private func markAnalyticsConsentShown() {
+        UserDefaults.standard.set(true, forKey: Self.hasShownAnalyticsConsentKey)
     }
 
     private var readerPlaceholder: some View {
