@@ -11,7 +11,7 @@ packages:
 options:
   bundleIdPrefix: com.fabiosasseron
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "26.0"
 
 settings:
   base:
