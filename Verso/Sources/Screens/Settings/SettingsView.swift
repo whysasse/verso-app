@@ -16,8 +16,6 @@ struct SettingsView: View {
     @State private var showLanguageRestartAlert = false
     @State private var analyticsOptIn = AnalyticsService.shared.isOptedIn
 
-    private var colors: ThemeColors { themeManager.colors }
-
     private let availableFonts: [(name: String, displayName: String)] = [
         ("Georgia", "Georgia"),
         ("NewYork", "New York"),
@@ -29,28 +27,30 @@ struct SettingsView: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
     }
 
+    private var currentFontDisplayName: String {
+        availableFonts.first { $0.name == readingPreferences.fontFamily }?.displayName ?? availableFonts.last!.displayName
+    }
+
+    // FAB-334 phase 3: SettingsView is now a real `Form` — inset-grouped sections,
+    // system checkmarks/section headers/value+chevron rows for free, instead of the
+    // hand-built `ScrollView` of `VStack`s this replaces. Absorbs most of FAB-329,
+    // FAB-325's divider half (`Form`/`List` draw their own separators), FAB-310's
+    // Settings font stepper (32x32 -> real 44x44 below), FAB-309's deferred
+    // Settings-row layout audit, and FAB-313 (a real `Toggle(label, isOn:)`
+    // announces its own name to VoiceOver for free).
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                generalSection
-                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                readingSection
-                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                storageSection
-                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                aboutSection
-                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                privacySection
-                #if DEBUG
-                Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                debugSection
-                #endif
-            }
-            .frame(maxWidth: 680, alignment: .leading)
-            .frame(maxWidth: .infinity)
+        Form {
+            generalSection
+            readingSection
+            storageSection
+            aboutSection
+            privacySection
+            #if DEBUG
+            debugSection
+            #endif
         }
-        .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: L10n.Settings.title)
+        .tint(themeManager.colors.accent)
+        .navigationTitle(L10n.Settings.title)
         .sheet(isPresented: $showImport) {
             ImportView()
                 .environmentObject(themeManager)
@@ -90,62 +90,29 @@ struct SettingsView: View {
     // MARK: - Sections
 
     private var generalSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            sectionHeader(L10n.Settings.sectionGeneral)
-
-            sectionLabel(L10n.Settings.languageSectionLabel)
-            VStack(spacing: 0) {
-                ForEach(AppLocale.allCases) { locale in
-                    let isSelected = localeManager.selectedLocale == locale
-                    SettingsRow(
-                        type: .language(name: locale.displayName, isSelected: isSelected),
-                        action: {
-                            guard !isSelected else { return }
-                            localeManager.selectedLocale = locale
-                            showLanguageRestartAlert = true
-                        }
-                    )
-                    .padding(.horizontal, VersoSpacing.md)
-                    if locale != AppLocale.allCases.last {
-                        Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                    }
-                }
+        Section(L10n.Settings.sectionGeneral) {
+            NavigationLink {
+                LanguagePickerView(onSelect: { _ in showLanguageRestartAlert = true })
+            } label: {
+                LabeledContent(L10n.Settings.languageSectionLabel, value: localeManager.selectedLocale.displayName)
             }
-            .padding(.bottom, VersoSpacing.sm)
         }
     }
 
     private var readingSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            sectionHeader(L10n.Settings.sectionReading)
-
-            // Font picker
-            sectionLabel(L10n.Settings.fontSectionLabel)
-            VStack(spacing: 0) {
-                ForEach(availableFonts, id: \.name) { font in
-                    let isSelected = readingPreferences.fontFamily == font.name
-                    SettingsRow(
-                        type: .font(
-                            name: font.displayName,
-                            preview: L10n.Settings.fontPreview,
-                            isSelected: isSelected
-                        ),
-                        action: { readingPreferences.fontFamily = font.name }
-                    )
-                    .padding(.horizontal, VersoSpacing.md)
-                    if font.name != availableFonts.last?.name {
-                        Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-                    }
-                }
+        Section(L10n.Settings.sectionReading) {
+            NavigationLink {
+                FontPickerView()
+            } label: {
+                LabeledContent(L10n.Settings.fontSectionLabel, value: currentFontDisplayName)
             }
 
-            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md).padding(.top, VersoSpacing.sm)
-
-            // Font size
+            // Font size: kept as an inline stepper (not a picker push -- this is a
+            // frequent, low-friction adjustment) but the +/- buttons grow from the
+            // old 32x32 to a real 44x44 minimum tappable target, closing FAB-310's
+            // last Settings offender.
             HStack {
                 Text(L10n.Settings.fontSizeSectionLabel)
-                    .font(VersoTypography.UI.input)
-                    .foregroundColor(colors.textPrimary)
                 Spacer()
                 HStack(spacing: VersoSpacing.sm) {
                     let currentBodySize = VersoTypography.Reading.BodySize.nearest(to: readingPreferences.fontSize)
@@ -154,146 +121,85 @@ struct SettingsView: View {
                         readingPreferences.fontSize = currentBodySize.stepped(by: -1).rawValue
                     } label: {
                         Image(systemName: "minus")
-                            .frame(width: 32, height: 32)
-                            .foregroundColor(currentBodySize != .xs ? colors.accent : colors.textSecondary)
                     }
-                    .buttonStyle(.plain)
+                    .frame(width: 44, height: 44)
                     .disabled(currentBodySize == .xs)
 
                     Text(L10n.Settings.fontSizeValueLabel(size: Int(readingPreferences.fontSize)))
                         .font(VersoTypography.UI.caption)
-                        .foregroundColor(colors.textSecondary)
+                        .foregroundColor(.secondary)
                         .frame(minWidth: 36, alignment: .center)
 
                     Button {
                         readingPreferences.fontSize = currentBodySize.stepped(by: 1).rawValue
                     } label: {
                         Image(systemName: "plus")
-                            .frame(width: 32, height: 32)
-                            .foregroundColor(currentBodySize != .xxl ? colors.accent : colors.textSecondary)
                     }
-                    .buttonStyle(.plain)
+                    .frame(width: 44, height: 44)
                     .disabled(currentBodySize == .xxl)
                 }
+                .buttonStyle(.borderless)
             }
-            .frame(minHeight: 44)
-            .padding(.horizontal, VersoSpacing.md)
 
-            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-
-            // Theme
-            sectionLabel(L10n.ReaderSettings.themeSectionLabel)
-            SettingsRow(type: .theme)
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.bottom, VersoSpacing.sm)
+            NavigationLink {
+                ThemePickerView()
+            } label: {
+                LabeledContent(L10n.ReaderSettings.themeSectionLabel, value: themeManager.currentTheme.displayName)
+            }
         }
     }
 
     private var storageSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            sectionHeader(L10n.Settings.sectionStorage)
+        Section(L10n.Settings.sectionStorage) {
+            Button {
+                showFolderPicker = true
+            } label: {
+                LabeledContent(L10n.Settings.folderRowLabel) {
+                    Text(folderBookmarkService.folderURL?.lastPathComponent ?? L10n.Settings.folderEmptyValue)
+                }
+            }
+            .buttonStyle(.plain)
 
-            let folderPath = folderBookmarkService.folderURL?.lastPathComponent ?? L10n.Settings.folderEmptyValue
-            SettingsRow(
-                type: .folder(label: L10n.Settings.folderRowLabel, path: folderPath),
-                action: { showFolderPicker = true }
-            )
-            .padding(.horizontal, VersoSpacing.md)
-
-            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-
-            SettingsRow(
-                type: .default(label: L10n.Settings.importRowLabel),
-                action: { showImport = true }
-            )
-            .padding(.horizontal, VersoSpacing.md)
+            Button(L10n.Settings.importRowLabel) {
+                showImport = true
+            }
         }
     }
 
     #if DEBUG
     /// FAB-298 calibration tool -- see `RelatedArticlesDebugView`. Not present in a Release build.
     private var debugSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            sectionHeader("Debug")
-
-            NavigationLink(destination: RelatedArticlesDebugView()) {
-                SettingsRow(type: .default(label: "Related Articles Debug"), usesButtonChrome: false)
-                    .padding(.horizontal, VersoSpacing.md)
-            }
-            .buttonStyle(.plain)
+        Section("Debug") {
+            NavigationLink("Related Articles Debug", destination: RelatedArticlesDebugView())
         }
     }
     #endif
 
     private var aboutSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            sectionHeader(L10n.Settings.sectionAbout)
-
-            NavigationLink(destination: AboutView()) {
-                SettingsRow(type: .default(label: L10n.Settings.aboutVersionRowLabel(version: appVersion)), usesButtonChrome: false)
-                    .padding(.horizontal, VersoSpacing.md)
-            }
-            .buttonStyle(.plain)
-
-            Rectangle().frame(height: 1).foregroundColor(colors.border).padding(.horizontal, VersoSpacing.md)
-
-            NavigationLink(destination: PrivacyPolicyView()) {
-                SettingsRow(type: .default(label: L10n.Settings.privacyPolicyRowLabel), usesButtonChrome: false)
-                    .padding(.horizontal, VersoSpacing.md)
-            }
-            .buttonStyle(.plain)
+        Section(L10n.Settings.sectionAbout) {
+            NavigationLink(L10n.Settings.aboutVersionRowLabel(version: appVersion), destination: AboutView())
+            NavigationLink(L10n.Settings.privacyPolicyRowLabel, destination: PrivacyPolicyView())
         }
     }
 
     private var privacySection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            sectionHeader(L10n.Settings.sectionPrivacy)
-
-            HStack {
+        Section(L10n.Settings.sectionPrivacy) {
+            Toggle(isOn: $analyticsOptIn) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L10n.Settings.analyticsRowLabel)
-                        .font(VersoTypography.UI.input)
-                        .foregroundColor(colors.textPrimary)
                     Text(L10n.Settings.analyticsSubtitle)
                         .font(VersoTypography.UI.caption)
-                        .foregroundColor(colors.textSecondary)
+                        .foregroundColor(.secondary)
                 }
-                Spacer()
-                Toggle("", isOn: $analyticsOptIn)
-                    .labelsHidden()
-                    .tint(colors.accent)
-                    .onChange(of: analyticsOptIn) { newValue in
-                        if newValue {
-                            AnalyticsService.shared.optIn()
-                        } else {
-                            AnalyticsService.shared.isOptedIn = false
-                        }
-                    }
             }
-            .frame(minHeight: 44)
-            .padding(.horizontal, VersoSpacing.md)
-            .padding(.vertical, VersoSpacing.sm)
+            .onChange(of: analyticsOptIn) { newValue in
+                if newValue {
+                    AnalyticsService.shared.optIn()
+                } else {
+                    AnalyticsService.shared.isOptedIn = false
+                }
+            }
         }
-    }
-
-    // MARK: - Helpers
-
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(VersoTypography.UI.caption)
-            .foregroundColor(colors.textSecondary)
-            .padding(.horizontal, VersoSpacing.md)
-            .padding(.top, VersoSpacing.lg)
-            .padding(.bottom, VersoSpacing.xs)
-    }
-
-    private func sectionLabel(_ title: String) -> some View {
-        Text(title)
-            .font(VersoTypography.UI.caption)
-            .foregroundColor(colors.textSecondary)
-            .padding(.horizontal, VersoSpacing.md)
-            .padding(.top, VersoSpacing.sm)
-            .padding(.bottom, VersoSpacing.xxs)
     }
 
     // MARK: - Folder Change Logic (FAB-48)
