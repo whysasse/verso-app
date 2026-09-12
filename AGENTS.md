@@ -135,43 +135,23 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 
 ## Documentation Rules
 
-- **All documentation lives in `docs/`.** Never create .md docs at the repo root or inside source folders (the only root files are README.md, CLAUDE.md, AGENTS.md, LICENSE). Platform-specific agent rules live in the platform folder (e.g. verso-web/AGENTS.md).
+See `CLAUDE.md`'s `## Workflow → Documentation` for the actual rules
+(where docs live, header format, archiving, naming, folder layout). Moved
+there 2026-09-12 so a session doing docs/backlog work sees them
+unconditionally, instead of only when this file happens to get opened —
+see `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §G1 for why that mattered.
 
-- **`docs/HANDOFF.md` is the index.** When you add, move, or archive a doc, update HANDOFF's doc map in the same commit.
-
-- **`docs/PROJECT_STATUS.md` is the only place project status lives.** Other docs must not restate implementation status — link to it instead.
-
-- **`docs/BACKLOG.md` is the issue tracker of record** (Linear is retired). `docs/DONE.md` is the archive of completed issues. Never copy issue tables into other docs — link to BACKLOG instead.
-
-- **Backlog hygiene:** New issues get the next FAB-xx number. The move-to-DONE and PR-reference mechanics live in `CLAUDE.md`'s `## Workflow` now — `scripts/check.sh` enforces the move, not duplicated here.
-
-- **Every doc starts with a header:** `**Version:** · **Date:** · **Status:**` where Status is one of `Draft`, `Active`, `Locked` (decisions final), or `Archived`.
-
-- **Superseded docs are archived, not deleted:** Move to `docs/_archive/`, prepend the archive banner, and fix all inbound links in the same commit.
-
-- **Per-issue working docs** (e.g. `FAB-77-…md`) move to `_archive/` when the issue closes.
-
-- **Folders:** `product/` (PRD, personas, flows) · `design/` (tokens, components, specs) · `engineering/` (integration/implementation specs) · `copy/` (strings) · `figma-plugin/` · `_archive/`. New top-level docs need a reason to be top-level (currently HANDOFF, PROJECT_STATUS, BACKLOG, DONE, and PENDING_TESTS — the last tracks work shipped but not yet confirmed on a real device while Fabio is away from his Mac).
-
-- **Naming:** `SCREAMING_SNAKE.md` for specs/reference docs, `kebab-case.md` for working notes. Don't rename existing files just to conform.
-
-- **When code changes invalidate a doc, update the doc in the same PR** — especially HANDOFF's services/screens tables and DESIGN_TOKENS ↔ globals.css parity.
+One rule that stays here, since it's about code-and-doc pairing rather
+than doc mechanics: **when code changes invalidate a doc, update the doc
+in the same PR** — especially HANDOFF's services/screens tables and
+DESIGN_TOKENS ↔ globals.css parity.
 
 ---
 
 ## Docs Reference
 
-Only fetch what you need — see `docs/HANDOFF.md` for the full doc map.
-
-| Working on… | Read this |
-|-------------|-----------|
-| Component dimensions, padding, corner radius | `docs/design/COMPONENT_SPECS.md` |
-| Token hex values and WCAG rationale | `docs/design/DESIGN_TOKENS.md` |
-| Animation implementation (SwiftUI code) | `docs/design/animation-spec.md` |
-| Accessibility (touch targets, VoiceOver) | `docs/design/accessibility-specs.md` |
-| Error states (8 scenarios, copy, a11y) | `docs/design/ERROR_STATES_SPEC.md` |
-| All UI copy strings | `docs/copy/UI_COPY.md` |
-| Localization (locales, plurals, pseudolocalization QA) | `docs/LOCALIZATION.md` |
-| User flows and navigation mechanics | `docs/product/user-flows.md`, `docs/product/navigation-patterns.md` |
-| Authoritative entry point | `docs/HANDOFF.md` |
+Don't duplicate this table — `docs/HANDOFF.md`'s own "Doc Map" section is
+the single, actively-maintained index of which file to read for which
+domain. (This used to be a second copy of it here, with paths that had
+drifted wrong — see `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §B4.)
 
