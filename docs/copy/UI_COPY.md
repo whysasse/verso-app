@@ -541,8 +541,8 @@ Full UI treatments and component specs: see `docs/ERROR_STATES_SPEC.md`.
 
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
-| `error.noFolder.headline` | Full-screen error headline | No folder selected. | Aucun dossier sélectionné. | Nenhuma pasta selecionada. | — |
-| `error.noFolder.subheadline` | Full-screen error subheadline | Choose a folder in iCloud Drive to start saving articles. | Choisis un dossier dans iCloud Drive pour commencer à enregistrer des articles. | Escolha uma pasta no iCloud Drive para começar a salvar artigos. | — |
+| `error.noFolder.headline` | Inline folder-prompt card headline (not full-screen — corrected 2026-09-12, see `docs/ERROR_STATES_SPEC.md` §3) | No folder selected. | Aucun dossier sélectionné. | Nenhuma pasta selecionada. | — |
+| `error.noFolder.subheadline` | Inline folder-prompt card subheadline | Choose a folder in iCloud Drive to start saving articles. | Choisis un dossier dans iCloud Drive pour commencer à enregistrer des articles. | Escolha uma pasta no iCloud Drive para começar a salvar artigos. | — |
 | `error.noFolder.cta` | CTA button | Choose folder | Choisir un dossier | Escolher pasta | — |
 
 ### Folder Not Found (Scenario 4)
