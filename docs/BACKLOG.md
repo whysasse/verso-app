@@ -696,12 +696,15 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   A new contributor can read HANDOFF.md and understand how to set up and run both iOS and web versions.
 
-### `error` token drifted from globals.css after FAB-336
+### `error` token drifted from 4 places after FAB-336, not just globals.css
 
-- [ ] 🟡 **FAB-339** · [WEB] `error` token drifted: globals.css still has the pre-FAB-336 Paper/Sepia hex  `Todo` `Medium`
+- [ ] 🟡 **FAB-339** · [WEB+Docs] `error` token drifted: 4 files still have the pre-FAB-336 Paper/Sepia hex  `Todo` `Medium`
   Found 2026-09-11 by `scripts/checks/check-token-parity.py` (new — see the
   sdlc-toolkit contract PR), which diffs `docs/DESIGN_TOKENS.md` against
-  `verso-web/app/globals.css` for real instead of by eye.
+  `verso-web/app/globals.css` for real instead of by eye. Widened
+  2026-09-12: the same doc-drift audit that found this ran a wider,
+  5-cluster cross-doc pass and turned up 3 more docs with the identical
+  stale value, not just the shipped CSS.
 
   FAB-336 (2026-09-06) darkened `error` for Paper/Sepia from `#C0392B` to
   `#AD3327` in `Colors.swift` and `docs/DESIGN_TOKENS.md`, to clear the
@@ -709,10 +712,16 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
   this looks like a plain oversight (the web token port, FAB-165, already
   existed by then), not a deliberate scope call.
 
-  **Fix:** `verso-web/app/globals.css` — `[data-theme="paper"]` and
-  `[data-theme="sepia"]`'s `--color-error: #C0392B;` → `#AD3327;`. Night
-  and Ink already match `docs/DESIGN_TOKENS.md`. One line each; re-run
-  `scripts/check-token-parity.py` after to confirm.
+  **Fix — 4 places, all the same one-line change (`#C0392B` → `#AD3327`
+  for Paper/Sepia only; Night/Ink already match):**
+  - `verso-web/app/globals.css` — `[data-theme="paper"]` and
+    `[data-theme="sepia"]`'s `--color-error:` line (the original finding).
+  - `docs/DESIGN_SYSTEM_FOUNDATIONS.md` §2.5's Semantic Colors table.
+  - `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md`'s `color/error` table row.
+  - `docs/ERROR_STATES_SPEC.md`'s Semantic Color Tokens table.
+
+  Re-run `scripts/check-token-parity.py` after the `globals.css` edit to
+  confirm; the other 3 are prose fixes the script doesn't cover.
 
 
 ## Design / UX
