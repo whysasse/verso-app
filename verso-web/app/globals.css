@@ -83,6 +83,15 @@
 
 /* ── Theme tokens ─────────────────────────────────────────────── */
 
+/* warning-surface / error-surface (2026-09-12): sanctioned exceptions to
+   "semantic tokens are text/border only, never large fill backgrounds" --
+   for the offline/sync-error banners in docs/ERROR_STATES_SPEC.md
+   (scenarios 1, 5). Same hex as warning/error, at the 10% opacity those
+   banners were already speced at. Not yet consumed by any component --
+   the banners aren't built yet either. Paper/sepia's error-surface uses
+   the correct post-FAB-336 #AD3327, not this file's still-buggy
+   --color-error (#C0392B, tracked separately as FAB-339) -- no reason to
+   bake a known bug into a brand-new token. */
 [data-theme="paper"] {
   --color-background: #F5F0E8;
   --color-surface: #EDE8DF;
@@ -96,6 +105,8 @@
   --color-error: #C0392B;
   --color-warning: #B45309;
   --color-success: #166534;
+  --color-warning-surface: rgba(180, 83, 9, 0.10);
+  --color-error-surface: rgba(173, 51, 39, 0.10);
 }
 
 [data-theme="sepia"] {
@@ -111,6 +122,8 @@
   --color-error: #C0392B;
   --color-warning: #B45309;
   --color-success: #166534;
+  --color-warning-surface: rgba(180, 83, 9, 0.10);
+  --color-error-surface: rgba(173, 51, 39, 0.10);
 }
 
 [data-theme="night"] {
@@ -126,6 +139,8 @@
   --color-error: #F87171;
   --color-warning: #FCD34D;
   --color-success: #4ADE80;
+  --color-warning-surface: rgba(252, 211, 77, 0.10);
+  --color-error-surface: rgba(248, 113, 113, 0.10);
 }
 
 [data-theme="ink"] {
@@ -141,6 +156,8 @@
   --color-error: #FC8181;
   --color-warning: #F6E05E;
   --color-success: #68D391;
+  --color-warning-surface: rgba(246, 224, 94, 0.10);
+  --color-error-surface: rgba(252, 129, 129, 0.10);
 }
 
 /* ── Base styles ──────────────────────────────────────────────── */

@@ -109,7 +109,7 @@ Semantic tokens communicate status and outcome. Because each theme has very diff
 | Success | `#166534`   | `#166534`   | `#4ADE80`   | `#68D391`   | Confirmations, completed actions |
 
 **Usage notes:**
-- Error and Success tokens are used as icon/text tints and as border colors on interactive elements (e.g., text field validation). They are not used as large fill backgrounds.
+- Error and Success tokens are used as icon/text tints and as border colors on interactive elements (e.g., text field validation). They are not used as large fill backgrounds — except the dedicated `warningSurface`/`errorSurface` tokens added for exactly that (see `docs/DESIGN_TOKENS.md`, the authoritative source for those values — not restated here).
 - Warning is used for inline notices and caution badges only — not for actionable states.
 - Verify these pairs against their theme's Background and Surface before Figma handoff.
 
