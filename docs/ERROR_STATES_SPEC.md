@@ -57,37 +57,57 @@ Tokens are used as **text tints and border colors only** — never as large fill
 
 ### 2 · Article Parsing Failed
 
+> **Rewritten 2026-09-12 to match what's actually shipped** — the
+> previous version of this section described a bottom-sheet UI with
+> "Open in Safari" / "Dismiss" buttons that was never built this way; the
+> real screen has different copy, a different button pair, and no
+> "Dismiss" at all. See `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §E2 (the
+> corner-radius finding that led to checking the rest of the spec against
+> code). Ground truth: `Verso/Sources/Screens/ArticleList/AddArticleView.swift`,
+> `failureContent`.
+
 **Trigger:** `ArticleParsingError.allParsersFailed` — Readability.js and SwiftSoup both return no content.
 
-**UI Treatment:** Bottom sheet (`.medium` detent)
+**UI Treatment:** Not a separate sheet — a state (`viewState == .failure`) within the same "Add Article" sheet used for URL entry, saving, and duplicate handling (presented from Home's "+" entry point).
 
 **Copy:**
 
-| Key | String |
-|-----|--------|
-| `error.parsing.headline` | Couldn't read this article. |
-| `error.parsing.subheadline` | The page may be behind a paywall or require a login. |
-| `error.parsing.openInSafari` | Open in Safari |
-| `error.parsing.dismiss` | Dismiss |
+| Key | String | Note |
+|-----|--------|------|
+| `addArticle.failure.headline` | Could not save article | Fixed headline |
+| — | *(dynamic)* | Subheadline is the parser's actual error text (`error.localizedDescription`), not a fixed string — except the no-library-folder path, which uses `addArticle.errorNoLibraryFolder` |
+| `addArticle.failure.tryAgain` | Try Again | Primary button |
+| `error.parsing.openInSafari` | Open in Safari | Secondary action — the one string this screen kept from the original spec |
+
+`error.parsing.headline`, `error.parsing.subheadline`, and
+`error.parsing.dismiss` are dead keys — still present in
+`docs/copy/UI_COPY.md` but referenced nowhere in code. Worth a separate
+copy-cleanup pass, not fixed here.
 
 **Spec:**
-- Icon: `exclamationmark.circle`, 36pt, `textSecondary`
-- Headline: SF Semibold 20pt, `textPrimary`
-- Subheadline: SF Regular 15pt, `textSecondary`
-- Vertical spacing between icon → headline → subheadline: `spacing.md` (16pt)
-- CTAs stacked vertically below subheadline, `spacing.lg` (24pt) gap:
-  - Primary: "Open in Safari" — full-width pill, `accent` fill, SF Semibold 17pt, white label
-  - Secondary: "Dismiss" — full-width pill, `surface` fill + `border` stroke, SF Regular 17pt, `textSecondary`
-- Both buttons: height 50pt, corner radius `pill` (20pt)
+- Icon: `xmark.circle.fill`, 56pt, `error` token
+- Headline: `listTitle` style (17pt semibold), `textPrimary`
+- Subheadline: `listSubtitle` style (15pt regular), `textSecondary`, centered, horizontal padding `spacing.md` (16pt)
+- Outer vertical spacing (icon → headline → subheadline → button stack): `spacing.md` (16pt)
+- Buttons stacked vertically, `spacing.sm` (12pt) gap:
+  - Primary: "Try Again" — the shared `VersoButtonStyle(.primary)` component (same styling as every other primary button in the system — no local override)
+  - Secondary: "Open in Safari" — a plain `Link`, full-width, height 50pt, `button` style (17pt semibold), `accent` foreground, **no fill, no corner radius** (it's text, not a filled shape)
+- No "Dismiss" button — the sheet's own toolbar ✕ (always present) is how this state is exited without retrying
 - Note: URL stub is already saved; article row appears in list with parse-failed indicator
 
 ---
 
 ### 3 · Folder Not Configured
 
-**Trigger:** User opens the app for the first time after skipping onboarding folder setup, or clears folder in Settings.
+> **Rewritten 2026-09-12 to match what's actually shipped** — this was
+> never a full-screen state; it's a small inline card. See the note on
+> §2 above for why this got checked. Ground truth:
+> `Verso/Sources/Components/FolderPickerPrompt.swift`, embedded in
+> `ArticleListView.swift`.
 
-**UI Treatment:** Full-screen error state (replaces article list)
+**Trigger:** `folderBookmarkService.folderURL == nil` — no folder bookmarked yet (first run before onboarding folder setup, or after clearing it in Settings).
+
+**UI Treatment:** An inline card pinned above the article list (list still renders below/around it — this does not replace the screen).
 
 **Copy:**
 
@@ -97,13 +117,17 @@ Tokens are used as **text tints and border colors only** — never as large fill
 | `error.noFolder.subheadline` | Choose a folder in iCloud Drive to start saving articles. |
 | `error.noFolder.cta` | Choose folder |
 
+(`docs/copy/UI_COPY.md`'s description column for these three still says
+"Full-screen error headline/subheadline" — same stale claim, worth fixing
+there too while it's fresh.)
+
 **Spec:**
-- Icon: `folder.badge.questionmark`, 48pt, `textSecondary`
-- Headline: SF Semibold 20pt, `textPrimary`
-- Subheadline: SF Regular 15pt, `textSecondary`
-- CTA: full-width pill (max 280pt), `accent` fill, SF Semibold 17pt, white label, height 50pt
-- Vertical layout centered in safe area, spacing `spacing.lg` (24pt) between elements
-- Horizontal padding: `spacing.xl` (32pt)
+- Card: `surface` fill, corner radius `radius.md` (12pt), 1pt `border` stroke, padding `spacing.md` (16pt) on all sides, full width, positioned with `spacing.md` horizontal/top padding from the list's own layout
+- Icon: `folder.badge.plus`, 32pt, `accent`
+- Headline: `listTitle` style, `textPrimary`
+- Subheadline: `caption` style (13pt regular), `textSecondary`, centered
+- Inner vertical spacing: `spacing.sm` (12pt)
+- CTA: "Choose folder" — content-hugging (not full-width), horizontal padding `spacing.md`, vertical padding `spacing.sm`, `accent` fill, corner radius `radius.pill` (20pt — appropriate here: the button's real height is well under 50pt, close to the ~40pt a true pill is meant for), label color is the theme's `background` color (a knockout effect against the accent fill, not `textPrimary`/white), `spacing.xs` (8pt) top margin above it
 
 ---
 
