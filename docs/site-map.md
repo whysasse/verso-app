@@ -32,7 +32,10 @@ flowchart TD
         HOME["Home · Article List
         ────────────────
         (search inline)
-        (archive filter toggle)"]
+        (sections: Continue Reading /
+        Unread / Read / Archived —
+        no separate archive screen,
+        revised FAB-292)"]
 
         READ["Reading View
         ────────────────
@@ -40,10 +43,6 @@ flowchart TD
 
         RS[/"Reader Settings
         (bottom sheet)"/]
-
-        ARC["Archive View
-        ────────────────
-        (filtered list)"]
 
         SET["Settings"]
         SET_FOLDER["Folder Setup"]
@@ -58,9 +57,7 @@ flowchart TD
     OTHER([Any iOS app]) --> SE
     SE -- Article saved --> HOME
 
-    HOME -- Tap article --> READ
-    HOME -- Archive filter --> ARC
-    ARC -- Tap article --> READ
+    HOME -- Tap article, any section --> READ
     READ -- Back --> HOME
     READ -. opens .-> RS
 
@@ -97,8 +94,7 @@ flowchart TD
 
 | Screen | Purpose |
 |--------|---------|
-| **Home · Article List** | Root screen. Shows all non-archived articles sorted by date (newest first). Filter chips at the top let the user narrow by status: **All / Unread / Reading / Read**. Inline search filters by title and body content in real-time. A filter toggle reveals the Archive View. A nav bar button opens Settings. Empty state when no articles are saved. |
-| **Archive View** | A filtered version of the article list showing only archived articles. Accessible via a toggle on the Home screen — not a separate destination. Swipe-to-unarchive sends the file back to the main folder. |
+| **Home · Article List** | Root screen. Articles are grouped into always-visible sections rather than filtered by chips (revised FAB-292, 2026-08-29): **Continue Reading** (pinned first, shows live scroll-progress), **Unread**, **Read** (collapsed by default), **Archived** (collapsed by default). Empty sections are omitted entirely. Inline search filters by title and body content in real-time. A nav bar button opens Settings. Empty state when no articles are saved at all. |
 | **Reading View** | Full-screen reading experience. Renders the Markdown article with the user's chosen theme and font. Opening an article automatically sets its status to **Reading** (if it was Unread). Tapping the screen hides/shows the chrome (immersive mode). Scrolling to the end sets status to **Read**. Back button returns to the list. |
 | **Reader Settings** *(bottom sheet)* | Slides up from the Reading View. Controls: theme (Paper, Sepia, Night, Ink), font (New York, Georgia, San Francisco, OpenDyslexic), and text size. Changes apply immediately. Not a separate screen — it's a sheet anchored to the Reading View. |
 | **Settings** | Top-level settings list. Entry point to sub-pages. Accessible from the nav bar on the Home screen. |
@@ -113,7 +109,7 @@ flowchart TD
 - **Tag / folder browsing** — articles are one flat list (plus archive). No nested folders.
 - **Reading list / queue** — no curated "up next" view.
 - **Account / sync settings** — no user accounts; iCloud Drive handles sync automatically.
-- **Sharing from within the app** — no share button inside the Reading View for MVP.
+~~**Sharing from within the app** — no share button inside the Reading View for MVP.~~ Shipped since (FAB-299, 2026-08-31) — Share is in the Reading View's `⋯` overflow menu, not a persistent bottom control.
 - **Notifications** — no read reminders or new article alerts.
 
 ---

@@ -40,26 +40,30 @@
 | **Long-press** article row | 0.5s press | Context menu: Open · Archive · Delete · Mark as Read |
 | Tap **search bar** | Tap search field | Activate inline search; keyboard appears; list filters in real time as user types |
 | Tap **✕** in search bar | Clear button | Clear query; restore full list; keyboard dismisses |
-| Tap **filter chip** (All / Unread / Reading / Read) | Tap chip | Switch active filter; list re-filters immediately |
+| ~~Tap **filter chip** (All / Unread / Reading / Read)~~ | ~~Tap chip~~ | **Superseded (FAB-292, 2026-08-29):** no chips anymore — articles are grouped into always-visible sections (Continue Reading, Unread, Read, Archived); tap a section header to expand/collapse the collapsed ones (Read, Archived) |
 | Tap **sort button** | Nav bar sort icon | Toggle sort order: newest first ↔ oldest first |
-| Tap **Archive toggle** | Toggle button (nav bar or inline) | Switch to Archive View (inline filter change, no navigation push) |
+| ~~Tap **Archive toggle**~~ | ~~Toggle button (nav bar or inline)~~ | **Superseded (FAB-292):** no toggle — Archived is one of the always-visible sections above, not a separate view |
 | Tap **Settings** button | Nav bar gear icon | Open Settings as full-screen modal cover |
 | **Pull to refresh** | Pull down on list | Force re-scan of iCloud Drive folder; reconcile any file changes made outside the app (e.g. via Obsidian) |
 
 ---
 
-## Archive View
+## Archived section
 
-Archive View is a filtered state of the article list, not a separate screen. Interactions mirror Home with two differences:
+> **Superseded 2026-08-29 (FAB-292):** this used to be a toggled "Archive
+> View" filter state; it's now the **Archived** section within Home ·
+> Article List (collapsed by default, expand by tapping its header — see
+> the Home table above). The interactions below still apply to articles
+> once you're looking at them there — only the *getting there* part
+> changed.
 
 | Interaction | Trigger | Result |
 |---|---|---|
 | **Swipe left** on article row | Horizontal swipe | Reveal two trailing actions: **Delete** (red) and **Unarchive** (blue) |
-| Tap **Unarchive** (swipe action) | Swipe action button | Move Markdown file back to main folder; remove row from archived list |
+| Tap **Unarchive** (swipe action) | Swipe action button | Move Markdown file back to main folder; row disappears from the Archived section |
 | **Long-press** article row | 0.5s press | Context menu: Open · Unarchive · Delete |
-| Tap **Archive toggle** (again) | Toggle button | Return to main article list (same toggle, same in-place switch) |
 
-All other interactions (tap row, search, sort, pull to refresh, Settings) behave identically to Home.
+All other interactions (tap row, search, sort, pull to refresh, Settings) behave identically to every other section on Home.
 
 ---
 
@@ -70,13 +74,15 @@ All other interactions (tap row, search, sort, pull to refresh, Settings) behave
 | **Tap** anywhere on content | Single tap (not on a link) | Toggle immersive mode: hide top bar + controls / show them. Chrome fades in/out with a short opacity animation (~0.2s). On first-ever use, if the hint pill is visible, this tap also permanently dismisses it (see First-use hint row below). |
 | **First-use hint** | Automatic — appears when chrome auto-hides for the first time ever | A "Tap anywhere to reveal" pill is shown centered over the article. Dismissed on the user's first tap; `UserDefaults` flag `hasShownImmersiveHint` is set to `true` and the hint is never shown again. Not shown when VoiceOver is active (see accessibility-specs.md §5.3). |
 | **Tap** a hyperlink | Tap on a link in the article | Open URL in in-app Safari (SFSafariViewController) |
-| Tap **back button** | Nav bar back button | Pop to previous list (Home or Archive) |
+| Tap **back button** | Nav bar back button | Pop to Home (`← Back \| Title \| ⋯` — the actual shipped top bar, FAB-299; no separate Archive list to return to anymore) |
 | **Swipe right from left edge** | Edge swipe | Pop to previous list (same as back button; standard iOS behavior) |
 | Tap **Reader Settings** button | Controls area (visible when chrome is shown) | Open Reader Settings as bottom sheet (.medium detent) |
-| **Long-press** on text | 0.5s press on body text | iOS native text selection (system behavior; no custom handling needed) |
+| Tap **⋯** (overflow menu) | Nav bar overflow button | Menu: Mark as unread/read · Tags · Open in browser · **Share** (FAB-299) · Archive/Unarchive · Delete |
+| **Long-press** on text | 0.5s press on body text | iOS native text selection, **plus a custom Highlight/Remove Highlight action added to the selection menu** (shipped since — FAB-54, cross-block selection added in FAB-303). No longer "no custom handling needed"; that was accurate before highlighting shipped. |
 | Tap **play** (Text-to-Speech) | TTS control | Start audio playback of article; controls appear |
 | Tap **pause** (Text-to-Speech) | TTS control | Pause audio |
 | Tap **skip forward** (Text-to-Speech) | TTS skip button | Advance to next paragraph |
+| Tap **skip backward** (Text-to-Speech) | TTS skip button | Return to previous paragraph — shipped alongside skip forward (FAB-41); missing from this table until 2026-09-12 despite this doc's own claim to be the complete interaction list |
 
 > **Immersive mode note:** The first tap into an article (coming from the list) should *not* toggle immersive mode — that tap is navigational. Immersive mode toggling only activates once Reading View is fully presented. This avoids the chrome immediately disappearing the moment the user arrives.
 
@@ -143,12 +149,12 @@ All other interactions (tap row, search, sort, pull to refresh, Settings) behave
 
 | Gesture | Where used |
 |---|---|
-| Single tap | Article rows, links, buttons, theme/font options, filter chips, immersive mode toggle |
-| Swipe left (trailing) | Article rows on Home and Archive View |
+| Single tap | Article rows, links, buttons, theme/font options, section headers (expand/collapse), immersive mode toggle |
+| Swipe left (trailing) | Article rows in any Home section, including Archived |
 | Swipe right (leading edge) | Reading View → back navigation |
 | Swipe down | Settings modal, Reader Settings sheet |
 | Long-press | Article rows (context menu), body text in Reading View (system selection) |
-| Pull down (list) | Home and Archive View → pull to refresh |
+| Pull down (list) | Home → pull to refresh (applies across all sections, not a separate Archive View) |
 
 ---
 

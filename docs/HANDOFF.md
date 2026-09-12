@@ -224,7 +224,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | iCloud/Obsidian file-first decisions | `docs/OBSIDIAN_INTEGRATION.md` |
 | Analytics strategy, event catalog, TelemetryDeck integration | `docs/ANALYTICS_STRATEGY.md` |
 | Figma token naming | `docs/FIGMA_DESIGN_SYSTEM_REFERENCE.md` |
-| Full product requirements | `docs/PRD_MinimalistReaderApp.md` |
+| Full product requirements (historical — rationale/personas only, not current feature status) | `docs/PRD_MinimalistReaderApp.md` |
 | Web CSS tokens (authoritative source) | `verso-web/app/globals.css` |
 | Web theme provider implementation | `verso-web/app/providers/ThemeProvider.tsx` |
 | Web locale provider implementation, language picker (FAB-284) | `verso-web/app/providers/LocaleProvider.tsx` |
