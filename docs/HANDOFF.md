@@ -218,6 +218,7 @@ New screens go under `Verso/Sources/Screens/<ScreenName>/`.
 | Web locale provider implementation, language picker (FAB-284) | `verso-web/app/providers/LocaleProvider.tsx` |
 | Settled decisions and their reasoning (ADR-lite) | `docs/DECISIONS.md` |
 | Recurring friction across sessions (raw log, not conclusions) | `docs/FRICTION.md` |
+| Cross-doc contradictions/drift found across the whole `docs/` corpus | `docs/DOC_DRIFT_AUDIT_2026-09-12.md` |
 
 ---
 
