@@ -398,8 +398,12 @@ writing the audit down, made after review:
 - **Fixed directly, no FAB needed** (small enough to just do once decided):
   B4 and B6 (both missed when the mechanical batch above was filed —
   fixed alongside G1 in the same PR, since all three touch
-  `AGENTS.md`/`CLAUDE.md`/`HANDOFF.md`); E2 (Fabio's call: match
-  `radius.md` — fixed in `docs/ERROR_STATES_SPEC.md`).
+  `AGENTS.md`/`CLAUDE.md`/`HANDOFF.md`); E2 — turned out bigger than
+  filed: the radius mismatch was real, but checking it against actual
+  code found both `ERROR_STATES_SPEC.md` scenarios describe UI that was
+  never built as specified (different buttons, different copy keys,
+  scenario 3 isn't even full-screen). Rewrote both scenarios to match
+  what's shipped, not just the radius line.
 - **Decided, not yet done:** E1 (Fabio's call: formalize
   `warningSurface`/`errorSurface` tokens); A1–A3 (Fabio's call: mark the
   PRD historical, batch-refresh `site-map.md`/`feature-priority-per-screen.md`/
