@@ -211,7 +211,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   ## Progress (2026-09-12)
 
-  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form`), **phase 0** (material spike — **verdict: proceed**, tinted glass over Paper/Sepia keeps its warmth where untinted washes out, see the plan doc's Phase 0 section for the full verdict and its two carry-forward requirements). Phases 4–7, gated on phase 0, are unblocked.
+  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form`), **phase 0** (material spike — **verdict: proceed**, tinted glass over Paper/Sepia keeps its warmth where untinted washes out, see the plan doc's Phase 0 section for the full verdict and its two carry-forward requirements), **phase 4** (navigation shell — real nav bar + toolbar replaces `defaultHeaderRow`, `VersoNavigationBar.swift` split, **pending Fabio's on-device R3 regression check** before it's fully confirmed safe). FAB-326 partially absorbed by phase 4, not closed — see the plan doc's phase 4 section for exactly which rows remain. Phases 5–7 next.
 
   ## Why this is an epic and not a skin
 

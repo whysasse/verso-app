@@ -33,7 +33,8 @@ struct PrivacyPolicyView: View {
             .padding(VersoSpacing.md)
         }
         .background(colors.background.ignoresSafeArea())
-        .versoNavigationBar(title: L10n.PrivacyPolicy.navTitle)
+        .navigationTitle(L10n.PrivacyPolicy.navTitle)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
