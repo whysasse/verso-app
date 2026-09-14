@@ -27,9 +27,14 @@
   * **Empty state already satisfied phase 6's own bullet** ("still needs its FAB-319 CTA") — `EmptyState` never hosted teaching hints in the first place (those were cut from FAB-327's scope back in phase 2, superseded by the still-pending welcome article, FAB-338) and already had its FAB-319 CTA wired since 2026-09-05. Confirmed, not rebuilt.
   * "System `List` styling" (phase 6's own summary bullet) is **not** a mandate to strip the article cards' custom insets/backgrounds/hidden separators — that's core to the app's visual identity (Reeder/Matter-style rows), not "custom chrome" the same way `headerRow`/`FilterPanel` were. Left untouched, deliberately.
 
+  **Two real gaps found and fixed on Fabio's first on-device pass:**
+
+  * Collapsing `isSearching` to `false` while selecting only hid the *expanded* search field — iOS 26's persistent bottom-anchored `.searchable` bar stayed visible, idle, during select mode regardless. A new `searchableUnlessSelecting` helper drops the `.searchable` modifier entirely while selecting instead of trying to hide its output.
+  * "N Selected" defaulted to the same large-title layout as "Verso" — title on its own line, Cancel/Done stacked in a separate compact bar above it, not sharing a row the way the standard iOS edit-mode convention does. `.navigationBarTitleDisplayMode(isSelecting ? .inline : .automatic)` fixes it — `.automatic` still gives the browsing state its large title (per `home.navTitle`'s own copy-doc note), `.inline` only while selecting.
+
   ## Verify
 
-  `xcodegen generate` + `xcodebuild` for both the `Verso` and `ShareExtension` schemes build clean; `scripts/check.sh` passes. Not verified here: the actual on-device feel of the select-mode transition animation, the bottom toolbar's Mark Read/Delete placement, and whether the row's new default tap feedback (from the dropped `.buttonStyle(.plain)`) looks right against `ArticleCard`'s custom styling — Fabio's part, no reliable headless Simulator automation for this project.
+  `xcodegen generate` + `xcodebuild` for both the `Verso` and `ShareExtension` schemes build clean; `scripts/check.sh` passes. Confirmed on-device by Fabio: selection itself works, including the two fixes above. Not separately re-verified after those two fixes: the select-mode transition animation's feel and the bottom toolbar's Mark Read/Delete placement, both mentioned as open questions before the fixes and not specifically called out again after.
 
 ### FAB-334 phase 5: search and filters (2026-09-14)
 

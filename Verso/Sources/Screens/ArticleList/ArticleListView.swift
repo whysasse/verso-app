@@ -1,6 +1,29 @@
 import SwiftUI
 import CoreData
 
+// MARK: - Conditional `.searchable`
+
+private extension View {
+    /// FAB-334 phase 6 fix: applies `.searchable` only when `isSelecting` is false. Simply
+    /// collapsing `isSearching` (the field's expanded state) isn't enough -- iOS 26's
+    /// bottom-anchored `.searchable` shows a persistent search bar even when idle, and that
+    /// bar has no business appearing during select mode at all. Dropping the modifier
+    /// entirely (rather than trying to hide its output) removes the entry point itself.
+    @ViewBuilder
+    func searchableUnlessSelecting(
+        _ isSelecting: Bool,
+        text: Binding<String>,
+        isPresented: Binding<Bool>,
+        prompt: String
+    ) -> some View {
+        if isSelecting {
+            self
+        } else {
+            searchable(text: text, isPresented: isPresented, prompt: prompt)
+        }
+    }
+}
+
 // MARK: - List filters (FAB-50, header/sections redesigned FAB-292)
 
 private enum ArticleListDatePreset: String, CaseIterable, Identifiable {
@@ -154,6 +177,13 @@ struct ArticleListView: View {
         // selecting either -- select mode now gets its own real title/toolbar below (R1
         // option (b), FAB-320's second half) instead of the old hand-built `selectionHeaderRow`.
         .navigationTitle(navigationTitleText)
+        // FAB-334 phase 6 fix (Fabio, on-device): "Verso"/"N Selected" and the toolbar
+        // buttons need to share one compact row, not the default large-title layout (title
+        // on its own line, toolbar in a slim bar above it). `.automatic` while browsing keeps
+        // the large title the copy doc calls for (`home.navTitle`'s own "Navigation bar large
+        // title" note); `.inline` while selecting puts "N Selected" and Cancel/Done in the
+        // same row, matching the standard iOS edit-mode convention.
+        .navigationBarTitleDisplayMode(isSelecting ? .inline : .automatic)
         .tint(themeManager.colors.accent)
         // FAB-334 phase 5: replaces the hand-built `searchActiveRow`/`SearchBar` entirely --
         // no more manual search icon in the toolbar either, since `.searchable` supplies its
@@ -161,10 +191,15 @@ struct ArticleListView: View {
         // stays a binding rather than reading `\.isSearching` from the environment so the rest
         // of the toolbar (filter/add/overflow) stays visible and usable while searching --
         // narrowing by tag or date while also searching by text is a reasonable thing to want,
-        // not something the old row's all-or-nothing swap allowed. Search and select mode stay
-        // mutually exclusive though (phase 6, below) -- a search field next to "N Selected"
-        // doesn't make sense the way search-plus-filter does.
-        .searchable(text: $searchText, isPresented: $isSearching, prompt: L10n.Home.searchPlaceholder)
+        // not something the old row's all-or-nothing swap allowed.
+        //
+        // FAB-334 phase 6 fix (Fabio, on-device): collapsing `isSearching` to false while
+        // selecting (the `.onChange` below) hides the *expanded* field, but iOS 26's
+        // bottom-anchored `.searchable` shows a persistent search bar regardless of whether
+        // it's actively focused -- that bar has no business appearing during select mode at
+        // all. `searchableUnlessSelecting` (below) drops the modifier entirely rather than
+        // just collapsing its state, so the entry point itself is gone, not just idle.
+        .searchableUnlessSelecting(isSelecting, text: $searchText, isPresented: $isSearching, prompt: L10n.Home.searchPlaceholder)
         .onChange(of: isSelecting) { _, newValue in
             if newValue { isSearching = false }
         }
