@@ -203,6 +203,7 @@ VoiceOver row label/hint for this card live in §9 (`a11y.articleRow.label` / `a
 | Key | Location | en | fr-CA | pt-BR | Notes |
 |-----|----------|----|-------|-------|-------|
 | `home.bulkSelect.select` | Toolbar button — enters bulk-select mode | Select | Sélectionner | Selecionar | Added during step 4 view-wiring pass — bulk select postdates the original audit. |
+| `home.bulkSelect.title` | Navigation title while selecting (FAB-334 phase 6, FAB-320) | {count} Selected | {count} sélectionnés | {count} selecionados | ⚠️ plural (this row shows the "other"/plural form; singular "one" form authored directly in codegen, same pattern as the other ⚠️-flagged keys). |
 | `home.bulkSelect.cancel` | Toolbar button — exits bulk-select mode | Cancel | Annuler | Cancelar | — |
 | `home.bulkSelect.markRead` | Bottom bar action (selection non-empty) | Mark read | Marquer comme lu | Marcar como lido | — |
 | `home.bulkSelect.delete` | Bottom bar action (selection non-empty) | Delete | Supprimer | Excluir | Destructive |

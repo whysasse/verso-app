@@ -166,7 +166,8 @@
       "cancel": "Cancel",
       "delete": "Delete",
       "markRead": "Mark read",
-      "select": "Select"
+      "select": "Select",
+      "title": "{count, plural, one {# Selected} other {# Selected}}"
     },
     "dateFilter": {
       "any": "Any time",

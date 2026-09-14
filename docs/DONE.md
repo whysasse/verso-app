@@ -2,9 +2,34 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**211 completed issues.**
+**213 completed issues.**
 
 ## iOS
+
+### FAB-334 phase 6: list and select mode (2026-09-14)
+
+- [x] 🟠 **FAB-320** · Bulk select: destructive action isn't marked, and nothing shows a count  `Done` `High`
+  Critique §5.6. Both halves shipped as part of FAB-334 phase 6, per its 2026-09-08 resolution:
+
+  * **Red delete** — `.buttonStyle(.plain)` dropped from the two bulk-action buttons (now real bottom-toolbar items, not a hand-built `safeAreaInset` bar). `Button(role: .destructive)` was already there; `.plain` was the only thing suppressing its color.
+  * **Count** — "N Selected" as the navigation title (a new pluralized `home.bulkSelect.title` key), with Cancel/Done as real toolbar items, replacing the hand-built `selectionHeaderRow`.
+
+  Deliberately not adopting `EditMode`'s real multi-select — see phase 6's own DONE entry below for why, and for the one place this decision leaves a complaint only partly answered (FAB-322's layout-shift note, corrected in place above).
+
+- [x] 🟠 **FAB-334 phase 6** · List and select mode go system  `Done` `High`
+  Per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md)'s phase 6, R1 option (b) (decided 2026-09-08): keep `selectedArticleIds: Set<UUID>` and the `List(selection: isSelecting ? .constant(nil) : $selectedArticle)` trick exactly as they are — real `List(selection: Set<ID>>)` + system `EditMode` was rejected because a `List` takes one selection binding, and swapping it would rebuild the list, losing scroll position and section-collapse state on every entry to select mode. Only the *chrome* moved to the system:
+
+  * **Real nav bar + toolbar for select mode.** `.navigationTitle`/`.toolbar` now show "N Selected" (`home.bulkSelect.title`, a new pluralized copy key) with Cancel/Done, replacing the hand-built `headerRow`/`selectionHeaderRow` (FAB-292) entirely — both now deleted, replaced by a single `exitSelectMode()` helper both buttons call.
+  * **Bulk actions move to a real bottom toolbar.** Mark Read / Delete were a hand-built `safeAreaInset` bar; now `ToolbarItemGroup(placement: .bottomBar)`, with `.buttonStyle(.plain)` dropped so `Button(role: .destructive)` renders red (FAB-320).
+  * **Search and select mode are mutually exclusive.** New `.onChange` pair on `isSelecting`/`isSearching` — entering one collapses the other, since a search field next to "N Selected" doesn't make sense the way search-plus-filter (phase 5) does.
+  * **`.buttonStyle(.plain)` dropped** from the per-row select-toggle `Button` too, so it gets real `List`-row tap feedback. Left `collapsibleSectionHeader`'s `.buttonStyle(.plain)` untouched — that's not select-mode chrome, it's general-purpose and better suited to phase 7's dedicated sweep with the rest of the file's remaining sites.
+  * **FAB-322's select-mode layout shift is softened, not eliminated** — see the corrected note on FAB-322's own entry above. R1's rejection of real `EditMode` means there's no system-owned row inset to draw the checkbox in instead of the row's own `HStack` width; reserving that width permanently (selecting or not) would trade a temporary shift for a permanent one (narrower cards always), which nobody asked for. Shipped the smaller fix: the transition itself now animates.
+  * **Empty state already satisfied phase 6's own bullet** ("still needs its FAB-319 CTA") — `EmptyState` never hosted teaching hints in the first place (those were cut from FAB-327's scope back in phase 2, superseded by the still-pending welcome article, FAB-338) and already had its FAB-319 CTA wired since 2026-09-05. Confirmed, not rebuilt.
+  * "System `List` styling" (phase 6's own summary bullet) is **not** a mandate to strip the article cards' custom insets/backgrounds/hidden separators — that's core to the app's visual identity (Reeder/Matter-style rows), not "custom chrome" the same way `headerRow`/`FilterPanel` were. Left untouched, deliberately.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild` for both the `Verso` and `ShareExtension` schemes build clean; `scripts/check.sh` passes. Not verified here: the actual on-device feel of the select-mode transition animation, the bottom toolbar's Mark Read/Delete placement, and whether the row's new default tap feedback (from the dropped `.buttonStyle(.plain)`) looks right against `ArticleCard`'s custom styling — Fabio's part, no reliable headless Simulator automation for this project.
 
 ### FAB-334 phase 5: search and filters (2026-09-14)
 
@@ -775,9 +800,14 @@
     non-collapsible headers structurally different beyond their existing
     chevron — a bigger, more subjective call than this bullet's "Low" priority
     warranted.
-  * **Entering select mode re-truncates every title** — already routed to
-    FAB-334 (`EditMode` owns the checkbox column there, so content width stops
-    changing). No action here.
+  * **Entering select mode re-truncates every title** — routed to FAB-334
+    phase 6, shipped 2026-09-14. Correction to this line's original claim:
+    real `EditMode` was rejected there (R1) to keep the split-view's scroll
+    position and section state across select-mode entry/exit, so there's no
+    system-owned inset to draw the checkbox in instead — content width still
+    changes, it isn't eliminated. What shipped: the transition now animates
+    (`withAnimation`) instead of popping, softening the shift rather than
+    removing it. See phase 6's own DONE entry for the full reasoning.
   * **Settings two taps deep behind "…"** — a genuine header-real-estate
     tradeoff (a 5th icon vs. today's 4). Asked Fabio rather than guessing at a
     redesign; he confirmed leaving it as-is for now.

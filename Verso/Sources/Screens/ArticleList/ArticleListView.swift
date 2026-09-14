@@ -82,6 +82,11 @@ struct ArticleListView: View {
         Self.makeListPredicate(searchText: searchText, datePreset: datePreset)
     }
 
+    /// FAB-334 phase 6, R1 option (b): "N Selected" while selecting (FAB-320's second half).
+    private var navigationTitleText: String {
+        isSelecting ? L10n.Home.bulkSelectTitle(count: selectedArticleIds.count) : L10n.Home.navTitle
+    }
+
     var body: some View {
         GeometryReader { listGeometry in
             VStack(spacing: 0) {
@@ -92,14 +97,6 @@ struct ArticleListView: View {
                     .padding(.horizontal, VersoSpacing.md)
                     .padding(.top, VersoSpacing.md)
                 }
-
-                // FAB-334 phase 4: only the selecting custom row remains here now -- phase 6
-                // (select mode) still owns it. Search moved to `.searchable` below (phase 5);
-                // the default state's title and icons live in the real nav bar/toolbar below.
-                headerRow
-                    .padding(.horizontal, VersoSpacing.md)
-                    .padding(.top, VersoSpacing.md)
-                    .padding(.bottom, VersoSpacing.sm)
 
                 // FAB-334 phase 5, absorbs FAB-319's remainder: a dismissible summary row
                 // ("2 tags · Past month ✕") when a tag/date filter is active, restoring the
@@ -153,11 +150,10 @@ struct ArticleListView: View {
         }
         // FAB-334 phase 4: real navigation bar replaces `defaultHeaderRow`'s title + four
         // icons (absorbs the rest of FAB-310 -- real toolbar items instead of a hand-built
-        // HStack of `.buttonStyle(.plain)` Images). Hidden only while the selecting custom
-        // row above is on screen, so there's no duplicate title -- that's phase 6 territory
-        // and keeps its current chrome for now.
-        .toolbar(isSelecting ? .hidden : .automatic, for: .navigationBar)
-        .navigationTitle(L10n.Home.navTitle)
+        // HStack of `.buttonStyle(.plain)` Images). FAB-334 phase 6: no longer hidden while
+        // selecting either -- select mode now gets its own real title/toolbar below (R1
+        // option (b), FAB-320's second half) instead of the old hand-built `selectionHeaderRow`.
+        .navigationTitle(navigationTitleText)
         .tint(themeManager.colors.accent)
         // FAB-334 phase 5: replaces the hand-built `searchActiveRow`/`SearchBar` entirely --
         // no more manual search icon in the toolbar either, since `.searchable` supplies its
@@ -165,10 +161,31 @@ struct ArticleListView: View {
         // stays a binding rather than reading `\.isSearching` from the environment so the rest
         // of the toolbar (filter/add/overflow) stays visible and usable while searching --
         // narrowing by tag or date while also searching by text is a reasonable thing to want,
-        // not something the old row's all-or-nothing swap allowed.
+        // not something the old row's all-or-nothing swap allowed. Search and select mode stay
+        // mutually exclusive though (phase 6, below) -- a search field next to "N Selected"
+        // doesn't make sense the way search-plus-filter does.
         .searchable(text: $searchText, isPresented: $isSearching, prompt: L10n.Home.searchPlaceholder)
+        .onChange(of: isSelecting) { _, newValue in
+            if newValue { isSearching = false }
+        }
+        .onChange(of: isSearching) { _, newValue in
+            if newValue { exitSelectMode() }
+        }
         .toolbar {
-            if !isSelecting {
+            if isSelecting {
+                // FAB-334 phase 6, R1 option (b): real toolbar Cancel/Done replace the old
+                // hand-built `selectionHeaderRow`'s title + Cancel button (FAB-320's second
+                // half) -- the selection model underneath (`selectedArticleIds`) is unchanged,
+                // only this chrome is new. Both exit select mode the same way; there's no
+                // "staged" action here to distinguish Cancel-as-undo from Done-as-commit,
+                // since mark-read/delete already apply immediately.
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.Home.bulkSelectCancel) { exitSelectMode() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(L10n.Import.doneDoneButton) { exitSelectMode() }
+                }
+            } else {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         withAnimation(VersoAnimation.normal) { showFilterPanel = true }
@@ -201,7 +218,7 @@ struct ArticleListView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(L10n.Home.bulkSelectSelect) {
-                            isSelecting = true
+                            withAnimation(VersoAnimation.fast) { isSelecting = true }
                         }
                         Button(L10n.Home.settingsAccessibilityLabel) {
                             showSettings = true
@@ -231,34 +248,15 @@ struct ArticleListView: View {
         }
     }
 
-    // MARK: - Header row (FAB-292, trimmed FAB-334 phases 4-5)
-
-    /// While selecting, the custom row becomes a Cancel button -- phase 6 territory, unchanged
-    /// here. Search moved to `.searchable` in phase 5, so that branch is gone; the default
-    /// state renders nothing -- its title and icons live in the real nav bar/toolbar above.
-    @ViewBuilder
-    private var headerRow: some View {
-        if isSelecting {
-            selectionHeaderRow
+    /// FAB-334 phase 6, R1 option (b): the single exit path for select mode, called from both
+    /// Cancel and Done (see the toolbar above) and from the two bulk actions once they finish.
+    /// Replaces `headerRow`/`selectionHeaderRow` (FAB-292's hand-built title + Cancel row,
+    /// deleted here -- its job is now the real nav bar/toolbar above).
+    private func exitSelectMode() {
+        withAnimation(VersoAnimation.fast) {
+            isSelecting = false
+            selectedArticleIds.removeAll()
         }
-    }
-
-    private var selectionHeaderRow: some View {
-        HStack {
-            Text(L10n.Home.navTitle)
-                .font(VersoTypography.UI.screenTitle)
-                .foregroundColor(themeManager.colors.textPrimary)
-
-            Spacer()
-
-            Button(L10n.Home.bulkSelectCancel) {
-                isSelecting = false
-                selectedArticleIds.removeAll()
-            }
-            .font(VersoTypography.UI.button)
-            .foregroundColor(themeManager.colors.accent)
-        }
-        .frame(height: 44)
     }
 
     /// FAB-334 phase 5, absorbs FAB-319's remainder. Tag count shown as a bare digit next to a
@@ -408,6 +406,15 @@ private struct ArticleListFetchedBody: View {
         hasNarrowingFilter || !selectedTags.isEmpty
     }
 
+    /// FAB-322's select-mode layout shift: entering/exiting select mode still changes
+    /// `ArticleCard`'s available width, since R1 option (b) (phase 6) means there's no
+    /// system-owned row inset to draw the checkbox in instead -- real `List(selection:
+    /// Set<ID>>)` was rejected specifically to keep scroll position and section state
+    /// across that transition (see the plan doc's R1). Reserving the checkbox's width
+    /// permanently, selecting or not, would trade a temporary shift for a permanent one
+    /// (narrower cards always). Chose the smaller fix instead: the toggle itself now
+    /// animates (`withAnimation` in `exitSelectMode()` and the toolbar's "Select" action),
+    /// so the shift is a smooth transition rather than a pop -- not eliminated, softened.
     @ViewBuilder
     private func rowLabel(for article: Article, showsProgress: Bool = false) -> some View {
         HStack(alignment: .top, spacing: VersoSpacing.sm) {
@@ -507,40 +514,21 @@ private struct ArticleListFetchedBody: View {
             guard let url = folderBookmarkService.folderURL else { return }
             await articleLibraryService.rebuildCache(from: url, context: viewContext)
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        // FAB-334 phase 6, R1 option (b): replaces the hand-built `safeAreaInset` bottom bar
+        // with real bottom toolbar items -- `.buttonStyle(.plain)` is gone, so
+        // `Button(role: .destructive)` renders red for free (FAB-320's first half, "delete
+        // isn't red"). The selection model underneath is unchanged; only this chrome moved.
+        .toolbar {
             if isSelecting, !selectedArticleIds.isEmpty {
-                HStack(spacing: VersoSpacing.lg) {
-                    Button {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button(L10n.Home.bulkSelectMarkRead) {
                         markSelectedArticlesRead()
-                    } label: {
-                        Text(L10n.Home.bulkSelectMarkRead)
-                            .font(VersoTypography.UI.button)
                     }
-                    .buttonStyle(.plain)
-                    .foregroundColor(themeManager.colors.accent)
-
                     Spacer()
-
-                    Button(role: .destructive) {
+                    Button(L10n.Home.bulkSelectDelete, role: .destructive) {
                         confirmBulkDelete = true
-                    } label: {
-                        Text(L10n.Home.bulkSelectDelete)
-                            .font(VersoTypography.UI.button)
                     }
-                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, VersoSpacing.lg)
-                .padding(.top, VersoSpacing.md)
-                .padding(.bottom, VersoSpacing.xs)
-                .frame(maxWidth: .infinity)
-                .overlay(
-                    Rectangle()
-                        .frame(height: 0.5)
-                        .foregroundColor(themeManager.colors.border),
-                    alignment: .top
-                )
-                // Match ReadingBottomBar: opaque fill through home indicator so controls aren't clipped.
-                .background(themeManager.colors.background.ignoresSafeArea(edges: .bottom))
             }
         }
         .confirmationDialog(
@@ -651,6 +639,10 @@ private struct ArticleListFetchedBody: View {
                     // Bulk-select mode: tap toggles a checkbox, no navigation involved.
                     // The List's selection binding is `.constant(nil)` while this is active,
                     // so this Button's own tap handling is what fires here, not row selection.
+                    // FAB-334 phase 6: `.buttonStyle(.plain)` dropped -- inside a `List` row
+                    // the default style gives real tap feedback (the standard row-highlight
+                    // flash), rather than this Button being an inert wrapper. The checkbox
+                    // icon itself stays hand-drawn either way (see `rowLabel`'s own comment).
                     Button {
                         if selectedArticleIds.contains(article.id) {
                             selectedArticleIds.remove(article.id)
@@ -660,7 +652,6 @@ private struct ArticleListFetchedBody: View {
                     } label: {
                         rowLabel(for: article, showsProgress: showsProgress)
                     }
-                    .buttonStyle(.plain)
                 } else {
                     // No Button/NavigationLink wrapper needed: this row's tap is handled by
                     // the List's `selection:` binding above (`.tag` is what associates the
@@ -677,7 +668,7 @@ private struct ArticleListFetchedBody: View {
             .listRowSeparator(.hidden)
             .contextMenu {
                 Button {
-                    isSelecting = true
+                    withAnimation(VersoAnimation.fast) { isSelecting = true }
                 } label: {
                     Label(L10n.Home.bulkSelectSelect, systemImage: "checkmark.circle")
                 }
@@ -818,8 +809,10 @@ private struct ArticleListFetchedBody: View {
             try? MarkdownWriter.updateStatus(.read, for: article.filePath)
         }
         try? viewContext.save()
-        selectedArticleIds.removeAll()
-        isSelecting = false
+        withAnimation(VersoAnimation.fast) {
+            selectedArticleIds.removeAll()
+            isSelecting = false
+        }
     }
 
     private func deleteSelectedArticles() {
@@ -831,8 +824,10 @@ private struct ArticleListFetchedBody: View {
             viewContext.delete(article)
         }
         try? viewContext.save()
-        selectedArticleIds.removeAll()
-        isSelecting = false
+        withAnimation(VersoAnimation.fast) {
+            selectedArticleIds.removeAll()
+            isSelecting = false
+        }
     }
 }
 

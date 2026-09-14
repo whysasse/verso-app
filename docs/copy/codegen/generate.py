@@ -52,6 +52,7 @@ TRUE_PLURAL_KEYS = {
     "dialog.bulkDelete.title",
     "import.done.summary",
     "import.done.skippedSuffix",
+    "home.bulkSelect.title",
 }
 
 # Hand-written "one" (singular) forms for the true-plural keys, since UI_COPY.md only
@@ -93,6 +94,11 @@ PLURAL_ONE_FORMS = {
         "en": ", %lld skipped",
         "fr": ", %lld ignoré",
         "pt": ", %lld ignorado",
+    },
+    "home.bulkSelect.title": {
+        "en": "%lld Selected",
+        "fr": "%lld sélectionné",
+        "pt": "%lld selecionado",
     },
 }
 

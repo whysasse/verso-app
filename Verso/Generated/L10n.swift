@@ -370,6 +370,10 @@ enum L10n {
         static var bulkSelectSelect: String {
             String(localized: "home.bulkSelect.select", defaultValue: "Select", comment: "Added during step 4 view-wiring pass — bulk select postdates the original audit.")
         }
+        /// "{count} Selected" -- ⚠️ plural (this row shows the 'other'/plural form; singular 'one' form authored directly in codegen, same pattern as the other ⚠️-flagged keys).
+        static func bulkSelectTitle(count: Int) -> String {
+            String(localized: "home.bulkSelect.title", defaultValue: "\(count) Selected", comment: "⚠️ plural (this row shows the 'other'/plural form; singular 'one' form authored directly in codegen, same pattern as the other ⚠️-flagged keys).")
+        }
         /// "Any time" -- Date-range menu option
         static var dateFilterAny: String {
             String(localized: "home.dateFilter.any", defaultValue: "Any time", comment: "Date-range menu option")
