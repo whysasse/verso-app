@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**28 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08, +FAB-338 opened same day, -FAB-319 closed 2026-09-14 — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**27 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08, +FAB-338 opened same day, -FAB-319/-FAB-320 closed 2026-09-14 — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — back to normal (Fabio back at his Mac, 2026-09-08)
 
@@ -51,7 +51,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   12. ~~**FAB-333**~~ — **done**, see [DONE.md](DONE.md): reading measure collapse w/ OpenDyslexic & max size, stacks on top of #11. All 3 fix options now shipped — the padding-taper (2026-09-05), OpenDyslexic's per-family size step-down, and a new Margins control in the reader's font sheet (both 2026-09-06).
   13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
   14. ~~*(pulled out of FAB-322)* **"Add Article: no escape while saving"**~~ — **done 2026-09-05**: the ✕ now shows and cancels during `.saving`, so a hung parse no longer traps the user. See [DONE.md](DONE.md)'s FAB-322 entry for the one known gap (Readability.js's `WKWebView` isn't itself interruptible mid-flight).
-  15. ~~**FAB-320**~~ — **moved to FAB-334.** System `EditMode` supplies both the red destructive action and the "N Selected" title.
+  15. ~~**FAB-320**~~ — **done**, see [DONE.md](DONE.md): shipped 2026-09-14 as part of FAB-334 phase 6 (real toolbar chrome, not `EditMode` itself — see phase 6's own entry for why).
   16. ~~**FAB-319**~~ — **done**, see [DONE.md](DONE.md). The empty-state CTA shipped 2026-09-05; the filter panel's "Clear all" and summary row shipped 2026-09-14 as part of FAB-334 phase 5, which rehomed filters around `.searchable` anyway.
   17. ~~**FAB-316**~~ — **done**, see [DONE.md](DONE.md). Was never actually in this numbered list despite being marked "not absorbed — do in 1.0" further down (line ~266) — a real gap, caught 2026-09-08 confirming release readiness, not a duplicate of anything above. Top bar's title `Text` now only shows once the H1 scrolls out of view (visually and to VoiceOver), closing accessibility-specs.md §5.2's matching requirement as the same fix.
 
@@ -137,31 +137,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Also seen: the panel is a fixed `width: 320` — ~80% of a 393pt screen and **~85% of the 375pt iPhone SE**, leaving a dismiss strip of roughly 55pt, too narrow to read as "tap outside to close". Use a fraction with a maximum rather than a fixed width. And with zero tags in the library it still renders a "Search tags…" field above a lone "All tags" row, searching nothing — hide it when the tag list is empty.
 
-- [ ] 🟠 **FAB-320** · Bulk select: destructive action isn't marked, and nothing shows a count  `Todo` `High`
-  ## Scope
-
-  Critique §5.6.
-
-  **Delete isn't red.** `Button(role: .destructive)` combined with `.buttonStyle(.plain)` drops the role's colour, so "Delete" renders in plain `textPrimary` while "Mark read" sits in accent — the irreversible action is the *less* prominent of the two. The reader's overflow menu gets this right (red, with a trash icon), which makes the bulk case — deleting *several* articles at once — both the inconsistent one and the more dangerous one. Use `semanticColors.error`.
-
-  **No selection count.** With one article selected the header still reads "Verso". iOS convention is "1 Selected", and it matters most immediately before a bulk delete. The confirmation dialog does show a count, but that is after the fact.
-
-  ## Resolution (decided 2026-09-08, ships in FAB-334 phase 6)
-
-  Both halves are fixed by adopting system **chrome** only — the selection model does not change:
-
-  * **Red delete** — drop `.buttonStyle(.plain)` from the bulk-action buttons. `Button(role: .destructive)` is
-    already there; `.plain` is the only thing suppressing the role's colour. That is the entire fix.
-  * **Count** — "N Selected" as the navigation title, with Cancel/Done as toolbar items, once phase 4 has
-    given the list a real toolbar.
-
-  Deliberately **not** adopting `EditMode`'s multi-select: `List(selection:)`'s single-value binding drives
-  `NavigationSplitView`'s sidebar→detail collapse, and a `List` takes one selection binding. Swapping it for a
-  `Set` changes the `List`'s generic type, breaking view identity and resetting scroll position and section
-  collapse on every entry to select mode — worst exactly when the user has scrolled far to find what they want
-  to delete. Accepted losses: no free Select All, no drag-to-select. Neither was asked for.
-
-
 ### Design critique 2026-09-01 — design system consistency
 
 - [ ] 🟡 **FAB-326** · Five different ways to close or go back  `Backlog` `Medium`
@@ -194,7 +169,7 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   ## Progress (2026-09-14)
 
-  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 0** (material spike, verdict: proceed, tinted glass), **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form` — its theme picker shipped a regression, fixed same day, see [DONE.md](DONE.md)), **phase 4** (navigation shell, merged 2026-09-14 — the plan's own R3 regression check, push Settings → background → cross the theme boundary → return, confirmed on-device by Fabio 2026-09-14: Settings survives it), **phase 5** (search and filters — `.searchable` replaces `SearchBar`, `FilterPanel` → a real `.sheet`, **FAB-319 now fully done**, see [DONE.md](DONE.md)). FAB-326 partially absorbed by phase 4, not closed — see the plan doc's phase 4 section for exactly which rows remain. Phases 6–7 next.
+  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 0** (material spike, verdict: proceed, tinted glass), **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form` — its theme picker shipped a regression, fixed same day, see [DONE.md](DONE.md)), **phase 4** (navigation shell — R3 regression check confirmed by Fabio on-device), **phase 5** (search and filters — `.searchable` replaces `SearchBar`, `FilterPanel` → a real `.sheet`, **FAB-319 now fully done**), **phase 6** (list and select mode — **FAB-320 now fully done**; FAB-322's select-mode layout shift is softened via animation, not eliminated — real `EditMode` was rejected in R1 to protect scroll position). See [DONE.md](DONE.md) for all closed issues' full detail. FAB-326 partially absorbed by phase 4, not closed — see the plan doc's phase 4 section for exactly which rows remain. Phase 7 (sweep and verify) next — the last one.
 
   ## Why this is an epic and not a skin
 
