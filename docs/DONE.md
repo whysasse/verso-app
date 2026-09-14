@@ -2,9 +2,33 @@
 
 > Archive of all completed issues. See [BACKLOG.md](BACKLOG.md) for open work.
 
-**210 completed issues.**
+**211 completed issues.**
 
 ## iOS
+
+### FAB-334 phase 5: search and filters (2026-09-14)
+
+- [x] 🟠 **FAB-319** · Filters are invisible once applied, and there's no way to clear them  `Done` `High`
+  Critique §5.1, §5.2. All three fix items now shipped, across two dates:
+
+  1. ~~"Add your first article" in `.empty`; "Clear filters" in `.searchMiss`~~ — **done 2026-09-05**, see the original entry's detail (superseded by this one moving to DONE).
+  2. **"Clear all" in the filter sheet** — **done here**: a toolbar button, disabled when `activeFilterCount == 0`, reusing `home.empty.noResults.cta` ("Clear filters") rather than adding a new phrasing of the same action.
+  3. **Dismissible summary row when filters are active** (a `tag` SF Symbol + count, "· Past month", and a clear ✕ — the critique's own "2 tags · Past month ✕" example, minus the word "tags" since the glyph already says it) — **done here**, shown above the list in `ArticleListView` itself (not inside the sheet) whenever `activeFilterCount > 0`. Tag count shown as a bare digit rather than a pluralized "N tags" string, matching FAB-322's own "a bare digit needs no localization" precedent — sidesteps needing new plural copy entirely.
+
+  Both remaining items shipped as part of FAB-334 phase 5 (native-shell search and filters), which rehomed the whole filter UI around a real system sheet anyway — see that phase's own DONE entry below for the sheet itself (`FilterPanel` → `FilterSheet`, a `Form` with `.searchable` replacing the fixed-`width: 320` custom overlay).
+
+- [x] 🟠 **FAB-334 phase 5** · Search and filters go system  `Done` `High`
+  Per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md)'s phase 5. Three pieces:
+
+  **R2 fix (list rebuild on every keystroke).** `ArticleListFetchedBody` was `.id(listFetchIdentity)`-keyed by its parent so a changed search/date predicate would force a fresh `@FetchRequest` init — tearing the whole view down and rebuilding it (losing `isReadExpanded`/`isArchivedExpanded` state) on every single keystroke, a jank risk `.searchable`'s own transition animation would have made newly visible. Fixed per the plan's preferred option: dropped `.id()` entirely, and instead mutate the existing fetch's predicate in place via the `@FetchRequest` projected value — `$articles.nsPredicate.wrappedValue = newPredicate` in `.onChange(of: listPredicate)`. No view identity change, nothing torn down, and it closes a re-keying hazard from the same family as FAB-304.
+
+  **`.searchable` replaces `SearchBar`.** `ArticleListView`'s hand-built `searchActiveRow` (a `SearchBar` + Cancel button swapped in for the whole header) is gone — `.searchable(text:isPresented:prompt:)` on the view itself, with `isSearching` kept as a binding (not read from the `\.isSearching` environment) so the rest of the toolbar — filter, add, overflow — stays visible and usable while searching. The hand-built magnifying-glass toolbar button is gone too, redundant with the system-provided search entry point (and, on iOS 26, its bottom-anchored placement, automatic with no code change). `SearchBar.swift` (61 lines, both call sites now gone) deleted.
+
+  **`FilterPanel` → `FilterSheet`.** The fixed-`width: 320` custom overlay (≈85% of an iPhone SE screen, per the epic's own audit) is now a real `.sheet` with `.presentationDetents([.medium, .large])`: a `Form` with a `Picker(.inline)` for the single-select date range (free radio-style selection, no more hand-drawn `largecircle.fill.circle`/`circle` pair) and a `Section` of checkmark rows for multi-select tags, hidden entirely when the library has no tags (FAB-319 above). The tag search field moved from a second `SearchBar` instance to the sheet's own `.searchable`. No competing close button — grabber + swipe-to-dismiss, plus an explicit "Done" toolbar action (reuses `import.done.doneButton`) since a `Form` full of actionable rows benefits from an unambiguous confirm the way FAB-311's plain scroll sheet didn't need one.
+
+  ## Verify
+
+  `xcodegen generate` + `xcodebuild` for both the `Verso` and `ShareExtension` schemes build clean; `scripts/check.sh` passes. Not verified here: the actual on-device feel of `.searchable`'s bottom-anchored field and transition, and whether the R2 fix's in-place predicate mutation is as smooth as intended while typing on a real device rather than inferred from the fix's own correctness — Fabio's part, no reliable headless Simulator automation for this project.
 
 ### FAB-334 phase 2: onboarding cut (2026-09-12)
 

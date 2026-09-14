@@ -17,7 +17,7 @@
 
 Issues continue the FAB-xx sequence from Linear (migration 2026-06-12). New issues receive the next available FAB-xx number in sequence.
 
-**29 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08, +FAB-338 opened same day — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
+**28 open issues** across iOS, Web, Design, and Infra (recounted 2026-09-08, +FAB-338 opened same day, -FAB-319 closed 2026-09-14 — the inline "which ones are done" enumeration this line used to carry had drifted out of sync with actual closures several times over, so it's dropped in favor of just the count; DONE.md is the actual record of what's closed). 30 were opened 2026-09-01/03 from [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md): FAB-306–329 (critique findings) and FAB-331–333 (found in the 2026-09-03 Ink + onboarding screenshot pass). **FAB-334** is the 1.1 native-shell epic agreed 2026-09-03 — read it before picking up any chrome issue, since it absorbs several.
 
 ## Working mode — back to normal (Fabio back at his Mac, 2026-09-08)
 
@@ -52,7 +52,7 @@ Excludes the iPad epic (FAB-131, FAB-152–162) and the Phase 3 expansion backlo
   13. ~~**FAB-310**~~ — **moved to FAB-334.** System controls are 44×44pt by default; the remaining offenders are all custom chrome the shell replaces. (The font stepper is still covered by #8.)
   14. ~~*(pulled out of FAB-322)* **"Add Article: no escape while saving"**~~ — **done 2026-09-05**: the ✕ now shows and cancels during `.saving`, so a hung parse no longer traps the user. See [DONE.md](DONE.md)'s FAB-322 entry for the one known gap (Readability.js's `WKWebView` isn't itself interruptible mid-flight).
   15. ~~**FAB-320**~~ — **moved to FAB-334.** System `EditMode` supplies both the red destructive action and the "N Selected" title.
-  16. **FAB-319** — **split.** The empty-state CTA **done 2026-09-05** — see the struck bullet under FAB-319 for detail. The filter panel's "Clear all" and summary row move to FAB-334, which rehomes filters around `.searchable` anyway; FAB-319 stays open in BACKLOG for that remainder.
+  16. ~~**FAB-319**~~ — **done**, see [DONE.md](DONE.md). The empty-state CTA shipped 2026-09-05; the filter panel's "Clear all" and summary row shipped 2026-09-14 as part of FAB-334 phase 5, which rehomed filters around `.searchable` anyway.
   17. ~~**FAB-316**~~ — **done**, see [DONE.md](DONE.md). Was never actually in this numbered list despite being marked "not absorbed — do in 1.0" further down (line ~266) — a real gap, caught 2026-09-08 confirming release readiness, not a duplicate of anything above. Top bar's title `Text` now only shows once the H1 scrolls out of view (visually and to VoiceOver), closing accessibility-specs.md §5.2's matching requirement as the same fix.
 
   *Post-launch polish — Backlog-status, fine to defer:*
@@ -135,23 +135,6 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
 ### Design critique 2026-09-01 — article list
 
-- [ ] 🟠 **FAB-319** · Filters are invisible once applied, and there's no way to clear them  `In Progress` `High`
-  ## Scope
-
-  Critique §5.1, §5.2. Once `FilterPanel` closes, the only signal that filters are active is a small count badge on the header icon — the same badge whose dark-theme contrast FAB-305 already fixed. If the filters match nothing, the user gets the `.searchMiss` empty state with no mention of the filters causing it and no way to clear them: **`FilterPanel` has no "Clear all"**, so tags must be deselected one by one and the date preset reset separately.
-
-  This is the same concern behind the earlier "keep chips visible on empty states" decision, resurfacing after the chips were removed. The old chip bar had a real virtue — filter state was always on screen.
-
-  Separately, **`EmptyState` has no call to action in any variant**. The `.empty` variant is what a brand-new user sees straight after a seven-screen onboarding, and it offers nothing to tap despite `AddArticleView` being one icon away. It is the highest-leverage screen in the app for activation and it is currently decorative.
-
-  **Seen 2026-09-03 on iPhone SE, and the copy makes it worse.** The empty state reads "No articles yet" / *"Share an article from Safari to get started."* — so the one instruction on the screen sends the user **out of the app**, while the `+` button that does the same job sits about 40pt above the message, unmentioned. Content occupies the top third and roughly 500pt below it is empty. Fix the copy and the CTA together: an "Add your first article" button wired to `showAddArticle`, with the share-sheet route as the secondary line rather than the only one.
-
-  ## Fix
-
-  1. "Clear all" in the panel header, enabled when `activeFilterCount > 0` — **moved to FAB-334**, which rehomes `FilterPanel` around `.searchable` anyway.
-  2. ~~"Add your first article" in `.empty`; "Clear filters" in `.searchMiss`~~ — **done 2026-09-05.** `EmptyState` takes an optional `onAction` closure and a per-variant CTA title, rendered as a real button between the headline and the (now secondary) subtext. `.empty` flips `showAddArticle`; `.searchMiss` clears search text, date preset, and tags. The `.empty` subheadline was reworded from "Share an article from Safari to get started." to "Or share one from Safari." now that it's the secondary route, not the only one.
-  3. Consider a dismissible summary row under the header when filters are active ("2 tags · Past month ✕") — restores the chip bar's visibility without its width problems. **Moved to FAB-334** along with #1 — same rehoming.
-
   Also seen: the panel is a fixed `width: 320` — ~80% of a 393pt screen and **~85% of the 375pt iPhone SE**, leaving a dismiss strip of roughly 55pt, too narrow to read as "tap outside to close". Use a fraction with a maximum rather than a fixed width. And with zero tags in the library it still renders a "Search tags…" field above a lone "All tags" row, searching nothing — hide it when the tag list is empty.
 
 - [ ] 🟠 **FAB-320** · Bulk select: destructive action isn't marked, and nothing shows a count  `Todo` `High`
@@ -209,9 +192,9 @@ Source: [DESIGN_CRITIQUE_2026-09-01.md](DESIGN_CRITIQUE_2026-09-01.md). Section 
 
   Decided with Fabio 2026-09-03: **native shell, custom reading room.** The article list, settings, search, navigation and toolbars adopt system components; the reading surface keeps its bespoke typography, its four themes and its custom chrome. This is how Reeder and Matter are built, and it puts the paper identity where it earns its keep instead of fighting the platform everywhere else.
 
-  ## Progress (2026-09-12)
+  ## Progress (2026-09-14)
 
-  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form`), **phase 0** (material spike — **verdict: proceed**, tinted glass over Paper/Sepia keeps its warmth where untinted washes out, see the plan doc's Phase 0 section for the full verdict and its two carry-forward requirements), **phase 4** (navigation shell — real nav bar + toolbar replaces `defaultHeaderRow`, `VersoNavigationBar.swift` split, **pending Fabio's on-device R3 regression check** before it's fully confirmed safe). FAB-326 partially absorbed by phase 4, not closed — see the plan doc's phase 4 section for exactly which rows remain. Phases 5–7 next.
+  Folded into 1.0, built before launch rather than as a 1.1 fast-follow (see Decision #2 correction below). Phases done so far, per [plans/FAB-334-1.1-native-shell-plan.md](plans/FAB-334-1.1-native-shell-plan.md): **phase 0** (material spike, verdict: proceed, tinted glass), **phase 1** (deployment target → iOS 26.0), **phase 2** (onboarding cut, FAB-348), **phase 3** (Settings → `Form` — its theme picker shipped a regression, fixed same day, see [DONE.md](DONE.md)), **phase 4** (navigation shell — **R3 regression check confirmed by Fabio on-device**, 2026-09-14), **phase 5** (search and filters — `.searchable` replaces `SearchBar`, `FilterPanel` → a real `.sheet`, **FAB-319 now fully done**, see [DONE.md](DONE.md)). FAB-326 partially absorbed by phase 4, not closed — see the plan doc's phase 4 section for exactly which rows remain. Phases 6–7 next.
 
   ## Why this is an epic and not a skin
 
