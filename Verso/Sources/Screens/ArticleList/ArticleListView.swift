@@ -11,9 +11,10 @@ private enum ArticleListDatePreset: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// User-facing text. `rawValue` stays a stable, English, non-localized identifier --
-    /// it doubles as this enum's Identifiable id and feeds `listFetchIdentity`'s cache-key
-    /// signature, so localizing it directly would tie cache invalidation to locale.
+    /// User-facing text. `rawValue` stays a stable, English, non-localized identifier -- it's
+    /// this enum's Identifiable id, and (pre-phase-5) fed the now-removed `listFetchIdentity`
+    /// cache key. Kept non-localized on general principle: a raw identifier used in Swift
+    /// code shouldn't be tied to whatever locale the device happens to be in.
     var displayLabel: String {
         switch self {
         case .any: return L10n.Home.dateFilterAny
@@ -81,11 +82,6 @@ struct ArticleListView: View {
         Self.makeListPredicate(searchText: searchText, datePreset: datePreset)
     }
 
-    /// Forces `@FetchRequest` to rebuild when inputs affecting Core Data matching change.
-    private var listFetchIdentity: String {
-        Self.listPredicateSignature(searchText: searchText, datePreset: datePreset)
-    }
-
     var body: some View {
         GeometryReader { listGeometry in
             VStack(spacing: 0) {
@@ -97,14 +93,23 @@ struct ArticleListView: View {
                     .padding(.top, VersoSpacing.md)
                 }
 
-                // Outside `.id(listFetchIdentity)` so typing doesn't recreate this view and drop keyboard focus.
-                // FAB-334 phase 4: only the selecting/searching custom rows remain here now --
-                // phase 6 (select mode) and phase 5 (search) still own those. The default
-                // state's title and icons moved to a real navigation bar + toolbar below.
+                // FAB-334 phase 4: only the selecting custom row remains here now -- phase 6
+                // (select mode) still owns it. Search moved to `.searchable` below (phase 5);
+                // the default state's title and icons live in the real nav bar/toolbar below.
                 headerRow
                     .padding(.horizontal, VersoSpacing.md)
                     .padding(.top, VersoSpacing.md)
                     .padding(.bottom, VersoSpacing.sm)
+
+                // FAB-334 phase 5, absorbs FAB-319's remainder: a dismissible summary row
+                // ("2 tags · Past month ✕") when a tag/date filter is active, restoring the
+                // old chip bar's visibility without its width problems -- search text isn't
+                // included, it's live and already visible in the search field itself.
+                if activeFilterCount > 0 {
+                    activeFilterSummaryRow
+                        .padding(.horizontal, VersoSpacing.md)
+                        .padding(.bottom, VersoSpacing.sm)
+                }
 
                 ArticleListFetchedBody(
                     listGeometry: listGeometry,
@@ -127,66 +132,43 @@ struct ArticleListView: View {
                 .environmentObject(folderBookmarkService)
                 .environmentObject(articleLibraryService)
                 .environment(\.managedObjectContext, viewContext)
-                .id(listFetchIdentity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(themeManager.colors.background)
-            .overlay {
-                if showFilterPanel {
-                    ZStack(alignment: .trailing) {
-                        // FAB-325: a flat 0.35 barely darkens an already-near-black Night/Ink
-                        // background -- deepen the scrim itself for dark themes rather than
-                        // changing its color (a dimming scrim is conventionally black either way).
-                        Color.black.opacity(themeManager.currentTheme.isDark ? 0.55 : 0.35)
-                            .ignoresSafeArea()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                withAnimation(VersoAnimation.normal) { showFilterPanel = false }
-                            }
-                            .transition(.opacity)
-
-                        FilterPanel(
-                            tags: allTagsSorted,
-                            selectedTags: $selectedTags,
-                            datePreset: $datePreset,
-                            onClose: {
-                                withAnimation(VersoAnimation.normal) { showFilterPanel = false }
-                            }
-                        )
-                        .environmentObject(themeManager)
-                        .gesture(
-                            DragGesture()
-                                .onEnded { value in
-                                    if value.translation.width > 60 {
-                                        withAnimation(VersoAnimation.normal) { showFilterPanel = false }
-                                    }
-                                }
-                        )
-                        .transition(.move(edge: .trailing))
-                    }
-                    .animation(VersoAnimation.normal, value: showFilterPanel)
-                }
-            }
+        }
+        // FAB-334 phase 5: replaces the fixed-`width: 320` custom overlay (85% of an iPhone SE,
+        // per the epic's own audit) with a real system sheet -- a grabber, fractional detents,
+        // and Form-native sections/checkmarks instead of hand-rolled rows. Absorbs FAB-311's
+        // ✕-collision pattern too: no competing close button, the grabber + swipe-to-dismiss
+        // (plus the explicit Done below, since a Form full of actionable rows benefits from an
+        // unambiguous confirm the way a plain scroll sheet doesn't) are enough.
+        .sheet(isPresented: $showFilterPanel) {
+            FilterSheet(
+                tags: allTagsSorted,
+                selectedTags: $selectedTags,
+                datePreset: $datePreset
+            )
+            .environmentObject(themeManager)
+            .presentationDetents([.medium, .large])
         }
         // FAB-334 phase 4: real navigation bar replaces `defaultHeaderRow`'s title + four
         // icons (absorbs the rest of FAB-310 -- real toolbar items instead of a hand-built
-        // HStack of `.buttonStyle(.plain)` Images). Hidden only while the selecting/searching
-        // custom rows above are on screen, so there's no duplicate title -- those two states
-        // are phase 6/5 territory and keep their current chrome for now.
-        .toolbar(isSelecting || isSearching ? .hidden : .automatic, for: .navigationBar)
+        // HStack of `.buttonStyle(.plain)` Images). Hidden only while the selecting custom
+        // row above is on screen, so there's no duplicate title -- that's phase 6 territory
+        // and keeps its current chrome for now.
+        .toolbar(isSelecting ? .hidden : .automatic, for: .navigationBar)
         .navigationTitle(L10n.Home.navTitle)
         .tint(themeManager.colors.accent)
+        // FAB-334 phase 5: replaces the hand-built `searchActiveRow`/`SearchBar` entirely --
+        // no more manual search icon in the toolbar either, since `.searchable` supplies its
+        // own entry point (and, on iOS 26, the bottom-anchored field automatically). `isSearching`
+        // stays a binding rather than reading `\.isSearching` from the environment so the rest
+        // of the toolbar (filter/add/overflow) stays visible and usable while searching --
+        // narrowing by tag or date while also searching by text is a reasonable thing to want,
+        // not something the old row's all-or-nothing swap allowed.
+        .searchable(text: $searchText, isPresented: $isSearching, prompt: L10n.Home.searchPlaceholder)
         .toolbar {
-            if !isSelecting && !isSearching {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        withAnimation(VersoAnimation.fast) { isSearching = true }
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    .accessibilityLabel(L10n.Home.searchIconAccessibilityLabel)
-                }
-
+            if !isSelecting {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         withAnimation(VersoAnimation.normal) { showFilterPanel = true }
@@ -231,32 +213,33 @@ struct ArticleListView: View {
                 }
             }
         }
-        // FAB-304: lives here, not inside ArticleListFetchedBody, deliberately. That struct
-        // is `.id(listFetchIdentity)`-keyed and gets torn down and rebuilt whenever
-        // search/date change the fetch predicate -- and, more disruptively, whenever
-        // ContentView's `.preferredColorScheme` flips across the light/dark boundary,
-        // which forces a hosting-hierarchy rebuild. A `navigationDestination` registered
-        // inside that subtree gets torn down with it while `showSettings` (owned here,
-        // one level up) survives as true -- a pushed slot with no destination left to
-        // resolve it, i.e. a blank screen. Attaching it to this stable ancestor instead
-        // means nothing re-keys it out from under the push. Unchanged by phase 4 -- only
-        // how `showSettings` gets set (a real toolbar Menu item now) moved, not this.
+        // FAB-304: lives here, not inside ArticleListFetchedBody, deliberately. Originally
+        // that struct was `.id(listFetchIdentity)`-keyed and got torn down and rebuilt on
+        // every search/date change -- phase 5's R2 fix removed that `.id()` entirely (see
+        // ArticleListFetchedBody's own `.onChange(of: listPredicate)`), so that specific
+        // teardown path is gone. The other one isn't: ContentView's `.preferredColorScheme`
+        // flipping across the light/dark boundary still forces a hosting-hierarchy rebuild
+        // (confirmed again, the hard way, by the theme-picker regression phase 3 shipped --
+        // see the plan doc's R3 section). A `navigationDestination` registered on a subtree
+        // that rebuild tears down would disappear while `showSettings` (owned here, one level
+        // up) survives as true -- a pushed slot with no destination left to resolve it, i.e.
+        // a blank screen. Attaching it to this stable ancestor instead means nothing re-keys
+        // it out from under the push. Unchanged by phases 4-5 -- only how `showSettings` gets
+        // set (a real toolbar Menu item, phase 4) moved, not this attachment point.
         .navigationDestination(isPresented: $showSettings) {
             SettingsView()
         }
     }
 
-    // MARK: - Header row (FAB-292, trimmed FAB-334 phase 4)
+    // MARK: - Header row (FAB-292, trimmed FAB-334 phases 4-5)
 
-    /// While selecting, the custom row becomes a Cancel button; while searching, it becomes
-    /// the expanded search field. Both are phase 6/5 territory, unchanged here. The default
+    /// While selecting, the custom row becomes a Cancel button -- phase 6 territory, unchanged
+    /// here. Search moved to `.searchable` in phase 5, so that branch is gone; the default
     /// state renders nothing -- its title and icons live in the real nav bar/toolbar above.
     @ViewBuilder
     private var headerRow: some View {
         if isSelecting {
             selectionHeaderRow
-        } else if isSearching {
-            searchActiveRow
         }
     }
 
@@ -278,31 +261,42 @@ struct ArticleListView: View {
         .frame(height: 44)
     }
 
-    private var searchActiveRow: some View {
-        HStack(spacing: VersoSpacing.sm) {
-            SearchBar(text: $searchText, placeholder: L10n.Home.searchPlaceholder)
-                .environmentObject(themeManager)
-
-            Button(L10n.Home.searchCancel) {
-                withAnimation(VersoAnimation.fast) {
-                    isSearching = false
-                    searchText = ""
-                }
+    /// FAB-334 phase 5, absorbs FAB-319's remainder. Tag count shown as a bare digit next to a
+    /// tag glyph rather than a pluralized "N tags" string -- same precedent as the section
+    /// headers' counts (DONE.md, FAB-322): "a bare digit needs no localization". The date segment
+    /// reuses `datePreset.displayLabel`, already localized. Reuses `L10n.Home.emptyNoResultsCta`
+    /// ("Clear filters") for the clear button rather than adding new copy for one more phrasing
+    /// of the same action.
+    private var activeFilterSummaryRow: some View {
+        HStack(spacing: VersoSpacing.xs) {
+            if !selectedTags.isEmpty {
+                Image(systemName: "tag")
+                Text("\(selectedTags.count)")
             }
-            .buttonStyle(.plain)
-            .font(VersoTypography.UI.button)
-            .foregroundColor(themeManager.colors.accent)
+            if !selectedTags.isEmpty && datePreset != .any {
+                Text("·")
+            }
+            if datePreset != .any {
+                Text(datePreset.displayLabel)
+            }
+            Spacer()
+            Button {
+                withAnimation(VersoAnimation.fast) { clearActiveFilters() }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+            }
+            .accessibilityLabel(L10n.Home.emptyNoResultsCta)
         }
+        .font(VersoTypography.UI.caption)
+        .foregroundColor(themeManager.colors.textSecondary)
+    }
+
+    private func clearActiveFilters() {
+        selectedTags.removeAll()
+        datePreset = .any
     }
 
     // MARK: - Predicate helpers
-
-    private static func listPredicateSignature(
-        searchText: String,
-        datePreset: ArticleListDatePreset
-    ) -> String {
-        "\(searchText)|\(datePreset.rawValue)"
-    }
 
     /// No status clause: `ArticleListFetchedBody` fetches every status and groups the results into
     /// sections client-side (Continue Reading / Unread / Read / Archived), replacing the old
@@ -498,6 +492,17 @@ private struct ArticleListFetchedBody: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(themeManager.colors.background)
         .scrollContentBackground(.hidden)
+        // FAB-334 phase 5, R2 fix: this view used to be `.id(listFetchIdentity)`-keyed by the
+        // parent so a changed predicate would force a fresh `@FetchRequest` init -- but that
+        // tore down and rebuilt this entire view (including `isReadExpanded`/`isArchivedExpanded`
+        // and, per the FAB-304 comment on `ArticleListView`, put a `navigationDestination` at
+        // risk if it were ever attached here) on every single keystroke, well before `.searchable`
+        // made that jank visible. `$articles` (the `@FetchRequest` projected value) exposes a
+        // mutable `nsPredicate` for exactly this: push the new predicate into the existing fetch
+        // in place, no view identity change, nothing torn down.
+        .onChange(of: listPredicate) { _, newPredicate in
+            $articles.nsPredicate.wrappedValue = newPredicate
+        }
         .refreshable {
             guard let url = folderBookmarkService.folderURL else { return }
             await articleLibraryService.rebuildCache(from: url, context: viewContext)
@@ -831,17 +836,18 @@ private struct ArticleListFetchedBody: View {
     }
 }
 
-// MARK: - Filter panel (tags + date range)
+// MARK: - Filter sheet (tags + date range)
 
-/// Combines tag selection with the date-range presets that previously lived in their own inline
-/// row above the (now-removed) status filter-chip bar -- one filter icon in the header opens both.
-private struct FilterPanel: View {
+/// FAB-334 phase 5: replaces the fixed-`width: 320` custom overlay `FilterPanel` (~85% of an
+/// iPhone SE screen, per the epic's own audit) with a real system sheet -- inset-grouped `Form`
+/// sections instead of hand-rolled rows, a real `Picker` for the single-select date range, and
+/// the tag search field hidden entirely when the library has no tags (FAB-319's remainder).
+private struct FilterSheet: View {
     let tags: [String]
     @Binding var selectedTags: Set<String>
     @Binding var datePreset: ArticleListDatePreset
-    let onClose: () -> Void
 
-    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) private var dismiss
     @State private var tagQuery: String = ""
 
     private var filteredTags: [String] {
@@ -850,125 +856,85 @@ private struct FilterPanel: View {
         return tags.filter { $0.localizedCaseInsensitiveContains(q) }
     }
 
+    private var activeFilterCount: Int {
+        selectedTags.count + (datePreset == .any ? 0 : 1)
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            header
-
-            Text(L10n.Home.dateFilterLabel)
-                .font(VersoTypography.UI.caption)
-                .foregroundColor(themeManager.colors.textSecondary)
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.top, VersoSpacing.sm)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            ForEach(ArticleListDatePreset.allCases) { preset in
-                tagRow(title: preset.displayLabel, isSelected: datePreset == preset, isSingleSelect: true) {
-                    datePreset = preset
-                }
-            }
-
-            Rectangle().frame(height: 1).foregroundColor(themeManager.colors.border)
-
-            SearchBar(text: $tagQuery, placeholder: L10n.Home.tagFilterSearchPlaceholder)
-                .padding(.horizontal, VersoSpacing.md)
-                .padding(.top, VersoSpacing.sm)
-                .padding(.bottom, VersoSpacing.sm)
-                .environmentObject(themeManager)
-
-            Rectangle().frame(height: 1).foregroundColor(themeManager.colors.border)
-
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    tagRow(
-                        title: L10n.Home.tagFilterAllTags,
-                        isSelected: selectedTags.isEmpty
-                    ) {
-                        selectedTags.removeAll()
+        NavigationStack {
+            Form {
+                Section(L10n.Home.dateFilterLabel) {
+                    Picker(L10n.Home.dateFilterLabel, selection: $datePreset) {
+                        ForEach(ArticleListDatePreset.allCases) { preset in
+                            Text(preset.displayLabel).tag(preset)
+                        }
                     }
+                    .pickerStyle(.inline)
+                    .labelsHidden()
+                }
 
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(themeManager.colors.border)
-                        .padding(.leading, VersoSpacing.md)
+                // FAB-319: hidden entirely when there are no tags to filter by, rather than
+                // showing a search field above a lone "All tags" row that searches nothing.
+                if !tags.isEmpty {
+                    Section(L10n.Home.tagFilterTitle) {
+                        tagRow(title: L10n.Home.tagFilterAllTags, isSelected: selectedTags.isEmpty) {
+                            selectedTags.removeAll()
+                        }
 
-                    if filteredTags.isEmpty && !tagQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text(L10n.Home.tagFilterNoMatches)
-                            .font(VersoTypography.UI.listSubtitle)
-                            .foregroundColor(themeManager.colors.textSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, VersoSpacing.md)
-                            .padding(.vertical, VersoSpacing.md)
-                    } else {
-                        ForEach(filteredTags, id: \.self) { tag in
-                            tagRow(
-                                title: tag,
-                                isSelected: selectedTags.contains(tag)
-                            ) {
-                                if selectedTags.contains(tag) {
-                                    selectedTags.remove(tag)
-                                } else {
-                                    selectedTags.insert(tag)
+                        if filteredTags.isEmpty && !tagQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Text(L10n.Home.tagFilterNoMatches)
+                                .foregroundColor(.secondary)
+                        } else {
+                            ForEach(filteredTags, id: \.self) { tag in
+                                tagRow(title: tag, isSelected: selectedTags.contains(tag)) {
+                                    if selectedTags.contains(tag) {
+                                        selectedTags.remove(tag)
+                                    } else {
+                                        selectedTags.insert(tag)
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        .frame(width: 320)
-        .frame(maxHeight: .infinity)
-        .background(themeManager.colors.surface.ignoresSafeArea())
-    }
-
-    private var header: some View {
-        HStack {
-            Text(L10n.Home.filterPanelTitle)
-                .font(VersoTypography.UI.screenTitle)
-                .foregroundColor(themeManager.colors.textPrimary)
-            Spacer()
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(themeManager.colors.textSecondary)
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(L10n.Home.tagFilterCloseAccessibilityLabel)
-        }
-        .padding(.leading, VersoSpacing.md)
-        .padding(.trailing, VersoSpacing.xs)
-        .padding(.top, VersoSpacing.md)
-    }
-
-    /// FAB-322: date presets and tags previously shared this exact row, differing only in
-    /// which one happened to have a checkmark on it -- despite being different selection
-    /// models (dates are single-select, tags are multi-select). `isSingleSelect` swaps the
-    /// checkmark (appears only when selected, the standard multi-select affordance) for a
-    /// radio-style indicator that's always visible (outline when unselected, filled when
-    /// selected) -- the standard iOS cue that exactly one option is always chosen.
-    private func tagRow(title: String, isSelected: Bool, isSingleSelect: Bool = false, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: VersoSpacing.sm) {
-                Text(title)
-                    .font(VersoTypography.UI.listTitle)
-                    .foregroundColor(themeManager.colors.textPrimary)
-                    .lineLimit(1)
-                Spacer(minLength: VersoSpacing.sm)
-                if isSingleSelect {
-                    Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(isSelected ? themeManager.colors.accent : themeManager.colors.textSecondary)
-                } else if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(themeManager.colors.accent)
+            .navigationTitle(L10n.Home.filterPanelTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .searchable(
+                text: $tagQuery,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: L10n.Home.tagFilterSearchPlaceholder
+            )
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(L10n.Home.emptyNoResultsCta) {
+                        selectedTags.removeAll()
+                        datePreset = .any
+                    }
+                    .disabled(activeFilterCount == 0)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(L10n.Import.doneDoneButton) { dismiss() }
                 }
             }
-            .padding(.horizontal, VersoSpacing.md)
-            .frame(minHeight: 44)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+    }
+
+    /// FAB-322: date presets and tags previously shared one hand-rolled row differing only in
+    /// checkmark style -- dates are now a real `Picker` above, which draws its own radio-style
+    /// selection for free. This row stays for tags, which are multi-select and so still need an
+    /// explicit checkmark rather than a `Picker`'s single-selection model.
+    private func tagRow(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Text(title)
+                    .foregroundColor(.primary)
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.accentColor)
+                }
+            }
+        }
     }
 }
