@@ -1,6 +1,6 @@
 # Verso — Project Status
 
-**Version:** — | **Date:** 2026-09-01 | **Status:** Active
+**Version:** — | **Date:** 2026-09-14 | **Status:** Active
 
 (No document version of its own — status reporting doc, updated in place. See [PRD_MinimalistReaderApp.md](PRD_MinimalistReaderApp.md) for the PRD's own version, currently 1.7.)
 
@@ -18,7 +18,7 @@ Verso is a minimalist, open-source article reader with iOS and web platforms. Ar
 
 | Platform | Status |
 |----------|--------|
-| **iOS** (SwiftUI, iOS 16+) | Implementation underway |
+| **iOS** (SwiftUI, iOS 26.0+) | Implementation underway — native-shell epic (FAB-334) in its last phase before launch |
 | **Web** (Next.js 16 + TypeScript + Tailwind) | Phases 1–3 complete ✅; Phase 4+ in backlog |
 
 ---
@@ -56,7 +56,8 @@ The design system and all screen designs are **complete**. Implementation is act
 
 Remaining iOS work is tracked in **`docs/BACKLOG.md`** (the issue tracker of record). Non-iPad work is sequenced into three phases as of 2026-08-24 (see BACKLOG.md's "Current sequencing" note for full detail):
 
-- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) closed 2026-08-26: a real-file smoke test surfaced a second bug (native-array imports always landed as `.unread`), fixed and reverified against Fabio's real export (86 read / 395 unread, matching the source data) — see `docs/DONE.md`. FAB-150 (App Store release checklist): signing, privacy manifest, the CI release path, and Store & compliance metadata (subtitle, description, keywords, screenshots, privacy nutrition labels, age rating, App Review notes) are all done — Fabio reviewed and entered everything into App Store Connect 2026-08-25, see `docs/APP_STORE_LISTING.md`. Only the final binary submission itself remains.
+- **Native shell (FAB-334) — in progress, gates the launch.** Decided 2026-09-12: the native iOS shell (system navigation, `.searchable`, `Form`/`List` styling, Liquid Glass chrome; the reading view is untouched) is built *before* the first submission, not as a 1.1 fast-follow. Deployment target raised from iOS 16 to **iOS 26.0**; `MARKETING_VERSION` stays `1.0`. Phases 0–6 are done and merged (material spike, deployment target, onboarding cut to Welcome + Folder (FAB-348), Settings as `Form`, navigation shell, search and filters, list and select mode — FAB-319 and FAB-320 closed along the way). **Phase 7 (sweep and verify) is the last one**, followed by the welcome article (FAB-338, seeded at folder-pick time). Detail: `docs/BACKLOG.md` (FAB-334) and `docs/plans/FAB-334-1.1-native-shell-plan.md`.
+- **Phase A (in progress) — ship this release.** FAB-163 (duplicate detection) verified complete and closed 2026-08-24. FAB-164 (GoodLinks import) closed 2026-08-26: a real-file smoke test surfaced a second bug (native-array imports always landed as `.unread`), fixed and reverified against Fabio's real export (86 read / 395 unread, matching the source data) — see `docs/DONE.md`. FAB-150 (App Store release checklist): signing, privacy manifest, the CI release path, and Store & compliance metadata (subtitle, description, keywords, screenshots, privacy nutrition labels, age rating, App Review notes) are all done — Fabio reviewed and entered everything into App Store Connect 2026-08-25, see `docs/APP_STORE_LISTING.md`. Only the final binary submission itself remains — it now waits behind the native shell (FAB-334) finishing.
 - **Phase B — localization (FAB-275).** Done 2026-08-25 — all 8 steps complete (see `docs/DONE.md`): FR-CA/PT-BR translated and linguistically QA'd, App Store metadata localized and pasted into App Store Connect, Québec Bill 96 posture decided (risk-accepted, not legally confirmed). FAB-284 (language picker, iOS + Web) also done 2026-08-28 — nothing open in this area.
 - **Phase C (after launch) — polish backlog.** Highlighting (FAB-54) done 2026-09-01, and its follow-up FAB-303 (highlighting v2) done 2026-09-02 — the parent issue's original 5 steps and all 3 named follow-ups (headings/lists/blockquotes joining selectable regions; merging with an existing highlight, same-block only; blockquote's colored accent bar) have all shipped — see `docs/DONE.md`. RSVP reading mode (FAB-277) and VoiceOver progress announcement (FAB-278) still need a UX decision from Fabio before implementation.
 - **Phase 4 (deferred, excluded from this sequencing): iPad support** (FAB-131, FAB-154 → FAB-162).
