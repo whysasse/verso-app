@@ -7,7 +7,7 @@
 Articles are saved as plain Markdown files to a user-selected iCloud Drive folder — no proprietary database, no accounts, no lock-in.
 
 - **Figma:** https://www.figma.com/design/WCPHZNg1my8VSSMbLO5bvX/Reader-UI
-- **Issue Tracker:** see `CLAUDE.md`'s `## Workflow → Issues` for what's authoritative. Historical note kept here only: GitHub Issues on `whysasse/verso-app` was tidied once (see `docs/DONE.md` "Repo Admin") — don't reconcile it against BACKLOG.md again.
+- **Issue Tracker:** see `CLAUDE.md`'s `## Workflow → Issues` — `docs/BACKLOG.md` is authoritative; GitHub Issues on `whysasse/verso-app` is not.
 
 ---
 
@@ -32,7 +32,7 @@ Articles are saved as plain Markdown files to a user-selected iCloud Drive folde
 
 ### iOS
 
-- **Platform:** SwiftUI, iOS 16+
+- **Platform:** SwiftUI, iOS 26+ (deployment target in `Verso/project.yml`)
 - **Bundle ID:** `com.fabiosasseron.verso`
 - **Entry point:** `Verso/Sources/App/VersoApp.swift` → `ContentView.swift`
 - **Navigation:** `NavigationSplitView` (hybrid: collapses to a single stack on iPhone/compact, sidebar + detail side-by-side on iPad/regular); no tab bar; orchestrated by `VersoMainSplitView.swift`
@@ -92,7 +92,7 @@ enum ArticleStatus: String { case unread, reading, read, archived }
 Badge colors are theme-aware as of FAB-325 (2026-09-05) — see `ArticleStatusColors` in `Colors.swift` for the per-theme table, not a fixed hex per status.
 SF Symbols: `circle` · `book.pages` · `checkmark` · `archivebox` (16pt, white, 28×28 badge). (`book.open` is not a real SF Symbol — don't reintroduce it.)
 
-`.archived` is a real, distinct status — filter counts (`FilterChipBar`) and `StatusBadge` must account for it explicitly rather than assuming only 3 cases (FAB-287 was exactly this mistake: the "All" count summed all 4 cases instead of excluding archived).
+`.archived` is a real, distinct status — any per-status count and `StatusBadge` must handle all four cases explicitly rather than assuming three (FAB-287 summed all four into the "All" count instead of excluding archived).
 
 ### Spacing, Radius, Typography, Animation
 
@@ -106,14 +106,14 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 - **WCAG AA:** All text on all 4 themes
 - **Dynamic Type:** Reading view supports 6 body sizes
 - **Reduce Motion:** Suppress auto-hide animations; instant show/hide only
-- **Portrait only:** iOS 16+ minimum
+- **Portrait only:** iPhone and iPad (`UISupportedInterfaceOrientations` in `Verso/project.yml`)
 - **Token parity (Web):** `globals.css` custom properties must stay in sync with `docs/DESIGN_TOKENS.md`
 
 ---
 
 ## SwiftUI Gotchas
 
-- **`#Preview` wrappers:** `@Previewable @State` doesn't compile on iOS 16. Wrap in a `private struct`.
+- **`#Preview` wrappers:** wrap `@State` in a `private struct`, as existing previews do.
 - **`NavigationStack` layout:** `ScrollView` must be direct child. Wrapping in `VStack` clips first element.
 - **Background + safe area:** Use `.background(color)` on content, not root view.
 - **Toolbar button style:** `.buttonStyle(.plain)` + `.tint(.clear)` needed to remove bubble background on iOS 16+.
@@ -126,8 +126,10 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 
 | Package | Source | Purpose |
 |---------|--------|---------|
-| SwiftSoup ≥2.7.6 | github.com/scinfu/SwiftSoup | HTML parsing |
-| TelemetryClient ≥2.0.0 | TelemetryDeck/SwiftClient | Analytics |
+| SwiftSoup | github.com/scinfu/SwiftSoup | HTML parsing |
+| TelemetryClient | TelemetryDeck/SwiftClient | Analytics |
+
+Minimum versions are declared in `Verso/project.yml`.
 
 **Analytics App ID:** `AF772698-A152-4DBF-AEAA-B49EFDC7BF8C`
 
@@ -135,23 +137,16 @@ See `Verso/Sources/Design/` for exact values and `docs/DESIGN_TOKENS.md` for hex
 
 ## Documentation Rules
 
-See `CLAUDE.md`'s `## Workflow → Documentation` for the actual rules
-(where docs live, header format, archiving, naming, folder layout). Moved
-there 2026-09-12 so a session doing docs/backlog work sees them
-unconditionally, instead of only when this file happens to get opened —
-see `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §G1 for why that mattered.
-
-One rule that stays here, since it's about code-and-doc pairing rather
-than doc mechanics: **when code changes invalidate a doc, update the doc
-in the same PR** — especially HANDOFF's services/screens tables and
-DESIGN_TOKENS ↔ globals.css parity.
+The documentation rules (where docs live, header format, archiving,
+naming) are in `CLAUDE.md`'s `## Workflow → Documentation`. One rule stays
+here because it pairs code with docs: **when code changes invalidate a
+doc, update the doc in the same PR** — especially HANDOFF's
+services/screens tables and DESIGN_TOKENS ↔ globals.css parity.
 
 ---
 
 ## Docs Reference
 
-Don't duplicate this table — `docs/HANDOFF.md`'s own "Doc Map" section is
-the single, actively-maintained index of which file to read for which
-domain. (This used to be a second copy of it here, with paths that had
-drifted wrong — see `docs/DOC_DRIFT_AUDIT_2026-09-12.md` §B4.)
+`docs/HANDOFF.md`'s "Doc Map" is the single index of which file to read
+for which domain; don't copy it here.
 
